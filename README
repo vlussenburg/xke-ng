@@ -1,0 +1,16 @@
+Welcome to the XKE-NG project.
+
+This project is a study on the use of Android and REST services from a more
+architectural point of view. But it is also meant for gaining knowledge in the
+Android API and REST services in an enterprise way.
+
+Basically it consists of the following components:
+- Android front-end to browse through conference talks
+- REST services to manage talks
+
+Database structure is not yet determined.
+
+
+
+Info:
+Michael van Leeuwen [mvanleeuwen@xebia.com]
