@@ -8,8 +8,19 @@ Basically it consists of the following components:
 - Android front-end to browse through conference talks
 - REST services to manage talks
 
-Database structure is not yet determined.
 
+There are three projects:
+
+  1. XCoSS (Xebia Conference Scheduling System)
+  2. aXCV (Xebia Conference Viewer for Android)
+  3. iXCV (Xebia Conference Viewer for iPhone/iPad)
+
+XCoSS is the server component with a web interface and REST services,
+      based on XML and/or JSON.
+
+aXCV  is the Android 2+ client for viewing and editing conference sessions.
+
+iXCV  is currently not active, but will do the same as aXCV.
 
 
 Info:
