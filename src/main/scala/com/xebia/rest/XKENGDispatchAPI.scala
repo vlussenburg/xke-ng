@@ -8,24 +8,42 @@ import net.liftweb.json.ext.JodaTimeSerializers
 
 import collection.mutable.{ListBuffer => MList}
 import net.liftweb.json._
+import net.liftweb.json.JsonDSL._
 
 object XKENGDispatchAPI extends RestHelper with Logger {
   serve {
+    case Req("xkeng" :: "sessions" :: Nil, _, GetRequest) =>
+      handleReadAll
     case Req("xkeng" :: "session" :: sessionId :: Nil, _, GetRequest) =>
-    Full(JsonResponse(Conversion.toJson(XKESessionRepo.findById(sessionId))))
+      handleRead(sessionId)
     case req @ Req("xkeng" :: "session" :: sessionId :: Nil, _, PutRequest) =>
       handleUpdate(req.body.toOption, sessionId)
     case req @ Req("xkeng" :: "session" :: Nil, _, PostRequest) =>
       handleCreate(req.body.toOption)
-    case Req("xkeng" :: "session" :: sessionId :: Nil, _, DeleteRequest)
-    => <b>Static</b>
+    case Req("xkeng" :: "session" :: sessionId :: Nil, _, DeleteRequest) =>
+      handleDelete(sessionId)
   }
 
-  def handleCreate(jsonBody:Option[Array[Byte]]):Box[LiftResponse] = {
+  private def handleReadAll():Box[LiftResponse] = {
+     val res = ("xkesessions" -> XKESessionRepo.findAll.map(s => Conversion.toJson(Some(s))))
+     Full(JsonResponse(res))
+  }
+
+  private def handleRead(sessionId:String):Box[LiftResponse] = {
+    Full(JsonResponse(Conversion.toJson(XKESessionRepo.findById(sessionId))))
+  }
+
+  private def handleDelete(sessionId:String):Box[LiftResponse] = {
+    XKESessionRepo.delete(sessionId)
+    Full(OkResponse())
+  }
+
+
+  private def handleCreate(jsonBody:Option[Array[Byte]]):Box[LiftResponse] = {
     handleXKESession(jsonBody)(_.copy(id = ""))
   }
 
-  def handleUpdate(jsonBody:Option[Array[Byte]], sessionId:String):Box[LiftResponse]  = {
+  private def handleUpdate(jsonBody:Option[Array[Byte]], sessionId:String):Box[LiftResponse]  = {
      XKESessionRepo.findById(sessionId) match {
        case Some(xkeSession) =>  handleXKESession(jsonBody)(_.copy(id = sessionId))
        case _ => Full(BadResponse())
@@ -78,10 +96,21 @@ object XKESessionRepo extends Logger {
 
   def findById(id: String): Option[XKESession] = xkeSessions.find(_.id == id)
 
+  def findAll:List[XKESession] = xkeSessions.toList
+
+  def delete(sessionId:String) = {
+    findById(sessionId) match {
+      case Some(found) => {
+        debug("Delete " + found)
+        (xkeSessions - found)
+      }
+    }
+  }
+
   def saveOrUpdate(s: XKESession): XKESession = {
     findById(s.id) match {
       case Some(found) => {
-        debug("Found " + found)
+        debug("Update " + found)
         (xkeSessions - found) += s
         s
       }
