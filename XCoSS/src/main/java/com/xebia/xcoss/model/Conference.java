@@ -19,13 +19,28 @@ public class Conference {
     @GeneratedValue
     private Integer id;
 
+    @Column(name="date")
     private Date date;
 
+    /**
+     * The description holds the information regarding the
+     * type of Conference in free format (XKE, MUD, etc.)
+     */
+    private String description;
+    
     public Date getDate() {
 		return date;
 	}
     
     public void setDate(Date date) {
 		this.date = date;
+	}
+    
+    public String getDescription() {
+		return description;
+	}
+    
+    public void setDescription(String description) {
+		this.description = description;
 	}
 }

@@ -14,7 +14,7 @@ public class DateParser {
 			.asList(new String[] { "d-M-yyyy", "d-MMM-yyyy", "dMyyyy", "dMyy", "dd-MM-yyyy", "ddMMyyyy", "ddMMyy",
 					"ddMM", "dd/MM", "yyyy", "MMyyyy", "MM-yyyy", "MM-yy" });
 
-	public static Date parseDate(String dateValue) throws ParseException {
+	public static DateRange parseDate(String dateValue) throws ParseException {
 
 		if (dateValue == null) {
 			throw new IllegalArgumentException("dateValue is null");
@@ -35,7 +35,8 @@ public class DateParser {
 				dateParser.applyPattern(format);
 			}
 			try {
-				return dateParser.parse(dateValue);
+				Date date = dateParser.parse(dateValue);
+				return new DateRange(date, format);
 			}
 			catch (ParseException pe) {
 			}
