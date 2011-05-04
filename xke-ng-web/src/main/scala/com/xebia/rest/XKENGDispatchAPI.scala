@@ -57,6 +57,7 @@ object XKENGDispatchAPI extends RestHelper with Logger {
       debug("handleXKESession - Body is " + bodyStr)
       val  xkeSession = Conversion.fromJson(bodyStr)
       val result = doWithXKESession(xkeSession)
+
       Full(JsonResponse(Conversion.toJson(Some(XKESessionRepo.saveOrUpdate(result)))))
       }
     case _ => Full(BadResponse())
@@ -74,7 +75,7 @@ object Conversion {
 
   def toJson(s: Option[XKESession]): JValue = {
     s match {
-      case Some(s) => Serialization.write(s)
+      case Some(s) => parse(Serialization.write(s))
       case _ => JNull
     }
   }
