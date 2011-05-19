@@ -35,7 +35,8 @@
 
   - Voer uit: 
     create database xcoss default character set utf8 default collate utf8_general_ci;
-	grant all privilegest on xcoss.* to xcoss@'localhost';
+	create user 'xcoss'@'localhost';
+	grant all privileges on xcoss.* to xcoss@'localhost';
 	set password for xcoss@'localhost' = old_password('xcoss');
 
 
