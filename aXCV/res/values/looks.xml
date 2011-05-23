@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color
+		name="textcolor_company">#663E71</color>
+	<dimen
+		name="textsize_company">22px</dimen>
+	<color
+		name="textcolor_title">#FFFFFF</color>
+	<color
+		name="textcolor_copyright">#FFFFFF</color>
+	<color
+		name="background_copyright">#A0663E71</color>
+	<dimen
+		name="textsize_title">15px</dimen>
+</resources>

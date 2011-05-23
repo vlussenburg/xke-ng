@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:background="@android:color/black"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<ImageView
+		android:layout_width="wrap_content"
+		android:id="@+id/imgConference"
+		android:layout_height="wrap_content"
+		android:src="@drawable/conference"
+		android:layout_gravity="center"
+		android:layout_marginTop="10dip"></ImageView>
+	<TextView
+		android:id="@+id/txtConference"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textColor="@color/textcolor_title"
+		android:textSize="@dimen/textsize_title"
+		android:text="@string/splash_conference"
+		android:layout_gravity="center"
+		android:layout_marginTop="3dip"></TextView>
+	<TextView
+		android:id="@+id/txtCompany"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textColor="@color/textcolor_company"
+		android:textSize="@dimen/textsize_company"
+		android:text="@string/splash_company"
+		android:textStyle="bold"
+		android:layout_gravity="center"
+		android:layout_marginTop="15dip"></TextView>
+	<ImageView
+		android:id="@+id/imgLoading_start"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@drawable/loading1"
+		android:layout_gravity="center"></ImageView>
+	<RelativeLayout
+		android:layout_width="fill_parent"
+		android:id="@+id/relativeLayout1"
+		android:layout_height="fill_parent" android:gravity="center|bottom">
+		<TextView
+			android:text="@string/splash_copyright"
+			android:textColor="@color/textcolor_copyright"
+			android:background="@color/background_copyright"
+			android:layout_height="wrap_content"
+			android:id="@+id/copyright"
+			android:layout_width="wrap_content" 
+			android:layout_marginBottom="10dip"
+			android:paddingTop="5px"
+			android:paddingRight="5px"
+			android:paddingLeft="5px"
+			android:paddingBottom="5px"
+
+></TextView>
+	</RelativeLayout>
+</LinearLayout>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ConferenceViewer</string>
+    <string name="splash_conference">Xebia Knowledge Exchange</string>
+    <string name="splash_company">Xebia</string>
+    <string name="splash_version">Version %s</string>
+    <string name="splash_copyright">Copyright (c) 2011 Xebia B.V.</string>
+    <string name="splash_copyright2">Copyright (c) 2011 Xebia B.V. All rights reserved.</string>
+
+    <string name="menu_settings">Preferences</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_overview">Conferences</string>
+    <string name="menu_add">Add</string>
+
+    <string name="password_set">Password stored</string>
+    <string name="password_unset">No password specified</string>
+    
+</resources>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory
+		android:title="Account">
+		<com.xebia.xcoss.axcv.preference.EditTextPreference
+			android:dialogTitle="Enter username"
+			android:dialogMessage="Specify your account name"
+			android:key="Username"
+			android:title="Username"
+			android:summary="(not specified)"
+			android:defaultValue="account" />
+		<com.xebia.xcoss.axcv.preference.EditPasswordPreference
+			android:dialogTitle="Enter password"
+			android:dialogMessage="This password is stored encrypted"
+			android:key="Password"
+			android:title="Password"
+			android:summary="None set" />
+		<CheckBoxPreference
+			android:dependency="Username"
+			android:key="StorePassword"
+			android:title="Store Password"
+			android:defaultValue="true"
+			android:summary="Save the password encrypted on the device" />
+<!--
+		<ListPreference
+			android:title="List Preference"
+			android:summary="This preference allows to select an item in an array"
+			android:dependency="Main_Option"
+			android:key="listPref"
+			android:defaultValue="1"
+			android:entries="@array/colors"
+			android:entryValues="@array/colors_values" />
+  -->
+  	</PreferenceCategory>
+	<PreferenceCategory
+		android:title="Preferences">
+		<RingtonePreference
+			android:ringtoneType="notification"
+			android:key="NotificationSound"
+			android:title="Notification sound"
+			android:showDefault="true"
+			android:showSilent="true"
+			android:summary="(no sound selected)"
+		/>
+		<CheckBoxPreference
+			android:key="NotifyOwned"
+			android:title="My presentations"
+			android:defaultValue="false"
+			android:summaryOff="Do not notify me if someone modifies my presentation"
+			android:summaryOn="Notify me if someone modifies my presentation" />
+		<CheckBoxPreference
+			android:key="NotifyTrack"
+			android:title="My track"
+			android:defaultValue="false"
+			android:summaryOff="Do notify me if my selected track changes"
+			android:summaryOn="Notify me if my selected track changes" />
+	</PreferenceCategory>
+	<PreferenceCategory android:title="About">
+		<Preference
+			android:key="ApplicationName"
+			android:title="XCoSS"/>
+		<Preference
+			android:key="ApplicationVersion"
+			android:title="Version"
+			android:summary="0.1"/>
+		<Preference
+			android:key="ApplicationHelp"
+			android:title="Show tutorial"
+			android:summary="Online tutorial on xebia.com"/>
+	</PreferenceCategory>
+</PreferenceScreen>
