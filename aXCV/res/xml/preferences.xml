@@ -22,26 +22,40 @@
 			android:title="Store Password"
 			android:defaultValue="true"
 			android:summary="Save the password encrypted on the device" />
-<!--
-		<ListPreference
-			android:title="List Preference"
-			android:summary="This preference allows to select an item in an array"
-			android:dependency="Main_Option"
-			android:key="listPref"
-			android:defaultValue="1"
-			android:entries="@array/colors"
-			android:entryValues="@array/colors_values" />
-  -->
   	</PreferenceCategory>
 	<PreferenceCategory
 		android:title="Preferences">
+		<CheckBoxPreference
+			android:key="Upcoming"
+			android:title="Open conference"
+			android:defaultValue="true"
+			android:summaryOff="Show the list of conferences this year"
+			android:summaryOn="Directly open the upcoming conference" />
+		<CheckBoxPreference
+			android:key="ListView"
+			android:title="Show listing"
+			android:defaultValue="false"
+			android:summaryOff="Use slide view"
+			android:summaryOn="Show sessions as schedule" />
+<!--
+		<ListPreference
+			android:title="Date format"
+			android:summary="Specifies the format of dates"
+			android:key="DateFormat"
+			android:defaultValue="1"
+			android:entries="@array/dates"
+			android:entryValues="@array/dates" />
+  -->
+	</PreferenceCategory>
+	<PreferenceCategory
+		android:title="Notification">
 		<RingtonePreference
 			android:ringtoneType="notification"
 			android:key="NotificationSound"
 			android:title="Notification sound"
 			android:showDefault="true"
 			android:showSilent="true"
-			android:summary="(no sound selected)"
+			android:summary="Sound used for notification"
 		/>
 		<CheckBoxPreference
 			android:key="NotifyOwned"

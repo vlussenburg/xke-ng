@@ -1,11 +1,10 @@
 package com.xebia.xcoss.axcv.preference;
 
-import com.xebia.xcoss.axcv.util.SecurityUtils;
-import com.xebia.xcoss.axcv.util.XCS;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
+
+import com.xebia.xcoss.axcv.util.XCS;
 
 public class EditTextPreference extends android.preference.EditTextPreference {
 
@@ -24,7 +23,7 @@ public class EditTextPreference extends android.preference.EditTextPreference {
 	@Override
 	public void setText(String text) {
 		super.setText(text);
-		Log.i(XCS.PROPERTIES, "Setting text to '"+text+"'");
+		Log.i(XCS.LOG.PROPERTIES, "Setting text to '"+text+"'");
 		setSummary(text);
 	}
 }

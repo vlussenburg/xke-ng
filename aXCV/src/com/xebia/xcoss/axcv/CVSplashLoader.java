@@ -1,38 +1,76 @@
 package com.xebia.xcoss.axcv;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.Window;
+import android.preference.PreferenceManager;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 
-public class CVSplashLoader extends XebiaConferenceActivity {
+import com.xebia.xcoss.axcv.util.XCS;
+
+public class CVSplashLoader extends Activity {
+
+	private boolean loaded = false;
+
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		setContentView(R.layout.loader);
+
+		ProgressDialog dialog = ProgressDialog.show(CVSplashLoader.this, "", "Loading. Please wait...", true);
+
+		// Do the loading stuff
+
+		loaded = true;
+		dialog.dismiss();
+		showHomeScreen();
+	}
+
+	private void showHomeScreen() {
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean jump = sp.getBoolean(XCS.PREF.JUMPTOFIRST, false);
+
+		if (jump) {
+			startActivity(new Intent(this, CVSettings.class));
+		} else {
+			startActivity(new Intent(this, CVConferences.class));
+		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+
+		MenuItem miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
+		miSettings.setIcon(R.drawable.menu_add);
+
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		super.onOptionsItemSelected(item);
+
+		switch (item.getItemId()) {
+			case XCS.MENU.SETTINGS:
+				startActivity(new Intent(this, CVSettings.class));
+			break;
+		}
+		return true;
+	}
 	
-	private int count = 0;
-	
-    /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
-//        requestWindowFeature(Window.FEATURE_PROGRESS);
-        setContentView(R.layout.loader);
-        
-        // https://github.com/commonsguy/cw-andtutorials/blob/master/08-Threads/LunchList/src/apt/tutorial/LunchList.java
-        /*
-        RotateAnimation anim = new RotateAnimation(0f, 350f, 15f, 15f);
-        anim.setInterpolator(new LinearInterpolator());
-        anim.setRepeatCount(Animation.INFINITE);
-        anim.setDuration(700);
-
-        // Start animating the image
-        final ImageView splash = (ImageView) findViewById(R.id.splash);
-        splash.startAnimation(anim);
-
-        // Later.. stop the animation
-        splash.setAnimation(null);
-        clearAnimation()
-        */
-//        setProgressBarVisibility(true);
-//        setProgress(count++);
-//        setProgressBarVisibility(false);
-//        enableMenu(true);
-    }
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		if ( loaded && event.getAction() == MotionEvent.ACTION_UP ) {
+			showHomeScreen();
+			return true;
+		}
+		return super.onTouchEvent(event);
+	}
 }

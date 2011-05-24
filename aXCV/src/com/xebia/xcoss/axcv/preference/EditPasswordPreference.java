@@ -1,12 +1,12 @@
 package com.xebia.xcoss.axcv.preference;
 
-import com.xebia.xcoss.axcv.R;
-import com.xebia.xcoss.axcv.util.SecurityUtils;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.preference.EditTextPreference;
 import android.util.AttributeSet;
+
+import com.xebia.xcoss.axcv.R;
+import com.xebia.xcoss.axcv.util.SecurityUtils;
 
 public class EditPasswordPreference extends EditTextPreference {
 

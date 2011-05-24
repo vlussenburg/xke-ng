@@ -26,20 +26,18 @@ public class SecurityUtils {
 			0x5e, 0x0c, 0x0d, 0x15, 0x16, 0x33, 0x17, 0x12, 0x5D, 0x14, 0x0e, 0x0f, 0x10, 0x11 };
 
 	public static String encrypt(String cleartext) {
-		Log.i(XCS.SECURITY, "Encrypting '"+cleartext+"'");
 		try {
 			byte[] rawKey = getRawKey(seed);
 			byte[] result = encrypt(rawKey, cleartext.getBytes());
 			return toHex(result);
 		}
 		catch (Exception e) {
-			Log.e(XCS.SECURITY, "Encrypt failure: " + e.toString());
+			Log.e(XCS.LOG.SECURITY, "Encrypt failure: " + e.toString());
 			return null;
 		}
 	}
 
 	public static String decrypt(String encrypted) {
-		Log.i(XCS.SECURITY, "Decrypting '"+encrypted+"'");
 		try {
 			byte[] rawKey = getRawKey(seed);
 			byte[] enc = toByte(encrypted);
@@ -47,7 +45,7 @@ public class SecurityUtils {
 			return new String(result);
 		}
 		catch (Exception e) {
-			Log.e(XCS.SECURITY, "Decrypt failure: " + e.toString());
+			Log.e(XCS.LOG.SECURITY, "Decrypt failure: " + e.toString());
 			return null;
 		}
 	}
