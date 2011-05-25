@@ -29,18 +29,7 @@ public class CVSplashLoader extends Activity {
 
 		loaded = true;
 		dialog.dismiss();
-		showHomeScreen();
-	}
-
-	private void showHomeScreen() {
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean jump = sp.getBoolean(XCS.PREF.JUMPTOFIRST, false);
-
-		if (jump) {
-			startActivity(new Intent(this, CVSettings.class));
-		} else {
-			startActivity(new Intent(this, CVConferences.class));
-		}
+		startActivity(new Intent(this, CVConferences.class));
 	}
 
 	@Override
@@ -68,7 +57,7 @@ public class CVSplashLoader extends Activity {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if ( loaded && event.getAction() == MotionEvent.ACTION_UP ) {
-			showHomeScreen();
+			startActivity(new Intent(this, CVConferences.class));
 			return true;
 		}
 		return super.onTouchEvent(event);

@@ -2,7 +2,6 @@ package com.xebia.xcoss.axcv.ui;
 
 import android.app.Activity;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,20 +10,19 @@ import android.widget.TextView;
 
 import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Conference;
-import com.xebia.xcoss.axcv.util.XCS;
 
 public class ConferenceAdapter extends BaseAdapter {
 
 	private Activity ctx;
 	private int viewResource;
 	private Conference[] data;
-	private ConferenceTime timeFormatter;
+	private ScreenTimeUtil timeFormatter;
 
 	public ConferenceAdapter(Activity context, int viewResourceId, Conference[] conferences) {
 		this.ctx = context;
 		this.viewResource = viewResourceId;
 		this.data = conferences;
-		this.timeFormatter = new ConferenceTime(ctx);
+		this.timeFormatter = new ScreenTimeUtil(ctx);
 	}
 
 	@Override

@@ -1,11 +1,11 @@
 package com.xebia.xcoss.axcv.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
-import android.location.Location;
 
-public class Conference {
+public class Conference implements Serializable {
 
 	private String title = "Not specified";
 	private Date date = new Date();
@@ -54,6 +54,11 @@ public class Conference {
 
 	public int getSessionsPerLocation() {
 		return sessionsPerLocation;
+	}
+
+	public void addSession(Session session) {
+		sessions.add(session);
+		session.setDate(date);
 	}
 
 	@Override

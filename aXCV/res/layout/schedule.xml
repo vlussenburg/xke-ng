@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:background="@android:color/black"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<RelativeLayout
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:id="@+id/relativeLayout1">
+		<ImageButton
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:src="@drawable/ic_btn_back"
+			android:id="@+id/imageButton1"
+			android:layout_alignParentLeft="true"></ImageButton>
+		<TextView
+			android:layout_height="fill_parent"
+			android:layout_width="wrap_content"
+			android:id="@+id/conferenceTitle"
+			android:text="Schedule"
+			android:layout_alignWithParentIfMissing="true"
+			android:gravity="center_vertical"
+			android:layout_toRightOf="@+id/imageButton1"
+			android:layout_alignTop="@+id/imageButton1"
+			android:layout_alignBottom="@+id/imageButton1"
+			android:textSize="@dimen/textsize_title"></TextView>
+		<ImageButton
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/ic_btn_next"
+			android:id="@+id/imageButton5"
+			android:layout_toLeftOf="@+id/imageButton4"
+			android:layout_alignTop="@+id/imageButton4"
+			android:layout_alignBottom="@+id/imageButton4"></ImageButton>
+		<ImageButton
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/ic_btn_next"
+			android:id="@+id/imageButton4"
+			android:layout_alignParentRight="true"></ImageButton>
+	</RelativeLayout>
+	<View
+		android:id="@+id/firstDivider"
+		android:layout_height="2dp"
+		android:layout_width="fill_parent"
+		android:background="@color/linebreak" />
+	<FrameLayout
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:id="@+id/frameLayout1">
+		<TextView
+			android:layout_gravity="center"
+			android:layout_width="wrap_content"
+			android:text="23 mei 1999"
+			android:layout_height="wrap_content"
+			android:id="@+id/conferenceDate"></TextView>
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/textView1"
+			android:layout_gravity="right"
+			android:text="Right" android:paddingRight="3dp"></TextView>
+		<TextView
+			android:id="@+id/textView2"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Left" android:layout_gravity="left" android:paddingLeft="3dp"></TextView>
+	</FrameLayout>
+	<View
+		android:id="@+id/secondDivider"
+		android:layout_height="2dp"
+		android:layout_width="fill_parent"
+		android:background="@color/linebreak" />
+	<ListView
+		android:id="@+id/sessionList"
+		android:layout_height="fill_parent"
+		android:layout_width="fill_parent"></ListView>
+</LinearLayout>

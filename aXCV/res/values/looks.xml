@@ -11,9 +11,9 @@
 
 	<color name="linebreak">#663E71</color>
 
-	<dimen name="textsize_company">40dp</dimen>
-	<dimen name="textsize_title">22dp</dimen>
-	<dimen name="ts_itemtitle">20dp</dimen>
-	<dimen name="ts_itemwhen">18dp</dimen>
-	<dimen name="ts_itemdetail">16dp</dimen>
+	<dimen name="textsize_company">40sp</dimen>
+	<dimen name="textsize_title">22sp</dimen>
+	<dimen name="ts_itemtitle">20sp</dimen>
+	<dimen name="ts_itemwhen">18sp</dimen>
+	<dimen name="ts_itemdetail">16sp</dimen>
 </resources>
