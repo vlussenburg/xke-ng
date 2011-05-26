@@ -42,6 +42,7 @@ public abstract class BaseActivity extends Activity {
 			case XCS.MENU.ADD:
 				break;
 			case XCS.MENU.OVERVIEW:
+				startActivity(new Intent(this, CVConferences.class));
 				break;
 			case XCS.MENU.SEARCH:
 				break;

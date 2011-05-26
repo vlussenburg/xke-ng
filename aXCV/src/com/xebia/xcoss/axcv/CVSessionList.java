@@ -60,9 +60,4 @@ public class CVSessionList extends BaseActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	//
-	// @Override
-	// public void onBackPressed() {
-	// startNextMatchingActivity(new Intent(this, CVConferences.class));
-	// }
 }

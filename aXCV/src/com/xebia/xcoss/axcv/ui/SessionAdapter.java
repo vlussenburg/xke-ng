@@ -31,7 +31,7 @@ public class SessionAdapter extends BaseAdapter {
 
 		Session session = (Session) getItem(paramInt);
 		int colorId = ctx.getResources().getColor(R.color.tc_itemdefault);
-		boolean now = timeUtil.isCurrent(session.getStartTime(), session.getEndTime());
+		boolean now = timeUtil.isNow(session.getStartTime(), session.getEndTime());
 //		if (timeUtil.isHistory(session.getEndDate())) {
 //			colorId = ctx.getResources().getColor(R.color.tc_itemgone);
 //		} else if (now) {
@@ -60,13 +60,24 @@ public class SessionAdapter extends BaseAdapter {
 	}
 
 	private String getLabels(Session session) {
-		// TODO Auto-generated method stub
-		return null;
+		final String divider = ", ";
+		StringBuilder sb = new StringBuilder();
+		for (String label : session.getLabels()) {
+			sb.append(label);
+			sb.append(divider);
+		}
+		return sb.substring(0, sb.length()-divider.length()).toString();
 	}
 
 	private CharSequence getLocationAndDate(Session session) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(session.getLocation().getLocation());
+		sb.append(" | ");
+		sb.append(timeUtil.getAbsoluteTime(session.getStartTime()));
+		sb.append(" - ");
+		sb.append(timeUtil.getAbsoluteTime(session.getEndTime()));
+		return sb.toString();
 	}
 
 	@Override

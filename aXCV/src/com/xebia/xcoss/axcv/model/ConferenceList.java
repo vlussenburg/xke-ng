@@ -4,7 +4,6 @@ import hirondelle.date4j.DateTime;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
@@ -48,14 +47,20 @@ public class ConferenceList {
 			
 			// TODO : Temp
 			Conference conf = new Conference();
-			conf.setDate(new Date(111, 5, 5));
+			conf.setDate(DateTime.forDateOnly(2011, 6, 5));
+			Log.w(LOG.ALL, "Date June 5th = " + conf.getDate());
+			Log.w(LOG.ALL, "Date June 5th = " + conf.getDate().getRawDateString());
 			set.add(conf);
 			
 			Conference conf2 = new Conference();
-			conf2.setDate(new Date(111, 4, 14));
+			conf2.setDate(DateTime.forDateOnly(2011, 5, 14));
+			Log.w(LOG.ALL, "Date May 14th = " + conf2.getDate());
+			Log.w(LOG.ALL, "Date May 14th = " + conf2.getDate().getRawDateString());
 			set.add(conf2);
 			
 			Conference conference = new Conference();
+			Log.w(LOG.ALL, "Date Today = " + conference.getDate());
+			Log.w(LOG.ALL, "Date Today = " + conference.getDate().getRawDateString());
 			Location loc = new Location("Laap");
 			Session session = new Session();
 			session.setLocation(loc);
@@ -74,16 +79,17 @@ public class ConferenceList {
 	}
 
 	public Conference getUpcomingConference() {
-		String year = XCS.YEARFORMAT.format(new Date());
+		DateTime dt = DateTime.today(XCS.TZ);
+		String year = String.valueOf(dt.getYear());
 		Set<Conference> cfs = getConferences(year);
-		DateTime now = DateTime.now(XCS.getTimeZone());
+
 		for (Conference conference : cfs) {
-			DateTime dt = DateTime.forInstant(conference.getDate().getTime(), XCS.getTimeZone());
-			if ( dt.isInThePast(XCS.getTimeZone()) && !now.isSameDayAs(dt)) {
-				Log.w(LOG.ALL, "Conference on " + conference.getDate().toString() + ": In the past" );
+			DateTime cdate = conference.getDate();
+			if ( cdate.isInThePast(XCS.TZ) ) {
+				Log.w(LOG.ALL, "Conference on " + cdate.toString() + ": In the past" );
 				continue;
 			}
-			Log.w(LOG.ALL, "Conference on " + conference.getDate().toString() + ": Ok" );
+			Log.w(LOG.ALL, "Conference on " + cdate.toString() + ": Ok" );
 			// List is sorted on date
 			return conference;
 		}

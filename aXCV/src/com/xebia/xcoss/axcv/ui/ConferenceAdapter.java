@@ -1,5 +1,6 @@
 package com.xebia.xcoss.axcv.ui;
 
+import hirondelle.date4j.DateTime;
 import android.app.Activity;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.util.XCS;
 
 public class ConferenceAdapter extends BaseAdapter {
 
@@ -30,11 +32,10 @@ public class ConferenceAdapter extends BaseAdapter {
 
 		Conference cfr = (Conference) getItem(paramInt);
 		int colorId = ctx.getResources().getColor(R.color.tc_itemdefault);
-		boolean today = timeFormatter.isToday(cfr.getDate());
-
-		if (timeFormatter.isHistory(cfr.getDate())) {
+		DateTime now = DateTime.today(XCS.TZ);
+		if (cfr.getDate().isInThePast(XCS.TZ)) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemgone);
-		} else if (today) {
+		} else if (cfr.getDate().isSameDayAs(now)) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemactive);
 		}
 
@@ -56,7 +57,7 @@ public class ConferenceAdapter extends BaseAdapter {
 		statusView.setTextColor(colorId);
 		dateView.setTextColor(colorId);
 
-		if ( today ) {
+		if ( cfr.getDate().isSameDayAs(now) ) {
 			titleView.setTypeface(titleView.getTypeface(), Typeface.BOLD);
 			whenView.setTypeface(whenView.getTypeface(), Typeface.BOLD);
 		}

@@ -4,40 +4,25 @@ import hirondelle.date4j.DateTime;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class Session implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private String title;
 	private String author;
 	private ArrayList<String> labels;
 	private Location location;
-	private Date date;
+	private DateTime date;
 	private DateTime startTime;
 	private DateTime endTime;
 
-	public Date getDate() {
+	public DateTime getDate() {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(DateTime date) {
 		this.date = date;
-	}
-
-	public DateTime getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(DateTime startTime) {
-		this.startTime = startTime;
-	}
-
-	public DateTime getEndTime() {
-		return endTime;
-	}
-
-	public void setEndTime(DateTime endTime) {
-		this.endTime = endTime;
 	}
 
 	public Session() {
@@ -74,5 +59,21 @@ public class Session implements Serializable {
 
 	public void setLocation(Location location) {
 		this.location = location;
+	}
+
+	public DateTime getStartTime() {
+		return startTime;
+	}
+
+	public DateTime getEndTime() {
+		return endTime;
+	}
+
+	public void setStartTime(DateTime startTime) {
+		this.startTime = startTime;
+	}
+
+	public void setEndTime(DateTime endTime) {
+		this.endTime = endTime;
 	}
 }

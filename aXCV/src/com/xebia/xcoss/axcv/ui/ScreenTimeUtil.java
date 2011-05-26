@@ -4,7 +4,7 @@ package com.xebia.xcoss.axcv.ui;
 import hirondelle.date4j.DateTime;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.TimeZone;
 
 import android.app.Activity;
@@ -15,15 +15,18 @@ import com.xebia.xcoss.axcv.util.XCS;
 
 public class ScreenTimeUtil {
 
-	private SimpleDateFormat formatter;
+	private SimpleDateFormat dateFormat;
+	private SimpleDateFormat timeFormat;
 
 	public ScreenTimeUtil(Activity ctx) {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
-		String format = sp.getString(XCS.PREF.DATEFORMAT, "d MMMM yyyy");
-		this.formatter = new SimpleDateFormat(format);
+		String datePref = sp.getString(XCS.PREF.DATEFORMAT, "d MMMM yyyy");
+		String timePref = sp.getString(XCS.PREF.TIMEFORMAT, "HH:mm'u'");
+		this.dateFormat = new SimpleDateFormat(datePref);
+		this.timeFormat = new SimpleDateFormat(timePref);
 	}
 
-	public String getRelativeDate(Date date) {
+	public String getRelativeDate(DateTime date) {
 		int days = getDayOffset(date);
 		switch (days) {
 			case -7: return "Last week";
@@ -44,34 +47,31 @@ public class ScreenTimeUtil {
 		return "In " + days/7 + " weeks";
 	}
 
-	private int getDayOffset(Date date) {
-		TimeZone tz = XCS.getTimeZone();
-		DateTime dt = DateTime.today(tz);
-		return dt.numDaysFrom(DateTime.forInstant(date.getTime(), tz));
+	private int getDayOffset(DateTime date) {
+		return DateTime.today(XCS.TZ).numDaysFrom(date);
 	}
 
-	public String getAbsoluteDate(Date date) {
-		return formatter.format(date);
+	public String getAbsoluteDate(DateTime date) {
+		Calendar cal = Calendar.getInstance(XCS.TZ);
+		cal.set(Calendar.YEAR, date.getYear());
+		cal.set(Calendar.MONTH, date.getMonth()-1);
+		cal.set(Calendar.DAY_OF_MONTH, date.getDay());
+		return dateFormat.format(cal.getTime());
 	}
 
-	public boolean isHistory(Date date) {
-		return getDayOffset(date) < 0;
-	}
-	
-	public boolean isToday(Date date) {
-		return getDayOffset(date) == 0;
+	public Object getAbsoluteTime(DateTime time) {
+		Calendar cal = Calendar.getInstance(XCS.TZ);
+		cal.set(Calendar.HOUR_OF_DAY, time.getHour());
+		cal.set(Calendar.MINUTE, time.getMinute());
+		return timeFormat.format(cal.getTime());
 	}
 
-	public boolean isCurrent(DateTime start, DateTime end) {
-		if ( end.lt(start) ) {
-			DateTime tmp = start;
-			start = end;
-			end = tmp;
-		}
-		if ( start.isInTheFuture(XCS.getTimeZone()) ) {
+	public boolean isNow(DateTime startTime, DateTime endTime) {
+		DateTime now = DateTime.now(XCS.TZ);
+		if (startTime.hasYearMonthDay() && !startTime.isSameDayAs(now)) {
 			return false;
 		}
-		if ( end.isInTheFuture(XCS.getTimeZone()) ) {
+		if ( startTime.lteq(now) && endTime.gteq(now)) {
 			return true;
 		}
 		return false;

@@ -1,14 +1,19 @@
 package com.xebia.xcoss.axcv.model;
 
+import hirondelle.date4j.DateTime;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
+
+import com.xebia.xcoss.axcv.util.XCS;
 
 
 public class Conference implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	private String title = "Not specified";
-	private Date date = new Date();
+	private DateTime date = DateTime.today(XCS.TZ);
 
 	private ArrayList<Session> sessions;
 	private ArrayList<Location> locations;
@@ -36,7 +41,7 @@ public class Conference implements Serializable {
 		return title;
 	}
 
-	public Date getDate() {
+	public DateTime getDate() {
 		return date;
 	}
 
@@ -44,7 +49,7 @@ public class Conference implements Serializable {
 		this.title = title;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(DateTime date) {
 		this.date = date;
 	}
 

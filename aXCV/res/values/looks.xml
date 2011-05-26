@@ -5,7 +5,7 @@
 	<color name="textcolor_copyright">#FFFFFF</color>
 	<color name="background_copyright">#A0663E71</color>
 
-	<color name="tc_itemactive">#AAAAFF</color>
+	<color name="tc_itemactive">#0000FF</color>
 	<color name="tc_itemgone">#AAAAAA</color>
 	<color name="tc_itemdefault">#FFFFFF</color>
 

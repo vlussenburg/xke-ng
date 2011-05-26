@@ -1,24 +1,22 @@
 package com.xebia.xcoss.axcv;
 
-import java.util.Date;
-
+import hirondelle.date4j.DateTime;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.ConferenceList;
 import com.xebia.xcoss.axcv.ui.ConferenceAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
-import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class CVConferences extends BaseActivity {
 
@@ -28,7 +26,8 @@ public class CVConferences extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.conferences);
 		
-		String year = XCS.YEARFORMAT.format(new Date());
+		DateTime dt = DateTime.today(XCS.TZ);
+		String year = String.valueOf(dt.getYear());
 		final Conference[] conferences = ConferenceList.getInstance().getConferencesAsList(year);
 		ConferenceAdapter adapter = new ConferenceAdapter(this, R.layout.conference_item, conferences);
 		ListView conferencesList = (ListView) findViewById(R.id.conferencesList);
@@ -46,6 +45,9 @@ public class CVConferences extends BaseActivity {
 		if (sp.getBoolean(XCS.PREF.JUMPTOFIRST, false)) {
 			switchTo(ConferenceList.getInstance().getUpcomingConference());
 		}
+		
+		TextView title = (TextView) findViewById(R.id.conferencesTitle);
+		title.setText(title.getText() + " " + year);
 	}
 
 	private void switchTo(Conference conference) {

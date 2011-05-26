@@ -1,15 +1,11 @@
 package com.xebia.xcoss.axcv.util;
 
-import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 import android.view.Menu;
 
 public class XCS {
-	private static TimeZone tz;
 
-	public static final SimpleDateFormat YEARFORMAT = new SimpleDateFormat("yyyy");
-	
 	public class LOG {
 		public static final String SECURITY = "XCS";
 		public static final String PROPERTIES = "XCS";
@@ -33,14 +29,9 @@ public class XCS {
 		public static final String NOTIFYSOUND = "NotificationSound";
 		public static final String NOTIFYTRACK = "NotifyTrack";
 		public static final String NOTIFYOWNED = "NotifyOwned";		
-		public static final String DATEFORMAT = "DateFormat";		
+		public static final String DATEFORMAT = "DateFormat";
+		public static final String TIMEFORMAT = "TimeFormat";		
 	}
 
-	public static TimeZone getTimeZone() {
-		if ( tz == null ) {
-			tz = TimeZone.getDefault();
-		}
-		return tz;
-	}
-	
+	public static final TimeZone TZ = TimeZone.getDefault();
 }
