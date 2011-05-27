@@ -9,6 +9,9 @@ public class Session implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private static int counter = 899;
+	private int id;
+	
 	private String title;
 	private String author;
 	private ArrayList<String> labels;
@@ -16,17 +19,23 @@ public class Session implements Serializable {
 	private DateTime date;
 	private DateTime startTime;
 	private DateTime endTime;
+	private Conference conference = null;
 
+	public Session() {
+		labels = new ArrayList<String>();
+		this.id = ++counter;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
 	public DateTime getDate() {
 		return date;
 	}
 
 	public void setDate(DateTime date) {
 		this.date = date;
-	}
-
-	public Session() {
-		labels = new ArrayList<String>();
 	}
 
 	public String getTitle() {
@@ -75,5 +84,13 @@ public class Session implements Serializable {
 
 	public void setEndTime(DateTime endTime) {
 		this.endTime = endTime;
+	}
+
+	public Conference getConference() {
+		return conference;
+	}
+
+	public void setConference(Conference conference) {
+		this.conference = conference;
 	}
 }

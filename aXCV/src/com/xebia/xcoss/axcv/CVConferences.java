@@ -52,7 +52,7 @@ public class CVConferences extends BaseActivity {
 
 	private void switchTo(Conference conference) {
 		Intent intent = new Intent(this, CVSessionList.class);
-		intent.putExtra("conference", conference);
+		intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
 		startActivity(intent);
 	}
 

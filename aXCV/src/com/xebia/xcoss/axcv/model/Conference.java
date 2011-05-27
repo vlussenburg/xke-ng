@@ -7,7 +7,10 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
 
+import android.util.Log;
+
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
+import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 
@@ -15,6 +18,8 @@ public class Conference implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
+	private static int counter = 1;
+	private int id;
 	private String title = "Not specified";
 	private DateTime date = DateTime.today(XCS.TZ);
 
@@ -26,8 +31,13 @@ public class Conference implements Serializable {
 	public Conference() {
 		locations = new ArrayList<Location>();
 		sessions = new TreeSet<Session>(new SessionComparator());
+		this.id = counter++;
 	}
 
+	public int getId() {
+		return id;
+	}
+	
 	public int getOpenSlots() {
 		return Math.max(0, getExpectedSlots() - sessions.size());
 	}
@@ -38,6 +48,15 @@ public class Conference implements Serializable {
 	
 	public ArrayList<Session> getSessions() {
 		return new ArrayList<Session>(sessions);
+	}
+	
+	public Session getSessionById(int id) {
+		for (Session session : sessions) {
+			if (id == session.getId()) {
+				return session;
+			}
+		}
+		return null;
 	}
 
 	public String getTitle() {
@@ -66,6 +85,8 @@ public class Conference implements Serializable {
 
 	public void addSession(Session session) {
 		sessions.add(session);
+		session.setConference(this);
+		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + this.getTitle());
 		session.setDate(date);
 	}
 
@@ -91,5 +112,14 @@ public class Conference implements Serializable {
 			if (other.title != null) return false;
 		} else if (!title.equals(other.title)) return false;
 		return true;
+	}
+
+	public Session getUpcomingSession() {
+		for (Session session : sessions) {
+			if ( ScreenTimeUtil.isNow(session.getStartTime(), session.getEndTime()) ) {
+				return session;
+			}
+		}
+		return null;
 	}
 }

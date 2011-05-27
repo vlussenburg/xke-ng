@@ -2,12 +2,20 @@ package com.xebia.xcoss.axcv;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.ConferenceList;
+import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.XCS;
+import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public abstract class BaseActivity extends Activity {
+	
+	public static final String IA_CONFERENCE = "ID-conference";
+	public static final String IA_SESSION = "ID-session";
 	
 	private MenuItem miSettings;
 	private MenuItem miSearch;
@@ -49,4 +57,38 @@ public abstract class BaseActivity extends Activity {
 		}
 		return true;
 	}
+
+	protected Conference getConference() {
+		Conference conference = null;
+		int identifier = -1;
+		try {
+			identifier = getIntent().getExtras().getInt(IA_CONFERENCE);
+			conference = ConferenceList.getInstance().findConferenceById(identifier);
+		} catch (Exception e) {
+			Log.w(LOG.ALL, "No conference with ID " + identifier);
+		}
+		if ( conference == null ) {
+			conference = ConferenceList.getInstance().getUpcomingConference();
+			Log.w(LOG.ALL, "Conference default " + conference.getTitle());
+		}
+		return conference;
+	}
+
+	protected Session getSession(Conference conference) {
+		Session session = null;
+		int identifier = -1;
+		try {
+			identifier = getIntent().getExtras().getInt(IA_SESSION);
+			session = conference.getSessionById(identifier);
+		} catch (Exception e) {
+			Log.w(LOG.ALL, "No session with ID " + identifier + " or conference not found.");
+		}
+		if ( session == null ) {
+			Log.w(LOG.ALL, "Conference default : " + (conference == null ? "NULL" : conference.getTitle()));
+			session = conference.getUpcomingSession();
+			Log.w(LOG.ALL, "Session default " + (session == null ? "NULL" : session.getTitle()));
+		}
+		return session;
+	}
+
 }

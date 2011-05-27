@@ -65,7 +65,7 @@ public class ScreenTimeUtil {
 		return timeFormat.format(cal.getTime());
 	}
 
-	public boolean isNow(DateTime startTime, DateTime endTime) {
+	public static boolean isNow(DateTime startTime, DateTime endTime) {
 		DateTime now = DateTime.now(XCS.TZ);
 		if (startTime.hasYearMonthDay() && !startTime.isSameDayAs(now)) {
 			return false;

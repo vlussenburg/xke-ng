@@ -5,11 +5,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.xebia.xcoss.axcv.model.Conference;
-import com.xebia.xcoss.axcv.model.ConferenceList;
+import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.SessionAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -23,15 +26,8 @@ public class CVSessionList extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.schedule);
 
-		Conference conference = null;
-		Object object = getIntent().getExtras().getSerializable("conference");
-		if (object instanceof Conference) {
-			conference = (Conference) object;
-			Log.w(LOG.ALL, "Conference from stream " + conference.getTitle());
-		} else {
-			conference = ConferenceList.getInstance().getUpcomingConference();
-			Log.w(LOG.ALL, "Conference default " + conference.getTitle());
-		}
+		final Conference conference = getConference();
+
 		TextView title = (TextView) findViewById(R.id.conferenceTitle);
 		title.setText(conference.getTitle());
 
@@ -43,6 +39,21 @@ public class CVSessionList extends BaseActivity {
 		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, conference);
 		ListView sessionList = (ListView) findViewById(R.id.sessionList);
 		sessionList.setAdapter(adapter);
+		sessionList.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
+				// Adapter = listview, view = tablelayout.
+				switchTo(conference, paramInt);
+			}
+		});
+	}
+
+	private void switchTo(Conference conference, int sessionIndex) {
+		Intent intent = new Intent(this, CVSessionView.class);
+		Session session = conference.getSessions().get(sessionIndex);
+		intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
+		intent.putExtra(BaseActivity.IA_SESSION, session.getId());
+		startActivity(intent);
 	}
 
 	@Override

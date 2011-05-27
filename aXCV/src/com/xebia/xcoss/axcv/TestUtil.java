@@ -54,12 +54,15 @@ public class TestUtil {
 		DateTime corrected = (i >= 0)? now.plusDays(i) : now.minusDays(i);
 		Conference conf = new Conference();
 		conf.setDate(corrected);
+		conf.setTitle("Delta " + i + ":" + corrected.getDay()+ "-" + corrected.getMonth());
+		
 		return conf;
 	}
 
 	private static Conference createConference(int i, int j) {
 		Conference conf = new Conference();
 		conf.setDate(DateTime.forDateOnly(2011, i, j));
+		conf.setTitle("Date " + i + ":" + j);
 		return conf;
 	}
 
