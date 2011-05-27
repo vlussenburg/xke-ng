@@ -4,7 +4,10 @@ import hirondelle.date4j.DateTime;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.TreeSet;
 
+import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.util.XCS;
 
 
@@ -15,14 +18,14 @@ public class Conference implements Serializable {
 	private String title = "Not specified";
 	private DateTime date = DateTime.today(XCS.TZ);
 
-	private ArrayList<Session> sessions;
+	private Set<Session> sessions;
 	private ArrayList<Location> locations;
 
 	private int sessionsPerLocation = 4;
 
 	public Conference() {
 		locations = new ArrayList<Location>();
-		sessions = new ArrayList<Session>();
+		sessions = new TreeSet<Session>(new SessionComparator());
 	}
 
 	public int getOpenSlots() {
@@ -34,7 +37,7 @@ public class Conference implements Serializable {
 	}
 	
 	public ArrayList<Session> getSessions() {
-		return sessions;
+		return new ArrayList<Session>(sessions);
 	}
 
 	public String getTitle() {

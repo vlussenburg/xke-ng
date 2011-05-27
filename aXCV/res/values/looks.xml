@@ -5,15 +5,19 @@
 	<color name="textcolor_copyright">#FFFFFF</color>
 	<color name="background_copyright">#A0663E71</color>
 
-	<color name="tc_itemactive">#0000FF</color>
 	<color name="tc_itemgone">#AAAAAA</color>
 	<color name="tc_itemdefault">#FFFFFF</color>
+	<color name="tc_itemactive">#FFFF00</color>
 
 	<color name="linebreak">#663E71</color>
+	<color name="tc_sessionschedule">#CCCCCC</color>
 
 	<dimen name="textsize_company">40sp</dimen>
 	<dimen name="textsize_title">22sp</dimen>
 	<dimen name="ts_itemtitle">20sp</dimen>
 	<dimen name="ts_itemwhen">18sp</dimen>
 	<dimen name="ts_itemdetail">16sp</dimen>
+	<dimen name="ts_sessiontitle">16sp</dimen>
+	<dimen name="ts_sessiondetail">13sp</dimen>
+	<dimen name="ts_sessionschedule">13sp</dimen>
 </resources>

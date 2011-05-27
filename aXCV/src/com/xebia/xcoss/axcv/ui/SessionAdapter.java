@@ -1,7 +1,8 @@
 package com.xebia.xcoss.axcv.ui;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
-import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,18 +11,21 @@ import android.widget.TextView;
 
 import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.MandatorySession;
 import com.xebia.xcoss.axcv.model.Session;
 
 public class SessionAdapter extends BaseAdapter {
 
 	private Activity ctx;
 	private int viewResource;
+	private int alternativeViewResource;
 	private Session[] data;
 	private ScreenTimeUtil timeUtil;
 
-	public SessionAdapter(Activity context, int viewResourceId, Conference conference) {
+	public SessionAdapter(Activity context, int viewResourceId, int altViewResourceId, Conference conference) {
 		this.ctx = context;
 		this.viewResource = viewResourceId;
+		this.alternativeViewResource = altViewResourceId;
 		this.data = conference.getSessions().toArray(new Session[0]);
 		timeUtil = new ScreenTimeUtil(context);
 	}
@@ -38,6 +42,14 @@ public class SessionAdapter extends BaseAdapter {
 //			colorId = ctx.getResources().getColor(R.color.tc_itemactive);
 //		}
 
+		if ( session instanceof MandatorySession ) {
+			return constructMandatoryView(parent, session, colorId);
+		}
+		return constructSessionView(parent, session, colorId);
+	}
+
+	private View constructSessionView(ViewGroup parent, Session session, int colorId) {
+
 		LayoutInflater inflater = ctx.getLayoutInflater();
 		View row = inflater.inflate(viewResource, parent, false);
 
@@ -47,22 +59,50 @@ public class SessionAdapter extends BaseAdapter {
 		TextView locDateView = (TextView) row.findViewById(R.id.ses_locdate);
 
 		titleView.setText(session.getTitle());
-		authorView.setText("Author: " + session.getAuthor());
-		labelView.setText("Labels: " + getLabels(session));
-		locDateView.setText(getLocationAndDate(session));
-
 		titleView.setTextColor(colorId);
+//			titleView.setTypeface(titleView.getTypeface(), Typeface.BOLD);
 
-		if ( now ) {
-			titleView.setTypeface(titleView.getTypeface(), Typeface.BOLD);
+		if ( StringUtil.isEmpty(session.getAuthor()) ) {
+			authorView.setVisibility(View.GONE);
+		} else {
+			authorView.setText("Author: " + session.getAuthor());
 		}
+
+		String labels = getLabels(session);
+		if ( StringUtil.isEmpty(labels) ) {
+			labelView.setVisibility(View.GONE);
+		} else {
+			labelView.setText("Labels: " + labels);
+		}
+		
+		locDateView.setText(getLocationAndDate(session));
+		return row;
+	}
+
+	private View constructMandatoryView(ViewGroup parent, Session session, int colorId) {
+
+		LayoutInflater inflater = ctx.getLayoutInflater();
+		View row = inflater.inflate(alternativeViewResource, parent, false);
+
+		TextView titleView = (TextView) row.findViewById(R.id.ses_title);
+		TextView locDateView = (TextView) row.findViewById(R.id.ses_locdate);
+
+		titleView.setText(session.getTitle());
+		titleView.setTextColor(colorId);
+//			titleView.setTypeface(titleView.getTypeface(), Typeface.BOLD);
+
+		locDateView.setText(getLocationAndDate(session));
 		return row;
 	}
 
 	private String getLabels(Session session) {
+		ArrayList<String> labels = session.getLabels();
+		if ( labels.size() == 0 ) {
+			return null;
+		}
 		final String divider = ", ";
 		StringBuilder sb = new StringBuilder();
-		for (String label : session.getLabels()) {
+		for (String label : labels) {
 			sb.append(label);
 			sb.append(divider);
 		}

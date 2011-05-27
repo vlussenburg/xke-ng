@@ -40,7 +40,7 @@ public class CVSessionList extends BaseActivity {
 		date.setText(val);
 
 		Log.w(LOG.ALL, "Conference has " + conference.getSessions().size() + " sessions.");
-		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, conference);
+		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, conference);
 		ListView sessionList = (ListView) findViewById(R.id.sessionList);
 		sessionList.setAdapter(adapter);
 	}

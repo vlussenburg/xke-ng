@@ -33,9 +33,12 @@ public class ConferenceAdapter extends BaseAdapter {
 		Conference cfr = (Conference) getItem(paramInt);
 		int colorId = ctx.getResources().getColor(R.color.tc_itemdefault);
 		DateTime now = DateTime.today(XCS.TZ);
+		boolean sameDayAs = cfr.getDate().isSameDayAs(now);
 		if (cfr.getDate().isInThePast(XCS.TZ)) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemgone);
-		} else if (cfr.getDate().isSameDayAs(now)) {
+		}
+		// Don't use else, since it is also regarded as being in the past
+		if (sameDayAs) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemactive);
 		}
 
@@ -57,7 +60,7 @@ public class ConferenceAdapter extends BaseAdapter {
 		statusView.setTextColor(colorId);
 		dateView.setTextColor(colorId);
 
-		if ( cfr.getDate().isSameDayAs(now) ) {
+		if ( sameDayAs ) {
 			titleView.setTypeface(titleView.getTypeface(), Typeface.BOLD);
 			whenView.setTypeface(whenView.getTypeface(), Typeface.BOLD);
 		}

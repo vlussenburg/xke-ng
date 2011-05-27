@@ -5,7 +5,6 @@ import hirondelle.date4j.DateTime;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.TimeZone;
 
 import android.app.Activity;
 import android.content.SharedPreferences;

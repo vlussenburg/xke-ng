@@ -5,7 +5,7 @@
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
 	<TableRow
-		android:layout_width="fill_parent">
+		android:layout_width="fill_parent" android:layout_height="wrap_content">
 		<TextView
 			android:text="Title"
 			android:textSize="@dimen/ts_itemtitle"
@@ -24,7 +24,7 @@
 			android:layout_height="wrap_content"></TextView>
 	</TableRow>
 	<TableRow
-		android:layout_width="fill_parent">
+		android:layout_width="fill_parent" android:layout_height="wrap_content">
 		<TextView
 			android:layout_column="1"
 			android:text="Jun 7th, 2011"
