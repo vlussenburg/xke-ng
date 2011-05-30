@@ -29,12 +29,12 @@ public class CVSessionView extends BaseActivity {
 		String val = timeUtil.getAbsoluteDate(conference.getDate());
 		date.setText(val);
 		
-		TextView sessionDate = (TextView) findViewById(R.id.sessionTime);
-		StringBuilder sb = new StringBuilder();
-		sb.append(timeUtil.getAbsoluteTime(session.getStartTime()));
-		sb.append(" - ");
-		sb.append(timeUtil.getAbsoluteTime(session.getEndTime()));
-		sessionDate.setText(sb.toString());
+//		TextView sessionDate = (TextView) findViewById(R.id.sessionTime);
+//		StringBuilder sb = new StringBuilder();
+//		sb.append(timeUtil.getAbsoluteTime(session.getStartTime()));
+//		sb.append(" - ");
+//		sb.append(timeUtil.getAbsoluteTime(session.getEndTime()));
+//		sessionDate.setText(sb.toString());
 	}
 
 	@Override

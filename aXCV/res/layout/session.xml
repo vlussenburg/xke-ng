@@ -1,93 +1,317 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical"
-	android:background="@android:color/black"
+<RelativeLayout
 	android:layout_width="fill_parent"
-	android:layout_height="fill_parent" android:layout_gravity="center">
-	<RelativeLayout
+	android:layout_height="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<!-- Header part of the session -->
+	<LinearLayout
+		android:orientation="vertical"
+		android:background="@android:color/black"
+		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:layout_width="fill_parent"
-		android:id="@+id/relativeLayout1">
-		<ImageButton
+		android:layout_alignParentTop="true"
+		android:text="Header"
+		android:id="@+id/sc_header">
+		<RelativeLayout
 			android:layout_height="wrap_content"
-			android:layout_width="wrap_content"
-			android:src="@drawable/ic_btn_back"
-			android:id="@+id/imageButton1"
-			android:layout_alignParentLeft="true"></ImageButton>
-		<TextView
-			android:layout_height="fill_parent"
-			android:layout_width="wrap_content"
-			android:id="@+id/conferenceTitle"
-			android:text="Schedule"
-			android:layout_alignWithParentIfMissing="true"
-			android:gravity="center_vertical"
-			android:layout_toRightOf="@+id/imageButton1"
-			android:layout_alignTop="@+id/imageButton1"
-			android:layout_alignBottom="@+id/imageButton1"
-			android:textSize="@dimen/textsize_title"></TextView>
-		<ImageButton
-			android:layout_width="wrap_content"
+			android:layout_width="fill_parent"
+			android:id="@+id/relativeLayout1">
+			<ImageButton
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:src="@drawable/ic_btn_back"
+				android:id="@+id/imageButton1"
+				android:layout_alignParentLeft="true"></ImageButton>
+			<TextView
+				android:layout_height="fill_parent"
+				android:layout_width="wrap_content"
+				android:id="@+id/conferenceTitle"
+				android:text="Schedule"
+				android:layout_alignWithParentIfMissing="true"
+				android:gravity="center_vertical"
+				android:layout_toRightOf="@+id/imageButton1"
+				android:layout_alignTop="@+id/imageButton1"
+				android:layout_alignBottom="@+id/imageButton1"
+				android:textSize="@dimen/textsize_title"></TextView>
+			<ImageButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/ic_btn_next"
+				android:id="@+id/imageButton5"
+				android:layout_toLeftOf="@+id/imageButton4"
+				android:layout_alignTop="@+id/imageButton4"
+				android:layout_alignBottom="@+id/imageButton4"
+				android:visibility="gone"></ImageButton>
+			<ImageButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/ic_btn_next"
+				android:id="@+id/imageButton4"
+				android:layout_alignParentRight="true"
+				android:visibility="gone"></ImageButton>
+		</RelativeLayout>
+		<View
+			android:id="@+id/firstDivider"
+			android:layout_height="2dp"
+			android:layout_width="fill_parent"
+			android:background="@color/linebreak" />
+		<FrameLayout
 			android:layout_height="wrap_content"
-			android:src="@drawable/ic_btn_next"
-			android:id="@+id/imageButton5"
-			android:layout_toLeftOf="@+id/imageButton4"
-			android:layout_alignTop="@+id/imageButton4"
-			android:layout_alignBottom="@+id/imageButton4" android:visibility="gone"></ImageButton>
-		<ImageButton
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:src="@drawable/ic_btn_next"
-			android:id="@+id/imageButton4"
-			android:layout_alignParentRight="true" android:visibility="gone"></ImageButton>
-	</RelativeLayout>
-	<View
-		android:id="@+id/firstDivider"
-		android:layout_height="2dp"
-		android:layout_width="fill_parent"
-		android:background="@color/linebreak" />
-	<FrameLayout
-		android:layout_height="wrap_content"
-		android:layout_width="fill_parent"
-		android:id="@+id/frameLayout1">
-		<TextView
-			android:layout_gravity="center"
-			android:layout_width="wrap_content"
-			android:text="23 mei 1999"
-			android:layout_height="wrap_content" android:id="@+id/conferenceDate"></TextView>
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/textView1"
-			android:layout_gravity="right"
-			android:text="Right" android:paddingRight="3dp"></TextView>
-		<TextView
-			android:id="@+id/textView2"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="Left" android:layout_gravity="left" android:paddingLeft="3dp"></TextView>
-	</FrameLayout>
-	<View
-		android:id="@+id/secondDivider"
-		android:layout_height="2dp"
-		android:layout_width="fill_parent"
-		android:background="@color/linebreak" />
-	<FrameLayout android:id="@+id/FrameLayout01" android:layout_width="fill_parent" android:layout_height="wrap_content">
-		<LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/linearLayout1" android:layout_gravity="right">
-			<ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/ic_btn_search" android:id="@+id/sessionEditButton"></ImageButton>
-			<ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/ic_btn_search" android:id="@+id/sessionMarkButton"></ImageButton>
-		</LinearLayout>
-		<LinearLayout android:layout_width="wrap_content" android:orientation="vertical" android:layout_height="wrap_content" android:id="@+id/linearLayout2" android:layout_gravity="center">
-			<TextView android:layout_gravity="center" android:layout_width="wrap_content" android:text="17.00u - 18.00u" android:layout_height="wrap_content" android:textSize="18sp" android:id="@+id/sessionTime"></TextView>
-			<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:text="in 10 minutes" android:id="@+id/sessionTimeRemark"></TextView>
-		</LinearLayout>
-	</FrameLayout>
-	<LinearLayout android:layout_width="fill_parent" android:id="@+id/sessionContentLayout" android:layout_height="wrap_content"></LinearLayout>
-	<View android:layout_height="2dp" android:layout_width="fill_parent" android:background="@color/linebreak" android:id="@+id/thirdDivider" android:layout_gravity="center"></View>
-	<LinearLayout android:layout_height="wrap_content" android:id="@+id/linearLayout3" android:layout_width="fill_parent" android:layout_gravity="center" android:gravity="center">
-		<ImageView android:layout_height="wrap_content" android:id="@+id/ImageView03" android:src="@drawable/ic_btn_back" android:layout_width="wrap_content"></ImageView>
-		<ImageView android:layout_height="wrap_content" android:id="@+id/ImageView02" android:src="@drawable/ic_btn_back" android:layout_width="wrap_content"></ImageView>
-		<ImageView android:layout_height="wrap_content" android:id="@+id/ImageView01" android:layout_width="wrap_content" android:src="@drawable/ic_btn_next"></ImageView>
-		<ImageView android:layout_height="wrap_content" android:id="@+id/imageView1" android:layout_width="wrap_content" android:src="@drawable/ic_btn_next"></ImageView>
+			android:layout_width="fill_parent"
+			android:id="@+id/frameLayout1">
+			<TextView
+				android:layout_gravity="center"
+				android:layout_width="wrap_content"
+				android:text="23 mei 1999"
+				android:layout_height="wrap_content"
+				android:id="@+id/conferenceDate"></TextView>
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:id="@+id/textView1"
+				android:layout_gravity="right"
+				android:text="Right"
+				android:paddingRight="3dp"></TextView>
+			<TextView
+				android:id="@+id/textView2"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Left"
+				android:layout_gravity="left"
+				android:paddingLeft="3dp"></TextView>
+		</FrameLayout>
+		<View
+			android:id="@+id/secondDivider"
+			android:layout_height="2dp"
+			android:layout_width="fill_parent"
+			android:background="@color/linebreak" />
 	</LinearLayout>
-</LinearLayout>
+	<!-- Footer part of the session -->
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:id="@+id/sc_navigate">
+		<View
+			android:layout_height="2dp"
+			android:layout_width="fill_parent"
+			android:background="@color/linebreak"
+			android:id="@+id/thirdDivider" />
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:id="@+id/linearLayout3"
+			android:layout_width="fill_parent"
+			android:gravity="center">
+			<ImageView
+				android:layout_height="wrap_content"
+				android:id="@+id/ImageView03"
+				android:src="@drawable/ic_btn_back"
+				android:layout_width="wrap_content"></ImageView>
+			<ImageView
+				android:layout_height="wrap_content"
+				android:id="@+id/ImageView02"
+				android:src="@drawable/ic_btn_back"
+				android:layout_width="wrap_content"></ImageView>
+			<ImageView
+				android:layout_height="wrap_content"
+				android:id="@+id/ImageView01"
+				android:layout_width="wrap_content"
+				android:src="@drawable/ic_btn_next"></ImageView>
+			<ImageView
+				android:layout_height="wrap_content"
+				android:id="@+id/imageView1"
+				android:layout_width="wrap_content"
+				android:src="@drawable/ic_btn_next"></ImageView>
+		</LinearLayout>
+	</LinearLayout>
+	<!-- Content part of the session -->
+	<ScrollView
+		android:id="@+id/sc_content"
+		android:layout_below="@id/sc_header"
+		android:layout_above="@id/sc_navigate"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent">
+		<LinearLayout
+			android:orientation="vertical"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content">
+			<FrameLayout
+				android:id="@+id/FrameLayout01"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content">
+				<LinearLayout
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:id="@+id/linearLayout1"
+					android:layout_gravity="right">
+					<ImageButton
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:src="@drawable/ic_btn_search"
+						android:id="@+id/sessionMarkButton"></ImageButton>
+				</LinearLayout>
+				<LinearLayout
+					android:layout_width="wrap_content"
+					android:orientation="vertical"
+					android:layout_height="wrap_content"
+					android:id="@+id/linearLayout2"
+					android:layout_gravity="center">
+					<TextView
+						android:layout_gravity="center"
+						android:layout_width="wrap_content"
+						android:text="17.00u - 18.00u"
+						android:layout_height="wrap_content"
+						android:textSize="18sp"
+						android:id="@+id/sessionTime"></TextView>
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center"
+						android:text="in 10 minutes"
+						android:id="@+id/sessionTimeRemark"></TextView>
+				</LinearLayout>
+			</FrameLayout>
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:id="@+id/scLinearLayout1"
+				android:orientation="vertical"
+				android:layout_gravity="center">
+				<TextView
+					android:id="@+id/scTitle"
+					android:layout_gravity="center"
+					android:textSize="18sp"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginLeft="3sp"
+					android:layout_marginRight="3sp"
+					android:text="XCoSS - a conference scheduling system"
+					android:gravity="center_horizontal"
+					android:textColor="@color/textcolor_title"></TextView>
+				<TextView
+					android:id="@+id/scDescription"
+					android:layout_gravity="center"
+					android:layout_width="wrap_content"
+					android:text="Browse, update, schedule your track on featured conferences via your mobile phone. This session describes the architecture."
+					android:layout_height="wrap_content"
+					android:layout_marginLeft="8sp"
+					android:layout_marginRight="8sp"
+					android:paddingBottom="12sp"></TextView>
+			</LinearLayout>
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:id="@+id/linearLayout2"
+				android:layout_width="fill_parent">
+				<TextView
+					android:layout_height="wrap_content"
+					android:paddingRight="8sp"
+					android:text="Author(s)"
+					android:id="@+id/scAuthorLabel"
+					android:layout_width="85sp"></TextView>
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="M.J.P. van Leeuwen, Geert Bossuyt"
+					android:id="@+id/scAuthor"
+					android:layout_width="wrap_content"></TextView>
+			</LinearLayout>
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:id="@+id/linearLayout1"
+				android:layout_width="fill_parent">
+				<TextView
+					android:paddingRight="8sp"
+					android:layout_height="wrap_content"
+					android:text="Audience"
+					android:id="@+id/scAudienceLabel"
+					android:layout_width="85sp"></TextView>
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="Anyone interested in Mobile application development"
+					android:id="@+id/scAudience"
+					android:layout_width="wrap_content"></TextView>
+			</LinearLayout>
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:id="@+id/linearLayout3"
+				android:layout_width="fill_parent">
+				<TextView
+					android:paddingRight="8sp"
+					android:layout_height="wrap_content"
+					android:text="Language"
+					android:id="@+id/scLanguageLabel"
+					android:layout_width="85sp"></TextView>
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="Dutch"
+					android:id="@+id/scLanguage"
+					android:layout_width="wrap_content"></TextView>
+			</LinearLayout>
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:id="@+id/linearLayout4"
+				android:layout_width="fill_parent">
+				<TextView
+					android:paddingRight="8sp"
+					android:layout_height="wrap_content"
+					android:text="Limit"
+					android:id="@+id/scLimitLabel"
+					android:layout_width="85sp"></TextView>
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="No limit"
+					android:id="@+id/scLimit"
+					android:layout_width="wrap_content"></TextView>
+			</LinearLayout>
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:id="@+id/linearLayout5"
+				android:layout_width="fill_parent">
+				<TextView
+					android:paddingRight="8sp"
+					android:layout_height="wrap_content"
+					android:text="Preparation"
+					android:id="@+id/scPreparationLabel"
+					android:layout_width="85sp"></TextView>
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="Install the Eclipse IDE and Android SDK"
+					android:id="@+id/scPreparation"
+					android:layout_width="wrap_content"></TextView>
+			</LinearLayout>
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:id="@+id/linearLayout6"
+				android:layout_width="fill_parent">
+				<TextView
+					android:paddingRight="8sp"
+					android:layout_height="wrap_content"
+					android:text="Labels"
+					android:id="@+id/scLabelsLabel"
+					android:layout_width="85sp"></TextView>
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="Android, iOs, Mobile"
+					android:id="@+id/scLabels"
+					android:layout_width="wrap_content"></TextView>
+			</LinearLayout>
+			<ScrollView
+				android:id="@+id/sc_comments"
+				android:layout_width="fill_parent"
+				android:layout_height="50sp"
+				android:scrollbarStyle="insideInset"
+				android:scrollbars="vertical"
+				android:background="@drawable/textbox"
+				android:scrollbarFadeDuration="0"
+				android:layout_margin="1sp">
+				<TextView
+					android:layout_width="fill_parent"
+					android:textSize="10sp"
+					android:textColor="@android:color/black"
+					android:layout_height="fill_parent"
+					android:text="This is to be a very long text which requires scrolling from top to bottom and not from left to right."
+					android:padding="2px" />
+			</ScrollView>
+		</LinearLayout>
+	</ScrollView>
+</RelativeLayout>
