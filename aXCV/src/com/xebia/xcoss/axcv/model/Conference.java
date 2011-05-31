@@ -9,6 +9,7 @@ import java.util.TreeSet;
 
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -47,11 +48,11 @@ public class Conference implements Serializable {
 	}
 	
 	public ArrayList<Session> getSessions() {
-		return new ArrayList<Session>(sessions);
+		return new ArrayList<Session>(loadSessions());
 	}
 	
 	public Session getSessionById(int id) {
-		for (Session session : sessions) {
+		for (Session session : loadSessions()) {
 			if (id == session.getId()) {
 				return session;
 			}
@@ -84,10 +85,16 @@ public class Conference implements Serializable {
 	}
 
 	public void addSession(Session session) {
+		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + this.getTitle());
 		sessions.add(session);
 		session.setConference(this);
-		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + this.getTitle());
 		session.setDate(date);
+		ConferenceServer.getInstance().storeSession(session);
+	}
+
+	private Set<Session> loadSessions() {
+		ConferenceServer.getInstance().loadSessions(this, sessions);
+		return sessions;
 	}
 
 	@Override

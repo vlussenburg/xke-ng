@@ -66,16 +66,18 @@ public abstract class BaseActivity extends Activity {
 
 	protected Conference getConference() {
 		Conference conference = null;
+		ConferenceList allConferences = getConferenceServer().getConferences();
+		
 		int identifier = -1;
 		try {
 			identifier = getIntent().getExtras().getInt(IA_CONFERENCE);
-			conference = ConferenceList.getInstance().findConferenceById(identifier);
+			conference = allConferences.findConferenceById(identifier);
 		}
 		catch (Exception e) {
 			Log.w(LOG.ALL, "No conference with ID " + identifier);
 		}
 		if (conference == null) {
-			conference = ConferenceList.getInstance().getUpcomingConference();
+			conference = allConferences.getUpcomingConference();
 			Log.w(LOG.ALL, "Conference default " + conference.getTitle());
 		}
 		return conference;

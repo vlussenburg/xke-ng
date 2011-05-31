@@ -1,10 +1,13 @@
 package com.xebia.xcoss.axcv;
 
+import java.util.Set;
+
 import hirondelle.date4j.DateTime;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,7 +31,8 @@ public class CVConferences extends BaseActivity {
 		
 		DateTime dt = DateTime.today(XCS.TZ);
 		String year = String.valueOf(dt.getYear());
-		final Conference[] conferences = ConferenceList.getInstance().getConferencesAsList(year);
+		ConferenceList collection = getConferenceServer().getConferences();
+		final Conference[] conferences = collection.getConferencesAsList(year);
 		ConferenceAdapter adapter = new ConferenceAdapter(this, R.layout.conference_item, conferences);
 		ListView conferencesList = (ListView) findViewById(R.id.conferencesList);
 		conferencesList.setAdapter(adapter);
@@ -43,7 +47,8 @@ public class CVConferences extends BaseActivity {
 		});
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 		if (sp.getBoolean(XCS.PREF.JUMPTOFIRST, true)) {
-			switchTo(ConferenceList.getInstance().getUpcomingConference());
+			Log.i(XCS.LOG.NAVIGATE, "Jumping to first upcomming conference.");
+			switchTo(getConferenceServer().getConferences().getUpcomingConference());
 		}
 		
 		TextView title = (TextView) findViewById(R.id.conferencesTitle);

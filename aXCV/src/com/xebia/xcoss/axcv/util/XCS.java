@@ -24,6 +24,7 @@ public class XCS {
 		public static final String SECURITY = "XCS";
 		public static final String PROPERTIES = "XCS";
 		public static final String ALL = "XCS";
+		public static final String NAVIGATE = "XCS";
 	}
 
 	public class MENU {

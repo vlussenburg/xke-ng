@@ -3,6 +3,8 @@ package com.xebia.xcoss.axcv;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,10 +12,13 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+import android.widget.TextView.BufferType;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.RatingValue;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
@@ -88,7 +93,9 @@ public class CVSessionView extends BaseActivity {
 		};
 		TextView view2 = (TextView) findViewById(R.id.scComments);
 		view2.setOnClickListener(lReview);
-		view2.setText(server.getComments(session));
+		Spanned spannedContent = Html.fromHtml(FormatUtil.getHtml(server.getRemarks(session)));
+		view2.setText(spannedContent, BufferType.SPANNABLE);
+//		view2.setText(server.getRemarks(session));
 	}
 
 	@Override
@@ -104,6 +111,8 @@ public class CVSessionView extends BaseActivity {
 
 				Button submit = (Button) dialog.findViewById(R.id.drSubmit);
 				final SeekBar seekbar = (SeekBar) dialog.findViewById(R.id.drSessionRate);
+				final TextView rateText = (TextView) dialog.findViewById(R.id.drRateText);
+				rateText.setText(RatingValue.message(seekbar.getProgress()));
 
 				// Or use a DialogInterface.OnClickListener to directly access the dialog
 				submit.setOnClickListener(new OnClickListener() {
@@ -112,6 +121,21 @@ public class CVSessionView extends BaseActivity {
 						int rate = 1 + seekbar.getProgress();
 						getConferenceServer().registerRate(rate);
 						dismissDialog(XCS.DIALOG.ADD_RATING);
+					}
+				});
+				
+				seekbar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+					@Override
+					public void onStopTrackingTouch(SeekBar paramSeekBar) {
+					}
+					
+					@Override
+					public void onStartTrackingTouch(SeekBar paramSeekBar) {
+					}
+					
+					@Override
+					public void onProgressChanged(SeekBar paramSeekBar, int paramInt, boolean paramBoolean) {
+						rateText.setText(RatingValue.message(paramInt));
 					}
 				});
 				return dialog;
