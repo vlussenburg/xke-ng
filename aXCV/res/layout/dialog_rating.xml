@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:id="@+id/linearLayout1"
+	android:layout_height="fill_parent"
+	android:layout_width="fill_parent">
+	<TextView
+		android:textColor="@color/textcolor_title"
+		android:layout_gravity="center_horizontal"
+		android:layout_margin="10sp"
+		android:id="@+id/drRateLabel"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:text="Please specify your rating for this session by setting the slider in position and click 'Submit'." android:gravity="center_horizontal"></TextView>
+	<TextView
+		android:text="XCoss - a very long title to show on this dialog"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textSize="18sp"
+		android:gravity="center"
+		android:layout_gravity="center_horizontal"
+		android:id="@+id/drSessionTitle" android:paddingLeft="5sp" android:paddingRight="5sp"></TextView>
+	<SeekBar android:progressDrawable="@drawable/rateslider" android:layout_margin="10sp" android:id="@+id/drSessionRate" android:layout_width="fill_parent" android:layout_height="wrap_content" android:max="9" android:progress="5"></SeekBar>
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_gravity="center_horizontal"
+		android:textColor="@color/textcolor_title"
+		android:layout_height="wrap_content"
+		android:text="Moderate"
+		android:id="@+id/drRateText"></TextView>
+	<Button
+		android:layout_gravity="center_horizontal"
+		android:layout_margin="20sp"
+		android:text="Submit"
+		android:layout_width="wrap_content"
+		android:id="@+id/drSubmit"
+		android:layout_height="wrap_content"></Button>
+</LinearLayout>

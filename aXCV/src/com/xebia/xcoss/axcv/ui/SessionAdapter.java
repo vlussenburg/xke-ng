@@ -68,7 +68,7 @@ public class SessionAdapter extends BaseAdapter {
 			authorView.setText("Author: " + session.getAuthor());
 		}
 
-		String labels = getLabels(session);
+		String labels = FormatUtil.getLabels(session);
 		if ( StringUtil.isEmpty(labels) ) {
 			labelView.setVisibility(View.GONE);
 		} else {
@@ -93,20 +93,6 @@ public class SessionAdapter extends BaseAdapter {
 
 		locDateView.setText(getLocationAndDate(session));
 		return row;
-	}
-
-	private String getLabels(Session session) {
-		ArrayList<String> labels = session.getLabels();
-		if ( labels.size() == 0 ) {
-			return null;
-		}
-		final String divider = ", ";
-		StringBuilder sb = new StringBuilder();
-		for (String label : labels) {
-			sb.append(label);
-			sb.append(divider);
-		}
-		return sb.substring(0, sb.length()-divider.length()).toString();
 	}
 
 	private CharSequence getLocationAndDate(Session session) {

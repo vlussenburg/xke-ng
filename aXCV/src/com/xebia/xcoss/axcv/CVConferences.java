@@ -42,7 +42,7 @@ public class CVConferences extends BaseActivity {
 			
 		});
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-		if (sp.getBoolean(XCS.PREF.JUMPTOFIRST, false)) {
+		if (sp.getBoolean(XCS.PREF.JUMPTOFIRST, true)) {
 			switchTo(ConferenceList.getInstance().getUpcomingConference());
 		}
 		
@@ -60,6 +60,7 @@ public class CVConferences extends BaseActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		menu.removeItem(XCS.MENU.OVERVIEW);
+		menu.removeItem(XCS.MENU.EDIT);
 		return true;
 	}
 
