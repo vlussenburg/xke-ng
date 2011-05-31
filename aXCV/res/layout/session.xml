@@ -168,9 +168,12 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:layout_gravity="center"
-						android:text="in 10 minutes"
-						android:id="@+id/sessionTimeRemark"></TextView>
+						android:id="@+id/sessionLocation" android:text="location"></TextView>
 				</LinearLayout>
+				<RelativeLayout android:layout_gravity="center_vertical" android:paddingLeft="8sp" android:paddingRight="8sp" android:layout_height="fill_parent" android:id="@+id/scRatingLayout" android:layout_width="wrap_content">
+					<ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:src="@drawable/ic_btn_search" android:layout_centerVertical="true" android:layout_centerHorizontal="true" android:id="@+id/scRatingImage"></ImageView>
+					<TextView android:layout_centerHorizontal="true" android:layout_centerVertical="true" android:textSize="24sp" android:layout_height="wrap_content" android:id="@+id/scRating" android:text="5.3" android:layout_width="wrap_content"></TextView>
+				</RelativeLayout>
 			</FrameLayout>
 			<LinearLayout
 				android:layout_width="fill_parent"
@@ -296,7 +299,6 @@
 					android:layout_width="wrap_content"></TextView>
 			</LinearLayout>
 			<ScrollView
-				android:id="@+id/sc_comments"
 				android:layout_width="fill_parent"
 				android:layout_height="50sp"
 				android:scrollbarStyle="insideInset"
@@ -305,6 +307,7 @@
 				android:scrollbarFadeDuration="0"
 				android:layout_margin="1sp">
 				<TextView
+					android:id="@+id/scComments"
 					android:layout_width="fill_parent"
 					android:textSize="10sp"
 					android:textColor="@android:color/black"

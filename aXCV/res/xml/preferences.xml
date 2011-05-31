@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
-	xmlns:android="http://schemas.android.com/apk/res/android">
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:key="xcvpreferences"
+	>
 	<PreferenceCategory
 		android:title="Account">
 		<com.xebia.xcoss.axcv.preference.EditTextPreference
@@ -14,6 +16,7 @@
 			android:dialogTitle="Enter password"
 			android:dialogMessage="This password is stored encrypted"
 			android:key="Password"
+			android:password="true"
 			android:title="Password"
 			android:summary="None set" />
 		<CheckBoxPreference
