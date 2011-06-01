@@ -2,6 +2,7 @@
 <resources>
 	<color name="textcolor_company">#663E71</color>
 	<color name="textcolor_title">#FFFFFF</color>
+	<color name="textcolor_header">#000000</color>
 	<color name="textcolor_copyright">#FFFFFF</color>
 	<color name="background_copyright">#A0663E71</color>
 
@@ -20,4 +21,7 @@
 	<dimen name="ts_sessiontitle">16sp</dimen>
 	<dimen name="ts_sessiondetail">13sp</dimen>
 	<dimen name="ts_sessionschedule">13sp</dimen>
+
+	<dimen name="ts_group">20sp</dimen>
+	<dimen name="ts_attribute">18sp</dimen>
 </resources>

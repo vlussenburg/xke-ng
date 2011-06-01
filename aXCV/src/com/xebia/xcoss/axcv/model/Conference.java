@@ -1,9 +1,11 @@
 package com.xebia.xcoss.axcv.model;
 
 import hirondelle.date4j.DateTime;
+import hirondelle.date4j.DateTime.DayOverflow;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -23,6 +25,8 @@ public class Conference implements Serializable {
 	private int id;
 	private String title = "Not specified";
 	private DateTime date = DateTime.today(XCS.TZ);
+	private DateTime startTime = DateTime.forTimeOnly(16, 0, 0,0);
+	private DateTime endTime = DateTime.forTimeOnly(21, 0, 0,0);
 
 	private Set<Session> sessions;
 	private ArrayList<Location> locations;
@@ -92,9 +96,30 @@ public class Conference implements Serializable {
 		ConferenceServer.getInstance().storeSession(session);
 	}
 
+	public List<TimeSlot> getAvailableTimeSlots() {
+		ArrayList<TimeSlot> list = new ArrayList<TimeSlot>();
+		
+		int end = (endTime.getHour()-startTime.getHour())*2;
+		for (int i = 0; i < end; i++) {
+			TimeSlot ts = new TimeSlot();
+			ts.start = startTime.plus(0, 0, 0, 0, i*30, 0, DayOverflow.Spillover);
+			ts.end = startTime.plus(0, 0, 0, 0, (i+1)*30, 0, DayOverflow.Spillover);
+			list.add(ts);
+		}
+		return list;
+	}
+	
 	private Set<Session> loadSessions() {
 		ConferenceServer.getInstance().loadSessions(this, sessions);
 		return sessions;
+	}
+	
+	public DateTime getStartTime() {
+		return startTime;
+	}
+	
+	public DateTime getEndTime() {
+		return endTime;
 	}
 
 	@Override
@@ -128,5 +153,10 @@ public class Conference implements Serializable {
 			}
 		}
 		return null;
+	}
+	
+	public class TimeSlot {
+		public DateTime start;
+		public DateTime end;
 	}
 }

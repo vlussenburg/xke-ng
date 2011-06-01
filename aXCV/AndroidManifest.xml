@@ -43,5 +43,9 @@
 			android:name="CVSessionView"
 			android:theme="@android:style/Theme.NoTitleBar">
 		</activity>
+		<activity
+			android:name="CVSessionAdd"
+			android:label="@string/app_name">
+		</activity>
 	</application>
 </manifest>

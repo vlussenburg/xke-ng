@@ -2,7 +2,9 @@ package com.xebia.xcoss.axcv.model;
 
 import hirondelle.date4j.DateTime;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -22,17 +24,19 @@ public class ConferenceList {
 		if ( conference == null ) {
 			return;
 		}
+		String year = null;
 		DateTime date = conference.getDate();
-		if ( date == null ) {
-			DateTime now = DateTime.now(XCS.TZ);
-			conference.setDate(now);
-			date = now;
+		if ( date != null ) {
+			year = String.valueOf(date.getYear());
 		}
-		String year = String.valueOf(date.getYear());
 		getConferences(year).add(conference);
 	}
 	
 	public Set<Conference> getConferences(String year) {
+		if ( year == null || year.trim().length() == 0 ) {
+			DateTime now = DateTime.now(XCS.TZ);
+			year = String.valueOf(now.getYear());
+		}
 		Set<Conference> set = conferences.get(year);
 		if ( set == null ) {
 			set = new TreeSet<Conference>(new ConferenceComparator());
@@ -72,5 +76,46 @@ public class ConferenceList {
 			return conference;
 		}
 		return getConferences(String.valueOf(dt.getYear()+1)).iterator().next();
+	}
+
+	public List<Conference> getUpcomingConferences(int size) {
+		
+		DateTime now = DateTime.today(XCS.TZ);
+		Integer yearValue = now.getYear();
+
+		List<Conference> list = findUpcomingConferences(yearValue, size);
+		int delta = size - list.size();
+		if ( delta > 0 ) {
+			list.addAll(findUpcomingConferences(yearValue+1, delta));
+		}
+		return list;
+	}
+	
+	private List<Conference> findUpcomingConferences(int yearValue, int size) {
+		String year = String.valueOf(yearValue);
+		ArrayList<Conference> list = new ArrayList<Conference>();
+		
+		Set<Conference> cfs = getConferences(year);
+		for (Conference conference : cfs) {
+			DateTime cdate = conference.getDate();
+			if ( cdate.plusDays(1).isInThePast(XCS.TZ)) {
+				continue;
+			}
+			list.add(conference);
+		}
+		return list;
+	}
+
+	public Conference findConferenceByName(String name) {
+		if ( name != null ) {
+			for (Set<Conference> result : conferences.values()) {
+				for (Conference conference : result) {
+					if ( name.equals(conference.getTitle()) ) {
+						return conference;
+					}
+				}
+			}
+		}
+		return null;
 	}
 }

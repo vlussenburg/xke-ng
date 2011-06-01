@@ -84,6 +84,10 @@ public abstract class BaseActivity extends Activity {
 	}
 
 	protected Session getSession(Conference conference) {
+		return getSession(conference, true);
+	}
+	
+	protected Session getSession(Conference conference, boolean useDefault) {
 		Session session = null;
 		int identifier = -1;
 		try {
@@ -93,7 +97,7 @@ public abstract class BaseActivity extends Activity {
 		catch (Exception e) {
 			Log.w(LOG.ALL, "No session with ID " + identifier + " or conference not found.");
 		}
-		if (session == null) {
+		if (session == null && useDefault) {
 			Log.w(LOG.ALL, "Conference default : " + (conference == null ? "NULL" : conference.getTitle()));
 			session = conference.getUpcomingSession();
 			Log.w(LOG.ALL, "Session default " + (session == null ? "NULL" : session.getTitle()));

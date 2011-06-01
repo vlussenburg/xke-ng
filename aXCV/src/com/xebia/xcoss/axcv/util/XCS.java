@@ -18,6 +18,9 @@ public class XCS {
 		public static final int ADD_RATING      = DIALOGID;
 		public static final int CREATE_REVIEW   = DIALOGID + 1;
 		public static final int CONNECT_FAILED  = DIALOGID + 2;
+		public static final int SELECT_CONFERENCE = DIALOGID + 3;
+		public static final int SELECT_TIME     = DIALOGID + 4;
+		public static final int SELECT_DURATION = DIALOGID + 5;
 	}
 	
 	public class LOG {

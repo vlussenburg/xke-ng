@@ -70,8 +70,7 @@ public class CVSessionList extends BaseActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == XCS.MENU.ADD) {
-			// TODO : Session addition
-			startActivity(new Intent(this, CVSettings.class));
+			startActivity(new Intent(this, CVSessionAdd.class));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

@@ -58,7 +58,7 @@ public class ScreenTimeUtil {
 		return dateFormat.format(cal.getTime());
 	}
 
-	public Object getAbsoluteTime(DateTime time) {
+	public String getAbsoluteTime(DateTime time) {
 		Calendar cal = Calendar.getInstance(XCS.TZ);
 		cal.set(Calendar.HOUR_OF_DAY, time.getHour());
 		cal.set(Calendar.MINUTE, time.getMinute());
