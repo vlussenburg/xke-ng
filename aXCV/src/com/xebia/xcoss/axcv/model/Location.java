@@ -16,4 +16,8 @@ public class Location implements Serializable {
 		return location;
 	}
 
+	@Override
+	public String toString() {
+		return location;
+	}
 }

@@ -36,15 +36,14 @@ public class TestUtil {
 		Location loc = new Location("Laap");
 		Session session = mandatory ? new BreakSession() : new Session();
 		session.setLocation(loc);
-		session.setAuthor("M. van Leeuwen");
+		session.addAuthor("M. van Leeuwen");
 		session.setStartTime(DateTime.forTimeOnly(start,0,0,0));
 		session.setEndTime(DateTime.forTimeOnly(start+1,0,0,0));
 		session.setTitle(title);
-		ArrayList<String> labels = new ArrayList<String>();
-		labels.add("Android");
-		labels.add("REST");
+		Set<String> labels = session.getLabels();
 		if ( start != 19 ) {
-			session.setLabels(labels);
+			labels.add("Android");
+			labels.add("REST");
 		}
 		return session;
 	}

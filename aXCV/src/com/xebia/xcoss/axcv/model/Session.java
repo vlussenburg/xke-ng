@@ -4,6 +4,9 @@ import hirondelle.date4j.DateTime;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Session implements Serializable {
 
@@ -16,20 +19,24 @@ public class Session implements Serializable {
 	private int id;
 
 	private String title;
-	private String author;
-	private ArrayList<String> labels;
 	private Location location;
 	private DateTime date;
 	private DateTime startTime;
 	private DateTime endTime;
 	private String description;
-	private String language;
 	private String intendedAudience;
 	private String limit;
 	private String preparation;
 
+	private Set<String> authors;
+	private Set<String> labels;
+	private Set<String> languages;
+
 	public Session() {
-		labels = new ArrayList<String>();
+		labels = new TreeSet<String>();
+		authors = new TreeSet<String>();
+		languages = new HashSet<String>();
+		location = new Location("TODO");
 		this.id = ++counter;
 	}
 
@@ -45,19 +52,31 @@ public class Session implements Serializable {
 		this.title = title;
 	}
 
-	public String getAuthor() {
-		return author;
+	public Set<String> getAuthors() {
+		return authors;
 	}
 
-	public void setAuthor(String author) {
-		this.author = author;
+	public void addAuthor(String author) {
+		authors.add(author);
+	}
+	
+	public void removeAuthor(String author) {
+		authors.remove(author);
 	}
 
-	public ArrayList<String> getLabels() {
+	public Set<String> getLabels() {
 		return labels;
 	}
 
-	public void setLabels(ArrayList<String> labels) {
+	public void addLabel(String label) {
+		labels.add(label);
+	}
+
+	public void removeLabel(String label) {
+		labels.remove(label);
+	}
+	
+	public void setLabels(Set<String> labels) {
 		this.labels = labels;
 	}
 
@@ -66,7 +85,9 @@ public class Session implements Serializable {
 	}
 
 	public void setLocation(Location location) {
-		this.location = location;
+		if ( location != null ) {
+			this.location = location;
+		}
 	}
 
 	public DateTime getDate() {
@@ -101,14 +122,6 @@ public class Session implements Serializable {
 		this.description = description;
 	}
 
-	public String getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-
 	public String getIntendedAudience() {
 		return intendedAudience;
 	}
@@ -139,5 +152,19 @@ public class Session implements Serializable {
 
 	public void setPreparation(String preparation) {
 		this.preparation = preparation;
+	}
+	
+	public Set<String> getLanguages() {
+		return languages;
+	}
+
+	public int getDuration() {
+		int duration = 0;
+		if (startTime != null && endTime != null) {
+			int start = startTime.getHour()*60 + startTime.getMinute();
+			int end = endTime.getHour()*60 + endTime.getMinute();
+			duration = end - start;
+		}
+		return duration;
 	}
 }

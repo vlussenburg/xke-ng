@@ -3,8 +3,10 @@ package com.xebia.xcoss.axcv.ui;
 
 import hirondelle.date4j.DateTime;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -65,6 +67,17 @@ public class ScreenTimeUtil {
 		return timeFormat.format(cal.getTime());
 	}
 
+	public DateTime getAbsoluteTime(String value) {
+		try {
+			Date date = timeFormat.parse(value);
+			return DateTime.forTimeOnly(date.getHours(), date.getMinutes(), 0,0);
+		}
+		catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	public static boolean isNow(DateTime startTime, DateTime endTime) {
 		DateTime now = DateTime.now(XCS.TZ);
 		if (startTime.hasYearMonthDay() && !startTime.isSameDayAs(now)) {

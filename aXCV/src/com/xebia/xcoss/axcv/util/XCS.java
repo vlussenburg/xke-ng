@@ -21,6 +21,15 @@ public class XCS {
 		public static final int SELECT_CONFERENCE = DIALOGID + 3;
 		public static final int SELECT_TIME     = DIALOGID + 4;
 		public static final int SELECT_DURATION = DIALOGID + 5;
+		public static final int INPUT_AUDIENCE  = DIALOGID + 6;
+		public static final int INPUT_AUTHORS   = DIALOGID + 7;
+		public static final int INPUT_LIMIT     = DIALOGID + 8;
+		public static final int INPUT_DESCRIPTION = DIALOGID + 9;
+		public static final int INPUT_LABELS    = DIALOGID + 10;
+		public static final int INPUT_LANGUAGE  = DIALOGID + 11;
+		public static final int INPUT_LOCATION  = DIALOGID + 12;
+		public static final int INPUT_PREPARATION = DIALOGID + 13;
+		public static final int INPUT_TITLE     = DIALOGID + 14;
 	}
 	
 	public class LOG {

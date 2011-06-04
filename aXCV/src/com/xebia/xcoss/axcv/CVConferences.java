@@ -28,7 +28,7 @@ public class CVConferences extends BaseActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.conferences);
-		
+
 		DateTime dt = DateTime.today(XCS.TZ);
 		String year = String.valueOf(dt.getYear());
 		ConferenceList collection = getConferenceServer().getConferences();
@@ -43,12 +43,15 @@ public class CVConferences extends BaseActivity {
 				// Adapter = listview, view = tablelayout.
 				switchTo(conferences[paramInt]);
 			}
-			
 		});
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-		if (sp.getBoolean(XCS.PREF.JUMPTOFIRST, true)) {
-			Log.i(XCS.LOG.NAVIGATE, "Jumping to first upcomming conference.");
-			switchTo(getConferenceServer().getConferences().getUpcomingConference());
+
+		// Check for redirection. Not the case if menu option is used.
+		if (getIntent().getBooleanExtra("redirect", true)) {
+			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+			if (sp.getBoolean(XCS.PREF.JUMPTOFIRST, true)) {
+				Log.i(XCS.LOG.NAVIGATE, "Jumping to first upcomming conference.");
+				switchTo(getConferenceServer().getConferences().getUpcomingConference());
+			}
 		}
 		
 		TextView title = (TextView) findViewById(R.id.conferencesTitle);

@@ -62,12 +62,12 @@ public class CVSessionView extends BaseActivity {
 		sessionLocation.setText(session.getLocation().getLocation());
 		sessionTitle.setText(session.getTitle());
 		sessionDescription.setText(session.getDescription());
-		sessionAuthor.setText(session.getAuthor());
+		sessionAuthor.setText(FormatUtil.getList(session.getAuthors()));
 
 		// Optional fields (hide when not available)
 		updateTextField(R.id.scAudience, R.id.scAudienceLabel, session.getIntendedAudience());
-		updateTextField(R.id.scLabels, R.id.scLabelsLabel, FormatUtil.getLabels(session));
-		updateTextField(R.id.scLanguage, R.id.scLanguageLabel, session.getLanguage());
+		updateTextField(R.id.scLabels, R.id.scLabelsLabel, FormatUtil.getList(session.getLabels()));
+		updateTextField(R.id.scLanguage, R.id.scLanguageLabel, FormatUtil.getList(session.getLanguages()));
 		updateTextField(R.id.scLimit, R.id.scLimitLabel, session.getLimit());
 		updateTextField(R.id.scPreparation, R.id.scPreparationLabel, session.getPreparation());
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:id="@+id/linearLayout1"
+	android:layout_height="fill_parent"
+	android:layout_width="fill_parent">
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textSize="18sp"
+		android:gravity="center"
+		android:layout_gravity="center_horizontal"
+		android:paddingLeft="5sp"
+		android:paddingRight="5sp" android:id="@+id/seDescription" android:layout_marginBottom="10sp" android:layout_marginTop="10sp" android:text="Field info"></TextView>
+	<EditText
+		android:layout_width="fill_parent"
+		android:text="EditText"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="5sp"
+		android:layout_marginRight="5sp"
+		android:layout_gravity="center_horizontal"
+		android:minLines="3"
+		android:cursorVisible="true"
+		android:gravity="top|left"
+		android:inputType="textAutoCorrect|textAutoComplete|textMultiLine|textLongMessage" android:maxLines="5" android:id="@+id/seValue"></EditText>
+	<LinearLayout android:id="@+id/linearLayout2" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:gravity="center_horizontal">
+		<Button android:text="Submit" android:layout_width="wrap_content" android:layout_gravity="center_horizontal" android:id="@+id/seCommit" android:layout_height="wrap_content"></Button>
+		<Button android:layout_width="wrap_content" android:layout_gravity="center_horizontal" android:layout_height="wrap_content" android:id="@+id/seCancel" android:text="Cancel"></Button>
+	</LinearLayout>
+</LinearLayout>

@@ -58,7 +58,9 @@ public abstract class BaseActivity extends Activity {
 				startActivity(new Intent(this, CVSettings.class));
 			break;
 			case XCS.MENU.OVERVIEW:
-				startActivity(new Intent(this, CVConferences.class));
+				Intent intent = new Intent(this, CVConferences.class);
+				intent.putExtra("redirect", false);
+				startActivity(intent);
 			break;
 		}
 		return true;

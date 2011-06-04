@@ -62,13 +62,14 @@ public class SessionAdapter extends BaseAdapter {
 		titleView.setTextColor(colorId);
 //			titleView.setTypeface(titleView.getTypeface(), Typeface.BOLD);
 
-		if ( StringUtil.isEmpty(session.getAuthor()) ) {
+		String authors = FormatUtil.getList(session.getAuthors());
+		if ( StringUtil.isEmpty(authors) ) {
 			authorView.setVisibility(View.GONE);
 		} else {
-			authorView.setText("Author: " + session.getAuthor());
+			authorView.setText("Author: " + authors);
 		}
 
-		String labels = FormatUtil.getLabels(session);
+		String labels = FormatUtil.getList(session.getLabels());
 		if ( StringUtil.isEmpty(labels) ) {
 			labelView.setVisibility(View.GONE);
 		} else {
