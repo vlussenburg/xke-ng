@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/linearLayout1"
+	android:layout_height="fill_parent"
+	android:layout_width="fill_parent" android:orientation="vertical">
+    <AutoCompleteTextView android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="AutoCompleteTextView" android:maxLines="1" android:minLines="1" android:id="@+id/ssa_authortext"></AutoCompleteTextView>
+    <ListView android:layout_width="fill_parent" android:layout_height="fill_parent" android:id="@+id/ssa_authorlist"></ListView>
+</LinearLayout>

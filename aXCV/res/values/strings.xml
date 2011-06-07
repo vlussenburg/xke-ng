@@ -20,4 +20,6 @@
     <string name="modify_session">Modify session</string>
 
     <string name="empty_value">&lt;specify value&gt;</string>    
+
+    <string name="author_select">Select authors...</string>    
 </resources>

@@ -21,30 +21,32 @@ import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class CVSessionList extends BaseActivity {
 
+	private Conference currentConference;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.schedule);
 
-		final Conference conference = getConference();
+		currentConference = getConference();
 
 		TextView title = (TextView) findViewById(R.id.conferenceTitle);
-		title.setText(conference.getTitle());
+		title.setText(currentConference.getTitle());
 
 		TextView date = (TextView) findViewById(R.id.conferenceDate);
-		String val = new ScreenTimeUtil(this).getAbsoluteDate(conference.getDate());
+		String val = new ScreenTimeUtil(this).getAbsoluteDate(currentConference.getDate());
 		date.setText(val);
 
-		Log.w(LOG.ALL, "Conference has " + conference.getSessions().size() + " sessions.");
-		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, conference);
+		Log.w(LOG.ALL, "Conference has " + currentConference.getSessions().size() + " sessions.");
+		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, currentConference);
 		ListView sessionList = (ListView) findViewById(R.id.sessionList);
 		sessionList.setAdapter(adapter);
 		sessionList.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
 				// Adapter = listview, view = tablelayout.
-				switchTo(conference, paramInt);
+				switchTo(currentConference, paramInt);
 			}
 		});
 	}
@@ -71,7 +73,9 @@ public class CVSessionList extends BaseActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == XCS.MENU.ADD) {
-			startActivity(new Intent(this, CVSessionAdd.class));
+			Intent intent = new Intent(this, CVSessionAdd.class);
+			intent.putExtra(BaseActivity.IA_CONFERENCE, currentConference.getId());
+			startActivity(intent);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

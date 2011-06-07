@@ -10,6 +10,7 @@ import java.util.Set;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.graphics.drawable.Drawable;
@@ -350,15 +351,6 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 			case XCS.DIALOG.INPUT_TITLE:
 				dialog = new TextInputDialog(this, R.id.sessionTitle);
 			break;
-			case XCS.DIALOG.INPUT_AUTHORS:
-				// dialog = new AuthorInputDialog(this, R.id.);
-			break;
-			case XCS.DIALOG.INPUT_LABELS:
-				// dialog = new LabelInputDialog(this, id);
-			break;
-			case XCS.DIALOG.INPUT_LOCATION:
-				// dialog = new LocationInputDialog(this, id);
-			break;
 		}
 		if (dialog != null) {
 			return dialog;
@@ -400,6 +392,13 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 		super.onPrepareDialog(id, dialog);
 	}
 
+	private void showAuthorPage() {
+		Intent intent = new Intent(this, CVSearchAuthor.class);
+		intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
+		intent.putExtra(BaseActivity.IA_SESSION, session.getId());
+		startActivity(intent);
+	}
+	
 	private class AddOnTouchListener implements OnTouchListener {
 
 		@Override
@@ -440,7 +439,7 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 					showDialog(XCS.DIALOG.INPUT_AUDIENCE);
 				break;
 				case R.id.sessionAuthors:
-					showDialog(XCS.DIALOG.INPUT_AUTHORS);
+					showAuthorPage();
 				break;
 				case R.id.sessionCount:
 					showDialog(XCS.DIALOG.INPUT_LIMIT);
@@ -449,13 +448,13 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 					showDialog(XCS.DIALOG.INPUT_DESCRIPTION);
 				break;
 				case R.id.sessionLabels:
-					showDialog(XCS.DIALOG.INPUT_LABELS);
+					// TODO
 				break;
 				case R.id.sessionLanguage:
 					showDialog(XCS.DIALOG.INPUT_LANGUAGE);
 				break;
 				case R.id.sessionLocation:
-					showDialog(XCS.DIALOG.INPUT_LOCATION);
+					// TODO
 				break;
 				case R.id.sessionPreps:
 					showDialog(XCS.DIALOG.INPUT_PREPARATION);

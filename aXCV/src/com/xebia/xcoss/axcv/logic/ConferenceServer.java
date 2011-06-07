@@ -91,4 +91,14 @@ public class ConferenceServer {
 	public void storeSession(Session session) {
 		// TODO Auto-generated method stub
 	}
+
+	public String[] getAllAuthors() {
+		// TODO implement
+
+		String[] authors = new String[3];
+		authors[0] = "Erwin Embsen";
+		authors[1] = "Guido Schoonheim";
+		authors[2] = "Marnix van Wendel de Joode";
+		return authors;
+	}
 }

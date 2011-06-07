@@ -199,6 +199,9 @@ public class Session implements Serializable {
 		if ( StringUtil.isEmpty(title) ) {
 			messages.add("Title");
 		}
+		if ( authors.isEmpty() ) {
+			messages.add("Author");
+		}
 		return (messages.size() == 0);
 	}
 }
