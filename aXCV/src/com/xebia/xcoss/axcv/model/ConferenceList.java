@@ -43,6 +43,7 @@ public class ConferenceList {
 		if ( set == null ) {
 			set = new TreeSet<Conference>(new ConferenceComparator());
 			conferences.put(year, set);
+			
 			ConferenceServer.getInstance().loadConferences(year, set);
 		}
 		return set;

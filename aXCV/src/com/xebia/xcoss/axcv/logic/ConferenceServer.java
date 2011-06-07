@@ -1,6 +1,11 @@
 package com.xebia.xcoss.axcv.logic;
 
+import java.util.ArrayList;
 import java.util.Set;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.util.Log;
 
@@ -10,6 +15,7 @@ import com.xebia.xcoss.axcv.model.ConferenceList;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.XCS;
+import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class ConferenceServer {
 
@@ -79,6 +85,28 @@ public class ConferenceServer {
 	public void loadConferences(String year, Set<Conference> set) {
 		Set<Conference> conferences = getConferences().getConferences(year);
 		if ( conferences.isEmpty() ) {
+//			String result = RestClient.loadURL(baseUrl + "/conferences/" + year);
+			Session session = RestClient.loadObject(baseUrl + "/sessions", Session.class);
+			ArrayList<Session> list = RestClient.loadObjects(baseUrl + "/sessions", "xkesessions", Session.class);
+			
+			for (Session session2 : list) {
+				Log.w(LOG.COMMUNICATE, "Result [] = " + session2);
+			}
+//            try {
+//				JSONObject json = new JSONObject(result);
+//				json.
+//				JSONArray nameArray = json.names();
+//				JSONArray valArray = json.toJSONArray(nameArray);
+//				for (int i = 0; i < valArray.length(); i++) {
+//				        Log.i("XCS", "JSON" + i + " = " + nameArray.getString(i)    + "\\n</jsonname" + i + ">\\n" + "<jsonvalue" + i + ">\\n" + valArray.getString(i) + "\\n</jsonvalue"   + i + ">");
+//				}
+//			}
+//			catch (JSONException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+			Log.w(LOG.COMMUNICATE, "Result = " + session);
 			// TODO Temp, temp temp...
 			TestUtil.createConferences(conferences);
 		}

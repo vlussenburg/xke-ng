@@ -37,7 +37,7 @@ public class CVSearchAuthor extends BaseActivity {
 				if (keyCode == KeyEvent.KEYCODE_ENTER ) {
 					Log.e("XCS", "Reads = " + textView.getText().toString());
 				}
-//				session.addAuthor("Test");
+				session.addAuthor("Test");
 				return false;
 			}
 		});

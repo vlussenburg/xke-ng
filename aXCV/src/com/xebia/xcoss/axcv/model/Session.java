@@ -3,12 +3,12 @@ package com.xebia.xcoss.axcv.model;
 import hirondelle.date4j.DateTime;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.google.gson.annotations.SerializedName;
 import com.xebia.xcoss.axcv.ui.StringUtil;
 
 public class Session implements Serializable {
@@ -19,14 +19,21 @@ public class Session implements Serializable {
 
 	private Conference conference = null;
 
+
+	// Auto mapped
+	private String title;
 	private int id;
 
-	private String title;
+	@SerializedName("desc")
+	private String description;
+
+	// TODO : map
 	private Location location;
 	private DateTime date;
 	private DateTime startTime;
 	private DateTime endTime;
-	private String description;
+	
+
 	private String intendedAudience;
 	private String limit;
 	private String preparation;
@@ -204,4 +211,13 @@ public class Session implements Serializable {
 		}
 		return (messages.size() == 0);
 	}
+
+	@Override
+	public String toString() {
+		return "Session [conference=" + conference + ", id=" + id + ", title=" + title + ", location=" + location
+				+ ", date=" + date + ", startTime=" + startTime + ", endTime=" + endTime + ", description="
+				+ description + ", intendedAudience=" + intendedAudience + ", limit=" + limit + ", preparation="
+				+ preparation + ", authors=" + authors + ", labels=" + labels + ", languages=" + languages + "]";
+	}
+	
 }
