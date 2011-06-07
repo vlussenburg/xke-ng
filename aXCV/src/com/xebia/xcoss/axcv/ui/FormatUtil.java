@@ -1,5 +1,6 @@
 package com.xebia.xcoss.axcv.ui;
 
+import java.util.List;
 import java.util.Set;
 
 import com.xebia.xcoss.axcv.model.Remark;
@@ -7,6 +8,8 @@ import com.xebia.xcoss.axcv.model.Session;
 
 public class FormatUtil {
 
+	private static final String LINE = System.getProperty("line.separator");
+	
 	public static String getText(double rate) {
 		return getText(rate, 1);
 	}
@@ -48,5 +51,15 @@ public class FormatUtil {
 			return "<Specify value>";
 		}
 		return value;
+	}
+
+	public static String getText(List<String> messages) {
+		StringBuilder sb = new StringBuilder();
+		for (String string : messages) {
+			sb.append(LINE);
+			sb.append(" - ");
+			sb.append(string);
+		}
+		return sb.toString();
 	}
 }

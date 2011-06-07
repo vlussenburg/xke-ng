@@ -93,11 +93,15 @@ public class Conference implements Serializable {
 		sessions.add(session);
 		session.setConference(this);
 		session.setDate(date);
+		Log.e("XCS", "Adding session to conference " + this);
 		ConferenceServer.getInstance().storeSession(session);
 		return true;
 	}
 
 	public TimeSlot getNextAvailableTimeSlot(DateTime start, int duration) {
+		if ( start == null ) {
+			start = startTime;
+		}
 		int prefstart = Math.max(getTime(start), getTime(startTime));
 
 		// TODO Allow for multiple locations
@@ -145,6 +149,9 @@ public class Conference implements Serializable {
 	}
 
 	private int getTime(DateTime dt) {
+		if ( dt == null ) {
+			return 0;
+		}
 		return 100*dt.getHour() + dt.getMinute();
 	}
 
@@ -204,5 +211,9 @@ public class Conference implements Serializable {
 	public class TimeSlot {
 		public DateTime start;
 		public DateTime end;
+	}
+
+	public void deleteSession(Session session) {
+		sessions.remove(session);
 	}
 }

@@ -49,6 +49,7 @@ public class CVSessionList extends BaseActivity {
 		});
 	}
 
+	
 	private void switchTo(Conference conference, int sessionIndex) {
 		Session session = conference.getSessions().get(sessionIndex);
 		if ( session instanceof BreakSession ) {

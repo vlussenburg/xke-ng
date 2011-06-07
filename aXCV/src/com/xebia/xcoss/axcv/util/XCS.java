@@ -30,6 +30,7 @@ public class XCS {
 		public static final int INPUT_LOCATION  = DIALOGID + 12;
 		public static final int INPUT_PREPARATION = DIALOGID + 13;
 		public static final int INPUT_TITLE     = DIALOGID + 14;
+		public static final int ERROR_SITUATION = DIALOGID + 15;
 	}
 	
 	public class LOG {
@@ -51,7 +52,36 @@ public class XCS {
 		// Should be the same as in preferences.xml
 		public static final String USERNAME = "Username";
 		public static final String PASSWORD = "Password";
-		public static final String STOREPASS = "StorePassword";
+		public static final String STOREPASS = "StorePassword";	
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		public static final String JUMPTOFIRST = "Upcoming";
 		public static final String SESSIONLIST = "ListView";
 		public static final String NOTIFYSOUND = "NotificationSound";

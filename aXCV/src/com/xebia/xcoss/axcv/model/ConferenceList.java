@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import android.util.Log;
+
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.util.ConferenceComparator;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -55,6 +57,7 @@ public class ConferenceList {
 		for (Set<Conference> result : conferences.values()) {
 			for (Conference conference : result) {
 				if ( id == conference.getId()) {
+					Log.e("XCS", "Conference is " + conference);
 					return conference;
 				}
 			}
@@ -63,19 +66,7 @@ public class ConferenceList {
 	}
 	
 	public Conference getUpcomingConference() {
-		DateTime dt = DateTime.today(XCS.TZ);
-		String year = String.valueOf(dt.getYear());
-		Set<Conference> cfs = getConferences(year);
-
-		for (Conference conference : cfs) {
-			DateTime cdate = conference.getDate();
-			if ( cdate.isInThePast(XCS.TZ) && !cdate.isSameDayAs(dt)) {
-				continue;
-			}
-			// List is sorted on date
-			return conference;
-		}
-		return getConferences(String.valueOf(dt.getYear()+1)).iterator().next();
+		return getFirstConference(DateTime.today(XCS.TZ));
 	}
 
 	public List<Conference> getUpcomingConferences(int size) {
@@ -117,5 +108,25 @@ public class ConferenceList {
 			}
 		}
 		return null;
+	}
+
+	public Conference getFirstConference(DateTime dt) {
+		String year = String.valueOf(dt.getYear());
+		Set<Conference> cfs = getConferences(year);
+
+		if ( cfs.isEmpty() ) {
+			return null;
+		}
+		
+		for (Conference conference : cfs) {
+			DateTime cdate = conference.getDate();
+			if ( cdate.isInThePast(XCS.TZ) && !cdate.isSameDayAs(dt)) {
+				continue;
+			}
+			// List is sorted on date
+			return conference;
+		}
+		// No conference in this year.
+		return getFirstConference(DateTime.forDateOnly(dt.getYear()+1, 1, 1));
 	}
 }

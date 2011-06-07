@@ -3,6 +3,7 @@ package com.xebia.xcoss.axcv;
 import hirondelle.date4j.DateTime;
 import hirondelle.date4j.DateTime.DayOverflow;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -25,6 +26,7 @@ import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
+import com.xebia.xcoss.axcv.model.ConferenceList;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
@@ -32,12 +34,14 @@ import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.StringUtil;
 import com.xebia.xcoss.axcv.ui.TextInputDialog;
 import com.xebia.xcoss.axcv.util.XCS;
+import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDismissListener {
 
 	private ScreenTimeUtil timeFormatter;
 	private Conference conference;
 	private Session session;
+	private Session originalSession;
 	private boolean create = false;
 
 	/** Called when the activity is first created. */
@@ -47,9 +51,12 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 		setContentView(R.layout.add_session);
 		this.timeFormatter = new ScreenTimeUtil(this);
 
-		if (session == null) {
+		originalSession = getSession(conference, false);
+		if (originalSession == null) {
 			create = true;
 			session = new Session();
+		} else {
+			session = new Session(originalSession);
 		}
 
 		showConference();
@@ -130,25 +137,31 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 			view.setOnClickListener(clickListener);
 			view.setBackgroundDrawable(drawable);
 		}
-		
+
 		Button button = (Button) findViewById(R.id.actionSave);
 		button.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
-				if ( ! conference.addSession(session) ) {
-					// TODO Show warning
+				List<String> messages = new ArrayList<String>();
+				if (!session.check(messages)) {
+					createDialog("Failed", "Please specify the following attributes: " + FormatUtil.getText(messages)).show();
+					return;
+				}
+				if (!conference.addSession(session)) {
+					Log.e(LOG.ALL, "Adding session failed.");
+					createDialog("No session added", "Session could not be added.");
 				}
 			}
 		});
 		button = (Button) findViewById(R.id.actionDelete);
-		if ( create ) {
+		if (create) {
 			button.setVisibility(View.GONE);
 		} else {
 			button.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View paramView) {
 					// TODO Confirmation dialog
-					// conference.deleteSession(session);
+					conference.deleteSession(originalSession);
 				}
 			});
 		}
@@ -156,14 +169,29 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 		button.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
-				
+
 				TimeSlot slot = conference.getNextAvailableTimeSlot(session.getStartTime(), session.getDuration());
-				if ( slot != null ) {
+				if ( slot == null ) {
+					ConferenceList allConferences = getConferenceServer().getConferences();
+					while ( slot == null ) {
+						conference = allConferences.getFirstConference(conference.getDate().plusDays(1));
+						if ( conference == null ) {
+							break;
+						}
+						slot = conference.getNextAvailableTimeSlot(session.getStartTime(), session.getDuration());
+					}
+				}
+				
+				if (slot != null) {
 					session.setStartTime(slot.start);
 					session.setEndTime(slot.end);
-					conference.addSession(session);
+					session.setConference(conference);
+					session.setDate(conference.getDate());
+					showConference();
+					showSession();
+					// TODO Difference in create and modify
 				} else {
-					// TODO Move to next conference ???
+					// No conferences available to fit slot in.
 				}
 			}
 		});

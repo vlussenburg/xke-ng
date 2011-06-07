@@ -11,8 +11,13 @@ public class SessionComparator implements Comparator<Session>, Serializable {
 
 	@Override
 	public int compare(Session s1, Session s2) {
+		if (s1.getStartTime() == null) {
+			return (s2.getStartTime() == null) ? 0 : -1;
+		} else if (s2.getStartTime() == null ) {
+			return 1;
+		}
 		int result = s1.getStartTime().compareTo(s2.getStartTime());
-		if ( result == 0 ) {
+		if (result == 0) {
 			result = s1.getLocation().toString().compareTo(s2.getLocation().toString());
 		}
 		return result;

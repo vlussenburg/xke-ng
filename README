@@ -11,17 +11,20 @@ Basically it consists of the following components:
 
 There are three projects:
 
-  1. XCoSS (Xebia Conference Scheduling System)
+  1. XCoSS (Xebia Conference Scheduling System - Java)
   2. aXCV (Xebia Conference Viewer for Android)
   3. iXCV (Xebia Conference Viewer for iPhone/iPad)
+  4. xke-ng-web (Xebia Conference Scheduling System - Scala)
 
 XCoSS is the server component with a web interface and REST services,
-      based on XML and/or JSON.
+      based on XML and/or JSON, written in Java and using Hibernate.
 
 aXCV  is the Android 2+ client for viewing and editing conference sessions.
 
 iXCV  is currently not active, but will do the same as aXCV.
 
+Xxke-ng-web is the server component with a web interface and REST services,
+      based on JSON, written in Scala and using ???.
 
 Info:
 Michael van Leeuwen [mvanleeuwen@xebia.com]

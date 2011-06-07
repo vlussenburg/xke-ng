@@ -1,20 +1,30 @@
 
-  XCoSS installation description
+This document describes both the Java and the Scala version of the server.
+
+
+  XCoSS installation description (Scala)
 ===========================================
 
-- Installeer Java6
+- Install Maven3
+- Install Java6
+- Run mvn jetty:run
 
-- Installeer Tomcat6
+API found on https://github.com/xebia/xke-ng/wiki
 
-- Installeer MySQL 5.5
 
-- Installeer MySQL Workbench 5.2 CE (optioneel)
+  XCoSS installation description (Java)
+===========================================
 
-- Installeer MySQL Connector/J 5.1.x
+- Install Maven3
+- Install Java6
+- Install Tomcat6
+- Install MySQL 5.5
+- Install MySQL Workbench 5.2 CE (optional)
+- Install MySQL Connector/J 5.1.x
 
-- Configureer Tomcat:
+- Configure Tomcat:
 
-  - Voeg toe aan ./conf/context.xml
+  - Add to ./conf/context.xml
 
 	<Resource name="jdbc/xcossds"
 			auth="Container"
@@ -27,23 +37,22 @@
 			maxIdle="4"
 	/>
   
-  - Plaats mysql-connector-java-5.1.x-bin.jar in ./lib/
+  - Place mysql-connector-java-5.1.x-bin.jar in ./lib/
 
-- Configureer MySQL:
+- Configure MySQL:
 
   - Start: mysql -u root -p
 
-  - Voer uit: 
+  - Execute: 
     create database xcoss default character set utf8 default collate utf8_general_ci;
 	create user 'xcoss'@'localhost';
 	grant all privileges on xcoss.* to xcoss@'localhost';
 	set password for xcoss@'localhost' = old_password('xcoss');
 
-
 ------------------------------------------------------------
 Developer notes:
 
-- Maven wordt gebruikt om te bouwen. Geen specifieke settings.
-- Atlassian Crowd API is nodig. Bouw 1x met atlas-compile om de dependencies op
-  te slaan in de lokale repository.
-- Deployment in Tomcat (handmatig).
+- Maven is used for building (no specific settings)
+- Atlassian Crowd API is needed. Build once with atlas-compile
+  (dependencies are than stored in the local repository).
+- Deployment in Tomcat (manually).

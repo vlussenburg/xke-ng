@@ -82,6 +82,7 @@ public abstract class BaseActivity extends Activity {
 			conference = allConferences.getUpcomingConference();
 			Log.w(LOG.ALL, "Conference default " + conference.getTitle());
 		}
+		Log.e("XCS", "Conference = " + conference);
 		return conference;
 	}
 
@@ -124,18 +125,22 @@ public abstract class BaseActivity extends Activity {
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		if (id == XCS.DIALOG.CONNECT_FAILED) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder
-				.setTitle("Connection failed")
-				.setMessage("The connection to the server failed. Either the server is down or your credentials are wrong.")
-				.setIcon(R.drawable.icon)
-				.setPositiveButton("Close", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
-					}
-				});
-			return builder.create();
+			return createDialog("Connection failed", "The connection to the server failed. Either the server is down or your credentials are wrong.");
 		}
 		return super.onCreateDialog(id);
+	}
+
+	protected Dialog createDialog(String title, String message) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder
+			.setTitle(title)
+			.setMessage(message)
+			.setIcon(R.drawable.icon)
+			.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+				}
+			});
+		return builder.create();
 	}
 }

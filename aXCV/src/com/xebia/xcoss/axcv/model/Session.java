@@ -5,8 +5,11 @@ import hirondelle.date4j.DateTime;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import com.xebia.xcoss.axcv.ui.StringUtil;
 
 public class Session implements Serializable {
 
@@ -37,7 +40,28 @@ public class Session implements Serializable {
 		authors = new TreeSet<String>();
 		languages = new HashSet<String>();
 		location = new Location("TODO");
-		this.id = ++counter;
+		id = ++counter;
+	}
+
+	public Session(Session original) {
+		this();
+		
+		conference = original.conference;
+		id = original.id;
+
+		title = original.title;
+		location = original.location;
+		date = original.date;
+		startTime = original.startTime;
+		endTime = original.endTime;
+		description = original.description;
+		intendedAudience = original.intendedAudience;
+		limit = original.limit;
+		preparation = original.preparation;
+
+		authors.addAll(original.authors);
+		labels.addAll(original.labels);
+		languages.addAll(original.languages);
 	}
 
 	public int getId() {
@@ -159,12 +183,22 @@ public class Session implements Serializable {
 	}
 
 	public int getDuration() {
-		int duration = 0;
+		int duration = 60;
 		if (startTime != null && endTime != null) {
 			int start = startTime.getHour()*60 + startTime.getMinute();
 			int end = endTime.getHour()*60 + endTime.getMinute();
 			duration = end - start;
 		}
 		return duration;
+	}
+
+	public boolean check(List<String> messages) {
+		if ( startTime == null ) {
+			messages.add("Start time");
+		}
+		if ( StringUtil.isEmpty(title) ) {
+			messages.add("Title");
+		}
+		return (messages.size() == 0);
 	}
 }
