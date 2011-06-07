@@ -1,16 +1,10 @@
 package bootstrap.liftweb
 
-import _root_.net.liftweb.util._
 import _root_.net.liftweb.common._
 import _root_.net.liftweb.http._
 import _root_.net.liftweb.http.provider._
 import _root_.net.liftweb.sitemap._
-import _root_.net.liftweb.sitemap.Loc._
-import Helpers._
-import _root_.net.liftweb.mapper.{DB, ConnectionManager, Schemifier, DefaultConnectionIdentifier, StandardDBVendor}
-import _root_.java.sql.{Connection, DriverManager}
-import _root_.com.xebia.model._
-import _root_.com.xebia.rest._
+import com.xebia.rest._
 
 
 /**
@@ -24,20 +18,21 @@ class Boot {
     LiftRules.addToPackages("com.xebia")
 
     // Build SiteMap
-    def sitemap() = SiteMap(
+/*    def sitemap() = SiteMap(
+
       Menu("Home") / "index" >> User.AddUserMenusAfter, // Simple menu form
       // Menu with special Link
       Menu(Loc("Static", Link(List("static"), true, "/static/index"), 
 	       "Static Content")))
+*/
 
-    LiftRules.setSiteMapFunc(() => User.sitemapMutator(sitemap()))
+//    LiftRules.setSiteMapFunc(() => User.sitemapMutator(sitemap()))
 
     LiftRules.dispatch.append(XKENGDispatchAPI)
     /*
      * Show the spinny image when an Ajax call starts
      */
-    LiftRules.ajaxStart =
-      Full(() => LiftRules.jsArtifacts.show("ajax-loader").cmd)
+    LiftRules.ajaxStart = Full(() => LiftRules.jsArtifacts.show("ajax-loader").cmd)
 
     /*
      * Make the spinny image go away when it ends
