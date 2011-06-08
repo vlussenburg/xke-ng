@@ -1,7 +1,5 @@
 package com.xebia.xcoss.axcv.ui;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +20,11 @@ public class SessionAdapter extends BaseAdapter {
 	private Session[] data;
 	private ScreenTimeUtil timeUtil;
 
-	public SessionAdapter(Activity context, int viewResourceId, int altViewResourceId, Conference conference) {
+	public SessionAdapter(Activity context, int viewResourceId, int altViewResourceId, Session[] data) {
 		this.ctx = context;
 		this.viewResource = viewResourceId;
 		this.alternativeViewResource = altViewResourceId;
-		this.data = conference.getSessions().toArray(new Session[0]);
+		this.data = data; //conference.getSessions().toArray(new Session[0]);
 		timeUtil = new ScreenTimeUtil(context);
 	}
 

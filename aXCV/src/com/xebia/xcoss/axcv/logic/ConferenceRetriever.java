@@ -22,7 +22,7 @@ public class ConferenceRetriever extends AsyncTask<String, Void, String> {
 
 	@Override
 	protected String doInBackground(String... arg0) {
-		ConferenceServer.getInstance().loadConferences(arg0[0], null);
+//		ConferenceServer.getInstance().loadConferences(arg0[0], null);
 		return "Result";
 	}
 

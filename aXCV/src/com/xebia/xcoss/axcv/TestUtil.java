@@ -2,7 +2,6 @@ package com.xebia.xcoss.axcv;
 
 import hirondelle.date4j.DateTime;
 
-import java.util.ArrayList;
 import java.util.Set;
 
 import com.xebia.xcoss.axcv.model.BreakSession;

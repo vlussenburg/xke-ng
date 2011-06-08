@@ -28,34 +28,35 @@ public class Conference implements Serializable {
 	private DateTime endTime = DateTime.forTimeOnly(21, 0, 0, 0);
 
 	private Set<Session> sessions;
-	private ArrayList<Location> locations;
-
-	private int sessionsPerLocation = 4;
 
 	public Conference() {
-		locations = new ArrayList<Location>();
-		sessions = new TreeSet<Session>(new SessionComparator());
+		resetSessions();
 		this.id = counter++;
+	}
+
+	private void resetSessions() {
+		sessions = new TreeSet<Session>(new SessionComparator());
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	public int getOpenSlots() {
-		return Math.max(0, getExpectedSlots() - sessions.size());
-	}
+//	public int getOpenSlots() {
+//		// TODO
+//		return Math.max(0, 7);
+//	}
 
-	public int getExpectedSlots() {
-		return locations.size() * sessionsPerLocation;
-	}
-
-	public ArrayList<Session> getSessions() {
-		return new ArrayList<Session>(loadSessions());
+	public Set<Session> getSessions() {
+		if ( sessions.isEmpty() ) {
+			List<Session> list = ConferenceServer.getInstance().getSessions(this);
+			sessions.addAll(list);
+		}
+		return sessions;
 	}
 
 	public Session getSessionById(int id) {
-		for (Session session : loadSessions()) {
+		for (Session session : getSessions()) {
 			if (id == session.getId()) {
 				return session;
 			}
@@ -79,48 +80,40 @@ public class Conference implements Serializable {
 		this.date = date;
 	}
 
-	public void setSessionsPerLocation(int sessionsPerLocation) {
-		this.sessionsPerLocation = sessionsPerLocation;
-	}
-
-	public int getSessionsPerLocation() {
-		return sessionsPerLocation;
-	}
-
 	public boolean addSession(Session session) {
 		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + this.getTitle());
 		// TODO : Check whether it fits. Otherwise return false.
-		sessions.add(session);
-		session.setConference(this);
+//		sessions.add(session);
 		session.setDate(date);
 		Log.e("XCS", "Adding session to conference " + this);
-		ConferenceServer.getInstance().storeSession(session);
+		ConferenceServer.getInstance().storeSession(session, getId(), false);
+		resetSessions();
 		return true;
 	}
 
 	public TimeSlot getNextAvailableTimeSlot(DateTime start, int duration) {
-		if ( start == null ) {
+		if (start == null) {
 			start = startTime;
 		}
 		int prefstart = Math.max(getTime(start), getTime(startTime));
 
 		// TODO Allow for multiple locations
-		
-		for (Session session: sessions) {
+
+		for (Session session : sessions) {
 			int sesstart = getTime(session.getStartTime());
-			
+
 			// Preferred start time is later than session time.
-			if ( sesstart <= prefstart ) {
+			if (sesstart <= prefstart) {
 				Log.w(XCS.LOG.ALL, "On " + session.getTitle() + " session starting earlier.");
 				int end = getTime(session.getEndTime());
-				if ( end > prefstart) {
+				if (end > prefstart) {
 					// Move start time to the end of this session
 					prefstart = end;
 				}
 			} else {
 				// There is room before this session
 				int available = prefstart - sesstart;
-				if (available >= duration ) {
+				if (available >= duration) {
 					return getTimeSlot(prefstart, duration);
 				}
 			}
@@ -128,20 +121,19 @@ public class Conference implements Serializable {
 
 		// Check last session till end of conference.
 		int endspace = getTime(endTime) - prefstart;
-		if ( endspace >= duration ) {
-			return getTimeSlot(prefstart, duration);			
+		if (endspace >= duration) {
+			return getTimeSlot(prefstart, duration);
 		}
 		return null;
 	}
 
-	
 	public List<TimeSlot> getAvailableTimeSlots() {
 		ArrayList<TimeSlot> list = new ArrayList<TimeSlot>();
 
 		final int length = 30;
 		DateTime start = startTime;
 		TimeSlot t;
-		while ((t = getNextAvailableTimeSlot(start, length)) != null ) {
+		while ((t = getNextAvailableTimeSlot(start, length)) != null) {
 			list.add(t);
 			start = start.plus(0, 0, 0, 0, length, 0, DayOverflow.Spillover);
 		}
@@ -149,22 +141,17 @@ public class Conference implements Serializable {
 	}
 
 	private int getTime(DateTime dt) {
-		if ( dt == null ) {
+		if (dt == null) {
 			return 0;
 		}
-		return 100*dt.getHour() + dt.getMinute();
+		return 100 * dt.getHour() + dt.getMinute();
 	}
 
 	private TimeSlot getTimeSlot(int value, int duration) {
 		TimeSlot ts = new TimeSlot();
-		ts.start = DateTime.forTimeOnly(value/100, value%100, 0, 0);
+		ts.start = DateTime.forTimeOnly(value / 100, value % 100, 0, 0);
 		ts.end = ts.start.plus(0, 0, 0, 0, duration, 0, DayOverflow.Spillover);
 		return ts;
-	}
-	
-	private Set<Session> loadSessions() {
-		ConferenceServer.getInstance().loadSessions(this, sessions);
-		return sessions;
 	}
 
 	public DateTime getStartTime() {
@@ -215,5 +202,11 @@ public class Conference implements Serializable {
 
 	public void deleteSession(Session session) {
 		sessions.remove(session);
+	}
+
+	@Override
+	public String toString() {
+		return "Conference [id=" + id + ", title=" + title + ", date=" + date + ", startTime=" + startTime
+				+ ", endTime=" + endTime + ", sessions=" + sessions + "]";
 	}
 }

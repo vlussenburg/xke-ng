@@ -22,6 +22,7 @@ import com.xebia.xcoss.axcv.util.XCS.LOG;
 public class CVSessionList extends BaseActivity {
 
 	private Conference currentConference;
+	private Session[] sessions;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -30,6 +31,7 @@ public class CVSessionList extends BaseActivity {
 		setContentView(R.layout.schedule);
 
 		currentConference = getConference();
+		sessions = currentConference.getSessions().toArray(new Session[0]);
 
 		TextView title = (TextView) findViewById(R.id.conferenceTitle);
 		title.setText(currentConference.getTitle());
@@ -39,7 +41,7 @@ public class CVSessionList extends BaseActivity {
 		date.setText(val);
 
 		Log.w(LOG.ALL, "Conference has " + currentConference.getSessions().size() + " sessions.");
-		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, currentConference);
+		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, sessions);
 		ListView sessionList = (ListView) findViewById(R.id.sessionList);
 		sessionList.setAdapter(adapter);
 		sessionList.setOnItemClickListener(new OnItemClickListener() {
@@ -53,7 +55,7 @@ public class CVSessionList extends BaseActivity {
 
 	
 	private void switchTo(Conference conference, int sessionIndex) {
-		Session session = conference.getSessions().get(sessionIndex);
+		Session session = sessions[sessionIndex];
 		if ( session instanceof BreakSession ) {
 			// No navigation to this session
 			return;

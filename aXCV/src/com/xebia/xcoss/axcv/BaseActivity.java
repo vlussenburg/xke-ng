@@ -13,7 +13,6 @@ import android.view.MenuItem;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Conference;
-import com.xebia.xcoss.axcv.model.ConferenceList;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -68,18 +67,18 @@ public abstract class BaseActivity extends Activity {
 
 	protected Conference getConference() {
 		Conference conference = null;
-		ConferenceList allConferences = getConferenceServer().getConferences();
+		ConferenceServer server = getConferenceServer();
 		
 		int identifier = -1;
 		try {
 			identifier = getIntent().getExtras().getInt(IA_CONFERENCE);
-			conference = allConferences.findConferenceById(identifier);
+			conference = server.getConference(identifier);
 		}
 		catch (Exception e) {
 			Log.w(LOG.ALL, "No conference with ID " + identifier);
 		}
 		if (conference == null) {
-			conference = allConferences.getUpcomingConference();
+			conference = server.getUpcomingConference();
 			Log.w(LOG.ALL, "Conference default " + conference.getTitle());
 		}
 		Log.e("XCS", "Conference = " + conference);

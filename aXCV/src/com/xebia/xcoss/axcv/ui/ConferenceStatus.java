@@ -9,8 +9,9 @@ public class ConferenceStatus {
 
 	public static String getStatus(Conference cfr) {
 		try {
-			int openSlots = cfr.getOpenSlots();
-			int expectedSlots = cfr.getExpectedSlots();
+			// TODO Implement
+			int openSlots = 5; // cfr.getOpenSlots();
+			int expectedSlots = 3*4; // cfr.getExpectedSlots();
 
 			if ( expectedSlots == 0 ) {
 				return "n/a";

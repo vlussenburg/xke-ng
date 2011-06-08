@@ -1,29 +1,27 @@
 package com.xebia.xcoss.axcv.logic;
 
-import java.util.ArrayList;
-import java.util.Set;
+import hirondelle.date4j.DateTime;
+import hirondelle.date4j.DateTime.Unit;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.util.Log;
 
-import com.xebia.xcoss.axcv.TestUtil;
+import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
-import com.xebia.xcoss.axcv.model.ConferenceList;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.XCS;
-import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class ConferenceServer {
 
 	private String baseUrl;
 	private String token;
-	private ConferenceList conferenceList;
 	
 	private static ConferenceServer instance;
+	
+	private ConferenceCache conferenceCache;
 
 	public static ConferenceServer getInstance() {
 		if (instance == null || instance.isLoggedIn() == false) {
@@ -33,19 +31,15 @@ public class ConferenceServer {
 	}
 
 	public static ConferenceServer createInstance(String user, String password, String url) {
-		ConferenceServer server = new ConferenceServer(url);
+		ConferenceServer server = new ConferenceServerWrapper(url);
 		server.login(user, password);
 		instance = server;
 		return instance;
 	}
 
-	private ConferenceServer(String base) {
+	protected ConferenceServer(String base) {
 		this.baseUrl = base;
-		this.conferenceList = new ConferenceList();
-	}
-
-	public ConferenceList getConferences() {
-		return conferenceList;
+		this.conferenceCache = new ConferenceCache();
 	}
 
 	public boolean login(String user, String password) {
@@ -58,7 +52,159 @@ public class ConferenceServer {
 		return (this.token != null);
 	}
 
-	public void registerRate(int rate) {
+	public Conference getConference(DateTime date) {
+		Conference result = conferenceCache.getConference(date);
+		if ( result == null ) {
+			StringBuilder requestUrl = new StringBuilder();
+			requestUrl.append(baseUrl);
+			requestUrl.append("/conference/on/");
+			requestUrl.append(date.format("YYYYMMDD"));
+			
+			result = RestClient.loadObject(requestUrl.toString(), Conference.class);
+			conferenceCache.add(result);
+		}
+		return result;
+	}
+	
+	public Conference getConference(int id) {
+		Conference result = conferenceCache.getConference(id);
+		if ( result == null ) {
+			StringBuilder requestUrl = new StringBuilder();
+			requestUrl.append(baseUrl);
+			requestUrl.append("/conference/");
+			requestUrl.append(id);
+			
+			result = RestClient.loadObject(requestUrl.toString(), Conference.class);
+			conferenceCache.add(result);
+		}
+		return result;
+	}
+	
+	public List<Conference> getConferences(Integer year) {
+		List<Conference> result = conferenceCache.getConferences(year);
+		if ( result == null ) {
+			StringBuilder requestUrl = new StringBuilder();
+			requestUrl.append(baseUrl);
+			requestUrl.append("/conferences/");
+			requestUrl.append(year);
+	
+			result = RestClient.loadObjects(requestUrl.toString(), "conferences", Conference.class);
+			conferenceCache.add(result);
+		}
+		return result;
+	}
+
+	public List<Conference> getConferences(DateTime date) {
+		List<Conference> result = conferenceCache.getConferences(date);
+		if ( result == null ) {
+			StringBuilder requestUrl = new StringBuilder();
+			requestUrl.append(baseUrl);
+			requestUrl.append("/conferences/");
+			requestUrl.append(date.getYear());
+			if ( date.unitsAllPresent(Unit.MONTH)) {
+				requestUrl.append("/");
+				requestUrl.append(date.getMonth());
+				if ( date.unitsAllPresent(Unit.DAY)) {
+					requestUrl.append("/");
+					requestUrl.append(date.getDay());
+				}
+			}	
+			result = RestClient.loadObjects(requestUrl.toString(), "conferences", Conference.class);
+			conferenceCache.add(result);
+		}
+		return result;
+	}
+
+	public int storeConference(Conference conference, boolean update) {
+		conferenceCache.remove(conference);
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/conference/");
+		requestUrl.append(conference.getId());
+		
+		if ( update ) {
+			RestClient.updateObject(requestUrl.toString(), conference);
+			return -1;
+		}
+		return RestClient.createObject(requestUrl.toString(), conference);
+	}
+
+	public void deleteConference(Conference conference) {
+		conferenceCache.remove(conference);
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/conference/");
+		requestUrl.append(conference.getId());
+		
+		RestClient.deleteObject(requestUrl.toString());
+	}
+
+	public List<Session> getSessions(Conference conference) {
+		// Conference is cached, so no need to do it for the sessions
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/conference/");
+		requestUrl.append(conference.getId());
+		requestUrl.append("/sessions");
+
+		List<Session> result = RestClient.loadObjects(requestUrl.toString(), "sessions", Session.class);
+		for (Session session : result) {
+//			conference.addSession(session);
+		}
+		conferenceCache.addSessions(result);
+		return result;
+	}
+
+	public Session getSession(int id) {
+		Session result = conferenceCache.getSession(id);
+		if ( result == null ) {
+			StringBuilder requestUrl = new StringBuilder();
+			requestUrl.append(baseUrl);
+			requestUrl.append("/session/");
+			requestUrl.append(id);
+	
+			result = RestClient.loadObject(requestUrl.toString(), Session.class);
+			conferenceCache.add(result);
+		}
+		return result;
+	}
+
+	public int storeSession(Session session, int conferenceId, boolean update) {
+		conferenceCache.remove(session);
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/conference/");
+		requestUrl.append(conferenceId);
+		requestUrl.append("/session");
+		
+		if ( update ) {
+			RestClient.updateObject(requestUrl.toString(), session);
+			return -1;
+		}
+		return RestClient.createObject(requestUrl.toString(), session);
+	}
+
+	public void deleteSession(Session session) {
+		conferenceCache.remove(session);
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/session/");
+		requestUrl.append(session.getId());
+		
+		RestClient.deleteObject(requestUrl.toString());
+	}
+
+	public Author[] getAllAuthors() {
+		// TODO implement
+
+		Author[] authors = new Author[3];
+		authors[0] = new Author("eembsen", "Erwin Embsen", "eembsen@xebia.com");
+		authors[1] =  new Author("guido", "Guido Schoonheim", "xita@xebia.com");
+		authors[2] =  new Author("marnix", "Marnix van Wendel de Joode", "info@xebia.com");
+		return authors;
+	}
+	
+	public void registerRate(Session session, int rate) {
 		// TODO implement
 	}
 
@@ -82,51 +228,55 @@ public class ConferenceServer {
 		Log.w(XCS.LOG.ALL, "Not implemented: " + remark);
 	}
 
-	public void loadConferences(String year, Set<Conference> set) {
-		Set<Conference> conferences = getConferences().getConferences(year);
-		if ( conferences.isEmpty() ) {
-//			String result = RestClient.loadURL(baseUrl + "/conferences/" + year);
-			Session session = RestClient.loadObject(baseUrl + "/sessions", Session.class);
-			ArrayList<Session> list = RestClient.loadObjects(baseUrl + "/sessions", "xkesessions", Session.class);
-			
-			for (Session session2 : list) {
-				Log.w(LOG.COMMUNICATE, "Result [] = " + session2);
-			}
-//            try {
-//				JSONObject json = new JSONObject(result);
-//				json.
-//				JSONArray nameArray = json.names();
-//				JSONArray valArray = json.toJSONArray(nameArray);
-//				for (int i = 0; i < valArray.length(); i++) {
-//				        Log.i("XCS", "JSON" + i + " = " + nameArray.getString(i)    + "\\n</jsonname" + i + ">\\n" + "<jsonvalue" + i + ">\\n" + valArray.getString(i) + "\\n</jsonvalue"   + i + ">");
-//				}
-//			}
-//			catch (JSONException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			
-			Log.w(LOG.COMMUNICATE, "Result = " + session);
-			// TODO Temp, temp temp...
-			TestUtil.createConferences(conferences);
+	/* Utility functions */
+
+	public List<Conference> getUpcomingConferences(int size) {
+		DateTime now = DateTime.today(XCS.TZ);
+		Integer yearValue = now.getYear();
+
+		List<Conference> list = findUpcomingConferences(yearValue, size);
+		int delta = size - list.size();
+		if ( delta > 0 ) {
+			list.addAll(findUpcomingConferences(yearValue+1, delta));
 		}
+		return list;
 	}
 
-	public void loadSessions(Conference conference, Set<Session> set) {
-		// TODO Auto-generated method stub
+	public Conference getUpcomingConference() {
+		return getUpcomingConference(DateTime.today(XCS.TZ));
 	}
 
-	public void storeSession(Session session) {
-		// TODO Auto-generated method stub
+	public Conference getUpcomingConference(DateTime dt) {
+		List<Conference> list = getConferences(dt.getYear());
+
+		if ( list.isEmpty() ) {
+			return null;
+		}
+		
+		for (Conference conference : list) {
+			DateTime cdate = conference.getDate();
+			if ( cdate.isInThePast(XCS.TZ) && !cdate.isSameDayAs(dt)) {
+				continue;
+			}
+			// List is sorted on date
+			return conference;
+		}
+		// No conference in this year.
+		return getUpcomingConference(DateTime.forDateOnly(dt.getYear()+1, 1, 1));
 	}
 
-	public String[] getAllAuthors() {
-		// TODO implement
-
-		String[] authors = new String[3];
-		authors[0] = "Erwin Embsen";
-		authors[1] = "Guido Schoonheim";
-		authors[2] = "Marnix van Wendel de Joode";
-		return authors;
+	private List<Conference> findUpcomingConferences(int yearValue, int size) {
+		ArrayList<Conference> list = new ArrayList<Conference>();
+		
+		List<Conference> cfs = getConferences(yearValue);
+		for (Conference conference : cfs) {
+			DateTime cdate = conference.getDate();
+			if ( cdate.plusDays(1).isInThePast(XCS.TZ)) {
+				continue;
+			}
+			list.add(conference);
+		}
+		return list;
 	}
+
 }

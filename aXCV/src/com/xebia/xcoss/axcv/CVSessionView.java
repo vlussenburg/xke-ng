@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -119,7 +118,7 @@ public class CVSessionView extends BaseActivity {
 					@Override
 					public void onClick(View paramView) {
 						int rate = 1 + seekbar.getProgress();
-						getConferenceServer().registerRate(rate);
+						getConferenceServer().registerRate(session, rate);
 						dismissDialog(XCS.DIALOG.ADD_RATING);
 					}
 				});

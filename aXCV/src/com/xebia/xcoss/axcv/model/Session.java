@@ -17,14 +17,12 @@ public class Session implements Serializable {
 
 	private static int counter = 899;
 
-	private Conference conference = null;
-
+//	private Conference conference = null;
 
 	// Auto mapped
 	private String title;
 	private int id;
 
-	@SerializedName("desc")
 	private String description;
 
 	// TODO : map
@@ -32,8 +30,8 @@ public class Session implements Serializable {
 	private DateTime date;
 	private DateTime startTime;
 	private DateTime endTime;
-	
 
+	@SerializedName("audience")
 	private String intendedAudience;
 	private String limit;
 	private String preparation;
@@ -53,7 +51,7 @@ public class Session implements Serializable {
 	public Session(Session original) {
 		this();
 		
-		conference = original.conference;
+//		conference = original.conference;
 		id = original.id;
 
 		title = original.title;
@@ -161,13 +159,13 @@ public class Session implements Serializable {
 		this.intendedAudience = intendedAudience;
 	}
 
-	public Conference getConference() {
-		return conference;
-	}
-
-	public void setConference(Conference conference) {
-		this.conference = conference;
-	}
+//	public Conference getConference() {
+//		return conference;
+//	}
+//
+//	public void setConference(Conference conference) {
+//		this.conference = conference;
+//	}
 
 	public String getLimit() {
 		return limit;
@@ -214,10 +212,19 @@ public class Session implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Session [conference=" + conference + ", id=" + id + ", title=" + title + ", location=" + location
-				+ ", date=" + date + ", startTime=" + startTime + ", endTime=" + endTime + ", description="
-				+ description + ", intendedAudience=" + intendedAudience + ", limit=" + limit + ", preparation="
-				+ preparation + ", authors=" + authors + ", labels=" + labels + ", languages=" + languages + "]";
+		return "Session [title=" + title + ", id=" + id + ", description=" + description + ", location=" + location
+				+ ", date=" + date + ", startTime=" + startTime + ", endTime=" + endTime + ", intendedAudience="
+				+ intendedAudience + ", limit=" + limit + ", preparation=" + preparation + ", authors=" + authors
+				+ ", labels=" + labels + ", languages=" + languages + "]";
 	}
+
+//	@Override
+//	public String toString() {
+//		return "Session [conference=" + (conference == null ? "(null)" : conference.getId()) + ", id=" + id + ", title=" + title + ", location=" + location
+//				+ ", date=" + date + ", startTime=" + startTime + ", endTime=" + endTime + ", description="
+//				+ description + ", intendedAudience=" + intendedAudience + ", limit=" + limit + ", preparation="
+//				+ preparation + ", authors=" + authors + ", labels=" + labels + ", languages=" + languages + "]";
+//	}
+
 	
 }

@@ -1,8 +1,9 @@
 package com.xebia.xcoss.axcv;
 
-import java.util.Set;
-
 import hirondelle.date4j.DateTime;
+
+import java.util.List;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,7 +18,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.xebia.xcoss.axcv.model.Conference;
-import com.xebia.xcoss.axcv.model.ConferenceList;
 import com.xebia.xcoss.axcv.ui.ConferenceAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -30,9 +30,8 @@ public class CVConferences extends BaseActivity {
 		setContentView(R.layout.conferences);
 
 		DateTime dt = DateTime.today(XCS.TZ);
-		String year = String.valueOf(dt.getYear());
-		ConferenceList collection = getConferenceServer().getConferences();
-		final Conference[] conferences = collection.getConferencesAsList(year);
+		List<Conference> list = getConferenceServer().getConferences(dt.getYear());
+		final Conference[] conferences = list.toArray(new Conference[list.size()]);
 		ConferenceAdapter adapter = new ConferenceAdapter(this, R.layout.conference_item, conferences);
 		ListView conferencesList = (ListView) findViewById(R.id.conferencesList);
 		conferencesList.setAdapter(adapter);
@@ -50,12 +49,12 @@ public class CVConferences extends BaseActivity {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			if (sp.getBoolean(XCS.PREF.JUMPTOFIRST, true)) {
 				Log.i(XCS.LOG.NAVIGATE, "Jumping to first upcomming conference.");
-				switchTo(getConferenceServer().getConferences().getUpcomingConference());
+				switchTo(getConferenceServer().getUpcomingConference());
 			}
 		}
 		
 		TextView title = (TextView) findViewById(R.id.conferencesTitle);
-		title.setText(title.getText() + " " + year);
+		title.setText(title.getText() + " " + dt.getYear());
 	}
 
 	private void switchTo(Conference conference) {

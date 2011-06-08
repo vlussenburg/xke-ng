@@ -1,14 +1,15 @@
 package com.xebia.xcoss.axcv;
 
-import com.xebia.xcoss.axcv.logic.ConferenceServer;
-import com.xebia.xcoss.axcv.model.Session;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+
+import com.xebia.xcoss.axcv.logic.ConferenceServer;
+import com.xebia.xcoss.axcv.model.Author;
+import com.xebia.xcoss.axcv.model.Session;
 
 public class CVSearchAuthor extends BaseActivity {
 
@@ -23,10 +24,16 @@ public class CVSearchAuthor extends BaseActivity {
 		
 		session = getSession(getConference());
 		
-        String[] allPersons = ConferenceServer.getInstance().getAllAuthors();
+        Author[] allPersons = ConferenceServer.getInstance().getAllAuthors();
+        
+        // Temp
+        String[] authors = new String[allPersons.length];
+        for (int i = 0; i < allPersons.length; i++) {
+			authors[i] = allPersons[i].getName();
+		}
         
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line, allPersons);
+                android.R.layout.simple_dropdown_item_1line, authors);
         final AutoCompleteTextView textView = (AutoCompleteTextView)
                 findViewById(R.id.ssa_authortext);
         textView.setAdapter(adapter);

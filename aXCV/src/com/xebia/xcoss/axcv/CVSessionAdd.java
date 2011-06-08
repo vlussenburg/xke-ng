@@ -10,9 +10,9 @@ import java.util.Set;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,10 +27,10 @@ import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
-import com.xebia.xcoss.axcv.model.ConferenceList;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
+import com.xebia.xcoss.axcv.ui.Identifiable;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.StringUtil;
 import com.xebia.xcoss.axcv.ui.TextInputDialog;
@@ -173,9 +173,8 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 
 				TimeSlot slot = conference.getNextAvailableTimeSlot(session.getStartTime(), session.getDuration());
 				if ( slot == null ) {
-					ConferenceList allConferences = getConferenceServer().getConferences();
 					while ( slot == null ) {
-						conference = allConferences.getFirstConference(conference.getDate().plusDays(1));
+						conference = getConferenceServer().getUpcomingConference(conference.getDate().plusDays(1));
 						if ( conference == null ) {
 							break;
 						}
@@ -186,7 +185,7 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 				if (slot != null) {
 					session.setStartTime(slot.start);
 					session.setEndTime(slot.end);
-					session.setConference(conference);
+//					session.setConference(conference);
 					session.setDate(conference.getDate());
 					showConference();
 					showSession();
@@ -208,16 +207,18 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 	 * @param state
 	 *            Indicates a set (true) or a reset (false)
 	 */
-	public void updateField(int field, String value, boolean state) {
+	public void updateField(int field, Object selection, boolean state) {
+		String value = selection.toString();
 		switch (field) {
 			case R.id.conferenceName:
-				conference = getConferenceServer().getConferences().findConferenceByName(value);
+				Identifiable ident = (Identifiable) selection;
+				conference = getConferenceServer().getConference(ident.getIdentifier());
 				session.setDate(conference.getDate());
-				session.setConference(conference);
+//				session.setConference(conference);
 				showConference();
 			break;
 			case R.id.sessionStart:
-				session.setStartTime(timeFormatter.getAbsoluteTime(value));
+				session.setStartTime(timeFormatter.getAbsoluteTime(value.toString()));
 			break;
 			case R.id.sessionDuration:
 				int duration = StringUtil.getFirstInteger(value);
@@ -289,15 +290,15 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 
 		switch (id) {
 			case XCS.DIALOG.SELECT_CONFERENCE:
-				List<Conference> list = getConferenceServer().getConferences().getUpcomingConferences(6);
-				items = new String[list.size()];
+				List<Conference> list = getConferenceServer().getUpcomingConferences(6);
+				Identifiable[] data = new Identifiable[list.size()];
 				idx = 0;
 				for (Conference conference : list) {
-					items[idx++] = conference.getTitle();
+					data[idx++] = new Identifiable(conference.getTitle(), conference.getId());
 				}
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Pick a conference");
-				builder.setItems(items, new DialogHandler(this, items, R.id.conferenceName));
+				builder.setItems(Identifiable.stringValue(data), new DialogHandler(this, data, R.id.conferenceName));
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.SELECT_TIME:
@@ -471,10 +472,10 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 
 	private class DialogHandler implements DialogInterface.OnClickListener, DialogInterface.OnMultiChoiceClickListener {
 		private int field;
-		private String[] items;
+		private Object[] items;
 		private CVSessionAdd activity;
 
-		public DialogHandler(CVSessionAdd activity, String[] items, int field) {
+		public DialogHandler(CVSessionAdd activity, Object[] items, int field) {
 			this.activity = activity;
 			this.items = items;
 			this.field = field;
@@ -486,7 +487,7 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 
 		@Override
 		public void onClick(DialogInterface dialog, int item, boolean state) {
-			Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), items[item].toString(), Toast.LENGTH_SHORT).show();
 			// TextView view = (TextView) activity.findViewById(field);
 			// view.setText(items[item]);
 			activity.updateField(field, items[item], state);
