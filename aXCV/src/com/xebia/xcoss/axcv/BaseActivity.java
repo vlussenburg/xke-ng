@@ -1,11 +1,17 @@
 package com.xebia.xcoss.axcv;
 
+import java.net.SocketException;
+import java.util.List;
+
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -142,4 +148,62 @@ public abstract class BaseActivity extends Activity {
 			});
 		return builder.create();
 	}
+	
+	protected void onSuccess() {}
+	protected void onFailure() {}
+
+	class DataRetriever extends AsyncTask<String, Void, Boolean> {
+
+		// http://appfulcrum.com/?p=126
+
+		private ProgressDialog dialog;
+		private BaseActivity ctx;
+
+		public DataRetriever(BaseActivity ctx) {
+			this.ctx = ctx;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			this.dialog = ProgressDialog.show(ctx, null, "Loading. Please wait...", true);
+		}
+
+		@Override
+		protected Boolean doInBackground(String... arg0) {
+			try {
+				List<Conference> conferences = getConferenceServer().getUpcomingConferences(4);
+				for (Conference conference : conferences) {
+					conference.getSessions();
+				}
+			} catch (Exception e) {
+				return false;
+			}
+			return true;
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result) {
+			dialog.cancel();
+			
+			if (result) {
+				ctx.onSuccess();
+			} else {
+				Dialog errorDialog = createDialog("Error", "Connection to URL:\n"+XCS.SETTING.URL+"\nfailed");
+				errorDialog.setOnCancelListener(new Dialog.OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface di) {
+						ctx.onFailure();
+					}
+				});
+				errorDialog.setOnDismissListener(new Dialog.OnDismissListener() {
+					@Override
+					public void onDismiss(DialogInterface paramDialogInterface) {
+						ctx.onFailure();
+					}
+				});
+				errorDialog.show();
+			}
+		}
+	}
+
 }

@@ -20,6 +20,9 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 
 import android.util.Log;
 
@@ -158,8 +161,7 @@ public class RestClient {
 	}
 
 	private static Reader getReader(HttpRequestBase request) throws IOException {
-		HttpClient httpclient = new DefaultHttpClient();
-		HttpResponse response = httpclient.execute(request);
+		HttpResponse response = getHttpClient().execute(request);
 
 		handleResponse(response);
 
@@ -172,8 +174,7 @@ public class RestClient {
 
 	private static Reader getReader(HttpEntityEnclosingRequestBase request, String content) throws IOException {
 		request.setEntity(new StringEntity(content));
-		HttpClient httpclient = new DefaultHttpClient();
-		HttpResponse response = httpclient.execute(request);
+		HttpResponse response = getHttpClient().execute(request);
 
 		handleResponse(response);
 
@@ -182,6 +183,13 @@ public class RestClient {
 			return new InputStreamReader(entity.getContent());
 		}
 		return null;
+	}
+	
+	private static HttpClient getHttpClient() {
+		HttpParams httpParams = new BasicHttpParams();
+		HttpConnectionParams.setConnectionTimeout(httpParams, 1300);
+		HttpConnectionParams.setSoTimeout(httpParams, 1300);
+		return new DefaultHttpClient(httpParams);
 	}
 
 	private static void handleResponse(HttpResponse response) throws IOException {

@@ -1,7 +1,5 @@
 package com.xebia.xcoss.axcv;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,7 +8,7 @@ import android.view.MotionEvent;
 
 import com.xebia.xcoss.axcv.util.XCS;
 
-public class CVSplashLoader extends Activity {
+public class CVSplashLoader extends BaseActivity {
 
 	private boolean loaded = false;
 
@@ -21,14 +19,19 @@ public class CVSplashLoader extends Activity {
 
 		setContentView(R.layout.loader);
 
-		ProgressDialog dialog = ProgressDialog.show(CVSplashLoader.this, "", "Loading. Please wait...", true);
-
-		// Do the loading stuff
-
-		loaded = true;
-		dialog.dismiss();
-		startActivity(new Intent(this, CVConferences.class));
+        DataRetriever task = new DataRetriever(this);
+        task.execute();
 	}
+	
+	@Override
+	protected void onSuccess() {
+        startActivity(new Intent(this, CVConferences.class));
+	};
+	
+	@Override
+	protected void onFailure() {
+        finish();
+	};
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
