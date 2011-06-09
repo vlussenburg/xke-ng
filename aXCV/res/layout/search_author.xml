@@ -8,11 +8,10 @@
 	<AutoCompleteTextView
 		android:layout_height="wrap_content"
 		android:layout_width="fill_parent"
-		android:text="AutoCompleteTextView"
 		android:completionThreshold="1"
 		android:maxLines="7"
 		android:minLines="1"
-		android:id="@+id/ssa_authortext"></AutoCompleteTextView>
+		android:id="@+id/ssa_authortext" android:text="@string/default_input_text"></AutoCompleteTextView>
 	<ListView
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"

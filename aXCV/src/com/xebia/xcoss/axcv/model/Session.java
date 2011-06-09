@@ -36,13 +36,13 @@ public class Session implements Serializable {
 	private String limit;
 	private String preparation;
 
-	private Set<String> authors;
+	private Set<Author> authors;
 	private Set<String> labels;
 	private Set<String> languages;
 
 	public Session() {
 		labels = new TreeSet<String>();
-		authors = new TreeSet<String>();
+		authors = new TreeSet<Author>();
 		languages = new HashSet<String>();
 		location = new Location("TODO");
 		id = ++counter;
@@ -81,11 +81,11 @@ public class Session implements Serializable {
 		this.title = title;
 	}
 
-	public Set<String> getAuthors() {
+	public Set<Author> getAuthors() {
 		return authors;
 	}
 
-	public void addAuthor(String author) {
+	public void addAuthor(Author author) {
 		authors.add(author);
 	}
 	

@@ -1,6 +1,7 @@
 package com.xebia.xcoss.axcv.ui;
 
 import android.app.Dialog;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
@@ -19,6 +20,22 @@ public class TextInputDialog extends Dialog {
 		this.activity = activity;
 		this.identifier = id;
 		init();
+		setSingleLine();
+	}
+
+	public void setSingleLine() {
+		final Button submit = (Button) findViewById(R.id.seCommit);
+		TextView text = (TextView) findViewById(R.id.seValue);
+		text.setOnKeyListener(new View.OnKeyListener() {
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent e) {
+				if (keyCode == KeyEvent.KEYCODE_ENTER ) {
+					submit.performClick();
+					return true;
+				}
+				return false;
+			}
+		});
 	}
 
 	private void init() {

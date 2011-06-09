@@ -1,11 +1,9 @@
 package com.xebia.xcoss.axcv;
 
-import java.net.SocketException;
 import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Application;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -28,6 +26,8 @@ public abstract class BaseActivity extends Activity {
 
 	public static final String IA_CONFERENCE = "ID-conference";
 	public static final String IA_SESSION = "ID-session";
+	public static final String IA_AUTHORS = "ID-authors";
+	public static final String IA_LABELS = "ID-labels";
 
 	private MenuItem miSettings;
 	private MenuItem miSearch;
@@ -176,6 +176,7 @@ public abstract class BaseActivity extends Activity {
 					conference.getSessions();
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 				return false;
 			}
 			return true;

@@ -5,6 +5,7 @@ import hirondelle.date4j.DateTime;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -35,6 +36,7 @@ import com.xebia.xcoss.axcv.logic.gson.GsonDateTimeAdapter;
 import com.xebia.xcoss.axcv.logic.gson.GsonLocationAdapter;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.util.StreamUtil;
+import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class RestClient {
@@ -77,12 +79,12 @@ public class RestClient {
 			reader = getReader(new HttpGet(url));
 			JsonParser parser = new JsonParser();
 			JsonElement parse = parser.parse(reader);
-			
+
 			ArrayList<T> results = new ArrayList<T>();
 			if (parse.isJsonObject()) {
 				JsonArray jsonArray = parse.getAsJsonObject().get(key).getAsJsonArray();
 				Iterator<JsonElement> iterator = jsonArray.iterator();
-	
+
 				Gson gson = getGson();
 				while (iterator.hasNext()) {
 					JsonElement element = iterator.next();
@@ -110,6 +112,14 @@ public class RestClient {
 			Gson gson = new Gson();
 			String postData = gson.toJson(object);
 			reader = getReader(new HttpPost(url), postData);
+
+//			System.out.println("Reading dump");
+//			char[] tmp = new char[2048];
+//			int l;
+//			while ((l = reader.read(tmp)) != -1) {
+//				System.out.print(new String(tmp, 0, l));
+//			}
+//			System.out.println("Reading done");
 			return gson.fromJson(reader, int.class);
 		}
 		catch (Exception e) {
@@ -184,7 +194,7 @@ public class RestClient {
 		}
 		return null;
 	}
-	
+
 	private static HttpClient getHttpClient() {
 		HttpParams httpParams = new BasicHttpParams();
 		HttpConnectionParams.setConnectionTimeout(httpParams, 1300);
@@ -193,13 +203,17 @@ public class RestClient {
 	}
 
 	private static void handleResponse(HttpResponse response) throws IOException {
-		switch (response.getStatusLine().getStatusCode()) {
+		int code = response.getStatusLine().getStatusCode();
+		switch (code) {
 			case 500:
 				throw new IOException("TODO: Server error.");
 			case 403:
 				throw new IOException("TODO: Unauthorized.");
 			case 404:
 				throw new IOException("TODO: Not found.");
+			default:
+				Log.d(XCS.LOG.ALL, "Return code = " + code);
+				break;
 		}
 	}
 }

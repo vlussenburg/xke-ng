@@ -5,3 +5,12 @@ aXCV/bin
 xke-ng-web/lib_managed
 xke-ng-web/project
 xke-ng-web/target/
+xke-ng-web/.classpath
+xke-ng-web/.idea/
+xke-ng-web/.project
+xke-ng-web/.settings/
+xke-ng-web/ng-rest.iml
+
+MockServer/tmp
+MockServer/.classpath
+MockServer/.project

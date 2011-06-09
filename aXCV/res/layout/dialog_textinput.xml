@@ -23,7 +23,7 @@
 		android:minLines="3"
 		android:cursorVisible="true"
 		android:gravity="top|left"
-		android:inputType="textAutoCorrect|textAutoComplete|textMultiLine|textLongMessage" android:maxLines="5" android:id="@+id/seValue"></EditText>
+		android:maxLines="5" android:id="@+id/seValue" android:inputType="textAutoCorrect|textAutoComplete|textMultiLine|textLongMessage"></EditText>
 	<LinearLayout android:id="@+id/linearLayout2" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:gravity="center_horizontal">
 		<Button android:text="Submit" android:layout_width="wrap_content" android:layout_gravity="center_horizontal" android:id="@+id/seCommit" android:layout_height="wrap_content"></Button>
 		<Button android:layout_width="wrap_content" android:layout_gravity="center_horizontal" android:layout_height="wrap_content" android:id="@+id/seCancel" android:text="Cancel"></Button>

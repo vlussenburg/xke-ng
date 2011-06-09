@@ -11,7 +11,7 @@ public class XCS {
 	public static final TimeZone TZ = TimeZone.getDefault();
 
 	public class SETTING {
-		public static final String URL = "http://10.0.2.2:8080/xkeng";
+		public static final String URL = "http://10.0.2.2:9000";
 	}
 
 	public class DIALOG {

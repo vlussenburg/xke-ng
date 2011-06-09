@@ -30,13 +30,13 @@ public class FormatUtil {
 		return sb.toString();
 	}
 
-	public static String getList(Set<String> data) {
+	public static <T> String getList(Set<T> data) {
 		if ( data == null ) {
 			return null;
 		}
 		StringBuilder sb = new StringBuilder();
-		for (String string : data) {
-			sb.append(string);
+		for (T value: data) {
+			sb.append(value.toString());
 			sb.append(", ");
 		}
 		if ( sb.length() > 0 ) {

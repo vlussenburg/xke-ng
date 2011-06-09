@@ -19,7 +19,8 @@
     <string name="add_session">Add session</string>
     <string name="modify_session">Modify session</string>
 
-    <string name="empty_value">&lt;specify value&gt;</string>    
-
     <string name="author_select">Select authors...</string>    
+
+    <string name="empty_value">&lt;specify value&gt;</string>    
+    <string name="default_input_text">&lt;start typing&gt;</string>    
 </resources>

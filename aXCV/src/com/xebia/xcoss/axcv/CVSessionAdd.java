@@ -3,6 +3,7 @@ package com.xebia.xcoss.axcv;
 import hirondelle.date4j.DateTime;
 import hirondelle.date4j.DateTime.DayOverflow;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -25,6 +26,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.model.Location;
@@ -39,10 +41,13 @@ import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDismissListener {
 
+	private static final int ACTIVITY_SEARCH_AUTHOR = 938957;
+
 	private ScreenTimeUtil timeFormatter;
 	private Conference conference;
 	private Session session;
 	private Session originalSession;
+	private Intent authorIntent;
 	private boolean create = false;
 
 	/** Called when the activity is first created. */
@@ -145,13 +150,15 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 			public void onClick(View paramView) {
 				List<String> messages = new ArrayList<String>();
 				if (!session.check(messages)) {
-					createDialog("Failed", "Please specify the following attributes: " + FormatUtil.getText(messages)).show();
+					createDialog("Failed", "Please specify the following attributes: " + FormatUtil.getText(messages))
+							.show();
 					return;
 				}
 				if (!conference.addSession(session)) {
 					Log.e(LOG.ALL, "Adding session failed.");
 					createDialog("No session added", "Session could not be added.");
 				}
+				CVSessionAdd.this.finish();
 			}
 		});
 		button = (Button) findViewById(R.id.actionDelete);
@@ -163,6 +170,7 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 				public void onClick(View paramView) {
 					// TODO Confirmation dialog
 					conference.deleteSession(originalSession);
+					CVSessionAdd.this.finish();
 				}
 			});
 		}
@@ -172,20 +180,20 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 			public void onClick(View paramView) {
 
 				TimeSlot slot = conference.getNextAvailableTimeSlot(session.getStartTime(), session.getDuration());
-				if ( slot == null ) {
-					while ( slot == null ) {
+				if (slot == null) {
+					while (slot == null) {
 						conference = getConferenceServer().getUpcomingConference(conference.getDate().plusDays(1));
-						if ( conference == null ) {
+						if (conference == null) {
 							break;
 						}
 						slot = conference.getNextAvailableTimeSlot(session.getStartTime(), session.getDuration());
 					}
 				}
-				
+
 				if (slot != null) {
 					session.setStartTime(slot.start);
 					session.setEndTime(slot.end);
-//					session.setConference(conference);
+					// session.setConference(conference);
 					session.setDate(conference.getDate());
 					showConference();
 					showSession();
@@ -214,7 +222,7 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 				Identifiable ident = (Identifiable) selection;
 				conference = getConferenceServer().getConference(ident.getIdentifier());
 				session.setDate(conference.getDate());
-//				session.setConference(conference);
+				// session.setConference(conference);
 				showConference();
 			break;
 			case R.id.sessionStart:
@@ -243,13 +251,6 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 			case R.id.sessionAudience:
 				session.setIntendedAudience(value);
 			break;
-			case R.id.sessionAuthors:
-				Set<String> authors = session.getAuthors();
-				if (state)
-					authors.add(value);
-				else
-					authors.remove(value);
-			break;
 			case R.id.sessionCount:
 				session.setLimit(value);
 			break;
@@ -272,6 +273,8 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 			case R.id.sessionTitle:
 				session.setTitle(value);
 			break;
+			default:
+				Log.w(LOG.NAVIGATE, "Don't know how to process: " + field);
 		}
 		showSession();
 	}
@@ -394,12 +397,36 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 	}
 
 	private void showAuthorPage() {
-		Intent intent = new Intent(this, CVSearchAuthor.class);
-		intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
-		intent.putExtra(BaseActivity.IA_SESSION, session.getId());
-		startActivity(intent);
+		if ( authorIntent == null ) {
+			authorIntent = new Intent(this, CVSearchAuthor.class);
+		}
+		ArrayList<Author> authorList = new ArrayList<Author>();
+		authorList.addAll(session.getAuthors());
+		authorIntent.putExtra(BaseActivity.IA_AUTHORS, (Serializable) authorList);
+		startActivityForResult(authorIntent, ACTIVITY_SEARCH_AUTHOR);
 	}
-	
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case ACTIVITY_SEARCH_AUTHOR:
+				if ( data != null ) {
+			        if ( data.hasExtra(IA_AUTHORS) ) {
+		    			session.getAuthors().clear();
+			    		Serializable extra = data.getSerializableExtra(IA_AUTHORS);
+			    		for (Author selected : ((ArrayList<Author>)extra)) {
+				    		session.addAuthor(selected);
+						}
+			    		showSession();
+			        }
+				}
+			break;
+			default:
+				super.onActivityResult(requestCode, resultCode, data);
+			break;
+		}
+	}
+
 	private class AddOnTouchListener implements OnTouchListener {
 
 		@Override

@@ -8,7 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.xebia.xcoss.axcv.R;
-import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.MandatorySession;
 import com.xebia.xcoss.axcv.model.Session;
 

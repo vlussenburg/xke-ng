@@ -89,6 +89,9 @@ public class ConferenceServer {
 			requestUrl.append(year);
 	
 			result = RestClient.loadObjects(requestUrl.toString(), "conferences", Conference.class);
+			if ( result == null) {
+				return new ArrayList<Conference>();
+			}
 			conferenceCache.add(result);
 		}
 		return result;
@@ -110,6 +113,9 @@ public class ConferenceServer {
 				}
 			}	
 			result = RestClient.loadObjects(requestUrl.toString(), "conferences", Conference.class);
+			if ( result == null) {
+				return new ArrayList<Conference>();
+			}
 			conferenceCache.add(result);
 		}
 		return result;
@@ -148,6 +154,9 @@ public class ConferenceServer {
 		requestUrl.append("/sessions");
 
 		List<Session> result = RestClient.loadObjects(requestUrl.toString(), "sessions", Session.class);
+		if ( result == null) {
+			return new ArrayList<Session>();
+		}
 		for (Session session : result) {
 //			conference.addSession(session);
 		}
@@ -195,13 +204,15 @@ public class ConferenceServer {
 	}
 
 	public Author[] getAllAuthors() {
-		// TODO implement
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/authors");
 
-		Author[] authors = new Author[3];
-		authors[0] = new Author("eembsen", "Erwin Embsen", "eembsen@xebia.com");
-		authors[1] =  new Author("guido", "Guido Schoonheim", "xita@xebia.com");
-		authors[2] =  new Author("marnix", "Marnix van Wendel de Joode", "info@xebia.com");
-		return authors;
+		List<Author> result = RestClient.loadObjects(requestUrl.toString(), "authors", Author.class);
+		if ( result == null ) {
+			return new Author[0];
+		}
+		return result.toArray(new Author[result.size()]);
 	}
 	
 	public void registerRate(Session session, int rate) {
