@@ -1,0 +1,33 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                                       Application.index
+
+# Ignore favicon requests
+GET     /favicon.ico                            404
+
+# Map static resources from the /app/public folder to the /public path
+GET     /public/                                staticDir:public
+
+GET		/conferences/{year}						Conferences.show
+GET		/conferences/{year}/{month}				Conferences.show
+GET		/conferences/{year}/{month}/{day}		Conferences.show
+GET		/conference/on/{yearmonthday}			Conference.showOnDate
+GET		/conference/{id}						Conference.showOnId
+PUT		/conference								Conference.update
+POST	/conference								Conference.create
+GET		/conference/{id}/sessions				Conference.sessions
+PUT		/conference/{id}/session				Session.update
+POST	/conference/{id}/session				Session.create
+GET		/session/{id}							Session.show
+DELETE	/session/{id}							Session.delete
+GET		/locations								Locations.show
+GET		/labels									Labels.show
+GET		/authors								Authors.show
+POST	/label/{name}							Labels.create
+
+
+# Catch all 
+*       /{controller}/{action}                  {controller}.{action}

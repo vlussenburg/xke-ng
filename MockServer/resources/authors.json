@@ -1,0 +1,29 @@
+{
+  "authors":[
+  {
+    "userId":"mvanleeuwen",
+    "mail":"info@xebia.com",
+    "name":"Michael van Leeuwen"
+  },
+  {
+    "userId":"marnix",
+    "mail":"info@xebia.com",
+    "name":"Marnix van Wendel de Joode"
+  },
+  {
+    "userId":"gschoonheim",
+    "mail":"info@xebia.com",
+    "name":"Guido Schoonheim"
+  },
+  {
+    "userId":"evdkoogh",
+    "mail":"info@xebia.com",
+    "name":"Erwin van der Koogh"
+  },
+  {
+    "userId":"eembsen",
+    "mail":"info@xebia.com",
+    "name":"Erwin Embsen"
+  }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "sessions":[
+  {
+    "title":"Scala in the Android World",
+    "description":"This session talks about using scala in the android world.",
+    "startTime":"0000-00-00T17:37:54.812Z",
+    "endTime":"0000-00-00T17:58:54.812Z",
+    "id":"8801",
+    "audience":"Everybody",
+	"location":"Maupertuus"
+  },
+  {
+    "title":"The power of Android",
+    "description":"No easy task to develop for Android, due to all the stuff.
+	Join this session to have some info.",
+    "startTime":"0000-00-00T18:00:00.000Z",
+    "endTime":"0000-00-00T19:00:00.000Z",
+    "id":"8802",
+    "limit":"10 people",
+	"location":"Laap"
+  }
+  ]
+}
+
