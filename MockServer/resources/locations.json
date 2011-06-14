@@ -1,1 +1,24 @@
-["Maupertuus", "Library", "Laap"]
+{
+  "locations":[
+  {
+    "id":"701",
+    "description":"Maupertuus",
+    "standard":"true"
+  },
+  {
+    "id":"702",
+    "description":"Library",
+    "standard":"true"
+  },
+  {
+    "id":"703",
+    "description":"Laap",
+    "standard":"true"
+  },
+  {
+    "id":"704",
+    "description":"Attic",
+    "standard":"false"
+  }
+  ]
+}

@@ -11,9 +11,9 @@
 		android:completionThreshold="1"
 		android:maxLines="7"
 		android:minLines="1"
-		android:id="@+id/ssa_authortext" android:text="@string/default_input_text"></AutoCompleteTextView>
+		android:id="@+id/ssa_text" android:text="@string/default_input_text"></AutoCompleteTextView>
 	<ListView
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
-		android:id="@+id/ssa_authorlist"></ListView>
+		android:id="@+id/ssa_list"></ListView>
 </LinearLayout>

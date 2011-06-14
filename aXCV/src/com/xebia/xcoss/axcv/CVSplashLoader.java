@@ -19,12 +19,15 @@ public class CVSplashLoader extends BaseActivity {
 
 		setContentView(R.layout.loader);
 
-        DataRetriever task = new DataRetriever(this);
-        task.execute();
+		if ( !loaded ) {
+	        DataRetriever task = new DataRetriever(this);
+	        task.execute();
+		}
 	}
 	
 	@Override
 	protected void onSuccess() {
+		loaded = true;
         startActivity(new Intent(this, CVConferences.class));
 	};
 	
@@ -35,8 +38,6 @@ public class CVSplashLoader extends BaseActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-
 		MenuItem miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
 		miSettings.setIcon(R.drawable.menu_add);
 
@@ -45,8 +46,6 @@ public class CVSplashLoader extends BaseActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		super.onOptionsItemSelected(item);
-
 		switch (item.getItemId()) {
 			case XCS.MENU.SETTINGS:
 				startActivity(new Intent(this, CVSettings.class));

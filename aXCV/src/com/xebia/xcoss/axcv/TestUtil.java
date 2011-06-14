@@ -33,7 +33,7 @@ public class TestUtil {
 	}
 	
 	private static Session createSession(String title, int start, boolean mandatory) {
-		Location loc = new Location("Laap");
+		Location loc = new Location(998, "Laap", true);
 		Session session = mandatory ? new BreakSession() : new Session();
 		session.setLocation(loc);
 		session.addAuthor(new Author("mvl", "M. van Leeuwen", "test@test.nl"));

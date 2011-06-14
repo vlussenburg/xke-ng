@@ -6,18 +6,30 @@ public class Location implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String location;
+	private int id;
+	private String description;
+	private boolean standard;
 
-	public Location(String place) {
-		this.location = place;
+	public Location(int id, String place, boolean isBase) {
+		this.description = place;
+		this.standard = isBase;
+		this.id = id;
 	}
-	
-	public String getLocation() {
-		return location;
+
+	public String getDescription() {
+		return description;
 	}
 
 	@Override
 	public String toString() {
-		return location;
+		return description;
+	}
+
+	public boolean isStandard() {
+		return standard;
+	}
+
+	public int getId() {
+		return id;
 	}
 }

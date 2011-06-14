@@ -96,7 +96,7 @@ public class SessionAdapter extends BaseAdapter {
 	private CharSequence getLocationAndDate(Session session) {
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append(session.getLocation().getLocation());
+		sb.append(session.getLocation().getDescription());
 		sb.append(" | ");
 		sb.append(timeUtil.getAbsoluteTime(session.getStartTime()));
 		sb.append(" - ");

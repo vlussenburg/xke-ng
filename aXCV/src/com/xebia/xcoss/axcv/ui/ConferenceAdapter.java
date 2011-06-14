@@ -50,10 +50,10 @@ public class ConferenceAdapter extends BaseAdapter {
 		TextView statusView = (TextView) row.findViewById(R.id.cnf_status);
 		TextView dateView = (TextView) row.findViewById(R.id.cnf_date);
 
-		titleView.setText(cfr.getTitle());
 		whenView.setText(timeFormatter.getRelativeDate(cfr.getDate()));
-		statusView.setText(ConferenceStatus.getStatus(cfr));
 		dateView.setText(timeFormatter.getAbsoluteDate(cfr.getDate()));
+		titleView.setText(cfr.getTitle());
+		statusView.setText(ConferenceStatus.getStatus(cfr));
 
 		titleView.setTextColor(colorId);
 		whenView.setTextColor(colorId);

@@ -11,6 +11,7 @@ import java.util.Date;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -73,7 +74,7 @@ public class ScreenTimeUtil {
 			return DateTime.forTimeOnly(date.getHours(), date.getMinutes(), 0,0);
 		}
 		catch (ParseException e) {
-			e.printStackTrace();
+			Log.w(XCS.LOG.ALL, "The value '"+value+"' is not a valid time!");
 		}
 		return null;
 	}

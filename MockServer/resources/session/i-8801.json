@@ -6,6 +6,10 @@
     "endTime":"0000-00-00T17:58:54.812Z",
     "id":"8801",
     "audience":"Everybody",
-	"location":"Maupertuus"
+	"location": {
+           "description": "Maupertuus",
+           "id": "711",
+           "standard": "true"
+	}
   }
 }

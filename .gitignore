@@ -14,3 +14,4 @@ xke-ng-web/ng-rest.iml
 MockServer/tmp
 MockServer/.classpath
 MockServer/.project
+MockServer/logs/

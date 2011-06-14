@@ -51,5 +51,9 @@
 			android:name="CVSearchAuthor"
 			android:label="@string/author_select">
 		</activity>
+		<activity
+			android:name="CVSearchLabel"
+			android:label="@string/label_select">
+		</activity>
 	</application>
 </manifest>

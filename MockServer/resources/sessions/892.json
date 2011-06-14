@@ -7,7 +7,11 @@
     "endTime":"0000-00-00T17:58:54.812Z",
     "id":"8801",
     "audience":"Everybody",
-	"location":"Maupertuus"
+	"location": {
+           "description": "Maupertuus",
+           "id": "711",
+           "standard": "true"
+	}
   },
   {
     "title":"The power of Android",
@@ -17,7 +21,12 @@
     "endTime":"0000-00-00T19:00:00.000Z",
     "id":"8802",
     "limit":"10 people",
-	"location":"Laap"
+	"location": {
+           "description": "Laap",
+           "id": "712",
+           "standard": "true"
+	},
+	"labels": ["Android","REST"]
   }
   ]
 }

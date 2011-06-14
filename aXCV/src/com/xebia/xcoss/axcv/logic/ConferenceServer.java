@@ -3,13 +3,16 @@ package com.xebia.xcoss.axcv.logic;
 import hirondelle.date4j.DateTime;
 import hirondelle.date4j.DateTime.Unit;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.util.Log;
 
+import com.google.gson.reflect.TypeToken;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -157,9 +160,7 @@ public class ConferenceServer {
 		if ( result == null) {
 			return new ArrayList<Session>();
 		}
-		for (Session session : result) {
-//			conference.addSession(session);
-		}
+		
 		conferenceCache.addSessions(result);
 		return result;
 	}
@@ -204,6 +205,7 @@ public class ConferenceServer {
 	}
 
 	public Author[] getAllAuthors() {
+		// TODO: Caching
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/authors");
@@ -215,6 +217,43 @@ public class ConferenceServer {
 		return result.toArray(new Author[result.size()]);
 	}
 	
+	public Location[] getLocations() {
+		// TODO: Caching
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/locations");
+
+		List<Location> result = RestClient.loadObjects(requestUrl.toString(), "locations", Location.class);
+		if ( result == null ) {
+			return new Location[0];
+		}
+		return result.toArray(new Location[result.size()]);
+	}
+
+	public String[] getLabels() {
+		// TODO: Caching
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/labels");
+
+		Type collectionType = new TypeToken<List<String>>(){}.getType();
+		List<String> result = RestClient.loadCollection(requestUrl.toString(), collectionType);
+		if ( result == null ) {
+			return new String[0];
+		}
+		return result.toArray(new String[result.size()]);
+	}
+
+
+	public void createLabel(String name) {
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/label/");
+		requestUrl.append(name);
+
+		RestClient.postUrl(requestUrl.toString());
+	}
+
 	public void registerRate(Session session, int rate) {
 		// TODO implement
 	}
@@ -289,5 +328,4 @@ public class ConferenceServer {
 		}
 		return list;
 	}
-
 }
