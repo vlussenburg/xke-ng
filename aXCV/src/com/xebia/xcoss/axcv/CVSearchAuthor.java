@@ -8,6 +8,7 @@ import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.ui.StringUtil;
+import com.xebia.xcoss.axcv.util.XCS;
 
 public class CVSearchAuthor extends BaseActivity {
 
@@ -31,9 +33,9 @@ public class CVSearchAuthor extends BaseActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.search_author);
-		view = (AutoCompleteTextView) findViewById(R.id.ssa_authortext);
-		ListView authorList = (ListView) findViewById(R.id.ssa_authorlist);
+		setContentView(R.layout.search_items);
+		view = (AutoCompleteTextView) findViewById(R.id.ssa_text);
+		ListView authorList = (ListView) findViewById(R.id.ssa_list);
 		final String startText = getResources().getString(R.string.default_input_text);
 		view.setSelection(0, startText.length());
 		initSelectedAuthors();
@@ -114,7 +116,7 @@ public class CVSearchAuthor extends BaseActivity {
 			selectedAuthors = (List<Author>) extras.getSerializable(IA_AUTHORS);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			Log.w(XCS.LOG.COMMUNICATE, "No authors loaded: " + e.getMessage());
 			selectedAuthors = new ArrayList<Author>();
 		}
 	}

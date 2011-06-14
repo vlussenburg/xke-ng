@@ -20,6 +20,7 @@
     <string name="modify_session">Modify session</string>
 
     <string name="author_select">Select authors...</string>    
+    <string name="label_select">Select labels...</string>    
 
     <string name="empty_value">&lt;specify value&gt;</string>    
     <string name="default_input_text">&lt;start typing&gt;</string>    

@@ -136,7 +136,11 @@ public abstract class BaseActivity extends Activity {
 	}
 
 	protected Dialog createDialog(String title, String message) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		return createDialog(this, title, message);
+	}
+	
+	public static Dialog createDialog(Activity ctx, String title, String message) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 		builder
 			.setTitle(title)
 			.setMessage(message)
@@ -176,7 +180,7 @@ public abstract class BaseActivity extends Activity {
 					conference.getSessions();
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				Log.w(XCS.LOG.COMMUNICATE, "Initial loading: " + e.getMessage());
 				return false;
 			}
 			return true;

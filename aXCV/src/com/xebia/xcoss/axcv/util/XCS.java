@@ -22,7 +22,7 @@ public class XCS {
 		public static final int SELECT_TIME     = DIALOGID + 4;
 		public static final int SELECT_DURATION = DIALOGID + 5;
 		public static final int INPUT_AUDIENCE  = DIALOGID + 6;
-
+		public static final int INPUT_LOCATION  = DIALOGID + 7;
 		public static final int INPUT_LIMIT     = DIALOGID + 8;
 		public static final int INPUT_DESCRIPTION = DIALOGID + 9;
 

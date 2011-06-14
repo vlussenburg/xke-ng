@@ -5,7 +5,8 @@ import hirondelle.date4j.DateTime;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.CharBuffer;
+import java.lang.reflect.Type;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -33,8 +34,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.xebia.xcoss.axcv.logic.gson.GsonDateTimeAdapter;
-import com.xebia.xcoss.axcv.logic.gson.GsonLocationAdapter;
-import com.xebia.xcoss.axcv.model.Location;
+import com.xebia.xcoss.axcv.ui.StringUtil;
 import com.xebia.xcoss.axcv.util.StreamUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
@@ -47,7 +47,6 @@ public class RestClient {
 		if (gsonInstance == null) {
 			GsonBuilder builder = new GsonBuilder();
 			builder.registerTypeAdapter(DateTime.class, new GsonDateTimeAdapter());
-			builder.registerTypeAdapter(Location.class, new GsonLocationAdapter());
 			gsonInstance = builder.create();
 		}
 		return gsonInstance;
@@ -64,7 +63,24 @@ public class RestClient {
 			// TODO: Handle!
 			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
 			Log.e(LOG.ALL, "Call was: " + url);
-			e.printStackTrace();
+		}
+		finally {
+			StreamUtil.close(reader);
+		}
+		return null;
+	}
+
+	public static <T> T loadCollection(String url, Type rvClass) {
+		Log.d(LOG.COMMUNICATE, "Loading [" + rvClass.toString() + "] " + url);
+		Reader reader = null;
+		try {
+			reader = getReader(new HttpGet(url));
+			return getGson().fromJson(reader, rvClass);
+		}
+		catch (Exception e) {
+			// TODO: Handle!
+			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
+			Log.e(LOG.ALL, "Call was: " + url);
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -90,6 +106,8 @@ public class RestClient {
 					JsonElement element = iterator.next();
 					results.add(gson.fromJson(element, rvClass));
 				}
+			} else {
+				Log.d(LOG.COMMUNICATE, "Not a JsonObject ...");
 			}
 			return results;
 		}
@@ -97,7 +115,6 @@ public class RestClient {
 			// TODO: Handle!
 			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
 			Log.e(LOG.ALL, "Call was: " + url);
-			e.printStackTrace();
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -113,20 +130,19 @@ public class RestClient {
 			String postData = gson.toJson(object);
 			reader = getReader(new HttpPost(url), postData);
 
-//			System.out.println("Reading dump");
-//			char[] tmp = new char[2048];
-//			int l;
-//			while ((l = reader.read(tmp)) != -1) {
-//				System.out.print(new String(tmp, 0, l));
-//			}
-//			System.out.println("Reading done");
+			// System.out.println("Reading dump");
+			// char[] tmp = new char[2048];
+			// int l;
+			// while ((l = reader.read(tmp)) != -1) {
+			// System.out.print(new String(tmp, 0, l));
+			// }
+			// System.out.println("Reading done");
 			return gson.fromJson(reader, int.class);
 		}
 		catch (Exception e) {
 			// TODO: Handle!
 			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
 			Log.e(LOG.ALL, "Call was: " + url);
-			e.printStackTrace();
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -146,7 +162,22 @@ public class RestClient {
 			// TODO: Handle!
 			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
 			Log.e(LOG.ALL, "Call was: " + url);
-			e.printStackTrace();
+		}
+		finally {
+			StreamUtil.close(reader);
+		}
+	}
+
+	public static <T> void postUrl(String url) {
+		Log.d(LOG.COMMUNICATE, "Posting " + url);
+		Reader reader = null;
+		try {
+			reader = getReader(new HttpPost(url), null);
+		}
+		catch (Exception e) {
+			// TODO: Handle!
+			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
+			Log.e(LOG.ALL, "Call was: " + url);
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -163,7 +194,6 @@ public class RestClient {
 			// TODO: Handle!
 			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
 			Log.e(LOG.ALL, "Call was: " + url);
-			e.printStackTrace();
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -173,7 +203,7 @@ public class RestClient {
 	private static Reader getReader(HttpRequestBase request) throws IOException {
 		HttpResponse response = getHttpClient().execute(request);
 
-		handleResponse(response);
+		handleResponse(request.getURI(), response.getStatusLine().getStatusCode());
 
 		HttpEntity entity = response.getEntity();
 		if (entity != null) {
@@ -183,10 +213,12 @@ public class RestClient {
 	}
 
 	private static Reader getReader(HttpEntityEnclosingRequestBase request, String content) throws IOException {
-		request.setEntity(new StringEntity(content));
+		if (!StringUtil.isEmpty(content)) {
+			request.setEntity(new StringEntity(content));
+		}
 		HttpResponse response = getHttpClient().execute(request);
 
-		handleResponse(response);
+		handleResponse(request.getURI(), response.getStatusLine().getStatusCode());
 
 		HttpEntity entity = response.getEntity();
 		if (entity != null) {
@@ -202,18 +234,15 @@ public class RestClient {
 		return new DefaultHttpClient(httpParams);
 	}
 
-	private static void handleResponse(HttpResponse response) throws IOException {
-		int code = response.getStatusLine().getStatusCode();
+	private static void handleResponse(URI uri, int code) {
 		switch (code) {
 			case 500:
-				throw new IOException("TODO: Server error.");
 			case 403:
-				throw new IOException("TODO: Unauthorized.");
 			case 404:
-				throw new IOException("TODO: Not found.");
+				throw new CommException(uri, code);
 			default:
 				Log.d(XCS.LOG.ALL, "Return code = " + code);
-				break;
+			break;
 		}
 	}
 }

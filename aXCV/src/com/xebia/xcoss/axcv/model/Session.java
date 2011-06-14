@@ -17,15 +17,12 @@ public class Session implements Serializable {
 
 	private static int counter = 899;
 
-//	private Conference conference = null;
-
 	// Auto mapped
 	private String title;
 	private int id;
 
 	private String description;
 
-	// TODO : map
 	private Location location;
 	private DateTime date;
 	private DateTime startTime;
@@ -44,7 +41,7 @@ public class Session implements Serializable {
 		labels = new TreeSet<String>();
 		authors = new TreeSet<Author>();
 		languages = new HashSet<String>();
-		location = new Location("TODO");
+//		location = new Location("TODO", true);
 		id = ++counter;
 	}
 

@@ -61,4 +61,11 @@ public class FormatUtil {
 		}
 		return sb.toString();
 	}
+
+	public static String getText(Object object) {
+		if ( object == null ) {
+			return "<Specify value>";
+		}
+		return object.toString();
+	}
 }

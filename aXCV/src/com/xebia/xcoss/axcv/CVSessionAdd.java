@@ -22,10 +22,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
@@ -43,11 +46,14 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 
 	private static final int ACTIVITY_SEARCH_AUTHOR = 938957;
 
+	private static final int ACTIVITY_SEARCH_LABEL = 0;
+
 	private ScreenTimeUtil timeFormatter;
 	private Conference conference;
 	private Session session;
 	private Session originalSession;
 	private Intent authorIntent;
+	private Intent labelIntent;
 	private boolean create = false;
 
 	/** Called when the activity is first created. */
@@ -122,7 +128,7 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 			view.setText(FormatUtil.getList(session.getLabels()));
 
 			view = (TextView) findViewById(R.id.sessionLocation);
-			view.setText(FormatUtil.getText(session.getLocation().toString()));
+			view.setText(FormatUtil.getText(session.getLocation()));
 
 			view = (TextView) findViewById(R.id.sessionPreps);
 			view.setText(FormatUtil.getText(session.getPreparation()));
@@ -257,21 +263,14 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 			case R.id.sessionDescription:
 				session.setDescription(value);
 			break;
-			case R.id.sessionLabels:
-				Set<String> labels = session.getLabels();
-				if (state)
-					labels.add(value);
-				else
-					labels.remove(value);
-			break;
-			case R.id.sessionLocation:
-				session.setLocation(new Location(value));
-			break;
 			case R.id.sessionPreps:
 				session.setPreparation(value);
 			break;
 			case R.id.sessionTitle:
 				session.setTitle(value);
+			break;
+			case R.id.sessionLocation:
+				session.setLocation((Location) selection);
 			break;
 			default:
 				Log.w(LOG.NAVIGATE, "Don't know how to process: " + field);
@@ -338,7 +337,15 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 				builder.setMultiChoiceItems(items, new boolean[items.length], new DialogHandler(this, items,
 						R.id.sessionLanguage));
 				dialog = builder.create();
-			case R.id.sessionLanguage:
+			break;
+			case XCS.DIALOG.INPUT_LOCATION:
+				Location[] locations = ConferenceServer.getInstance().getLocations();
+
+				builder = new AlertDialog.Builder(this);
+				builder.setTitle("Select location");
+				ListAdapter la = new ArrayAdapter<Location>(this, R.layout.simple_list_item_single_choice, locations);
+				builder.setSingleChoiceItems(la, -1, new DialogHandler(this, locations, R.id.sessionLocation));
+				dialog = builder.create();
 			break;
 			case XCS.DIALOG.INPUT_AUDIENCE:
 				dialog = new TextInputDialog(this, R.id.sessionAudience);
@@ -392,12 +399,25 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 				tid.setDescription("Session title");
 				tid.setValue(session.getTitle());
 			break;
+			case XCS.DIALOG.INPUT_LOCATION:
+				AlertDialog ad = (AlertDialog) dialog;
+				if (session.getLocation() != null) {
+					int sid = session.getLocation().getId();
+					int size = ad.getListView().getCount();
+					for (int idx = 0; idx < size; idx++) {
+						if (((Location) ad.getListView().getItemAtPosition(idx)).getId() == sid) {
+							ad.getListView().setSelection(idx);
+							break;
+						}
+					}
+				}
+			break;
 		}
 		super.onPrepareDialog(id, dialog);
 	}
 
 	private void showAuthorPage() {
-		if ( authorIntent == null ) {
+		if (authorIntent == null) {
 			authorIntent = new Intent(this, CVSearchAuthor.class);
 		}
 		ArrayList<Author> authorList = new ArrayList<Author>();
@@ -406,19 +426,41 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 		startActivityForResult(authorIntent, ACTIVITY_SEARCH_AUTHOR);
 	}
 
+	private void showLabelPage() {
+		if (labelIntent == null) {
+			labelIntent = new Intent(this, CVSearchLabel.class);
+		}
+		ArrayList<String> list = new ArrayList<String>();
+		list.addAll(session.getLabels());
+		labelIntent.putExtra(BaseActivity.IA_LABELS, (Serializable) list);
+		startActivityForResult(labelIntent, ACTIVITY_SEARCH_LABEL);
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 			case ACTIVITY_SEARCH_AUTHOR:
-				if ( data != null ) {
-			        if ( data.hasExtra(IA_AUTHORS) ) {
-		    			session.getAuthors().clear();
-			    		Serializable extra = data.getSerializableExtra(IA_AUTHORS);
-			    		for (Author selected : ((ArrayList<Author>)extra)) {
-				    		session.addAuthor(selected);
+				if (data != null) {
+					if (data.hasExtra(IA_AUTHORS)) {
+						session.getAuthors().clear();
+						Serializable extra = data.getSerializableExtra(IA_AUTHORS);
+						for (Author selected : ((ArrayList<Author>) extra)) {
+							session.addAuthor(selected);
 						}
-			    		showSession();
-			        }
+						showSession();
+					}
+				}
+			break;
+			case ACTIVITY_SEARCH_LABEL:
+				if (data != null) {
+					if (data.hasExtra(IA_LABELS)) {
+						session.getLabels().clear();
+						Serializable extra = data.getSerializableExtra(IA_LABELS);
+						for (String selected : ((List<String>) extra)) {
+							session.addLabel(selected);
+						}
+						showSession();
+					}
 				}
 			break;
 			default:
@@ -476,13 +518,13 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 					showDialog(XCS.DIALOG.INPUT_DESCRIPTION);
 				break;
 				case R.id.sessionLabels:
-					// TODO
+					showLabelPage();
 				break;
 				case R.id.sessionLanguage:
 					showDialog(XCS.DIALOG.INPUT_LANGUAGE);
 				break;
 				case R.id.sessionLocation:
-					// TODO
+					showDialog(XCS.DIALOG.INPUT_LOCATION);
 				break;
 				case R.id.sessionPreps:
 					showDialog(XCS.DIALOG.INPUT_PREPARATION);

@@ -58,7 +58,7 @@ public class CVSessionView extends BaseActivity {
 		TextView sessionDescription = (TextView) findViewById(R.id.scDescription);
 		TextView sessionAuthor = (TextView) findViewById(R.id.scAuthor);
 
-		sessionLocation.setText(session.getLocation().getLocation());
+		sessionLocation.setText(session.getLocation().getDescription());
 		sessionTitle.setText(session.getTitle());
 		sessionDescription.setText(session.getDescription());
 		sessionAuthor.setText(FormatUtil.getList(session.getAuthors()));
