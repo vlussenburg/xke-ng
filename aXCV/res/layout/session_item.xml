@@ -57,12 +57,12 @@
 						android:layout_height="wrap_content"
 						android:layout_width="wrap_content"
 						android:id="@+id/editButton"
-						android:src="@drawable/btn_rating_star_off_pressed"></ImageView>
+						android:src="@drawable/x_conference"></ImageView>
 					<ImageView
 						android:layout_height="wrap_content"
 						android:layout_width="wrap_content"
 						android:id="@+id/markButton"
-						android:src="@drawable/btn_rating_star_off_normal"></ImageView>
+						android:src="@drawable/x_conference"></ImageView>
 				</TableRow>
 			</TableLayout>
 		</LinearLayout>

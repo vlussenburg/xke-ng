@@ -27,7 +27,6 @@ public class CVSessionList extends BaseActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 		setContentView(R.layout.schedule);
 
 		currentConference = getConference();
@@ -51,6 +50,7 @@ public class CVSessionList extends BaseActivity {
 				switchTo(currentConference, paramInt);
 			}
 		});
+		super.onCreate(savedInstanceState);
 	}
 
 	
@@ -74,12 +74,21 @@ public class CVSessionList extends BaseActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		// Add a session
 		if (item.getItemId() == XCS.MENU.ADD) {
 			Intent intent = new Intent(this, CVSessionAdd.class);
 			intent.putExtra(BaseActivity.IA_CONFERENCE, currentConference.getId());
 			startActivity(intent);
 			return true;
 		}
+		// Edit the conference
+		if (item.getItemId() == XCS.MENU.EDIT) {
+			Intent intent = new Intent(this, CVConferenceAdd.class);
+			intent.putExtra(BaseActivity.IA_CONFERENCE, currentConference.getId());
+			startActivity(intent);
+			return true;
+		}
 		return super.onOptionsItemSelected(item);
 	}
+
 }

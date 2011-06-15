@@ -89,15 +89,6 @@ public class ConferenceCache {
 		return result;
 	}
 
-//	public List<Session> getSessions(Conference conference) {
-//		try {
-//			return checkValid(conferencesById.get(conference.getId())).getSessions();
-//		}
-//		catch (Exception e) {
-//		}
-//		return null;
-//	}
-
 	public Session getSession(int id) {
 		return checkValid(sessionsById.get(id));
 	}
@@ -150,7 +141,6 @@ public class ConferenceCache {
 
 	private <T> T checkValid(CachedObject<T> co) {
 		if ( co == null ) {
-			Log.d(XCS.LOG.CACHE, "Cache miss.");
 			return null;
 		}
 		long now = System.currentTimeMillis();

@@ -5,6 +5,7 @@ import hirondelle.date4j.DateTime.DayOverflow;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -14,6 +15,7 @@ import android.util.Log;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
+import com.xebia.xcoss.axcv.ui.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class Conference implements Serializable {
@@ -26,12 +28,37 @@ public class Conference implements Serializable {
 	private DateTime date = DateTime.today(XCS.TZ);
 	private DateTime startTime = DateTime.forTimeOnly(16, 0, 0, 0);
 	private DateTime endTime = DateTime.forTimeOnly(21, 0, 0, 0);
-
+	private Set<Location> locations;
 	private Set<Session> sessions;
 
 	public Conference() {
 		resetSessions();
+		this.locations = new HashSet<Location>();
 		this.id = counter++;
+	}
+	
+	public Conference(Conference original) {
+		this();
+		
+		this.id = original.id;
+		this.title = original.title;
+		// DateTime is immutable
+		this.date = original.date;
+		this.startTime = original.startTime;
+		this.endTime = original.endTime;
+	}
+
+	public boolean check(List<String> messages) {
+		if ( date == null ) {
+			messages.add("Date");
+		}
+		if ( StringUtil.isEmpty(title) ) {
+			messages.add("Title");
+		}
+		if ( locations == null || locations.isEmpty() ) {
+			messages.add("Locations");
+		}
+		return (messages.size() == 0);
 	}
 
 	private void resetSessions() {
@@ -89,6 +116,19 @@ public class Conference implements Serializable {
 		ConferenceServer.getInstance().storeSession(session, getId(), false);
 		resetSessions();
 		return true;
+	}
+
+	public static int create(Conference conference) {
+		return ConferenceServer.getInstance().storeConference(conference, false);
+	}
+	
+	public boolean update() {
+		ConferenceServer.getInstance().storeConference(this, true);
+		return true;
+	}
+
+	public void delete() {
+		ConferenceServer.getInstance().deleteConference(this);
 	}
 
 	public TimeSlot getNextAvailableTimeSlot(DateTime start, int duration) {
@@ -202,6 +242,7 @@ public class Conference implements Serializable {
 
 	public void deleteSession(Session session) {
 		sessions.remove(session);
+		ConferenceServer.getInstance().deleteSession(session);
 	}
 
 	@Override

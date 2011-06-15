@@ -61,8 +61,7 @@ public class RestClient {
 		}
 		catch (Exception e) {
 			// TODO: Handle!
-			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
-			Log.e(LOG.ALL, "Call was: " + url);
+			Log.e(LOG.ALL, "Load object failed: " + e.getMessage() + " (" + url + ")");
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -79,8 +78,7 @@ public class RestClient {
 		}
 		catch (Exception e) {
 			// TODO: Handle!
-			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
-			Log.e(LOG.ALL, "Call was: " + url);
+			Log.e(LOG.ALL, "Load collection failed: " + e.getMessage() + " (" + url + ")");
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -106,15 +104,12 @@ public class RestClient {
 					JsonElement element = iterator.next();
 					results.add(gson.fromJson(element, rvClass));
 				}
-			} else {
-				Log.d(LOG.COMMUNICATE, "Not a JsonObject ...");
 			}
 			return results;
 		}
 		catch (Exception e) {
 			// TODO: Handle!
-			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
-			Log.e(LOG.ALL, "Call was: " + url);
+			Log.e(LOG.ALL, "Load objects failed: " + e.getMessage() + " (" + url + ")");
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -129,20 +124,11 @@ public class RestClient {
 			Gson gson = new Gson();
 			String postData = gson.toJson(object);
 			reader = getReader(new HttpPost(url), postData);
-
-			// System.out.println("Reading dump");
-			// char[] tmp = new char[2048];
-			// int l;
-			// while ((l = reader.read(tmp)) != -1) {
-			// System.out.print(new String(tmp, 0, l));
-			// }
-			// System.out.println("Reading done");
 			return gson.fromJson(reader, int.class);
 		}
 		catch (Exception e) {
 			// TODO: Handle!
-			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
-			Log.e(LOG.ALL, "Call was: " + url);
+			Log.e(LOG.ALL, "Create failed: " + e.getMessage() + " (" + url + ")");
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -160,8 +146,7 @@ public class RestClient {
 		}
 		catch (Exception e) {
 			// TODO: Handle!
-			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
-			Log.e(LOG.ALL, "Call was: " + url);
+			Log.e(LOG.ALL, "Update failed: " + e.getMessage() + " (" + url + ")");
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -176,8 +161,7 @@ public class RestClient {
 		}
 		catch (Exception e) {
 			// TODO: Handle!
-			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
-			Log.e(LOG.ALL, "Call was: " + url);
+			Log.e(LOG.ALL, "Post failed: " + e.getMessage() + " (" + url + ")");
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -192,8 +176,7 @@ public class RestClient {
 		}
 		catch (Exception e) {
 			// TODO: Handle!
-			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
-			Log.e(LOG.ALL, "Call was: " + url);
+			Log.e(LOG.ALL, "Delete failed: " + e.getMessage() + " (" + url + ")");
 		}
 		finally {
 			StreamUtil.close(reader);

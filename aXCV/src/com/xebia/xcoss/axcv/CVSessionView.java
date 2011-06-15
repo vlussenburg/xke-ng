@@ -32,7 +32,6 @@ public class CVSessionView extends BaseActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 		setContentView(R.layout.session);
 
 		conference = getConference();
@@ -95,6 +94,7 @@ public class CVSessionView extends BaseActivity {
 		Spanned spannedContent = Html.fromHtml(FormatUtil.getHtml(server.getRemarks(session)));
 		view2.setText(spannedContent, BufferType.SPANNABLE);
 //		view2.setText(server.getRemarks(session));
+		super.onCreate(savedInstanceState);
 	}
 
 	@Override
@@ -179,8 +179,17 @@ public class CVSessionView extends BaseActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		// Add or edit a session
+		Intent intent = new Intent(this, CVSessionAdd.class);
+		intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
+
 		if (item.getItemId() == XCS.MENU.ADD) {
-			startActivity(new Intent(this, CVSessionAdd.class));
+			startActivity(intent);
+			return true;
+		}
+		if (item.getItemId() == XCS.MENU.EDIT) {
+			intent.putExtra(BaseActivity.IA_SESSION, session.getId());
+			startActivity(intent);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

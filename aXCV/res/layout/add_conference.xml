@@ -24,8 +24,8 @@
 			<TextView
 				android:layout_height="fill_parent"
 				android:layout_width="wrap_content"
- android:paddingLeft="7sp"
- 				android:layout_alignWithParentIfMissing="true"
+				android:paddingLeft="7sp"
+				android:layout_alignWithParentIfMissing="true"
 				android:gravity="center_vertical"
 				android:layout_toRightOf="@+id/conferenceButton"
 				android:layout_alignTop="@+id/conferenceButton"
@@ -111,7 +111,8 @@
 				android:textColor="@color/textcolor_header"
 				android:paddingBottom="2sp"
 				android:layout_height="wrap_content"
-				android:paddingTop="2sp" android:text="Planning"></TextView>
+				android:paddingTop="2sp"
+				android:text="Planning"></TextView>
 			<TableLayout
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
@@ -123,10 +124,10 @@
 					android:layout_height="wrap_content">
 					<TextView
 						android:id="@+id/TextView07"
-						android:text="Conference"
 						android:textSize="@dimen/ts_attribute"
 						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"></TextView>
+						android:layout_width="wrap_content"
+						android:text="Title"></TextView>
 					<TextView
 						android:text="@string/empty_value"
 						android:padding="1sp"
@@ -152,7 +153,8 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/conferenceDate" android:background="@drawable/touchtext_disable"></TextView>
+						android:id="@+id/conferenceDate"
+						android:background="@drawable/touchtext_disable"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -160,10 +162,10 @@
 					android:layout_height="wrap_content">
 					<TextView
 						android:id="@+id/TextView12"
-						android:text="Start"
 						android:textSize="@dimen/ts_attribute"
 						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"></TextView>
+						android:layout_width="wrap_content"
+						android:text="Start time"></TextView>
 					<TextView
 						android:text="@string/empty_value"
 						android:padding="1sp"
@@ -171,7 +173,7 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/sessionStart"></TextView>
+						android:id="@+id/conferenceStart"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -182,7 +184,7 @@
 						android:textSize="@dimen/ts_attribute"
 						android:layout_height="wrap_content"
 						android:layout_width="wrap_content"
-						android:text="Duration"></TextView>
+						android:text="End time"></TextView>
 					<TextView
 						android:text="@string/empty_value"
 						android:padding="1sp"
@@ -190,26 +192,7 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/sessionDuration"></TextView>
-				</TableRow>
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow12"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView24"
-						android:layout_height="wrap_content"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_width="wrap_content"
-						android:text="Location"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionLocation"></TextView>
+						android:id="@+id/conferenceEnd"></TextView>
 				</TableRow>
 			</TableLayout>
 			<TextView
@@ -217,37 +200,18 @@
 				android:textSize="@dimen/ts_group"
 				android:id="@+id/TextView16"
 				android:layout_width="fill_parent"
-				android:text="Session"
 				android:paddingRight="5sp"
 				android:paddingLeft="5sp"
 				android:textColor="@color/textcolor_header"
 				android:paddingBottom="2sp"
 				android:layout_height="wrap_content"
-				android:paddingTop="2sp"></TextView>
+				android:paddingTop="2sp"
+				android:text="Details"></TextView>
 			<TableLayout
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:id="@+id/TableLayout02"
 				android:padding="6sp">
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow08"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView18"
-						android:text="Title"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionTitle"></TextView>
-				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
 					android:id="@+id/TableRow01"
@@ -265,7 +229,7 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/sessionDescription"></TextView>
+						android:id="@+id/conferenceDescription"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -273,10 +237,10 @@
 					android:layout_height="wrap_content">
 					<TextView
 						android:id="@+id/TextView15"
-						android:text="Authors"
 						android:textSize="@dimen/ts_attribute"
 						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"></TextView>
+						android:layout_width="wrap_content"
+						android:text="Organiser"></TextView>
 					<TextView
 						android:text="@string/empty_value"
 						android:padding="1sp"
@@ -284,120 +248,26 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/sessionAuthors"></TextView>
-				</TableRow>
-			</TableLayout>
-			<TextView
-				android:id="@+id/textView5"
-				android:layout_height="wrap_content"
-				android:layout_width="fill_parent"
-				android:paddingLeft="5sp"
-				android:paddingRight="5sp"
-				android:paddingBottom="2sp"
-				android:paddingTop="2sp"
-				android:background="@drawable/rateslider"
-				android:textSize="@dimen/ts_group"
-				android:textColor="@color/textcolor_header"
-				android:text="Details"></TextView>
-			<TableLayout
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:id="@+id/tableLayout2"
-				android:padding="6sp">
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow03"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView06"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"
-						android:text="Audience"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionAudience"></TextView>
+						android:id="@+id/conferenceOrganiser"></TextView>
 				</TableRow>
 				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow02"
-					android:layout_height="wrap_content">
+					android:id="@+id/TableRow12"
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content">
 					<TextView
-						android:id="@+id/TextView04"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
+						android:id="@+id/TextView24"
 						android:layout_width="wrap_content"
-						android:text="Preparation"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
+						android:text="Locations"
 						android:layout_height="wrap_content"
+						android:textSize="@dimen/ts_attribute"></TextView>
+					<TextView
+						android:padding="1sp"
+						android:id="@+id/conferenceLocations"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/sessionPreps"></TextView>
-				</TableRow>
-				<TableRow
-					android:id="@+id/tableRow1"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/textView3"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:text="# People"></TextView>
-					<TextView
-						android:textSize="@dimen/ts_attribute"
-						android:layout_marginLeft="5sp"
-						android:id="@+id/sessionCount"
 						android:text="@string/empty_value"
-						android:padding="1sp"
 						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"></TextView>
-				</TableRow>
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow11"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView23"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"
-						android:text="Language"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionLanguage"></TextView>
-				</TableRow>
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow10"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView21"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"
-						android:text="Labels"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionLabels"></TextView>
+						android:textSize="@dimen/ts_attribute"></TextView>
 				</TableRow>
 			</TableLayout>
 		</LinearLayout>

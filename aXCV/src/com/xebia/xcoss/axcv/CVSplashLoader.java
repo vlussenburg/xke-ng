@@ -2,6 +2,7 @@ package com.xebia.xcoss.axcv;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -15,14 +16,13 @@ public class CVSplashLoader extends BaseActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
 		setContentView(R.layout.loader);
 
 		if ( !loaded ) {
 	        DataRetriever task = new DataRetriever(this);
 	        task.execute();
 		}
+		super.onCreate(savedInstanceState);
 	}
 	
 	@Override
@@ -37,9 +37,15 @@ public class CVSplashLoader extends BaseActivity {
 	};
 
 	@Override
+	protected void onRestart() {
+		finish();
+		super.onRestart();
+	}
+	
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuItem miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
-		miSettings.setIcon(R.drawable.menu_add);
+		miSettings.setIcon(android.R.drawable.ic_menu_preferences);
 
 		return true;
 	}

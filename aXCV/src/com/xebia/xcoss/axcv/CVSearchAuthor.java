@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -32,7 +33,6 @@ public class CVSearchAuthor extends BaseActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 		setContentView(R.layout.search_items);
 		view = (AutoCompleteTextView) findViewById(R.id.ssa_text);
 		ListView authorList = (ListView) findViewById(R.id.ssa_list);
@@ -86,6 +86,7 @@ public class CVSearchAuthor extends BaseActivity {
 				Toast.makeText(getApplicationContext(), "Author removed", Toast.LENGTH_SHORT).show();
 			}
 		});
+		super.onCreate(savedInstanceState);
 	}
 
 	private boolean addAuthor(String authorName) {
@@ -128,5 +129,10 @@ public class CVSearchAuthor extends BaseActivity {
 		result.putExtra(IA_AUTHORS, (Serializable) selectedAuthors);
 		setResult(RESULT_OK, result);
 		finish();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		return true;
 	}
 }

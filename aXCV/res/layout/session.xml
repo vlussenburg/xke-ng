@@ -16,27 +16,28 @@
 			android:layout_height="wrap_content"
 			android:layout_width="fill_parent"
 			android:id="@+id/relativeLayout1">
-			<ImageButton
+			<ImageView
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
-				android:src="@drawable/ic_btn_back"
-				android:id="@+id/imageButton1"
-				android:layout_alignParentLeft="true"></ImageButton>
+				android:src="@drawable/x_conference"
+				android:id="@+id/conferenceButton"
+				android:layout_alignParentLeft="true"></ImageView>
 			<TextView
 				android:layout_height="fill_parent"
+				android:paddingLeft="7sp"
 				android:layout_width="wrap_content"
 				android:id="@+id/conferenceTitle"
 				android:text="Schedule"
 				android:layout_alignWithParentIfMissing="true"
 				android:gravity="center_vertical"
-				android:layout_toRightOf="@+id/imageButton1"
-				android:layout_alignTop="@+id/imageButton1"
-				android:layout_alignBottom="@+id/imageButton1"
+				android:layout_toRightOf="@+id/conferenceButton"
+				android:layout_alignTop="@+id/conferenceButton"
+				android:layout_alignBottom="@+id/conferenceButton"
 				android:textSize="@dimen/textsize_title"></TextView>
 			<ImageButton
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:src="@drawable/ic_btn_next"
+				android:src="@drawable/x_conference"
 				android:id="@+id/imageButton5"
 				android:layout_toLeftOf="@+id/imageButton4"
 				android:layout_alignTop="@+id/imageButton4"
@@ -45,7 +46,7 @@
 			<ImageButton
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:src="@drawable/ic_btn_next"
+				android:src="@drawable/x_conference"
 				android:id="@+id/imageButton4"
 				android:layout_alignParentRight="true"
 				android:visibility="gone"></ImageButton>
@@ -106,23 +107,23 @@
 			<ImageView
 				android:layout_height="wrap_content"
 				android:id="@+id/ImageView03"
-				android:src="@drawable/ic_btn_back"
+				android:src="@drawable/x_conference"
 				android:layout_width="wrap_content"></ImageView>
 			<ImageView
 				android:layout_height="wrap_content"
 				android:id="@+id/ImageView02"
-				android:src="@drawable/ic_btn_back"
+				android:src="@drawable/x_conference"
 				android:layout_width="wrap_content"></ImageView>
 			<ImageView
 				android:layout_height="wrap_content"
 				android:id="@+id/ImageView01"
 				android:layout_width="wrap_content"
-				android:src="@drawable/ic_btn_next"></ImageView>
+				android:src="@drawable/x_conference"></ImageView>
 			<ImageView
 				android:layout_height="wrap_content"
 				android:id="@+id/imageView1"
 				android:layout_width="wrap_content"
-				android:src="@drawable/ic_btn_next"></ImageView>
+				android:src="@drawable/x_conference"></ImageView>
 		</LinearLayout>
 	</LinearLayout>
 	<!-- Content part of the session -->
@@ -148,7 +149,7 @@
 					<ImageButton
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:src="@drawable/ic_btn_search"
+						android:src="@drawable/x_conference"
 						android:id="@+id/sessionMarkButton"></ImageButton>
 				</LinearLayout>
 				<LinearLayout
@@ -168,11 +169,33 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:layout_gravity="center"
-						android:id="@+id/sessionLocation" android:text="location"></TextView>
+						android:id="@+id/sessionLocation"
+						android:text="location"></TextView>
 				</LinearLayout>
-				<RelativeLayout android:layout_gravity="center_vertical" android:paddingLeft="8sp" android:paddingRight="8sp" android:layout_height="fill_parent" android:id="@+id/scRatingLayout" android:layout_width="wrap_content">
-					<ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:src="@drawable/ic_btn_search" android:layout_centerVertical="true" android:layout_centerHorizontal="true" android:id="@+id/scRatingImage"></ImageView>
-					<TextView android:layout_centerHorizontal="true" android:layout_centerVertical="true" android:textSize="24sp" android:layout_height="wrap_content" android:id="@+id/scRating" android:text="5.3" android:layout_width="wrap_content"></TextView>
+				<RelativeLayout
+					android:layout_gravity="center_vertical"
+					android:paddingLeft="8sp"
+					android:paddingRight="8sp"
+					android:layout_height="fill_parent"
+					android:id="@+id/scRatingLayout"
+					android:layout_width="wrap_content">
+					<ImageView
+						android:layout_height="wrap_content"
+						android:layout_width="wrap_content"
+						android:src="@drawable/ic_menu_list"
+						android:layout_centerVertical="true"
+						android:layout_centerHorizontal="true"
+						android:id="@+id/scRatingImage"></ImageView>
+					<TextView
+						android:layout_centerHorizontal="true"
+						android:layout_centerVertical="true"
+						android:textSize="24sp"
+						android:layout_height="wrap_content"
+						android:id="@+id/scRating"
+						android:text="5.3"
+						android:textStyle="bold"
+						android:textColor="@color/textcolor_title"
+						android:layout_width="wrap_content"></TextView>
 				</RelativeLayout>
 			</FrameLayout>
 			<LinearLayout

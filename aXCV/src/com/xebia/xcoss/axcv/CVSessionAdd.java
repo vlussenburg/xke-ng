@@ -42,11 +42,10 @@ import com.xebia.xcoss.axcv.ui.TextInputDialog;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 
-public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDismissListener {
+public class CVSessionAdd extends AdditionActivity implements OnCancelListener, OnDismissListener {
 
 	private static final int ACTIVITY_SEARCH_AUTHOR = 938957;
-
-	private static final int ACTIVITY_SEARCH_LABEL = 0;
+	private static final int ACTIVITY_SEARCH_LABEL  = 938958;
 
 	private ScreenTimeUtil timeFormatter;
 	private Conference conference;
@@ -59,27 +58,27 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 		setContentView(R.layout.add_session);
 		this.timeFormatter = new ScreenTimeUtil(this);
 
+		conference = getConference();
 		originalSession = getSession(conference, false);
 		if (originalSession == null) {
 			create = true;
 			session = new Session();
+			((TextView) findViewById(R.id.addModifyTitle)).setText("Add session");
 		} else {
 			session = new Session(originalSession);
+			((TextView) findViewById(R.id.addModifyTitle)).setText("Edit session");
 		}
 
 		showConference();
 		showSession();
 		registerActions();
+		super.onCreate(savedInstanceState);
 	}
 
 	private void showConference() {
-		if (conference == null) {
-			conference = getConference();
-		}
 		if (conference != null) {
 			TextView view = (TextView) findViewById(R.id.conferenceDate);
 			view.setText(timeFormatter.getAbsoluteDate(conference.getDate()));
@@ -314,8 +313,7 @@ public class CVSessionAdd extends BaseActivity implements OnCancelListener, OnDi
 				builder.setTitle("Pick a start time");
 				if (items.length == 0) {
 					builder.setMessage("This conference is fully booked!");
-					// TODO Use alert icon
-					builder.setIcon(R.drawable.icon);
+					builder.setIcon(android.R.drawable.alert_dark_frame);
 				} else {
 					builder.setItems(items, new DialogHandler(this, items, R.id.sessionStart));
 				}

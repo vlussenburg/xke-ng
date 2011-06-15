@@ -10,10 +10,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Conference;
@@ -36,6 +40,35 @@ public abstract class BaseActivity extends Activity {
 	private MenuItem miEdit;
 
 	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);
+		if ( conferenceButton != null ) {
+			conferenceButton.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					showConferencesList();
+				}
+			});
+			conferenceButton.setOnLongClickListener(new View.OnLongClickListener() {
+				@Override
+				public boolean onLongClick(View v) {
+					kill();
+					return true;
+				}
+			});
+		}
+		super.onCreate(savedInstanceState);
+	}
+
+
+	private boolean kill() {
+		Intent intent = new Intent(this, CVSplashLoader.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		startActivity(intent);
+		return true;
+	}
+
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 
@@ -45,11 +78,11 @@ public abstract class BaseActivity extends Activity {
 		miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
 		miSearch = menu.add(0, XCS.MENU.SEARCH, Menu.NONE, R.string.menu_search);
 
-		miAdd.setIcon(R.drawable.ic_menu_add);
-		miEdit.setIcon(R.drawable.ic_menu_allfriends);
-		miSettings.setIcon(R.drawable.ic_menu_agenda);
-		miSearch.setIcon(R.drawable.ic_btn_search);
-		miList.setIcon(R.drawable.menu_list);
+		miAdd.setIcon(android.R.drawable.ic_menu_add);
+		miEdit.setIcon(android.R.drawable.ic_menu_edit);
+		miSettings.setIcon(android.R.drawable.ic_menu_preferences);
+		miSearch.setIcon(android.R.drawable.ic_menu_search);
+		miList.setIcon(R.drawable.ic_menu_list);
 
 		return true;
 	}
@@ -63,15 +96,28 @@ public abstract class BaseActivity extends Activity {
 				startActivity(new Intent(this, CVSettings.class));
 			break;
 			case XCS.MENU.OVERVIEW:
-				Intent intent = new Intent(this, CVConferences.class);
-				intent.putExtra("redirect", false);
-				startActivity(intent);
+				showConferencesList();
+			break;
+			case XCS.MENU.SEARCH:
+				// TODO Implement search screen
 			break;
 		}
 		return true;
 	}
 
+	private void showConferencesList() {
+		Intent intent = new Intent(this, CVConferences.class);
+		intent.putExtra("redirect", false);
+		// Clears out the activity call stack
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(intent);
+	}
+
 	protected Conference getConference() {
+		return getConference(true);
+	}
+
+	protected Conference getConference(boolean useDefault) {
 		Conference conference = null;
 		ConferenceServer server = getConferenceServer();
 		
@@ -83,7 +129,7 @@ public abstract class BaseActivity extends Activity {
 		catch (Exception e) {
 			Log.w(LOG.ALL, "No conference with ID " + identifier);
 		}
-		if (conference == null) {
+		if (conference == null && useDefault) {
 			conference = server.getUpcomingConference();
 			Log.w(LOG.ALL, "Conference default " + conference.getTitle());
 		}
@@ -104,6 +150,7 @@ public abstract class BaseActivity extends Activity {
 		}
 		catch (Exception e) {
 			Log.w(LOG.ALL, "No session with ID " + identifier + " or conference not found.");
+			e.printStackTrace();
 		}
 		if (session == null && useDefault) {
 			Log.w(LOG.ALL, "Conference default : " + (conference == null ? "NULL" : conference.getTitle()));
@@ -144,7 +191,7 @@ public abstract class BaseActivity extends Activity {
 		builder
 			.setTitle(title)
 			.setMessage(message)
-			.setIcon(R.drawable.icon)
+			.setIcon(R.drawable.x_conference)
 			.setPositiveButton("Close", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();

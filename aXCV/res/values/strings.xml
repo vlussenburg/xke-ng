@@ -16,7 +16,6 @@
     <string name="password_set">Password stored</string>
     <string name="password_unset">No password specified</string>
     <string name="session_title"></string>
-    <string name="add_session">Add session</string>
     <string name="modify_session">Modify session</string>
 
     <string name="author_select">Select authors...</string>    
