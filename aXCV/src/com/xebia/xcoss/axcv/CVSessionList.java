@@ -11,7 +11,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.xebia.xcoss.axcv.model.BreakSession;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
@@ -56,7 +55,7 @@ public class CVSessionList extends BaseActivity {
 	
 	private void switchTo(Conference conference, int sessionIndex) {
 		Session session = sessions[sessionIndex];
-		if ( session instanceof BreakSession ) {
+		if ( session.isBreak() ) {
 			// No navigation to this session
 			return;
 		}

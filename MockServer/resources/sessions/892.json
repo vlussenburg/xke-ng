@@ -3,8 +3,8 @@
   {
     "title":"Scala in the Android World",
     "description":"This session talks about using scala in the android world.",
-    "startTime":"0000-00-00T17:37:54.812Z",
-    "endTime":"0000-00-00T17:58:54.812Z",
+    "startTime":"0000-00-00T16:37:54.812Z",
+    "endTime":"0000-00-00T17:30:54.812Z",
     "id":"8801",
     "audience":"Everybody",
 	"location": {
@@ -12,6 +12,18 @@
            "id": "711",
            "standard": "true"
 	}
+  },
+  {
+    "title":"Diner break",
+    "startTime":"0000-00-00T17:30:00.000Z",
+    "endTime":"0000-00-00T18:00:00.000Z",
+    "id":"8803",
+	"location": {
+           "description": "Maupertuus",
+           "id": "711",
+           "standard": "true"
+	},
+	"type":"BREAK"
   },
   {
     "title":"The power of Android",

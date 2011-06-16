@@ -113,7 +113,7 @@ public abstract class BaseActivity extends Activity {
 		startActivity(intent);
 	}
 
-	protected Conference getConference() {
+	public Conference getConference() {
 		return getConference(true);
 	}
 

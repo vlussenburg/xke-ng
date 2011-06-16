@@ -64,9 +64,8 @@ public class CVSearchAuthor extends BaseActivity {
 					view.getText().clear();
 				}
 
-				if (keyCode != KeyEvent.KEYCODE_ENTER || StringUtil.isEmpty(authorName)) {
-					return false;
-				}
+				if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
+				if (StringUtil.isEmpty(authorName)) return true;
 
 				if (view.isPopupShowing() && view.getListSelection() != ListView.INVALID_POSITION) {
 					authorName = (String) view.getAdapter().getItem(view.getListSelection());
@@ -95,7 +94,7 @@ public class CVSearchAuthor extends BaseActivity {
 	}
 
 	private boolean addAuthor(String authorName) {
-		if ( StringUtil.isEmpty(authorName) ) {
+		if (StringUtil.isEmpty(authorName)) {
 			return true;
 		}
 		if (allAuthors.containsKey(authorName)) {
@@ -107,7 +106,7 @@ public class CVSearchAuthor extends BaseActivity {
 				}
 			}
 			if (!contains) {
-				if ( singleMode && selectedAuthors.size() > 0 ) {
+				if (singleMode && selectedAuthors.size() > 0) {
 					Builder builder = new AlertDialog.Builder(this);
 					builder.setTitle("Single select!");
 					builder.setMessage("You cannot select more than one person! What shall I do with the previously selected one?");
@@ -140,7 +139,7 @@ public class CVSearchAuthor extends BaseActivity {
 	}
 
 	private void initSelectedAuthors() {
-		if (selectedAuthors == null ) {
+		if (selectedAuthors == null) {
 			selectedAuthors = new ArrayList<Author>();
 		}
 		try {
@@ -153,7 +152,7 @@ public class CVSearchAuthor extends BaseActivity {
 			Log.w(XCS.LOG.COMMUNICATE, "No authors loaded: " + e.getMessage());
 		}
 	}
-	
+
 	@Override
 	protected void onResume() {
 		initSelectedAuthors();

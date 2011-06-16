@@ -1,25 +1,29 @@
 package com.xebia.xcoss.axcv.ui;
 
-import android.app.Activity;
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.xebia.xcoss.axcv.BaseActivity;
+import com.xebia.xcoss.axcv.CVSessionAdd;
 import com.xebia.xcoss.axcv.R;
-import com.xebia.xcoss.axcv.model.MandatorySession;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class SessionAdapter extends BaseAdapter {
 
-	private Activity ctx;
+	private BaseActivity ctx;
 	private int viewResource;
 	private int alternativeViewResource;
 	private Session[] data;
 	private ScreenTimeUtil timeUtil;
 
-	public SessionAdapter(Activity context, int viewResourceId, int altViewResourceId, Session[] data) {
+	public SessionAdapter(BaseActivity context, int viewResourceId, int altViewResourceId, Session[] data) {
 		this.ctx = context;
 		this.viewResource = viewResourceId;
 		this.alternativeViewResource = altViewResourceId;
@@ -39,13 +43,13 @@ public class SessionAdapter extends BaseAdapter {
 //			colorId = ctx.getResources().getColor(R.color.tc_itemactive);
 //		}
 
-		if ( session instanceof MandatorySession ) {
+		if ( session.isMandatory() ) {
 			return constructMandatoryView(parent, session, colorId);
 		}
 		return constructSessionView(parent, session, colorId);
 	}
 
-	private View constructSessionView(ViewGroup parent, Session session, int colorId) {
+	private View constructSessionView(ViewGroup parent, final Session session, int colorId) {
 
 		LayoutInflater inflater = ctx.getLayoutInflater();
 		View row = inflater.inflate(viewResource, parent, false);
@@ -74,6 +78,25 @@ public class SessionAdapter extends BaseAdapter {
 		}
 		
 		locDateView.setText(getLocationAndDate(session));
+
+		
+		ImageView button;
+		button = (ImageView) row.findViewById(R.id.markButton);
+		button.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Log.e(LOG.ALL, "Clicked on " + view);
+			}
+		});
+		button = (ImageView) row.findViewById(R.id.editButton);
+		button.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Log.e(LOG.ALL, "Clicked on " + view);
+				editSession(session);
+			}
+		});
+
 		return row;
 	}
 
@@ -91,6 +114,14 @@ public class SessionAdapter extends BaseAdapter {
 
 		locDateView.setText(getLocationAndDate(session));
 		return row;
+	}
+
+
+	private void editSession(Session session) {
+		Intent intent = new Intent(ctx, CVSessionAdd.class);
+		intent.putExtra(BaseActivity.IA_CONFERENCE, ctx.getConference().getId());
+		intent.putExtra(BaseActivity.IA_SESSION, session.getId());
+		ctx.startActivity(intent);
 	}
 
 	private CharSequence getLocationAndDate(Session session) {
