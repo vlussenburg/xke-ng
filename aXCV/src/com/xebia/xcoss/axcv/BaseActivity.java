@@ -63,7 +63,8 @@ public abstract class BaseActivity extends Activity {
 
 	private boolean kill() {
 		Intent intent = new Intent(this, CVSplashLoader.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.putExtra("exit", true);
 		startActivity(intent);
 		return true;
 	}
