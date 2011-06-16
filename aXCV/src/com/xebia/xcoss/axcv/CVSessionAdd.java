@@ -11,22 +11,15 @@ import java.util.Set;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
-import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Author;
@@ -42,17 +35,12 @@ import com.xebia.xcoss.axcv.ui.TextInputDialog;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 
-public class CVSessionAdd extends AdditionActivity implements OnCancelListener, OnDismissListener {
-
-	private static final int ACTIVITY_SEARCH_AUTHOR = 938957;
-	private static final int ACTIVITY_SEARCH_LABEL  = 938958;
+public class CVSessionAdd extends AdditionActivity {
 
 	private ScreenTimeUtil timeFormatter;
 	private Conference conference;
 	private Session session;
 	private Session originalSession;
-	private Intent authorIntent;
-	private Intent labelIntent;
 	private boolean create = false;
 
 	/** Called when the activity is first created. */
@@ -135,19 +123,11 @@ public class CVSessionAdd extends AdditionActivity implements OnCancelListener, 
 	}
 
 	private void registerActions() {
-		AddOnTouchListener touchListener = new AddOnTouchListener();
-		AddOnClickListener clickListener = new AddOnClickListener();
-		Drawable drawable = getResources().getDrawable(R.drawable.touchtext_disable);
-
 		int[] identifiers = new int[] { R.id.conferenceName, R.id.sessionAudience, R.id.sessionAuthors,
 				R.id.sessionCount, R.id.sessionDescription, R.id.sessionDuration, R.id.sessionLabels,
 				R.id.sessionLanguage, R.id.sessionLocation, R.id.sessionPreps, R.id.sessionStart, R.id.sessionTitle };
-		for (int i = 0; i < identifiers.length; i++) {
-			TextView view = (TextView) findViewById(identifiers[i]);
-			view.setOnTouchListener(touchListener);
-			view.setOnClickListener(clickListener);
-			view.setBackgroundDrawable(drawable);
-		}
+
+		activateViews(identifiers);
 
 		Button button = (Button) findViewById(R.id.actionSave);
 		button.setOnClickListener(new OnClickListener() {
@@ -278,11 +258,6 @@ public class CVSessionAdd extends AdditionActivity implements OnCancelListener, 
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		return true;
-	}
-
-	@Override
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog = null;
 		String[] items;
@@ -313,7 +288,7 @@ public class CVSessionAdd extends AdditionActivity implements OnCancelListener, 
 				builder.setTitle("Pick a start time");
 				if (items.length == 0) {
 					builder.setMessage("This conference is fully booked!");
-					builder.setIcon(android.R.drawable.alert_dark_frame);
+					builder.setIcon(android.R.drawable.ic_dialog_alert);
 				} else {
 					builder.setItems(items, new DialogHandler(this, items, R.id.sessionStart));
 				}
@@ -337,7 +312,7 @@ public class CVSessionAdd extends AdditionActivity implements OnCancelListener, 
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.INPUT_LOCATION:
-				Location[] locations = ConferenceServer.getInstance().getLocations();
+				Location[] locations = getConferenceServer().getLocations(false);
 
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Select location");
@@ -415,9 +390,7 @@ public class CVSessionAdd extends AdditionActivity implements OnCancelListener, 
 	}
 
 	private void showAuthorPage() {
-		if (authorIntent == null) {
-			authorIntent = new Intent(this, CVSearchAuthor.class);
-		}
+		Intent authorIntent = getAuthorIntent();
 		ArrayList<Author> authorList = new ArrayList<Author>();
 		authorList.addAll(session.getAuthors());
 		authorIntent.putExtra(BaseActivity.IA_AUTHORS, (Serializable) authorList);
@@ -425,9 +398,7 @@ public class CVSessionAdd extends AdditionActivity implements OnCancelListener, 
 	}
 
 	private void showLabelPage() {
-		if (labelIntent == null) {
-			labelIntent = new Intent(this, CVSearchLabel.class);
-		}
+		Intent labelIntent = getLabelIntent();
 		ArrayList<String> list = new ArrayList<String>();
 		list.addAll(session.getLabels());
 		labelIntent.putExtra(BaseActivity.IA_LABELS, (Serializable) list);
@@ -438,27 +409,23 @@ public class CVSessionAdd extends AdditionActivity implements OnCancelListener, 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 			case ACTIVITY_SEARCH_AUTHOR:
-				if (data != null) {
-					if (data.hasExtra(IA_AUTHORS)) {
-						session.getAuthors().clear();
-						Serializable extra = data.getSerializableExtra(IA_AUTHORS);
-						for (Author selected : ((ArrayList<Author>) extra)) {
-							session.addAuthor(selected);
-						}
-						showSession();
+				if (data != null && data.hasExtra(IA_AUTHORS)) {
+					session.getAuthors().clear();
+					Serializable extra = data.getSerializableExtra(IA_AUTHORS);
+					for (Author selected : ((ArrayList<Author>) extra)) {
+						session.addAuthor(selected);
 					}
+					showSession();
 				}
 			break;
 			case ACTIVITY_SEARCH_LABEL:
-				if (data != null) {
-					if (data.hasExtra(IA_LABELS)) {
-						session.getLabels().clear();
-						Serializable extra = data.getSerializableExtra(IA_LABELS);
-						for (String selected : ((List<String>) extra)) {
-							session.addLabel(selected);
-						}
-						showSession();
+				if (data != null && data.hasExtra(IA_LABELS)) {
+					session.getLabels().clear();
+					Serializable extra = data.getSerializableExtra(IA_LABELS);
+					for (String selected : ((List<String>) extra)) {
+						session.addLabel(selected);
 					}
+					showSession();
 				}
 			break;
 			default:
@@ -467,107 +434,61 @@ public class CVSessionAdd extends AdditionActivity implements OnCancelListener, 
 		}
 	}
 
-	private class AddOnTouchListener implements OnTouchListener {
+	public void onTextClick(int id) {
 
-		@Override
-		public boolean onTouch(View view, MotionEvent event) {
-			Drawable drawable = null;
-			switch (event.getAction()) {
-				case MotionEvent.ACTION_DOWN:
-				case MotionEvent.ACTION_MOVE:
-				case MotionEvent.ACTION_POINTER_DOWN:
-					drawable = getResources().getDrawable(R.drawable.touchtext);
-				break;
-				default:
-				break;
-			}
-			view.setBackgroundDrawable(drawable);
-			// Need to return false to handle click event
-			return false;
-		}
-	}
-
-	private class AddOnClickListener implements OnClickListener {
-
-		@Override
-		public void onClick(View view) {
-
-			switch (view.getId()) {
-				case R.id.conferenceDate:
-				case R.id.conferenceName:
-					showDialog(XCS.DIALOG.SELECT_CONFERENCE);
-				break;
-				case R.id.sessionStart:
-					showDialog(XCS.DIALOG.SELECT_TIME);
-				break;
-				case R.id.sessionDuration:
-					showDialog(XCS.DIALOG.SELECT_DURATION);
-				break;
-				case R.id.sessionAudience:
-					showDialog(XCS.DIALOG.INPUT_AUDIENCE);
-				break;
-				case R.id.sessionAuthors:
-					showAuthorPage();
-				break;
-				case R.id.sessionCount:
-					showDialog(XCS.DIALOG.INPUT_LIMIT);
-				break;
-				case R.id.sessionDescription:
-					showDialog(XCS.DIALOG.INPUT_DESCRIPTION);
-				break;
-				case R.id.sessionLabels:
-					showLabelPage();
-				break;
-				case R.id.sessionLanguage:
-					showDialog(XCS.DIALOG.INPUT_LANGUAGE);
-				break;
-				case R.id.sessionLocation:
-					showDialog(XCS.DIALOG.INPUT_LOCATION);
-				break;
-				case R.id.sessionPreps:
-					showDialog(XCS.DIALOG.INPUT_PREPARATION);
-				break;
-				case R.id.sessionTitle:
-					showDialog(XCS.DIALOG.INPUT_TITLE);
-				break;
-				default:
-					Log.w(XCS.LOG.NAVIGATE, "Click on text not handled: " + view.getId());
-				break;
-			}
-		}
-	}
-
-	private class DialogHandler implements DialogInterface.OnClickListener, DialogInterface.OnMultiChoiceClickListener {
-		private int field;
-		private Object[] items;
-		private CVSessionAdd activity;
-
-		public DialogHandler(CVSessionAdd activity, Object[] items, int field) {
-			this.activity = activity;
-			this.items = items;
-			this.field = field;
-		}
-
-		public void onClick(DialogInterface dialog, int item) {
-			onClick(dialog, item, true);
-		}
-
-		@Override
-		public void onClick(DialogInterface dialog, int item, boolean state) {
-			Toast.makeText(getApplicationContext(), items[item].toString(), Toast.LENGTH_SHORT).show();
-			// TextView view = (TextView) activity.findViewById(field);
-			// view.setText(items[item]);
-			activity.updateField(field, items[item], state);
+		switch (id) {
+			case R.id.conferenceDate:
+			case R.id.conferenceName:
+				showDialog(XCS.DIALOG.SELECT_CONFERENCE);
+			break;
+			case R.id.sessionStart:
+				showDialog(XCS.DIALOG.SELECT_TIME);
+			break;
+			case R.id.sessionDuration:
+				showDialog(XCS.DIALOG.SELECT_DURATION);
+			break;
+			case R.id.sessionAudience:
+				showDialog(XCS.DIALOG.INPUT_AUDIENCE);
+			break;
+			case R.id.sessionAuthors:
+				showAuthorPage();
+			break;
+			case R.id.sessionCount:
+				showDialog(XCS.DIALOG.INPUT_LIMIT);
+			break;
+			case R.id.sessionDescription:
+				showDialog(XCS.DIALOG.INPUT_DESCRIPTION);
+			break;
+			case R.id.sessionLabels:
+				showLabelPage();
+			break;
+			case R.id.sessionLanguage:
+				showDialog(XCS.DIALOG.INPUT_LANGUAGE);
+			break;
+			case R.id.sessionLocation:
+				showDialog(XCS.DIALOG.INPUT_LOCATION);
+			break;
+			case R.id.sessionPreps:
+				showDialog(XCS.DIALOG.INPUT_PREPARATION);
+			break;
+			case R.id.sessionTitle:
+				showDialog(XCS.DIALOG.INPUT_TITLE);
+			break;
+			default:
+				Log.w(XCS.LOG.NAVIGATE, "Click on text not handled: " + id);
+			break;
 		}
 	}
 
 	@Override
 	public void onDismiss(DialogInterface di) {
+		// Remove the dialog to recreate it with correct values
 		removeDialog(XCS.DIALOG.SELECT_TIME);
 	}
 
 	@Override
 	public void onCancel(DialogInterface di) {
+		// Remove the dialog to recreate it with correct values
 		removeDialog(XCS.DIALOG.SELECT_TIME);
 	}
 }

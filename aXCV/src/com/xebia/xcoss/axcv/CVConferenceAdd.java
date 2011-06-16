@@ -1,33 +1,35 @@
 package com.xebia.xcoss.axcv;
 
+import hirondelle.date4j.DateTime;
+
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
-import android.content.DialogInterface.OnDismissListener;
-import android.graphics.drawable.Drawable;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.xebia.xcoss.axcv.logic.ConferenceServer;
+import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.TextInputDialog;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 
-public class CVConferenceAdd extends AdditionActivity implements OnCancelListener, OnDismissListener {
+public class CVConferenceAdd extends AdditionActivity {
 
 	private ScreenTimeUtil timeFormatter;
 	private Conference originalConference;
@@ -57,27 +59,36 @@ public class CVConferenceAdd extends AdditionActivity implements OnCancelListene
 
 	private void showConference() {
 		if (conference != null) {
-			TextView view = (TextView) findViewById(R.id.conferenceDate);
-			view.setText(timeFormatter.getAbsoluteDate(conference.getDate()));
+			TextView view = (TextView) findViewById(R.id.conferenceName);
+			view.setText(FormatUtil.getText(conference.getTitle()));
 
-			view = (TextView) findViewById(R.id.conferenceName);
-			view.setText(conference.getTitle());
+			DateTime date = conference.getDate();
+			if (date != null) {
+				view = (TextView) findViewById(R.id.conferenceDate);
+				view.setText(timeFormatter.getAbsoluteDate(date));
+			}
+			view = (TextView) findViewById(R.id.conferenceStart);
+			view.setText(timeFormatter.getAbsoluteTime(conference.getStartTime()));
+
+			view = (TextView) findViewById(R.id.conferenceEnd);
+			view.setText(timeFormatter.getAbsoluteTime(conference.getEndTime()));
+
+			view = (TextView) findViewById(R.id.conferenceDescription);
+			view.setText(FormatUtil.getText(conference.getDescription()));
+
+			view = (TextView) findViewById(R.id.conferenceOrganiser);
+			view.setText(FormatUtil.getText(conference.getOrganiser()));
+
+			view = (TextView) findViewById(R.id.conferenceLocations);
+			view.setText(FormatUtil.getList(conference.getLocations()));
 		}
 	}
 
-
 	private void registerActions() {
-		AddOnTouchListener touchListener = new AddOnTouchListener();
-		AddOnClickListener clickListener = new AddOnClickListener();
-		Drawable drawable = getResources().getDrawable(R.drawable.touchtext_disable);
+		int[] identifiers = new int[] { R.id.conferenceName, R.id.conferenceDate, R.id.conferenceStart,
+				R.id.conferenceEnd, R.id.conferenceDescription, R.id.conferenceOrganiser, R.id.conferenceLocations };
 
-		int[] identifiers = new int[] { R.id.conferenceName, R.id.conferenceDate };
-		for (int i = 0; i < identifiers.length; i++) {
-			TextView view = (TextView) findViewById(identifiers[i]);
-			view.setOnTouchListener(touchListener);
-			view.setOnClickListener(clickListener);
-			view.setBackgroundDrawable(drawable);
-		}
+		activateViews(identifiers);
 
 		Button button = (Button) findViewById(R.id.actionSave);
 		button.setOnClickListener(new OnClickListener() {
@@ -89,8 +100,8 @@ public class CVConferenceAdd extends AdditionActivity implements OnCancelListene
 							.show();
 					return;
 				}
-				
-				if ( create ) {
+
+				if (create) {
 					Conference.create(conference);
 				} else {
 					conference.update();
@@ -129,6 +140,49 @@ public class CVConferenceAdd extends AdditionActivity implements OnCancelListene
 			case R.id.conferenceName:
 				conference.setTitle(value);
 			break;
+			// case R.id.conferenceDate:
+			// conference.setDate(value);
+			// break;
+			// case R.id.conferenceStart:
+			// conference.setStartTime(value);
+			// break;
+			// case R.id.conferenceEnd:
+			// conference.setEndTime(value);
+			// break;
+			case R.id.conferenceDescription:
+				conference.setDescription(value);
+			break;
+			// case R.id.conferenceOrganiser:
+			// conference.setOrganiser(value);
+			// break;
+			case R.id.conferenceLocations:
+				if (state) {
+					// Add the location
+					Location[] locations = getConferenceServer().getLocations(false);
+					Location selected = null;
+					for (int i = 0; i < locations.length; i++) {
+						if (locations[i].getDescription().equals(value)) {
+							selected = locations[i];
+							break;
+						}
+					}
+					if (selected != null) {
+						conference.getLocations().add(selected);
+					}
+				} else {
+					Location contained = null;
+					Set<Location> locations = conference.getLocations();
+					for (Location location : locations) {
+						if (location.getDescription().equals(value)) {
+							contained = location;
+							break;
+						}
+					}
+					if (contained != null) {
+						locations.remove(contained);
+					}
+				}
+			break;
 			default:
 				Log.w(LOG.NAVIGATE, "Don't know how to process: " + field);
 		}
@@ -136,20 +190,29 @@ public class CVConferenceAdd extends AdditionActivity implements OnCancelListene
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		return true;
-	}
-
-	@Override
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog = null;
 		String[] items;
 		AlertDialog.Builder builder;
-		int idx;
 
 		switch (id) {
 			case XCS.DIALOG.INPUT_TITLE:
-				dialog = new TextInputDialog(this, R.id.sessionTitle);
+				dialog = new TextInputDialog(this, R.id.conferenceName);
+			break;
+			case XCS.DIALOG.INPUT_DESCRIPTION:
+				dialog = new TextInputDialog(this, R.id.conferenceDescription);
+			break;
+			case XCS.DIALOG.INPUT_LOCATION:
+				Location[] locations = getConferenceServer().getLocations(false);
+				items = new String[locations.length];
+				boolean[] check = new boolean[locations.length];
+				for (int i = 0; i < locations.length; i++) {
+					items[i] = locations[i].getDescription();
+				}
+				builder = new AlertDialog.Builder(this);
+				builder.setTitle("Select locations");
+				builder.setMultiChoiceItems(items, check, new DialogHandler(this, items, R.id.conferenceLocations));
+				dialog = builder.create();
 			break;
 		}
 		if (dialog != null) {
@@ -168,81 +231,81 @@ public class CVConferenceAdd extends AdditionActivity implements OnCancelListene
 				tid.setDescription("Conference title");
 				tid.setValue(conference.getTitle());
 			break;
+			case XCS.DIALOG.INPUT_DESCRIPTION:
+				tid = (TextInputDialog) dialog;
+				tid.setDescription("Description");
+				tid.setValue(conference.getDescription());
+			break;
+			case XCS.DIALOG.INPUT_LOCATION:
+				AlertDialog ad = (AlertDialog) dialog;
+				int size = ad.getListView().getCount();
+				Set<Location> locations = conference.getLocations();
+				Set<String> locNames = new HashSet<String>();
+				for (Location location : locations) {
+					locNames.add(location.getDescription());
+				}
+				for (int idx = 0; idx < size; idx++) {
+					String loc = (String) ad.getListView().getItemAtPosition(idx);
+					ad.getListView().setItemChecked(idx, locNames.contains(loc));
+				}
+			break;
 		}
 		super.onPrepareDialog(id, dialog);
 	}
 
-	private class AddOnTouchListener implements OnTouchListener {
-
-		@Override
-		public boolean onTouch(View view, MotionEvent event) {
-			Drawable drawable = null;
-			switch (event.getAction()) {
-				case MotionEvent.ACTION_DOWN:
-				case MotionEvent.ACTION_MOVE:
-				case MotionEvent.ACTION_POINTER_DOWN:
-					drawable = getResources().getDrawable(R.drawable.touchtext);
-				break;
-				default:
-				break;
-			}
-			view.setBackgroundDrawable(drawable);
-			// Need to return false to handle click event
-			return false;
+	protected void onTextClick(int id) {
+		switch (id) {
+			case R.id.conferenceName:
+				showDialog(XCS.DIALOG.INPUT_TITLE);
+			break;
+			case R.id.conferenceDescription:
+				showDialog(XCS.DIALOG.INPUT_DESCRIPTION);
+			break;
+			case R.id.conferenceLocations:
+				showDialog(XCS.DIALOG.INPUT_LOCATION);
+			break;
+			case R.id.conferenceOrganiser:
+				showAuthorPage();
+			break;
+			default:
+				Log.w(XCS.LOG.NAVIGATE, "Click on text not handled: " + id);
+			break;
 		}
 	}
 
-	private class AddOnClickListener implements OnClickListener {
-
-		@Override
-		public void onClick(View view) {
-
-			switch (view.getId()) {
-				case R.id.conferenceDate:
-				case R.id.conferenceName:
-					break;
-
-				case R.id.sessionTitle:
-					showDialog(XCS.DIALOG.INPUT_TITLE);
-				break;
-				default:
-					Log.w(XCS.LOG.NAVIGATE, "Click on text not handled: " + view.getId());
-				break;
-			}
-		}
+	private void showAuthorPage() {
+		Intent authorIntent = getAuthorIntent();
+		ArrayList<Author> authorList = new ArrayList<Author>();
+		Author organiser = conference.getOrganiser();
+		if (organiser != null) authorList.add(organiser);
+		authorIntent.putExtra(BaseActivity.IA_AUTHORS, (Serializable) authorList);
+		authorIntent.putExtra("singleSelectionMode", true);
+		startActivityForResult(authorIntent, ACTIVITY_SEARCH_AUTHOR);
 	}
 
-	private class DialogHandler implements DialogInterface.OnClickListener, DialogInterface.OnMultiChoiceClickListener {
-		private int field;
-		private Object[] items;
-		private CVConferenceAdd activity;
-
-		public DialogHandler(CVConferenceAdd activity, Object[] items, int field) {
-			this.activity = activity;
-			this.items = items;
-			this.field = field;
-		}
-
-		public void onClick(DialogInterface dialog, int item) {
-			onClick(dialog, item, true);
-		}
-
-		@Override
-		public void onClick(DialogInterface dialog, int item, boolean state) {
-			Toast.makeText(getApplicationContext(), items[item].toString(), Toast.LENGTH_SHORT).show();
-			// TextView view = (TextView) activity.findViewById(field);
-			// view.setText(items[item]);
-			activity.updateField(field, items[item], state);
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case ACTIVITY_SEARCH_AUTHOR:
+				if (data != null && data.hasExtra(IA_AUTHORS)) {
+					Serializable extra = data.getSerializableExtra(IA_AUTHORS);
+					for (Author selected : ((ArrayList<Author>) extra)) {
+						conference.setOrganiser(selected);
+					}
+					showConference();
+				}
+			break;
+			default:
+				super.onActivityResult(requestCode, resultCode, data);
+			break;
 		}
 	}
 
 	@Override
 	public void onDismiss(DialogInterface di) {
-		removeDialog(XCS.DIALOG.SELECT_TIME);
 	}
 
 	@Override
 	public void onCancel(DialogInterface di) {
-		removeDialog(XCS.DIALOG.SELECT_TIME);
 	}
 }

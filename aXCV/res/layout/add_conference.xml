@@ -79,11 +79,6 @@
 				android:id="@+id/actionSave"
 				android:layout_height="wrap_content"></Button>
 			<Button
-				android:text="Reschedule"
-				android:layout_width="wrap_content"
-				android:id="@+id/actionReschedule"
-				android:layout_height="wrap_content"></Button>
-			<Button
 				android:text="Delete"
 				android:layout_width="wrap_content"
 				android:id="@+id/actionDelete"

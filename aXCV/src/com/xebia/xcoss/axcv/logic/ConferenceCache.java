@@ -41,7 +41,7 @@ public class ConferenceCache {
 			CachedObject<T> other = (CachedObject<T>) obj;
 			return object == null ? other.object == null : object.equals(other.object);
 		}
-		
+
 	};
 
 	private HashMap<Integer, CachedObject<Conference>> conferencesById;
@@ -98,12 +98,13 @@ public class ConferenceCache {
 		try {
 			Integer key = result.getDate().getYear();
 			CachedObject<List<Conference>> cachedObject = conferencesByYear.get(key);
-			if ( cachedObject == null ) {
+			if (cachedObject == null) {
 				cachedObject = new CachedObject<List<Conference>>(new ArrayList<Conference>());
 				conferencesByYear.put(key, cachedObject);
 			}
 			cachedObject.object.add(result);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			// ignore
 		}
 	}
@@ -126,21 +127,26 @@ public class ConferenceCache {
 	}
 
 	public void remove(Conference conference) {
-		conferencesById.remove(conference.getId());
 		try {
+			conferencesById.remove(conference.getId());
 			conferencesByYear.get(conference.getDate().getYear()).object.remove(conference);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			// ignore
 		}
 	}
 
 	public void remove(Session session) {
-		// Assume conferences are updated via server.
-		sessionsById.remove(session.getId());
+		try {
+			sessionsById.remove(session.getId());
+		}
+		catch (Exception e) {
+			// ignore
+		}
 	}
 
 	private <T> T checkValid(CachedObject<T> co) {
-		if ( co == null ) {
+		if (co == null) {
 			return null;
 		}
 		long now = System.currentTimeMillis();

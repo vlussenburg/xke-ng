@@ -5,6 +5,7 @@ import hirondelle.date4j.DateTime.DayOverflow;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,12 +21,19 @@ import com.xebia.xcoss.axcv.util.XCS;
 
 public class Conference implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	public class TimeSlot {
+		public DateTime start;
+		public DateTime end;
+	}
 
+	private static final long serialVersionUID = 2L;
 	private static int counter = 1;
+
 	private int id;
-	private String title = "Not specified";
-	private DateTime date = DateTime.today(XCS.TZ);
+	private String title;
+	private String description;
+	private Author organiser;
+	private DateTime date;
 	private DateTime startTime = DateTime.forTimeOnly(16, 0, 0, 0);
 	private DateTime endTime = DateTime.forTimeOnly(21, 0, 0, 0);
 	private Set<Location> locations;
@@ -36,26 +44,105 @@ public class Conference implements Serializable {
 		this.locations = new HashSet<Location>();
 		this.id = counter++;
 	}
-	
+
 	public Conference(Conference original) {
 		this();
-		
+
 		this.id = original.id;
 		this.title = original.title;
+		this.description = original.description;
 		// DateTime is immutable
 		this.date = original.date;
 		this.startTime = original.startTime;
 		this.endTime = original.endTime;
+		// Author is immutable
+		this.organiser = original.organiser;
 	}
 
+	// Getters and setters
+
+	public int getId() {
+		return id;
+	}
+
+	public Set<Session> getSessions() {
+		if (sessions.isEmpty()) {
+			List<Session> list = ConferenceServer.getInstance().getSessions(this);
+			sessions.addAll(list);
+		}
+		return sessions;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public DateTime getDate() {
+		return date;
+	}
+
+	public void setDate(DateTime date) {
+		this.date = date;
+	}
+
+	public DateTime getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(DateTime startTime) {
+		this.startTime = startTime;
+	}
+
+	public DateTime getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(DateTime endTime) {
+		this.endTime = endTime;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public Author getOrganiser() {
+		return organiser;
+	}
+
+	public void setOrganiser(Author organiser) {
+		this.organiser = organiser;
+	}
+
+	public Set<Location> getLocations() {
+		if (locations.isEmpty()) {
+			Location[] list = ConferenceServer.getInstance().getLocations(true);
+			locations.addAll(Arrays.asList(list));
+		}
+		return locations;
+	}
+
+	public void setLocations(Set<Location> locations) {
+		this.locations = locations;
+	}
+
+	// Utilities
+
 	public boolean check(List<String> messages) {
-		if ( date == null ) {
+		if (date == null) {
 			messages.add("Date");
 		}
-		if ( StringUtil.isEmpty(title) ) {
+		if (StringUtil.isEmpty(title)) {
 			messages.add("Title");
 		}
-		if ( locations == null || locations.isEmpty() ) {
+		if (locations == null || locations.isEmpty()) {
 			messages.add("Locations");
 		}
 		return (messages.size() == 0);
@@ -63,23 +150,6 @@ public class Conference implements Serializable {
 
 	private void resetSessions() {
 		sessions = new TreeSet<Session>(new SessionComparator());
-	}
-
-	public int getId() {
-		return id;
-	}
-
-//	public int getOpenSlots() {
-//		// TODO
-//		return Math.max(0, 7);
-//	}
-
-	public Set<Session> getSessions() {
-		if ( sessions.isEmpty() ) {
-			List<Session> list = ConferenceServer.getInstance().getSessions(this);
-			sessions.addAll(list);
-		}
-		return sessions;
 	}
 
 	public Session getSessionById(int id) {
@@ -91,37 +161,38 @@ public class Conference implements Serializable {
 		return null;
 	}
 
-	public String getTitle() {
-		return title;
+	public Session getUpcomingSession() {
+		for (Session session : sessions) {
+			if (ScreenTimeUtil.isNow(session.getStartTime(), session.getEndTime())) {
+				return session;
+			}
+		}
+		return null;
 	}
 
-	public DateTime getDate() {
-		return date;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public void setDate(DateTime date) {
-		this.date = date;
-	}
-
+	/**
+	 * Adds a session on the server and resets the local stored sessions.
+	 * 
+	 * @param session
+	 * @return
+	 */
 	public boolean addSession(Session session) {
-		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + this.getTitle());
-		// TODO : Check whether it fits. Otherwise return false.
-//		sessions.add(session);
+		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + getTitle());
 		session.setDate(date);
-		Log.e("XCS", "Adding session to conference " + this);
-		ConferenceServer.getInstance().storeSession(session, getId(), false);
+		int id = ConferenceServer.getInstance().storeSession(session, getId(), false);
 		resetSessions();
-		return true;
+		return id > 0;
+	}
+
+	public void deleteSession(Session session) {
+		sessions.remove(session);
+		ConferenceServer.getInstance().deleteSession(session, getId());
 	}
 
 	public static int create(Conference conference) {
 		return ConferenceServer.getInstance().storeConference(conference, false);
 	}
-	
+
 	public boolean update() {
 		ConferenceServer.getInstance().storeConference(this, true);
 		return true;
@@ -194,14 +265,6 @@ public class Conference implements Serializable {
 		return ts;
 	}
 
-	public DateTime getStartTime() {
-		return startTime;
-	}
-
-	public DateTime getEndTime() {
-		return endTime;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -226,28 +289,8 @@ public class Conference implements Serializable {
 		return true;
 	}
 
-	public Session getUpcomingSession() {
-		for (Session session : sessions) {
-			if (ScreenTimeUtil.isNow(session.getStartTime(), session.getEndTime())) {
-				return session;
-			}
-		}
-		return null;
-	}
-
-	public class TimeSlot {
-		public DateTime start;
-		public DateTime end;
-	}
-
-	public void deleteSession(Session session) {
-		sessions.remove(session);
-		ConferenceServer.getInstance().deleteSession(session);
-	}
-
 	@Override
 	public String toString() {
-		return "Conference [id=" + id + ", title=" + title + ", date=" + date + ", startTime=" + startTime
-				+ ", endTime=" + endTime + ", sessions=" + sessions + "]";
+		return "Conference [id=" + id + ", title=" + title + ", date=" + date + "]";
 	}
 }

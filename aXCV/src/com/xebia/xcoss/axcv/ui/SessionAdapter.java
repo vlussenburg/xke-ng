@@ -32,7 +32,7 @@ public class SessionAdapter extends BaseAdapter {
 
 		Session session = (Session) getItem(paramInt);
 		int colorId = ctx.getResources().getColor(R.color.tc_itemdefault);
-		boolean now = timeUtil.isNow(session.getStartTime(), session.getEndTime());
+		boolean now = ScreenTimeUtil.isNow(session.getStartTime(), session.getEndTime());
 //		if (timeUtil.isHistory(session.getEndDate())) {
 //			colorId = ctx.getResources().getColor(R.color.tc_itemgone);
 //		} else if (now) {

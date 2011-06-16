@@ -118,7 +118,7 @@ public class CVSearchLabel extends BaseActivity {
 			.setIcon(R.drawable.x_conference)
 			.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
-					ConferenceServer.getInstance().createLabel(name);
+					getConferenceServer().createLabel(name);
 					allLabels.add(name);
 					dialog.dismiss();
 				}

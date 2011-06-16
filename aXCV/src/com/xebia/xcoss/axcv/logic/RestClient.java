@@ -219,6 +219,9 @@ public class RestClient {
 
 	private static void handleResponse(URI uri, int code) {
 		switch (code) {
+			case 200:
+				// This is an ok status
+				break;
 			case 500:
 			case 403:
 			case 404:
