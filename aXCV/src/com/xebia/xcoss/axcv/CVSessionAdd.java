@@ -277,7 +277,7 @@ public class CVSessionAdd extends AdditionActivity {
 				builder.setItems(Identifiable.stringValue(data), new DialogHandler(this, data, R.id.conferenceName));
 				dialog = builder.create();
 			break;
-			case XCS.DIALOG.SELECT_TIME:
+			case XCS.DIALOG.INPUT_TIME_START:
 				List<TimeSlot> tslist = conference.getAvailableTimeSlots();
 				items = new String[tslist.size()];
 				idx = 0;
@@ -296,7 +296,7 @@ public class CVSessionAdd extends AdditionActivity {
 				dialog.setOnCancelListener(this);
 				dialog.setOnDismissListener(this);
 			break;
-			case XCS.DIALOG.SELECT_DURATION:
+			case XCS.DIALOG.INPUT_DURATION:
 				items = new String[] { "5 min", "10 min", "15 min", "30 min", "60 min", "90 min", "120 min" };
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Pick a duration");
@@ -442,10 +442,10 @@ public class CVSessionAdd extends AdditionActivity {
 				showDialog(XCS.DIALOG.SELECT_CONFERENCE);
 			break;
 			case R.id.sessionStart:
-				showDialog(XCS.DIALOG.SELECT_TIME);
+				showDialog(XCS.DIALOG.INPUT_TIME_START);
 			break;
 			case R.id.sessionDuration:
-				showDialog(XCS.DIALOG.SELECT_DURATION);
+				showDialog(XCS.DIALOG.INPUT_DURATION);
 			break;
 			case R.id.sessionAudience:
 				showDialog(XCS.DIALOG.INPUT_AUDIENCE);
@@ -483,12 +483,12 @@ public class CVSessionAdd extends AdditionActivity {
 	@Override
 	public void onDismiss(DialogInterface di) {
 		// Remove the dialog to recreate it with correct values
-		removeDialog(XCS.DIALOG.SELECT_TIME);
+		removeDialog(XCS.DIALOG.INPUT_TIME_START);
 	}
 
 	@Override
 	public void onCancel(DialogInterface di) {
 		// Remove the dialog to recreate it with correct values
-		removeDialog(XCS.DIALOG.SELECT_TIME);
+		removeDialog(XCS.DIALOG.INPUT_TIME_START);
 	}
 }

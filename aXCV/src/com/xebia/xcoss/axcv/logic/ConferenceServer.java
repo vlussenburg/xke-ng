@@ -128,9 +128,8 @@ public class ConferenceServer {
 		conferenceCache.remove(conference);
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
-		requestUrl.append("/conference/");
-		requestUrl.append(conference.getId());
-
+		requestUrl.append("/conference");
+		
 		if (update) {
 			RestClient.updateObject(requestUrl.toString(), conference);
 			return -1;

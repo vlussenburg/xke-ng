@@ -133,7 +133,7 @@ public abstract class BaseActivity extends Activity {
 			conference = server.getUpcomingConference();
 			Log.w(LOG.ALL, "Conference default " + conference.getTitle());
 		}
-		Log.e("XCS", "Conference = " + conference);
+		Log.e("XCS", "[GET] Conference (on '"+identifier+"') = " + conference);
 		return conference;
 	}
 
