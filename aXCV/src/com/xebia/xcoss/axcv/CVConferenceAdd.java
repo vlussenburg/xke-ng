@@ -172,7 +172,9 @@ public class CVConferenceAdd extends AdditionActivity {
 						}
 					}
 					if (selected != null) {
-						conference.getLocations().add(selected);
+						Set<Location> set = conference.getLocations();
+						set.add(selected);
+						conference.setLocations(set);
 					}
 				} else {
 					Location contained = null;

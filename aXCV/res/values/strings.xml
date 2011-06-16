@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ConferenceViewer</string>
+    <string name="app_name">Conference Viewer</string>
     <string name="splash_conference">Xebia Knowledge Exchange</string>
     <string name="splash_company">Xebia</string>
     <string name="splash_version">Version %s</string>

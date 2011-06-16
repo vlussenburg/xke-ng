@@ -18,7 +18,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
+import com.xebia.xcoss.axcv.logic.ServerException;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
@@ -41,7 +43,7 @@ public abstract class BaseActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);
-		if ( conferenceButton != null ) {
+		if (conferenceButton != null) {
 			conferenceButton.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -58,7 +60,6 @@ public abstract class BaseActivity extends Activity {
 		}
 		super.onCreate(savedInstanceState);
 	}
-
 
 	private boolean kill() {
 		Intent intent = new Intent(this, CVSplashLoader.class);
@@ -120,7 +121,7 @@ public abstract class BaseActivity extends Activity {
 	protected Conference getConference(boolean useDefault) {
 		Conference conference = null;
 		ConferenceServer server = getConferenceServer();
-		
+
 		int identifier = -1;
 		try {
 			identifier = getIntent().getExtras().getInt(IA_CONFERENCE);
@@ -133,14 +134,14 @@ public abstract class BaseActivity extends Activity {
 			conference = server.getUpcomingConference();
 			Log.w(LOG.ALL, "Conference default " + conference.getTitle());
 		}
-		Log.e("XCS", "[GET] Conference (on '"+identifier+"') = " + conference);
+		Log.e("XCS", "[GET] Conference (on '" + identifier + "') = " + conference);
 		return conference;
 	}
 
 	protected Session getSession(Conference conference) {
 		return getSession(conference, true);
 	}
-	
+
 	protected Session getSession(Conference conference, boolean useDefault) {
 		Session session = null;
 		int identifier = -1;
@@ -177,7 +178,8 @@ public abstract class BaseActivity extends Activity {
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		if (id == XCS.DIALOG.CONNECT_FAILED) {
-			return createDialog("Connection failed", "The connection to the server failed. Either the server is down or your credentials are wrong.");
+			return createDialog("Connection failed",
+					"The connection to the server failed. Either the server is down or your credentials are wrong.");
 		}
 		return super.onCreateDialog(id);
 	}
@@ -185,23 +187,23 @@ public abstract class BaseActivity extends Activity {
 	protected Dialog createDialog(String title, String message) {
 		return createDialog(this, title, message);
 	}
-	
+
 	public static Dialog createDialog(Activity ctx, String title, String message) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-		builder
-			.setTitle(title)
-			.setMessage(message)
-			.setIcon(R.drawable.x_conference)
-			.setPositiveButton("Close", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					dialog.dismiss();
-				}
-			});
+		builder.setTitle(title).setMessage(message).setIcon(android.R.drawable.ic_dialog_alert)
+				.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+					}
+				});
 		return builder.create();
 	}
-	
-	protected void onSuccess() {}
-	protected void onFailure() {}
+
+	protected void onSuccess() {
+	}
+
+	protected void onFailure() {
+	}
 
 	class DataRetriever extends AsyncTask<String, Void, Boolean> {
 
@@ -226,9 +228,13 @@ public abstract class BaseActivity extends Activity {
 				for (Conference conference : conferences) {
 					conference.getSessions();
 				}
-			} catch (Exception e) {
-				Log.w(XCS.LOG.COMMUNICATE, "Initial loading: " + e.getMessage());
+			}
+			catch (ServerException e) {
+				Log.e(XCS.LOG.COMMUNICATE, "Fail on initial loading: " + e.getMessage());
 				return false;
+			}
+			catch (CommException e) {
+				Log.w(XCS.LOG.COMMUNICATE, "Problem while loading: " + e.getMessage());
 			}
 			return true;
 		}
@@ -236,11 +242,11 @@ public abstract class BaseActivity extends Activity {
 		@Override
 		protected void onPostExecute(Boolean result) {
 			dialog.cancel();
-			
+
 			if (result) {
 				ctx.onSuccess();
 			} else {
-				Dialog errorDialog = createDialog("Error", "Connection to URL:\n"+XCS.SETTING.URL+"\nfailed");
+				Dialog errorDialog = createDialog("Error", "Connection to server failed." + "\n" + XCS.SETTING.URL);
 				errorDialog.setOnCancelListener(new Dialog.OnCancelListener() {
 					@Override
 					public void onCancel(DialogInterface di) {

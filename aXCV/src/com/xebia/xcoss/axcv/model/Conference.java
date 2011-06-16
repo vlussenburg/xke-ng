@@ -15,6 +15,7 @@ import android.util.Log;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
+import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -37,7 +38,7 @@ public class Conference implements Serializable {
 	private DateTime startTime = DateTime.forTimeOnly(16, 0, 0, 0);
 	private DateTime endTime = DateTime.forTimeOnly(21, 0, 0, 0);
 	private Set<Location> locations;
-	private Set<Session> sessions;
+	private transient Set<Session> sessions;
 
 	public Conference() {
 		resetSessions();
@@ -57,6 +58,8 @@ public class Conference implements Serializable {
 		this.endTime = original.endTime;
 		// Author is immutable
 		this.organiser = original.organiser;
+		// Location is immutable
+		this.locations.addAll(original.locations);
 	}
 
 	// Getters and setters
@@ -130,7 +133,10 @@ public class Conference implements Serializable {
 	}
 
 	public void setLocations(Set<Location> locations) {
+		Log.e("XCS", "Locations are set to: " + FormatUtil.getList(locations));
 		this.locations = locations;
+		// Temp
+		ConferenceServer.getInstance().storeConference(this, true);
 	}
 
 	// Utilities
@@ -291,6 +297,13 @@ public class Conference implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Conference [id=" + id + ", title=" + title + ", date=" + date + "]";
+		return "Conference [id=" + id + ", title=" + title + ", description=" + description + ", organiser="
+				+ organiser + ", date=" + date + ", startTime=" + startTime + ", endTime=" + endTime + ", locations="
+				+ FormatUtil.getList(locations) + ", sessions=" + FormatUtil.getList(sessions) + "]";
 	}
+	
+//	@Override
+//	public String toString() {
+//		return "Conference [id=" + id + ", title=" + title + ", date=" + date + "]";
+//	}
 }

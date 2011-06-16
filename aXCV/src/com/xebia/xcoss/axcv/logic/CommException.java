@@ -24,10 +24,6 @@ public class CommException extends RuntimeException {
 				this.title = "Not Found";
 				this.message = "Could not find '" + uri.getPath() + "'";
 			break;
-			case 500:
-				this.title = "Server Error";
-				this.message = "Request '" + uri.getPath() + "' could not be handled by server.";
-			break;
 			default:
 				this.title = "Error " + code;
 				this.message = "Failed to retrieve '" + uri.getPath() + "'.";

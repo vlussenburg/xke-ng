@@ -62,14 +62,12 @@ public class RestClient {
 			Log.e(LOG.ALL, "Loaded: " + result);
 			return result;
 		}
-		catch (Exception e) {
-			// TODO: Handle!
-			Log.e(LOG.ALL, "Load object failed: " + e.getMessage() + " (" + url + ")");
+		catch (IOException e) {
+			throw new ServerException(url, e);
 		}
 		finally {
 			StreamUtil.close(reader);
 		}
-		return null;
 	}
 
 	public static <T> T loadCollection(String url, Type rvClass) {
@@ -79,14 +77,12 @@ public class RestClient {
 			reader = getReader(new HttpGet(url));
 			return getGson().fromJson(reader, rvClass);
 		}
-		catch (Exception e) {
-			// TODO: Handle!
-			Log.e(LOG.ALL, "Load collection failed: " + e.getMessage() + " (" + url + ")");
+		catch (IOException e) {
+			throw new ServerException(url, e);
 		}
 		finally {
 			StreamUtil.close(reader);
 		}
-		return null;
 	}
 
 	public static <T> List<T> loadObjects(String url, String key, Class<T> rvClass) {
@@ -110,14 +106,12 @@ public class RestClient {
 			}
 			return results;
 		}
-		catch (Exception e) {
-			// TODO: Handle!
-			Log.e(LOG.ALL, "Load objects failed: " + e.getMessage() + " (" + url + ")");
+		catch (IOException e) {
+			throw new ServerException(url, e);
 		}
 		finally {
 			StreamUtil.close(reader);
 		}
-		return null;
 	}
 
 	public static <T> int createObject(String url, T object) {
@@ -129,14 +123,12 @@ public class RestClient {
 			reader = getReader(new HttpPost(url), postData);
 			return gson.fromJson(reader, int.class);
 		}
-		catch (Exception e) {
-			// TODO: Handle!
-			Log.e(LOG.ALL, "Create failed: " + e.getMessage() + " (" + url + ")");
+		catch (IOException e) {
+			throw new ServerException(url, e);
 		}
 		finally {
 			StreamUtil.close(reader);
 		}
-		return -1;
 	}
 
 	public static <T> void updateObject(String url, T object) {
@@ -147,9 +139,8 @@ public class RestClient {
 			String postData = gson.toJson(object);
 			reader = getReader(new HttpPut(url), postData);
 		}
-		catch (Exception e) {
-			// TODO: Handle!
-			Log.e(LOG.ALL, "Update failed: " + e.getMessage() + " (" + url + ")");
+		catch (IOException e) {
+			throw new ServerException(url, e);
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -162,9 +153,8 @@ public class RestClient {
 		try {
 			reader = getReader(new HttpPost(url), null);
 		}
-		catch (Exception e) {
-			// TODO: Handle!
-			Log.e(LOG.ALL, "Post failed: " + e.getMessage() + " (" + url + ")");
+		catch (IOException e) {
+			throw new ServerException(url, e);
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -177,9 +167,8 @@ public class RestClient {
 		try {
 			reader = getReader(new HttpDelete(url));
 		}
-		catch (Exception e) {
-			// TODO: Handle!
-			Log.e(LOG.ALL, "Delete failed: " + e.getMessage() + " (" + url + ")");
+		catch (IOException e) {
+			throw new ServerException(url, e);
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -226,10 +215,11 @@ public class RestClient {
 			case 200:
 				// This is an ok status
 				break;
-			case 500:
 			case 403:
 			case 404:
 				throw new CommException(uri, code);
+			case 500:
+				throw new ServerException(uri.getPath());
 			default:
 				Log.d(XCS.LOG.ALL, "Return code = " + code);
 			break;
