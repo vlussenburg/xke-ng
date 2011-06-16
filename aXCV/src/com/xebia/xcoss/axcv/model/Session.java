@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.google.gson.annotations.SerializedName;
+import com.xebia.xcoss.axcv.model.Session.Type;
 import com.xebia.xcoss.axcv.ui.StringUtil;
 
 public class Session implements Serializable {
@@ -179,6 +180,10 @@ public class Session implements Serializable {
 	
 	public Set<String> getLanguages() {
 		return languages;
+	}
+
+	protected void setType(Type type) {
+		this.type = type;
 	}
 
 	public int getDuration() {

@@ -132,13 +132,6 @@ public class Conference implements Serializable {
 		return locations;
 	}
 
-	public void setLocations(Set<Location> locations) {
-		Log.e("XCS", "Locations are set to: " + FormatUtil.getList(locations));
-		this.locations = locations;
-		// Temp
-		ConferenceServer.getInstance().storeConference(this, true);
-	}
-
 	// Utilities
 
 	public boolean check(List<String> messages) {
