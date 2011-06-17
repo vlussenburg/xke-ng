@@ -2,9 +2,11 @@ package com.xebia.xcoss.axcv.logic;
 
 import hirondelle.date4j.DateTime;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
@@ -41,15 +43,14 @@ import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class RestClient {
 
-	private static Gson gsonInstance = null;
+	private static GsonBuilder gsonBuilder = null;
 
 	private static Gson getGson() {
-		if (gsonInstance == null) {
-			GsonBuilder builder = new GsonBuilder();
-			builder.registerTypeAdapter(DateTime.class, new GsonDateTimeAdapter());
-			gsonInstance = builder.create();
+		if (gsonBuilder == null) {
+			gsonBuilder = new GsonBuilder();
+			gsonBuilder.registerTypeAdapter(DateTime.class, new GsonDateTimeAdapter());
 		}
-		return gsonInstance;
+		return gsonBuilder.create();
 	}
 
 	public static <T> T loadObject(String url, Class<T> rvClass) {
@@ -57,17 +58,16 @@ public class RestClient {
 		Reader reader = null;
 		try {
 			reader = getReader(new HttpGet(url));
-			return getGson().fromJson(reader, rvClass);
+			T result = getGson().fromJson(reader, rvClass);
+			Log.e(LOG.ALL, "Loaded: " + result);
+			return result;
 		}
-		catch (Exception e) {
-			// TODO: Handle!
-			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
-			Log.e(LOG.ALL, "Call was: " + url);
+		catch (IOException e) {
+			throw new ServerException(url, e);
 		}
 		finally {
 			StreamUtil.close(reader);
 		}
-		return null;
 	}
 
 	public static <T> T loadCollection(String url, Type rvClass) {
@@ -77,15 +77,12 @@ public class RestClient {
 			reader = getReader(new HttpGet(url));
 			return getGson().fromJson(reader, rvClass);
 		}
-		catch (Exception e) {
-			// TODO: Handle!
-			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
-			Log.e(LOG.ALL, "Call was: " + url);
+		catch (IOException e) {
+			throw new ServerException(url, e);
 		}
 		finally {
 			StreamUtil.close(reader);
 		}
-		return null;
 	}
 
 	public static <T> List<T> loadObjects(String url, String key, Class<T> rvClass) {
@@ -106,20 +103,15 @@ public class RestClient {
 					JsonElement element = iterator.next();
 					results.add(gson.fromJson(element, rvClass));
 				}
-			} else {
-				Log.d(LOG.COMMUNICATE, "Not a JsonObject ...");
 			}
 			return results;
 		}
-		catch (Exception e) {
-			// TODO: Handle!
-			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
-			Log.e(LOG.ALL, "Call was: " + url);
+		catch (IOException e) {
+			throw new ServerException(url, e);
 		}
 		finally {
 			StreamUtil.close(reader);
 		}
-		return null;
 	}
 
 	public static <T> int createObject(String url, T object) {
@@ -129,25 +121,14 @@ public class RestClient {
 			Gson gson = new Gson();
 			String postData = gson.toJson(object);
 			reader = getReader(new HttpPost(url), postData);
-
-			// System.out.println("Reading dump");
-			// char[] tmp = new char[2048];
-			// int l;
-			// while ((l = reader.read(tmp)) != -1) {
-			// System.out.print(new String(tmp, 0, l));
-			// }
-			// System.out.println("Reading done");
 			return gson.fromJson(reader, int.class);
 		}
-		catch (Exception e) {
-			// TODO: Handle!
-			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
-			Log.e(LOG.ALL, "Call was: " + url);
+		catch (IOException e) {
+			throw new ServerException(url, e);
 		}
 		finally {
 			StreamUtil.close(reader);
 		}
-		return -1;
 	}
 
 	public static <T> void updateObject(String url, T object) {
@@ -158,10 +139,8 @@ public class RestClient {
 			String postData = gson.toJson(object);
 			reader = getReader(new HttpPut(url), postData);
 		}
-		catch (Exception e) {
-			// TODO: Handle!
-			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
-			Log.e(LOG.ALL, "Call was: " + url);
+		catch (IOException e) {
+			throw new ServerException(url, e);
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -174,10 +153,8 @@ public class RestClient {
 		try {
 			reader = getReader(new HttpPost(url), null);
 		}
-		catch (Exception e) {
-			// TODO: Handle!
-			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
-			Log.e(LOG.ALL, "Call was: " + url);
+		catch (IOException e) {
+			throw new ServerException(url, e);
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -190,14 +167,19 @@ public class RestClient {
 		try {
 			reader = getReader(new HttpDelete(url));
 		}
-		catch (Exception e) {
-			// TODO: Handle!
-			Log.e(LOG.ALL, "Fail to load stream: " + e.getMessage());
-			Log.e(LOG.ALL, "Call was: " + url);
+		catch (IOException e) {
+			throw new ServerException(url, e);
 		}
 		finally {
 			StreamUtil.close(reader);
 		}
+	}
+
+	private static Reader getReader(HttpEntityEnclosingRequestBase request, String content) throws IOException {
+		if (!StringUtil.isEmpty(content)) {
+			request.setEntity(new StringEntity(content));
+		}
+		return getReader(request);
 	}
 
 	private static Reader getReader(HttpRequestBase request) throws IOException {
@@ -207,22 +189,16 @@ public class RestClient {
 
 		HttpEntity entity = response.getEntity();
 		if (entity != null) {
-			return new InputStreamReader(entity.getContent());
-		}
-		return null;
-	}
-
-	private static Reader getReader(HttpEntityEnclosingRequestBase request, String content) throws IOException {
-		if (!StringUtil.isEmpty(content)) {
-			request.setEntity(new StringEntity(content));
-		}
-		HttpResponse response = getHttpClient().execute(request);
-
-		handleResponse(request.getURI(), response.getStatusLine().getStatusCode());
-
-		HttpEntity entity = response.getEntity();
-		if (entity != null) {
-			return new InputStreamReader(entity.getContent());
+			StringBuilder result = new StringBuilder();
+			InputStreamReader str = new InputStreamReader(entity.getContent());
+			char[] buffer = new char[1024];
+			int read;
+			while ( (read = str.read(buffer, 0, 1024)) >= 0 ) {
+				result.append(buffer, 0, read);
+			}
+			str.close();
+			Log.i(XCS.LOG.COMMUNICATE, "Read: " + result.toString());
+			return new StringReader(result.toString());
 		}
 		return null;
 	}
@@ -236,10 +212,14 @@ public class RestClient {
 
 	private static void handleResponse(URI uri, int code) {
 		switch (code) {
-			case 500:
+			case 200:
+				// This is an ok status
+				break;
 			case 403:
 			case 404:
 				throw new CommException(uri, code);
+			case 500:
+				throw new ServerException(uri.getPath());
 			default:
 				Log.d(XCS.LOG.ALL, "Return code = " + code);
 			break;

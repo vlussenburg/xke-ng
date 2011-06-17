@@ -7,15 +7,15 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.xebia.xcoss.axcv.CVSessionAdd;
+import com.xebia.xcoss.axcv.AdditionActivity;
 import com.xebia.xcoss.axcv.R;
 
 public class TextInputDialog extends Dialog {
 
-	private CVSessionAdd activity;
+	private AdditionActivity activity;
 	private int identifier;
 
-	public TextInputDialog(CVSessionAdd activity, int id) {
+	public TextInputDialog(AdditionActivity activity, int id) {
 		super(activity);
 		this.activity = activity;
 		this.identifier = id;

@@ -26,7 +26,6 @@ public class CVConferences extends BaseActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 		setContentView(R.layout.conferences);
 
 		DateTime dt = DateTime.today(XCS.TZ);
@@ -55,6 +54,7 @@ public class CVConferences extends BaseActivity {
 		
 		TextView title = (TextView) findViewById(R.id.conferencesTitle);
 		title.setText(title.getText() + " " + dt.getYear());
+		super.onCreate(savedInstanceState);
 	}
 
 	private void switchTo(Conference conference) {
@@ -73,9 +73,10 @@ public class CVConferences extends BaseActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		// Add a conference
 		if (item.getItemId() == XCS.MENU.ADD) {
-			// TODO : Conference addition
-			startActivity(new Intent(this, CVSettings.class));
+			Intent intent = new Intent(this, CVConferenceAdd.class);
+			startActivity(intent);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

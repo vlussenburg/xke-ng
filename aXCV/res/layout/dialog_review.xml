@@ -26,7 +26,6 @@
 		android:id="@+id/dvSessionTitle"></TextView>
 	<EditText
 		android:layout_width="fill_parent"
-		android:text="EditText"
 		android:layout_height="wrap_content"
 		android:layout_marginLeft="5sp"
 		android:layout_marginRight="5sp"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ConferenceViewer</string>
+    <string name="app_name">Conference Viewer</string>
     <string name="splash_conference">Xebia Knowledge Exchange</string>
     <string name="splash_company">Xebia</string>
     <string name="splash_version">Version %s</string>
@@ -16,7 +16,6 @@
     <string name="password_set">Password stored</string>
     <string name="password_unset">No password specified</string>
     <string name="session_title"></string>
-    <string name="add_session">Add session</string>
     <string name="modify_session">Modify session</string>
 
     <string name="author_select">Select authors...</string>    

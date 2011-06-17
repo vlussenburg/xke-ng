@@ -5,7 +5,6 @@ import hirondelle.date4j.DateTime;
 import java.util.Set;
 
 import com.xebia.xcoss.axcv.model.Author;
-import com.xebia.xcoss.axcv.model.BreakSession;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Session;
@@ -34,7 +33,7 @@ public class TestUtil {
 	
 	private static Session createSession(String title, int start, boolean mandatory) {
 		Location loc = new Location(998, "Laap", true);
-		Session session = mandatory ? new BreakSession() : new Session();
+		Session session = new Session();
 		session.setLocation(loc);
 		session.addAuthor(new Author("mvl", "M. van Leeuwen", "test@test.nl"));
 		session.setStartTime(DateTime.forTimeOnly(start,0,0,0));

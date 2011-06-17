@@ -16,9 +16,4 @@ public class Conferences extends DefaultController {
     	}
     	handleResponse("conferences", sb.toString());
     }
-
-	public static void post() {
-		renderArgs.put("json", "182");
-        render();
-    }
 }

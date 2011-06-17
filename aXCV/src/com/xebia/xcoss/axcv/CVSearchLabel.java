@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -35,7 +36,6 @@ public class CVSearchLabel extends BaseActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 		setContentView(R.layout.search_items);
 		view = (AutoCompleteTextView) findViewById(R.id.ssa_text);
 		ListView labelList = (ListView) findViewById(R.id.ssa_list);
@@ -63,18 +63,18 @@ public class CVSearchLabel extends BaseActivity {
 					view.getText().clear();
 				}
 
-				if (keyCode != KeyEvent.KEYCODE_ENTER || StringUtil.isEmpty(name)) {
-					return false;
-				}
+				if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
+				
+				if (!StringUtil.isEmpty(name)) {
+					if (view.isPopupShowing() && view.getListSelection() != ListView.INVALID_POSITION) {
+						name = (String) view.getAdapter().getItem(view.getListSelection());
+					}
+					if (!addLabel(name)) {
+						storeLabel(name);
+					}
 
-				if (view.isPopupShowing() && view.getListSelection() != ListView.INVALID_POSITION) {
-					name = (String) view.getAdapter().getItem(view.getListSelection());
+					view.getText().clear();
 				}
-				if (!addLabel(name)) {
-					storeLabel(name);
-				}
-
-				view.getText().clear();
 				return true;
 			}
 
@@ -89,6 +89,7 @@ public class CVSearchLabel extends BaseActivity {
 				Toast.makeText(getApplicationContext(), "Label removed", Toast.LENGTH_SHORT).show();
 			}
 		});
+		super.onCreate(savedInstanceState);
 	}
 
 	private boolean addLabel(String name) {
@@ -111,24 +112,20 @@ public class CVSearchLabel extends BaseActivity {
 
 	private void storeLabel(final String name) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder
-			.setTitle("Add label...")
-			.setMessage("Create the new label '" + name + "'?")
-			.setIcon(R.drawable.icon)
-			.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					ConferenceServer.getInstance().createLabel(name);
-					allLabels.add(name);
-					dialog.dismiss();
-				}
-			})
-			.setNegativeButton("No", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					selectedLabels.remove(name);
-					listAdapter.notifyDataSetChanged();
-					dialog.dismiss();
-				}
-			});
+		builder.setTitle("Add label...").setMessage("Create the new label '" + name + "'?")
+				.setIcon(R.drawable.x_conference).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						getConferenceServer().createLabel(name);
+						allLabels.add(name);
+						dialog.dismiss();
+					}
+				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						selectedLabels.remove(name);
+						listAdapter.notifyDataSetChanged();
+						dialog.dismiss();
+					}
+				});
 		AlertDialog create = builder.create();
 		create.show();
 	}
@@ -151,5 +148,10 @@ public class CVSearchLabel extends BaseActivity {
 		result.putExtra(IA_LABELS, (Serializable) selectedLabels);
 		setResult(RESULT_OK, result);
 		finish();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		return true;
 	}
 }

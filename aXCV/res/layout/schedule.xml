@@ -9,36 +9,39 @@
 		android:layout_height="wrap_content"
 		android:layout_width="fill_parent"
 		android:id="@+id/relativeLayout1">
-		<ImageButton
+		<ImageView
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
-			android:src="@drawable/ic_btn_back"
-			android:id="@+id/imageButton1"
-			android:layout_alignParentLeft="true"></ImageButton>
+			android:src="@drawable/x_conference"
+			android:id="@+id/conferenceButton"
+			android:layout_alignParentLeft="true"></ImageView>
 		<TextView
+			android:paddingLeft="7sp"
 			android:layout_height="fill_parent"
 			android:layout_width="wrap_content"
 			android:id="@+id/conferenceTitle"
 			android:text="Schedule"
 			android:layout_alignWithParentIfMissing="true"
 			android:gravity="center_vertical"
-			android:layout_toRightOf="@+id/imageButton1"
-			android:layout_alignTop="@+id/imageButton1"
-			android:layout_alignBottom="@+id/imageButton1"
+			android:layout_toRightOf="@+id/conferenceButton"
+			android:layout_alignTop="@+id/conferenceButton"
+			android:layout_alignBottom="@+id/conferenceButton"
 			android:textSize="@dimen/textsize_title"></TextView>
 		<ImageButton
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:src="@drawable/ic_btn_next"
+			android:src="@drawable/x_conference"
 			android:id="@+id/imageButton5"
 			android:layout_toLeftOf="@+id/imageButton4"
 			android:layout_alignTop="@+id/imageButton4"
+			android:visibility="gone"
 			android:layout_alignBottom="@+id/imageButton4"></ImageButton>
 		<ImageButton
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:src="@drawable/ic_btn_next"
+			android:src="@drawable/x_conference"
 			android:id="@+id/imageButton4"
+			android:visibility="gone"
 			android:layout_alignParentRight="true"></ImageButton>
 	</RelativeLayout>
 	<View
@@ -61,12 +64,15 @@
 			android:layout_height="wrap_content"
 			android:id="@+id/textView1"
 			android:layout_gravity="right"
-			android:text="Right" android:paddingRight="3dp"></TextView>
+			android:text="Right"
+			android:paddingRight="3dp"></TextView>
 		<TextView
 			android:id="@+id/textView2"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Left" android:layout_gravity="left" android:paddingLeft="3dp"></TextView>
+			android:text="Left"
+			android:layout_gravity="left"
+			android:paddingLeft="3dp"></TextView>
 	</FrameLayout>
 	<View
 		android:id="@+id/secondDivider"

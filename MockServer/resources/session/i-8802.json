@@ -1,5 +1,4 @@
 {
-  "session": {
     "title":"The power of Android",
     "description":"No easy task to develop for Android, due to all the stuff.
 	Join this session to have some info.",
@@ -12,5 +11,4 @@
            "id": "714",
            "standard": "true"
 	}
-  }
 }

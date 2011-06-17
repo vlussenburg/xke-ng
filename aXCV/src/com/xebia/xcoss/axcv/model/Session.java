@@ -9,9 +9,16 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.google.gson.annotations.SerializedName;
+import com.xebia.xcoss.axcv.model.Session.Type;
 import com.xebia.xcoss.axcv.ui.StringUtil;
 
 public class Session implements Serializable {
+	
+	public enum Type {
+		STANDARD,
+		MANDATORY,
+		BREAK, // This is also Mandatory
+	}
 
 	private static final long serialVersionUID = 1L;
 
@@ -20,6 +27,7 @@ public class Session implements Serializable {
 	// Auto mapped
 	private String title;
 	private int id;
+	private Type type = Type.STANDARD;
 
 	private String description;
 
@@ -41,14 +49,12 @@ public class Session implements Serializable {
 		labels = new TreeSet<String>();
 		authors = new TreeSet<Author>();
 		languages = new HashSet<String>();
-//		location = new Location("TODO", true);
 		id = ++counter;
 	}
 
 	public Session(Session original) {
 		this();
 		
-//		conference = original.conference;
 		id = original.id;
 
 		title = original.title;
@@ -156,14 +162,6 @@ public class Session implements Serializable {
 		this.intendedAudience = intendedAudience;
 	}
 
-//	public Conference getConference() {
-//		return conference;
-//	}
-//
-//	public void setConference(Conference conference) {
-//		this.conference = conference;
-//	}
-
 	public String getLimit() {
 		return limit;
 	}
@@ -182,6 +180,10 @@ public class Session implements Serializable {
 	
 	public Set<String> getLanguages() {
 		return languages;
+	}
+
+	protected void setType(Type type) {
+		this.type = type;
 	}
 
 	public int getDuration() {
@@ -215,13 +217,11 @@ public class Session implements Serializable {
 				+ ", labels=" + labels + ", languages=" + languages + "]";
 	}
 
-//	@Override
-//	public String toString() {
-//		return "Session [conference=" + (conference == null ? "(null)" : conference.getId()) + ", id=" + id + ", title=" + title + ", location=" + location
-//				+ ", date=" + date + ", startTime=" + startTime + ", endTime=" + endTime + ", description="
-//				+ description + ", intendedAudience=" + intendedAudience + ", limit=" + limit + ", preparation="
-//				+ preparation + ", authors=" + authors + ", labels=" + labels + ", languages=" + languages + "]";
-//	}
-
+	public boolean isMandatory() {
+		return (type != null && (type == Type.MANDATORY || type == Type.BREAK));
+	}
 	
+	public boolean isBreak() {
+		return (type != null && type == Type.BREAK);
+	}
 }

@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -23,6 +25,7 @@ import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
+import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class CVSessionView extends BaseActivity {
 
@@ -32,7 +35,6 @@ public class CVSessionView extends BaseActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 		setContentView(R.layout.session);
 
 		conference = getConference();
@@ -94,7 +96,14 @@ public class CVSessionView extends BaseActivity {
 		view2.setOnClickListener(lReview);
 		Spanned spannedContent = Html.fromHtml(FormatUtil.getHtml(server.getRemarks(session)));
 		view2.setText(spannedContent, BufferType.SPANNABLE);
-//		view2.setText(server.getRemarks(session));
+		ImageView button = (ImageView) findViewById(R.id.sessionMarkButton);
+		button.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Log.e(LOG.ALL, "Clicked on " + view);
+			}
+		});
+		super.onCreate(savedInstanceState);
 	}
 
 	@Override
@@ -179,8 +188,17 @@ public class CVSessionView extends BaseActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		// Add or edit a session
+		Intent intent = new Intent(this, CVSessionAdd.class);
+		intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
+
 		if (item.getItemId() == XCS.MENU.ADD) {
-			startActivity(new Intent(this, CVSessionAdd.class));
+			startActivity(intent);
+			return true;
+		}
+		if (item.getItemId() == XCS.MENU.EDIT) {
+			intent.putExtra(BaseActivity.IA_SESSION, session.getId());
+			startActivity(intent);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

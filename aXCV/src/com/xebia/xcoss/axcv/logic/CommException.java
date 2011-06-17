@@ -4,6 +4,8 @@ import java.net.URI;
 
 public class CommException extends RuntimeException {
 
+	private static final long serialVersionUID = 2056882476603190969L;
+
 	private String title;
 	private String message;
 
@@ -21,10 +23,6 @@ public class CommException extends RuntimeException {
 			case 404:
 				this.title = "Not Found";
 				this.message = "Could not find '" + uri.getPath() + "'";
-			break;
-			case 500:
-				this.title = "Server Error";
-				this.message = "Request '" + uri.getPath() + "' could not be handled by server.";
 			break;
 			default:
 				this.title = "Error " + code;
