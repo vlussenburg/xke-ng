@@ -25,6 +25,7 @@ public class Conference implements Serializable {
 	public class TimeSlot {
 		public DateTime start;
 		public DateTime end;
+		public Location location;
 	}
 
 	private static final long serialVersionUID = 2L;
@@ -201,38 +202,36 @@ public class Conference implements Serializable {
 		ConferenceServer.getInstance().deleteConference(this);
 	}
 
-	public TimeSlot getNextAvailableTimeSlot(DateTime start, int duration) {
-		if (start == null) {
-			start = startTime;
-		}
+	public TimeSlot getNextAvailableTimeSlot(DateTime start, int duration, Location location) {
+
 		int prefstart = Math.max(getTime(start), getTime(startTime));
 
-		// TODO Allow for multiple locations
-
 		for (Session session : sessions) {
+			if ( !location.equals(session.getLocation())) {
+				continue;
+			}
 			int sesstart = getTime(session.getStartTime());
 
 			// Preferred start time is later than session time.
-			if (sesstart <= prefstart) {
-				Log.w(XCS.LOG.ALL, "On " + session.getTitle() + " session starting earlier.");
-				int end = getTime(session.getEndTime());
-				if (end > prefstart) {
-					// Move start time to the end of this session
-					prefstart = end;
-				}
+			if (prefstart >= sesstart) {
+				Log.d(XCS.LOG.ALL, "On " + session.getTitle() + ": session starting earlier.");
+				// If the session ends after the preferred start time, move start time.
+				prefstart = Math.max(getTime(session.getEndTime()), prefstart);
 			} else {
 				// There is room before this session
-				int available = prefstart - sesstart;
+				int available = sesstart - prefstart;
 				if (available >= duration) {
-					return getTimeSlot(prefstart, duration);
+					return getTimeSlot(prefstart, duration, location);
 				}
+				// Not enough time available. Try with a later time.
+				prefstart = getTime(session.getEndTime());
 			}
 		}
 
 		// Check last session till end of conference.
 		int endspace = getTime(endTime) - prefstart;
 		if (endspace >= duration) {
-			return getTimeSlot(prefstart, duration);
+			return getTimeSlot(prefstart, duration, location);
 		}
 		return null;
 	}
@@ -241,11 +240,13 @@ public class Conference implements Serializable {
 		ArrayList<TimeSlot> list = new ArrayList<TimeSlot>();
 
 		final int length = 30;
-		DateTime start = startTime;
 		TimeSlot t;
-		while ((t = getNextAvailableTimeSlot(start, length)) != null) {
-			list.add(t);
-			start = start.plus(0, 0, 0, 0, length, 0, DayOverflow.Spillover);
+		for (Location loc : locations) {
+			DateTime start = startTime;
+			while ((t = getNextAvailableTimeSlot(start, length, loc)) != null) {
+				list.add(t);
+				start = start.plus(0, 0, 0, 0, length, 0, DayOverflow.Spillover);
+			}
 		}
 		return list;
 	}
@@ -254,13 +255,14 @@ public class Conference implements Serializable {
 		if (dt == null) {
 			return 0;
 		}
-		return 100 * dt.getHour() + dt.getMinute();
+		return 60 * dt.getHour() + dt.getMinute();
 	}
 
-	private TimeSlot getTimeSlot(int value, int duration) {
+	private TimeSlot getTimeSlot(int value, int duration, Location loc) {
 		TimeSlot ts = new TimeSlot();
-		ts.start = DateTime.forTimeOnly(value / 100, value % 100, 0, 0);
+		ts.start = DateTime.forTimeOnly(value / 60, value % 60, 0, 0);
 		ts.end = ts.start.plus(0, 0, 0, 0, duration, 0, DayOverflow.Spillover);
+		ts.location = loc;
 		return ts;
 	}
 
