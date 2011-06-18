@@ -214,7 +214,7 @@ public class Session implements Serializable {
 		if (StringUtil.isEmpty(title)) {
 			messages.add("Title");
 		}
-		if (authors.isEmpty()) {
+		if (type != Type.BREAK && authors.isEmpty()) {
 			messages.add("Author");
 		}
 		if (location == null) {

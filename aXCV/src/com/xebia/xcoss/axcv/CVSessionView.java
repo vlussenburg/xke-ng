@@ -16,6 +16,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
+import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Conference;
@@ -101,6 +102,37 @@ public class CVSessionView extends BaseActivity {
 			@Override
 			public void onClick(View view) {
 				Log.e(LOG.ALL, "Clicked on " + view);
+			}
+		});
+		
+		// Slide buttons
+		ImageView im;
+		im = (ImageView) findViewById(R.id.slideLocationMin);
+		im.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View paramView) {
+				Toast.makeText(CVSessionView.this, "Slide previous location", Toast.LENGTH_SHORT).show();
+			}
+		});
+		im = (ImageView) findViewById(R.id.slideLocationPlus);
+		im.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View paramView) {
+				Toast.makeText(CVSessionView.this, "Slide next location", Toast.LENGTH_SHORT).show();
+			}
+		});
+		im = (ImageView) findViewById(R.id.slideTimeMin);
+		im.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View paramView) {
+				Toast.makeText(CVSessionView.this, "Slide previous session", Toast.LENGTH_SHORT).show();
+			}
+		});
+		im = (ImageView) findViewById(R.id.slideTimePlus);
+		im.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View paramView) {
+				Toast.makeText(CVSessionView.this, "Slide next session", Toast.LENGTH_SHORT).show();
 			}
 		});
 		super.onCreate(savedInstanceState);

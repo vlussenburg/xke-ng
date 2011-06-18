@@ -106,24 +106,24 @@
 			android:gravity="center">
 			<ImageView
 				android:layout_height="wrap_content"
-				android:id="@+id/ImageView03"
-				android:src="@drawable/x_conference"
-				android:layout_width="wrap_content"></ImageView>
-			<ImageView
-				android:layout_height="wrap_content"
-				android:id="@+id/ImageView02"
-				android:src="@drawable/x_conference"
-				android:layout_width="wrap_content"></ImageView>
-			<ImageView
-				android:layout_height="wrap_content"
-				android:id="@+id/ImageView01"
 				android:layout_width="wrap_content"
-				android:src="@drawable/x_conference"></ImageView>
+				android:src="@drawable/location_previous"
+				android:id="@+id/slideLocationMin" android:padding="1sp" android:layout_weight="1"></ImageView>
 			<ImageView
 				android:layout_height="wrap_content"
-				android:id="@+id/imageView1"
+				android:src="@drawable/time_previous"
 				android:layout_width="wrap_content"
-				android:src="@drawable/x_conference"></ImageView>
+				android:id="@+id/slideTimeMin" android:padding="1sp" android:layout_weight="1"></ImageView>
+			<ImageView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:src="@drawable/time_next"
+				android:id="@+id/slideTimePlus" android:padding="1sp" android:layout_weight="1"></ImageView>
+			<ImageView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:src="@drawable/location_next"
+				android:id="@+id/slideLocationPlus" android:padding="1sp" android:layout_weight="1"></ImageView>
 		</LinearLayout>
 	</LinearLayout>
 	<!-- Content part of the session -->
@@ -192,7 +192,8 @@
 					android:src="@android:drawable/btn_star_big_off"
 					android:layout_height="fill_parent"
 					android:layout_centerVertical="true"
-					android:layout_alignParentRight="true" android:padding="8sp"></ImageView>
+					android:layout_alignParentRight="true"
+					android:padding="8sp"></ImageView>
 			</RelativeLayout>
 			<LinearLayout
 				android:layout_width="fill_parent"

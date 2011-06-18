@@ -130,7 +130,7 @@
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
 						android:id="@+id/conferenceDate"
-						android:background="@drawable/touchtext_disable"></TextView>
+						android:background="@drawable/touchtext_disable" android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -149,7 +149,7 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/conferenceStart"></TextView>
+						android:id="@+id/conferenceStart" android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -168,7 +168,7 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/conferenceEnd"></TextView>
+						android:id="@+id/conferenceEnd" android:layout_weight="1"></TextView>
 				</TableRow>
 			</TableLayout>
 			<TextView
@@ -190,7 +190,7 @@
 				android:padding="6sp">
 				<TableRow android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TableRow06">
 					<TextView android:textSize="@dimen/ts_attribute" android:text="Title" android:layout_height="wrap_content" android:id="@+id/TextView07" android:layout_width="wrap_content"></TextView>
-					<TextView android:textSize="@dimen/ts_attribute" android:padding="1sp" android:layout_marginLeft="5sp" android:text="@string/empty_value" android:layout_height="wrap_content" android:id="@+id/conferenceName" android:layout_width="wrap_content"></TextView>
+					<TextView android:textSize="@dimen/ts_attribute" android:padding="1sp" android:layout_marginLeft="5sp" android:text="@string/empty_value" android:layout_height="wrap_content" android:id="@+id/conferenceName" android:layout_width="wrap_content" android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -209,7 +209,7 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/conferenceDescription"></TextView>
+						android:id="@+id/conferenceDescription" android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -228,7 +228,7 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/conferenceOrganiser"></TextView>
+						android:id="@+id/conferenceOrganiser" android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:id="@+id/TableRow12"
@@ -247,7 +247,7 @@
 						android:layout_width="wrap_content"
 						android:text="@string/empty_value"
 						android:layout_height="wrap_content"
-						android:textSize="@dimen/ts_attribute"></TextView>
+						android:textSize="@dimen/ts_attribute" android:layout_weight="1"></TextView>
 				</TableRow>
 			</TableLayout>
 		</LinearLayout>
