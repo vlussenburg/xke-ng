@@ -29,7 +29,6 @@ public class Conference implements Serializable {
 	}
 
 	private static final long serialVersionUID = 2L;
-	private static int counter = 1;
 
 	private int id;
 	private String title;
@@ -44,7 +43,6 @@ public class Conference implements Serializable {
 	public Conference() {
 		resetSessions();
 		this.locations = new HashSet<Location>();
-		this.id = counter++;
 	}
 
 	public Conference(Conference original) {
@@ -71,8 +69,13 @@ public class Conference implements Serializable {
 
 	public Set<Session> getSessions() {
 		if (sessions.isEmpty()) {
-			List<Session> list = ConferenceServer.getInstance().getSessions(this);
-			sessions.addAll(list);
+			try {
+				List<Session> list = ConferenceServer.getInstance().getSessions(this);
+				sessions.addAll(list);
+			}
+			catch (Exception e) {
+				Log.w(XCS.LOG.COMMUNICATE, "No sessions for conference: " + e.getMessage());
+			}
 		}
 		return sessions;
 	}
