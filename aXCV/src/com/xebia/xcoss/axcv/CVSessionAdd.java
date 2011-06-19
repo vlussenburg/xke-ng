@@ -5,6 +5,8 @@ import hirondelle.date4j.DateTime.DayOverflow;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -19,14 +21,15 @@ import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.model.Session.Type;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.Identifiable;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
@@ -119,6 +122,9 @@ public class CVSessionAdd extends AdditionActivity {
 
 			view = (TextView) findViewById(R.id.sessionPreps);
 			view.setText(FormatUtil.getText(session.getPreparation()));
+
+			view = (TextView) findViewById(R.id.sessionType);
+			view.setText(FormatUtil.getText(session.getType()));
 		}
 	}
 
@@ -127,6 +133,11 @@ public class CVSessionAdd extends AdditionActivity {
 				R.id.sessionCount, R.id.sessionDescription, R.id.sessionDuration, R.id.sessionLabels,
 				R.id.sessionLanguage, R.id.sessionLocation, R.id.sessionPreps, R.id.sessionStart, R.id.sessionTitle };
 
+		if ( create ) {
+			activateViews(new int[] { R.id.sessionType } );
+		} else {
+			passivateView(R.id.sessionType);
+		}
 		activateViews(identifiers);
 
 		Button button = (Button) findViewById(R.id.actionSave);
@@ -163,33 +174,52 @@ public class CVSessionAdd extends AdditionActivity {
 		button.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
-
-				TimeSlot slot = conference.getNextAvailableTimeSlot(session.getStartTime(), session.getDuration());
-				if (slot == null) {
-					while (slot == null) {
-						conference = getConferenceServer().getUpcomingConference(conference.getDate().plusDays(1));
-						if (conference == null) {
-							break;
-						}
-						slot = conference.getNextAvailableTimeSlot(session.getStartTime(), session.getDuration());
-					}
+				if ( rescheduleSession(0) == null ) {
+					createDialog("Rescheduling failed", "The session cannot be scheduled. Minimize duration or use another location.").show();
 				}
-
-				if (slot != null) {
-					session.setStartTime(slot.start);
-					session.setEndTime(slot.end);
-					// session.setConference(conference);
-					session.setDate(conference.getDate());
-					showConference();
-					showSession();
-					// TODO Difference in create and modify
-				} else {
-					// No conferences available to fit slot in.
-				}
+				showConference();
+				showSession();
 			}
 		});
 	}
 
+	private TimeSlot rescheduleSession(int duration) {
+		if ( conference == null ) {
+			return null;
+		}
+		if ( duration == 0 ) {
+			duration = session.getDuration();
+		}
+		Set<Location> locations = null;
+		if ( session.getLocation() != null ) {
+			locations = new HashSet<Location>();
+			locations.add(session.getLocation());
+		} else {
+			locations = conference.getLocations();
+		}
+		
+		TimeSlot slot = null;
+		Iterator<Location> iterator = locations.iterator();
+		while (slot == null && iterator.hasNext()) {
+			Location next = iterator.next();
+			slot = conference.getNextAvailableTimeSlot(session.getStartTime(), duration, next);
+			Log.v("XCS", "Reschedule [" + session.getStartTime() + ", " + duration + ", " + next.getDescription() + "] => "
+					+ (slot == null ? "NONE" : slot.start.format("h:mm") + " till " + slot.end.format("h:mm") + " @ " + slot.location.getDescription()));
+		}
+		// Move up to the next conference and call this method recursively
+		if (slot == null) {
+			conference = getConferenceServer().getUpcomingConference(conference.getDate().plusDays(1));
+			slot = rescheduleSession(duration);
+		}
+		
+		if ( slot != null ) {
+			session.setStartTime(slot.start);
+			session.setEndTime(slot.end);
+			session.setLocation(slot.location);
+			session.setDate(conference.getDate());
+		}
+		return slot;
+	}
 	/**
 	 * Takes the chosen attribute and converts this (String) value to a value for the object
 	 * 
@@ -216,13 +246,7 @@ public class CVSessionAdd extends AdditionActivity {
 			case R.id.sessionDuration:
 				int duration = StringUtil.getFirstInteger(value);
 				if (session.getStartTime() == null) {
-					DateTime startTime = conference.getStartTime();
-					TimeSlot slot = conference.getNextAvailableTimeSlot(startTime, duration);
-					if (slot != null) {
-						session.setStartTime(slot.start);
-					} else {
-						session.setStartTime(startTime);
-					}
+					rescheduleSession(duration);
 				}
 				session.setEndTime(session.getStartTime().plus(0, 0, 0, 0, duration, 0, DayOverflow.Spillover));
 			break;
@@ -251,10 +275,23 @@ public class CVSessionAdd extends AdditionActivity {
 			case R.id.sessionLocation:
 				session.setLocation((Location) selection);
 			break;
+			case R.id.sessionType:
+				Type type = (Type)selection;
+				session.setType(type);
+				activateDetails(type == Type.STANDARD);
+			break;
 			default:
 				Log.w(LOG.NAVIGATE, "Don't know how to process: " + field);
 		}
 		showSession();
+	}
+
+	private void activateDetails(boolean state) {
+		findViewById(R.id.sessionAudience).setEnabled(state);
+		findViewById(R.id.sessionCount).setEnabled(state);
+		findViewById(R.id.sessionPreps).setEnabled(state);
+		findViewById(R.id.sessionLanguage).setEnabled(state);
+		findViewById(R.id.sessionLabels).setEnabled(state);
 	}
 
 	@Override
@@ -335,6 +372,14 @@ public class CVSessionAdd extends AdditionActivity {
 			case XCS.DIALOG.INPUT_TITLE:
 				dialog = new TextInputDialog(this, R.id.sessionTitle);
 			break;
+			case XCS.DIALOG.INPUT_TYPE:
+				Type[] values = Session.Type.values();
+				builder = new AlertDialog.Builder(this);
+				builder.setTitle("Pick a type");
+				ListAdapter ta = new ArrayAdapter<Type>(this, R.layout.simple_list_item_single_choice, values);
+				builder.setSingleChoiceItems(ta, -1, new DialogHandler(this, values, R.id.sessionType));
+				dialog = builder.create();
+			break;
 		}
 		if (dialog != null) {
 			return dialog;
@@ -345,7 +390,8 @@ public class CVSessionAdd extends AdditionActivity {
 	@Override
 	protected void onPrepareDialog(int id, Dialog dialog) {
 		TextInputDialog tid;
-
+		ListView lv;
+		
 		switch (id) {
 			case XCS.DIALOG.INPUT_AUDIENCE:
 				tid = (TextInputDialog) dialog;
@@ -373,18 +419,32 @@ public class CVSessionAdd extends AdditionActivity {
 				tid.setValue(session.getTitle());
 			break;
 			case XCS.DIALOG.INPUT_LOCATION:
-				AlertDialog ad = (AlertDialog) dialog;
+				lv = ((AlertDialog) dialog).getListView();
 				if (session.getLocation() != null) {
 					int sid = session.getLocation().getId();
-					int size = ad.getListView().getCount();
+					int size = lv.getCount();
 					for (int idx = 0; idx < size; idx++) {
-						if (((Location) ad.getListView().getItemAtPosition(idx)).getId() == sid) {
-							ad.getListView().setSelection(idx);
+						if (((Location) lv.getItemAtPosition(idx)).getId() == sid) {
+							lv.setItemChecked(idx, true);
 							break;
 						}
 					}
 				}
 			break;
+			case XCS.DIALOG.INPUT_TYPE:
+				lv = ((AlertDialog) dialog).getListView();
+				if (session.getType() != null) {
+					Type type = session.getType();
+					int size = lv.getCount();
+					for (int idx = 0; idx < size; idx++) {
+						Type listType = (Type) lv.getItemAtPosition(idx);
+						if (type.equals(listType)) {
+							lv.setItemChecked(idx, true);
+							break;
+						}
+					}
+				}
+				break;
 		}
 		super.onPrepareDialog(id, dialog);
 	}
@@ -473,6 +533,9 @@ public class CVSessionAdd extends AdditionActivity {
 			break;
 			case R.id.sessionTitle:
 				showDialog(XCS.DIALOG.INPUT_TITLE);
+			break;
+			case R.id.sessionType:
+				showDialog(XCS.DIALOG.INPUT_TYPE);
 			break;
 			default:
 				Log.w(XCS.LOG.NAVIGATE, "Click on text not handled: " + id);

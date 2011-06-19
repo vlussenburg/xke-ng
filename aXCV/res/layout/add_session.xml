@@ -24,8 +24,8 @@
 			<TextView
 				android:layout_height="fill_parent"
 				android:layout_width="wrap_content"
- android:paddingLeft="7sp"
- 				android:layout_alignWithParentIfMissing="true"
+				android:paddingLeft="7sp"
+				android:layout_alignWithParentIfMissing="true"
 				android:gravity="center_vertical"
 				android:layout_toRightOf="@+id/conferenceButton"
 				android:layout_alignTop="@+id/conferenceButton"
@@ -111,7 +111,8 @@
 				android:textColor="@color/textcolor_header"
 				android:paddingBottom="2sp"
 				android:layout_height="wrap_content"
-				android:paddingTop="2sp" android:text="Planning"></TextView>
+				android:paddingTop="2sp"
+				android:text="Planning"></TextView>
 			<TableLayout
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
@@ -134,7 +135,8 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/conferenceName"></TextView>
+						android:id="@+id/conferenceName"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -152,7 +154,9 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/conferenceDate" android:background="@drawable/touchtext_disable"></TextView>
+						android:id="@+id/conferenceDate"
+						android:background="@drawable/touchtext_disable"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -171,7 +175,8 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/sessionStart"></TextView>
+						android:id="@+id/sessionStart"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -190,7 +195,8 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/sessionDuration"></TextView>
+						android:id="@+id/sessionDuration"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -209,7 +215,8 @@
 						android:layout_marginLeft="5sp"
 						android:textSize="@dimen/ts_attribute"
 						android:layout_width="wrap_content"
-						android:id="@+id/sessionLocation"></TextView>
+						android:id="@+id/sessionLocation"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 			</TableLayout>
 			<TextView
@@ -221,14 +228,34 @@
 				android:paddingRight="5sp"
 				android:paddingLeft="5sp"
 				android:textColor="@color/textcolor_header"
-				android:paddingBottom="2sp"
 				android:layout_height="wrap_content"
-				android:paddingTop="2sp"></TextView>
+				android:paddingTop="2sp"
+				android:paddingBottom="2sp"></TextView>
 			<TableLayout
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:id="@+id/TableLayout02"
 				android:padding="6sp">
+				<TableRow
+					android:layout_width="wrap_content"
+					android:id="@+id/TableRow14"
+					android:layout_height="wrap_content">
+					<TextView
+						android:id="@+id/TextView99"
+						android:text="Type"
+						android:textSize="@dimen/ts_attribute"
+						android:layout_height="wrap_content"
+						android:layout_width="wrap_content"></TextView>
+					<TextView
+						android:text="@string/empty_value"
+						android:padding="1sp"
+						android:textSize="@dimen/ts_attribute"
+						android:layout_height="wrap_content"
+						android:layout_marginLeft="5sp"
+						android:layout_width="wrap_content"
+						android:id="@+id/sessionType"
+						android:layout_weight="1"></TextView>
+				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
 					android:id="@+id/TableRow08"
@@ -246,11 +273,12 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/sessionTitle"></TextView>
+						android:id="@+id/sessionTitle"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
-					android:id="@+id/TableRow01"
+					android:id="@+id/TableRow13"
 					android:layout_height="wrap_content">
 					<TextView
 						android:id="@+id/TextView17"
@@ -265,7 +293,8 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/sessionDescription"></TextView>
+						android:id="@+id/sessionDescription"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -284,11 +313,11 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/sessionAuthors"></TextView>
+						android:id="@+id/sessionAuthors"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 			</TableLayout>
 			<TextView
-				android:id="@+id/textView5"
 				android:layout_height="wrap_content"
 				android:layout_width="fill_parent"
 				android:paddingLeft="5sp"
@@ -298,12 +327,11 @@
 				android:background="@drawable/rateslider"
 				android:textSize="@dimen/ts_group"
 				android:textColor="@color/textcolor_header"
-				android:text="Details"></TextView>
+				android:text="Details" android:id="@+id/detailsTitle"></TextView>
 			<TableLayout
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
-				android:id="@+id/tableLayout2"
-				android:padding="6sp">
+				android:padding="6sp" android:id="@+id/detailsLayout">
 				<TableRow
 					android:layout_width="wrap_content"
 					android:id="@+id/TableRow03"
@@ -321,7 +349,8 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/sessionAudience"></TextView>
+						android:id="@+id/sessionAudience"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -340,7 +369,8 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/sessionPreps"></TextView>
+						android:id="@+id/sessionPreps"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:id="@+id/tableRow1"
@@ -359,7 +389,8 @@
 						android:text="@string/empty_value"
 						android:padding="1sp"
 						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"></TextView>
+						android:layout_width="wrap_content"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -378,7 +409,8 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/sessionLanguage"></TextView>
+						android:id="@+id/sessionLanguage"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -397,7 +429,8 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/sessionLabels"></TextView>
+						android:id="@+id/sessionLabels"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 			</TableLayout>
 		</LinearLayout>

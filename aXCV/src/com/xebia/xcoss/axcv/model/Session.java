@@ -9,20 +9,21 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.google.gson.annotations.SerializedName;
-import com.xebia.xcoss.axcv.model.Session.Type;
 import com.xebia.xcoss.axcv.ui.StringUtil;
 
 public class Session implements Serializable {
-	
+
 	public enum Type {
-		STANDARD,
-		MANDATORY,
-		BREAK, // This is also Mandatory
+		STANDARD ("Standard session"), 
+		MANDATORY ("Mandatory session"), 
+		BREAK ("Break"); // This is also Mandatory
+		
+		private String text;
+		private Type(String txt) { this.text = txt; }
+		public String toString() { return text; } 
 	}
 
 	private static final long serialVersionUID = 1L;
-
-	private static int counter = 899;
 
 	// Auto mapped
 	private String title;
@@ -49,12 +50,11 @@ public class Session implements Serializable {
 		labels = new TreeSet<String>();
 		authors = new TreeSet<Author>();
 		languages = new HashSet<String>();
-		id = ++counter;
 	}
 
 	public Session(Session original) {
 		this();
-		
+
 		id = original.id;
 
 		title = original.title;
@@ -75,7 +75,7 @@ public class Session implements Serializable {
 	public int getId() {
 		return id;
 	}
-	
+
 	public String getTitle() {
 		return title;
 	}
@@ -91,7 +91,7 @@ public class Session implements Serializable {
 	public void addAuthor(Author author) {
 		authors.add(author);
 	}
-	
+
 	public void removeAuthor(String author) {
 		authors.remove(author);
 	}
@@ -107,7 +107,7 @@ public class Session implements Serializable {
 	public void removeLabel(String label) {
 		labels.remove(label);
 	}
-	
+
 	public void setLabels(Set<String> labels) {
 		this.labels = labels;
 	}
@@ -117,7 +117,7 @@ public class Session implements Serializable {
 	}
 
 	public void setLocation(Location location) {
-		if ( location != null ) {
+		if (location != null) {
 			this.location = location;
 		}
 	}
@@ -177,34 +177,48 @@ public class Session implements Serializable {
 	public void setPreparation(String preparation) {
 		this.preparation = preparation;
 	}
-	
+
 	public Set<String> getLanguages() {
 		return languages;
 	}
 
-	protected void setType(Type type) {
-		this.type = type;
+	/**
+	 * Only allow the type to be set if it has no id yet.
+	 */
+	public void setType(Type type) {
+		if (id == 0) {
+			this.type = type;
+		} else {
+			System.err.println("Could not set type to "+type+", id = " + id);
+		}
+	}
+
+	public Type getType() {
+		return type;
 	}
 
 	public int getDuration() {
 		int duration = 60;
 		if (startTime != null && endTime != null) {
-			int start = startTime.getHour()*60 + startTime.getMinute();
-			int end = endTime.getHour()*60 + endTime.getMinute();
+			int start = startTime.getHour() * 60 + startTime.getMinute();
+			int end = endTime.getHour() * 60 + endTime.getMinute();
 			duration = end - start;
 		}
 		return duration;
 	}
 
 	public boolean check(List<String> messages) {
-		if ( startTime == null ) {
+		if (startTime == null) {
 			messages.add("Start time");
 		}
-		if ( StringUtil.isEmpty(title) ) {
+		if (StringUtil.isEmpty(title)) {
 			messages.add("Title");
 		}
-		if ( authors.isEmpty() ) {
+		if (type != Type.BREAK && authors.isEmpty()) {
 			messages.add("Author");
+		}
+		if (location == null) {
+			messages.add("Location");
 		}
 		return (messages.size() == 0);
 	}
@@ -220,7 +234,7 @@ public class Session implements Serializable {
 	public boolean isMandatory() {
 		return (type != null && (type == Type.MANDATORY || type == Type.BREAK));
 	}
-	
+
 	public boolean isBreak() {
 		return (type != null && type == Type.BREAK);
 	}

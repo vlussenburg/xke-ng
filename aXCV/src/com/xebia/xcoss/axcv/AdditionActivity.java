@@ -21,8 +21,9 @@ public abstract class AdditionActivity extends BaseActivity implements OnCancelL
 	private Intent labelIntent;
 
 	public abstract void updateField(int field, Object selection, boolean state);
+
 	abstract protected void onTextClick(int field);
-	
+
 	protected Intent getAuthorIntent() {
 		if (authorIntent == null) {
 			authorIntent = new Intent(this, CVSearchAuthor.class);
@@ -44,10 +45,18 @@ public abstract class AdditionActivity extends BaseActivity implements OnCancelL
 
 		for (int i = 0; i < identifiers.length; i++) {
 			TextView view = (TextView) findViewById(identifiers[i]);
-			view.setOnTouchListener(touchListener);
-			view.setOnClickListener(clickListener);
-			view.setBackgroundDrawable(drawable);
+			if (view != null) {
+				view.setOnTouchListener(touchListener);
+				view.setOnClickListener(clickListener);
+				view.setBackgroundDrawable(drawable);
+			}
 		}
+	}
+	
+	protected void passivateView(int id) {
+		Drawable drawable = getResources().getDrawable(R.drawable.touchtext_disable);
+		TextView view = (TextView) findViewById(id);
+		view.setBackgroundDrawable(drawable);
 	}
 
 	@Override
@@ -55,7 +64,8 @@ public abstract class AdditionActivity extends BaseActivity implements OnCancelL
 		return true;
 	}
 
-	protected class DialogHandler implements DialogInterface.OnClickListener, DialogInterface.OnMultiChoiceClickListener {
+	protected class DialogHandler implements DialogInterface.OnClickListener,
+			DialogInterface.OnMultiChoiceClickListener {
 		private int field;
 		private Object[] items;
 		private AdditionActivity activity;
@@ -75,7 +85,7 @@ public abstract class AdditionActivity extends BaseActivity implements OnCancelL
 			activity.updateField(field, items[item], state);
 		}
 	}
-	
+
 	private class AddOnTouchListener implements OnTouchListener {
 		@Override
 		public boolean onTouch(View view, MotionEvent event) {
