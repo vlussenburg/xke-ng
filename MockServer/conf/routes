@@ -16,17 +16,19 @@ GET		/conferences/{year}/{month}				Conferences.show
 GET		/conferences/{year}/{month}/{day}		Conferences.show
 GET		/conference/on/{yearmonthday}			Conference.showOnDate
 GET		/conference/{id}						Conference.showOnId
-PUT		/conference								Conference.update
-POST	/conference								Conference.create
+PUT		/conference								Conference.create
+POST	/conference								Conference.update
 GET		/conference/{id}/sessions				Conference.sessions
-PUT		/conference/{id}/session				Session.update
-POST	/conference/{id}/session				Session.create
+PUT		/conference/{id}/session				Session.create
+POST	/conference/{id}/session				Session.update
 GET		/session/{id}							Session.show
 DELETE	/session/{id}							Session.delete
 GET		/locations								Locations.show
 GET		/labels									Labels.show
 GET		/authors								Authors.show
-POST	/label/{name}							Labels.create
+PUT		/label/{name}							Labels.create
+POST	/search/authors							Authors.search
+POST	/search/sessions						Session.search
 
 
 # Catch all 

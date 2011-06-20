@@ -23,4 +23,9 @@ public class Session extends DefaultController {
     	System.out.println("Create: " + body);
     	renderText(new Random().nextInt());
     }
+
+    public static void search(JsonObject body) {
+    	System.out.println("Search: " + body);
+    	handleResponse("sessions", "search");
+    }
 }

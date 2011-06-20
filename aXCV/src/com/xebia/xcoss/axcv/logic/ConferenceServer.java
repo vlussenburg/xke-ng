@@ -14,6 +14,7 @@ import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Remark;
+import com.xebia.xcoss.axcv.model.Search;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -61,7 +62,8 @@ public class ConferenceServer {
 			StringBuilder requestUrl = new StringBuilder();
 			requestUrl.append(baseUrl);
 			requestUrl.append("/conference/on/");
-			requestUrl.append(date.format("YYYYMMDD"));
+			// Oeps, the framework does not support concatenations. Using escape for nothing.
+			requestUrl.append(date.format("YYYY||MM||DD"));
 
 			result = RestClient.loadObject(requestUrl.toString(), Conference.class);
 			conferenceCache.add(result);
@@ -246,8 +248,7 @@ public class ConferenceServer {
 		requestUrl.append(baseUrl);
 		requestUrl.append("/labels");
 
-		Type collectionType = new TypeToken<List<String>>() {
-		}.getType();
+		Type collectionType = new TypeToken<List<String>>() {}.getType();
 		List<String> result = RestClient.loadCollection(requestUrl.toString(), collectionType);
 		if (result == null) {
 			return new String[0];
@@ -261,7 +262,33 @@ public class ConferenceServer {
 		requestUrl.append("/label/");
 		requestUrl.append(name);
 
-		RestClient.postUrl(requestUrl.toString());
+		RestClient.createObject(requestUrl.toString(), name);
+	}
+
+
+	public List<Author> searchAuthors(Search search) {
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/search/authors");
+
+		List<Author> result = RestClient.searchObjects(requestUrl.toString(), "authors", Author.class, search);
+		if (result == null) {
+			return new ArrayList<Author>();
+		}
+		return result;
+	}
+
+	public List<Session> searchSessions(Search search) {
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/search/sessions");
+
+		List<Session> result = RestClient.searchObjects(requestUrl.toString(), "sessions", Session.class, search);
+		System.out.println("Sessions returned: " + result);
+		if (result == null) {
+			return new ArrayList<Session>();
+		}
+		return result;
 	}
 
 	public void registerRate(Session session, int rate) {

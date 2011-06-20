@@ -299,6 +299,11 @@ public class Conference implements Serializable {
 				+ organiser + ", date=" + date + ", startTime=" + startTime + ", endTime=" + endTime + ", locations="
 				+ FormatUtil.getList(locations) + ", sessions=" + FormatUtil.getList(sessions) + "]";
 	}
+
+	public void setId(int i) {
+		// TODO Auto-generated method stub
+		this.id = i;
+	}
 	
 //	@Override
 //	public String toString() {

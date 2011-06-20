@@ -118,9 +118,9 @@ public class RestClient {
 		Log.d(LOG.COMMUNICATE, "Creating [" + object.getClass().getSimpleName() + "] " + url);
 		Reader reader = null;
 		try {
-			Gson gson = new Gson();
+			Gson gson = getGson();
 			String postData = gson.toJson(object);
-			reader = getReader(new HttpPost(url), postData);
+			reader = getReader(new HttpPut(url), postData);
 			return gson.fromJson(reader, int.class);
 		}
 		catch (IOException e) {
@@ -135,23 +135,9 @@ public class RestClient {
 		Log.d(LOG.COMMUNICATE, "Updating [" + object.getClass().getSimpleName() + "] " + url);
 		Reader reader = null;
 		try {
-			Gson gson = new Gson();
+			Gson gson = getGson();
 			String postData = gson.toJson(object);
-			reader = getReader(new HttpPut(url), postData);
-		}
-		catch (IOException e) {
-			throw new ServerException(url, e);
-		}
-		finally {
-			StreamUtil.close(reader);
-		}
-	}
-
-	public static <T> void postUrl(String url) {
-		Log.d(LOG.COMMUNICATE, "Posting " + url);
-		Reader reader = null;
-		try {
-			reader = getReader(new HttpPost(url), null);
+			reader = getReader(new HttpPost(url), postData);
 		}
 		catch (IOException e) {
 			throw new ServerException(url, e);
@@ -166,6 +152,36 @@ public class RestClient {
 		Reader reader = null;
 		try {
 			reader = getReader(new HttpDelete(url));
+		}
+		catch (IOException e) {
+			throw new ServerException(url, e);
+		}
+		finally {
+			StreamUtil.close(reader);
+		}
+	}
+
+	public static <T> List<T> searchObjects(String url, String key, Class<T> rvClass, Object searchParms) {
+		Log.d(LOG.COMMUNICATE, "Searching [" + key + "[" + rvClass.getSimpleName() + "]] " + url);
+		Reader reader = null;
+		try {
+			Gson gson = getGson();
+			String postData = gson.toJson(searchParms);
+			reader = getReader(new HttpPost(url), postData);
+			JsonParser parser = new JsonParser();
+			JsonElement parse = parser.parse(reader);
+
+			ArrayList<T> results = new ArrayList<T>();
+			if (parse.isJsonObject()) {
+				JsonArray jsonArray = parse.getAsJsonObject().get(key).getAsJsonArray();
+				Iterator<JsonElement> iterator = jsonArray.iterator();
+
+				while (iterator.hasNext()) {
+					JsonElement element = iterator.next();
+					results.add(gson.fromJson(element, rvClass));
+				}
+			}
+			return results;
 		}
 		catch (IOException e) {
 			throw new ServerException(url, e);

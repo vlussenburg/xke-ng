@@ -35,7 +35,7 @@ public class TestUtil {
 		Location loc = new Location(998, "Laap", true);
 		Session session = new Session();
 		session.setLocation(loc);
-		session.addAuthor(new Author("mvl", "M. van Leeuwen", "test@test.nl"));
+		session.addAuthor(new Author("mvl", "M. van Leeuwen", "test@test.nl", "06 55891506"));
 		session.setStartTime(DateTime.forTimeOnly(start,0,0,0));
 		session.setEndTime(DateTime.forTimeOnly(start+1,0,0,0));
 		session.setTitle(title);

@@ -9,11 +9,13 @@ public class Author implements Serializable, Comparable<Author> {
 	private String mail;
 	private String name;
 	private String userId;
+	private String phone;
 
-	public Author(String id, String name, String mail) {
+	public Author(String id, String name, String mail, String phone) {
 		this.userId = id;
 		this.name = name;
 		this.mail = mail;
+		this.phone = phone;
 	}
 
 	public String getMail() {
@@ -28,6 +30,11 @@ public class Author implements Serializable, Comparable<Author> {
 		return userId;
 	}
 	
+
+	public String getPhone() {
+		return phone;
+	}
+
 	@Override
 	public String toString() {
 		return getName();

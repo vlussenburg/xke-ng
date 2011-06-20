@@ -32,6 +32,7 @@ public abstract class BaseActivity extends Activity {
 	public static final String IA_CONFERENCE = "ID-conference";
 	public static final String IA_SESSION = "ID-session";
 	public static final String IA_AUTHORS = "ID-authors";
+	public static final String IA_AUTHOR = "ID-author";
 	public static final String IA_LABELS = "ID-labels";
 
 	private MenuItem miSettings;
@@ -100,7 +101,7 @@ public abstract class BaseActivity extends Activity {
 				showConferencesList();
 			break;
 			case XCS.MENU.SEARCH:
-				// TODO Implement search screen
+				startActivity(new Intent(this, CVSearch.class));
 			break;
 		}
 		return true;

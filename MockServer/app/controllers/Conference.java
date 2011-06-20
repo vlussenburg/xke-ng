@@ -6,8 +6,8 @@ import com.google.gson.JsonObject;
 
 public class Conference extends DefaultController {
 
-    public static void showOnDate(String date) {
-    	handleResponse("conference", "d-" + date);
+    public static void showOnDate(String yearmonthday) {
+    	handleResponse("conference", "d-" + yearmonthday);
     }
 
     public static void showOnId(int id) {

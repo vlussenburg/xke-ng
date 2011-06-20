@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:stretchColumns="1"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+	<View
+		android:layout_width="fill_parent"
+		android:id="@+id/tabDivider"
+		android:background="@color/linebreak"
+		android:layout_height="1dp"></View>
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:id="@+id/linearLayout2"
+		android:orientation="horizontal"
+		android:layout_height="wrap_content">
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:id="@+id/linearLayout3"
+			android:layout_height="fill_parent"
+			android:layout_weight="2"
+			android:orientation="vertical">
+			<TextView
+				android:text="Title"
+				android:textSize="@dimen/ts_sessiontitle"
+				android:paddingRight="3dp"
+				android:layout_width="wrap_content"
+				android:paddingLeft="3dp"
+				android:id="@+id/ses_title"
+				android:layout_height="wrap_content"></TextView>
+			<TextView
+				android:text="Jun 7th, 2011"
+				android:textSize="@dimen/ts_sessiondetail"
+				android:paddingRight="3dp"
+				android:layout_width="wrap_content"
+				android:paddingLeft="3dp"
+				android:layout_height="wrap_content" android:id="@+id/ses_text"></TextView>
+		</LinearLayout>
+		<FrameLayout
+			android:layout_width="wrap_content"
+			android:layout_height="fill_parent"
+			android:id="@+id/frameLayout1"
+			android:padding="3dp">
+			<TextView
+				android:layout_width="wrap_content"
+				android:background="@drawable/touchtext"
+				android:layout_height="wrap_content"
+				android:text="7.6"
+				android:layout_gravity="top|right" android:id="@+id/ses_rating"></TextView>
+		</FrameLayout>
+	</LinearLayout>
+</LinearLayout>
