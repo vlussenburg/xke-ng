@@ -94,6 +94,7 @@ public class CVSearch extends BaseActivity {
 		}
 		if (selected instanceof Author) {
 			Author author = (Author) selected;
+			// TODO AUthor view
 			// Intent intent = new Intent(this, CVAuthorView.class);
 			// intent.putExtra(BaseActivity.IA_AUTHOR, author.getUserId());
 			// startActivity(intent);

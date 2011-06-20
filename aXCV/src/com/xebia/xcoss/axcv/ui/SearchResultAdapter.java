@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,6 +80,9 @@ public class SearchResultAdapter extends BaseAdapter {
 		nameView.setTextColor(colorId);
 		mailView.setText(author.getMail());
 		phoneView.setText(author.getPhone());
+		
+		Linkify.addLinks(mailView, Linkify.EMAIL_ADDRESSES);
+		Linkify.addLinks(phoneView, Linkify.PHONE_NUMBERS);
 		
 		// TODO : Author image
 //		ImageView icon = (ImageView) row.findViewById(R.id.author_image);
