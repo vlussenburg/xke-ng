@@ -5,7 +5,12 @@ import java.util.SortedSet;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Point;
+import android.gesture.Gesture;
+import android.gesture.GestureLibraries;
+import android.gesture.GestureLibrary;
+import android.gesture.GestureOverlayView;
+import android.gesture.GestureOverlayView.OnGesturePerformedListener;
+import android.gesture.Prediction;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -17,18 +22,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
-import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.RatingValue;
 import com.xebia.xcoss.axcv.model.Session;
-import com.xebia.xcoss.axcv.ui.ActivitySwipeDetector;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.StringUtil;
@@ -36,24 +38,28 @@ import com.xebia.xcoss.axcv.ui.SwipeActivity;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 
-public class CVSessionView extends BaseActivity implements SwipeActivity {
+public class CVSessionView extends BaseActivity implements OnGesturePerformedListener {
 
 	private Session currentSession;
+	private GestureLibrary mLibrary;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.session);
-		
-		ActivitySwipeDetector activitySwipeDetector = new ActivitySwipeDetector(this);
-		RelativeLayout lowestLayout = (RelativeLayout) this.findViewById(R.id.relativeLayoutLowest);
-		lowestLayout.setOnTouchListener(activitySwipeDetector);
+		mLibrary = GestureLibraries.fromRawResource(this, R.raw.swipegestures);
+        if (!mLibrary.load()) {
+        	finish();
+        }
+        Log.i(XCS.LOG.SWIPE, "mLibrary.getGestureEntries()" + mLibrary.getGestureEntries().size());
 
+        GestureOverlayView gestures = (GestureOverlayView) findViewById(R.id.swipegestures);
+        gestures.addOnGesturePerformedListener(this);
+        
 		Conference conference = getConference();
 		currentSession = getSession(conference);
 
 		fill(conference, currentSession);
-//		view2.setText(server.getRemarks(session));
 		super.onCreate(savedInstanceState);
 	}
 
@@ -256,7 +262,6 @@ public class CVSessionView extends BaseActivity implements SwipeActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
 	public void onSwipeBottomToTop() {		
 		SortedSet<Session> sessionsSet = this.getConference().getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet); 
@@ -267,18 +272,15 @@ public class CVSessionView extends BaseActivity implements SwipeActivity {
 		}
 	}
 
-	@Override
 	public void onSwipeLeftToRight() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void onSwipeRightToLeft() {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
 	public void onSwipeTopToBottom() {
 		SortedSet<Session> sessionsSet = this.getConference().getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet); 
@@ -286,6 +288,29 @@ public class CVSessionView extends BaseActivity implements SwipeActivity {
 		if (index > 0) {
 			currentSession = sessions.get(--index);
 			fill(this.getConference(), currentSession);
+		}
+	}
+
+	public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
+		ArrayList<Prediction> predictions = mLibrary.recognize(gesture);
+		Log.i(XCS.LOG.SWIPE, "predictions.size=" + predictions.size());
+		if (predictions.size() > 0) {
+			if (predictions.get(0).score > 1.0) {
+				String action = predictions.get(0).name;
+				if ("onSwipeBottomToTop".equals(action)) {
+					Log.i(XCS.LOG.SWIPE, "onSwipeBottomToTop!");
+					this.onSwipeBottomToTop();
+				} else if ("onSwipeTopToBottom".equals(action)) {
+					Log.i(XCS.LOG.SWIPE, "onSwipeTopToBottom!");
+					this.onSwipeTopToBottom();
+				} else if ("onSwipeRightToLeft".equals(action)) {
+					Log.i(XCS.LOG.SWIPE, "onSwipeRightToLeft!");
+					this.onSwipeRightToLeft();
+				} else if ("onSwipeLeftToRight".equals(action)) {
+					Log.i(XCS.LOG.SWIPE, "onSwipeLeftToRight!");
+					this.onSwipeLeftToRight();
+				}
+			}
 		}
 	}
 }
