@@ -5,43 +5,21 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 import com.mongodb.{Mongo, MongoOptions, ServerAddress}
 import net.liftweb._
-import json.ext.JodaTimeSerializers
 import mongodb._
 import org.bson.types.ObjectId
 import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 import org.joda.time.DateTime
-
-object Conference extends MongoDocumentMeta[Conference] {
-  override def collectionName = "confs"
-
-  override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
-}
-
-case class Conference(_id: ObjectId, name: String, date: DateTime, session: List[SessionInfo]) extends MongoDocument[Conference] {
-  def meta = Conference
-
-}
-case class SessionInfo(title: String, presenter:String, slots: List[Slot], sessionRef:Option[ObjectId] = None)
-
-case class Slot(start: DateTime, end: DateTime, location: Location)
-
-case class Location(name: String, capacity: Int)
-
-object Session extends MongoDocumentMeta[Session] {
-  override def collectionName = "session"
-  override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
-}
-
-//, rating:Option[List[Int]]
-case class Session(_id: ObjectId, title: String, presenter:String, descr:String) extends MongoDocument[Session] {
-  def meta = Session
-
-}
-
+import com.xebia.model._
+import com.xebia.model.domain._
 
 
 @RunWith(classOf[JUnitRunner])
 class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAfterEach {
+
+  val l1 = Location("Maup", 20)
+  val l2 = Location("Laap", 30)
+  val xkeStartDate = new DateTime().plusDays(3)
+
   override def beforeEach() {
     val srvr = new ServerAddress("127.0.0.1", 27017)
     val mo = new MongoOptions
@@ -50,31 +28,58 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
     MongoDB.defineDb(DefaultMongoIdentifier, new Mongo(srvr, mo), "xkeng")
   }
 
-  it should "save a converence correctly" in {
-    val sess1 = Session(ObjectId.get, "Scala rocks even more",  "upeter@xebia.com", "Scala is a scalable programming language"  )
+  private def createTestConference() = {
+    val sess1 = Session(ObjectId.get, "Scala rocks even more", "upeter@xebia.com", "Scala is a scalable programming language")
     sess1.save
-
-    val xkeStartDate = new DateTime().plusDays(3)
-    val l1 = Location("Maup", 20)
-    val l2 = Location("Laap", 30)
-    val s1 = SessionInfo("Mongo rocks", "amooi@xebia.com", Slot(xkeStartDate, xkeStartDate.plusMinutes(60), l1) :: Nil)
-    val s2 = SessionInfo("Scala rocks even more", "upeter@xebia.com", Slot(xkeStartDate, xkeStartDate.plusMinutes(60), l2) :: Nil, Some(sess1._id))
-
-    val c = Conference(ObjectId.get, "XKE", xkeStartDate, s1 :: s2 :: Nil)
-
-    c._id
+    val s1 = Slot(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "amooi@xebia.com", None)
+    val s2 = Slot(xkeStartDate, xkeStartDate.plusMinutes(60), l2, "Scala rocks even more", "upeter@xebia.com", Some(sess1._id))
+    val c = Conference(ObjectId.get, "XKE", xkeStartDate, List(s1, s2), List(l1, l2))
     c.save
-    val pFromDb = Conference.find(c._id)
-    println(pFromDb)
+    (sess1, s1, s2, c)
+
+  }
+
+
+  it should "save a converence correctly" in {
+    val (sess1, s1, s2, c) = createTestConference()
+
+    var pFromDb = Conference.find(c._id)
     pFromDb should not be (None)
     pFromDb.get._id should be(c._id)
 
-    val sRef = pFromDb.get.session.filter(_.sessionRef != None).head.sessionRef.get
+    val sRef = pFromDb.get.slots.filter(_.sessionRef != None).head.sessionRef.get
     val sFromDb = Session.find(sRef)
-    println(sFromDb)
 
     sFromDb should not be (None)
     sFromDb.get._id should be(sRef)
+
+    c.delete
+    sess1.delete
+  }
+
+
+  it should "add and remove a slot correctly" in {
+    val (sess1, s1, s2, cOriginal) = createTestConference()
+
+    var cFromDb = Conference.find(cOriginal._id)
+    cFromDb should not be (None)
+    var c = cFromDb.get
+    c - s1
+    c.save
+
+    cFromDb = Conference.find(c._id)
+    cFromDb should not be (None)
+    c = cFromDb.get
+    c.slots.size should be(1)
+
+    c + Slot(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Git rocks", "amooi@xebia.com", None)
+    c.save
+
+    cFromDb = Conference.find(c._id)
+    c = cFromDb.get
+    c.slots.size should be(2)
+    c.slots(0).location should not be(None)
+
     c.delete
     sess1.delete
   }
