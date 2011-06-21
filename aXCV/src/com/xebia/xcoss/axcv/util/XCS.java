@@ -48,6 +48,7 @@ public class XCS {
 		public static final String NAVIGATE = "XCS";
 		public static final String COMMUNICATE = "XCS";
 		public static final String CACHE = "XCS";
+		public static final String SWIPE = "XCS";
 	}
 
 	public static class MENU {

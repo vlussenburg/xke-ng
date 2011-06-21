@@ -1,13 +1,17 @@
 package com.xebia.xcoss.axcv.ui;
 
+import android.view.WindowManager;
+
 
 public interface SwipeActivity {
 
-	public void bottomToUpSwipe();
+	public void onSwipeBottomToTop();
 
-	public void leftToRightSwipe();
+	public void onSwipeLeftToRight();
 
-	public void rightToLeftSwipe();
+	public void onSwipeRightToLeft();
 
-	public void upToBottomSwipe();
+	public void onSwipeTopToBottom();
+	
+	public WindowManager getWindowManager();
 }

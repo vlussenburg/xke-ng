@@ -5,6 +5,7 @@ import java.util.SortedSet;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -47,7 +48,6 @@ public class CVSessionView extends BaseActivity implements SwipeActivity {
 		ActivitySwipeDetector activitySwipeDetector = new ActivitySwipeDetector(this);
 		RelativeLayout lowestLayout = (RelativeLayout) this.findViewById(R.id.relativeLayoutLowest);
 		lowestLayout.setOnTouchListener(activitySwipeDetector);
-
 
 		Conference conference = getConference();
 		currentSession = getSession(conference);
@@ -131,28 +131,28 @@ public class CVSessionView extends BaseActivity implements SwipeActivity {
 		im.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
-				Toast.makeText(CVSessionView.this, "Slide previous location", Toast.LENGTH_SHORT).show();
+				onSwipeLeftToRight();
 			}
 		});
 		im = (ImageView) findViewById(R.id.slideLocationPlus);
 		im.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
-				Toast.makeText(CVSessionView.this, "Slide next location", Toast.LENGTH_SHORT).show();
+				onSwipeRightToLeft();
 			}
 		});
 		im = (ImageView) findViewById(R.id.slideTimeMin);
 		im.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
-				Toast.makeText(CVSessionView.this, "Slide previous session", Toast.LENGTH_SHORT).show();
+				onSwipeTopToBottom();
 			}
 		});
 		im = (ImageView) findViewById(R.id.slideTimePlus);
 		im.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
-				Toast.makeText(CVSessionView.this, "Slide next session", Toast.LENGTH_SHORT).show();
+				onSwipeBottomToTop();
 			}
 		});
 		
@@ -257,7 +257,7 @@ public class CVSessionView extends BaseActivity implements SwipeActivity {
 	}
 
 	@Override
-	public void bottomToUpSwipe() {		
+	public void onSwipeBottomToTop() {		
 		SortedSet<Session> sessionsSet = this.getConference().getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet); 
 		int index = sessions.indexOf(currentSession);
@@ -268,19 +268,18 @@ public class CVSessionView extends BaseActivity implements SwipeActivity {
 	}
 
 	@Override
-	public void leftToRightSwipe() {
+	public void onSwipeLeftToRight() {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void rightToLeftSwipe() {
+	public void onSwipeRightToLeft() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
-	public void upToBottomSwipe() {
+	public void onSwipeTopToBottom() {
 		SortedSet<Session> sessionsSet = this.getConference().getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet); 
 		int index = sessions.indexOf(currentSession);
