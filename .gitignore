@@ -5,13 +5,15 @@ aXCV/bin
 xke-ng-web/lib_managed
 xke-ng-web/project
 xke-ng-web/target/
-xke-ng-web/.classpath
 xke-ng-web/.idea/
-xke-ng-web/.project
-xke-ng-web/.settings/
 xke-ng-web/ng-rest.iml
+xke-ng-web/ng-rest.ipr
+xke-ng-web/ng-rest.iws
 
 MockServer/tmp
-MockServer/.classpath
-MockServer/.project
 MockServer/logs/
+
+.classpath
+.project
+.DS_Store
+.settings
