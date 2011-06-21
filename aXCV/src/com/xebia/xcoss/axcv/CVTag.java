@@ -26,6 +26,8 @@ public class CVTag extends BaseActivity {
 	private List<Object> searchResults;
 	private SearchResultAdapter searchAdapter;
 
+	// TODO Use baseclass
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -78,11 +80,9 @@ public class CVTag extends BaseActivity {
 		}
 		if (selected instanceof Author) {
 			Author author = (Author) selected;
-			createDialog("Author selection", "No implementation on click of '"+author.getName()+"'").show();
-			// TODO AUthor view
-			// Intent intent = new Intent(this, CVAuthorView.class);
-			// intent.putExtra(BaseActivity.IA_AUTHOR, author.getUserId());
-			// startActivity(intent);
+			Intent intent = new Intent(this, CVAuthor.class);
+			intent.putExtra(BaseActivity.IA_AUTHOR, author.getUserId());
+			startActivity(intent);
 			return;
 		}
 	}

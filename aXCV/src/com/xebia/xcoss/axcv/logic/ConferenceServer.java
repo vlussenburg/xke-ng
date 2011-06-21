@@ -5,7 +5,9 @@ import hirondelle.date4j.DateTime.Unit;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import android.util.Log;
 
@@ -254,6 +256,16 @@ public class ConferenceServer {
 			return new String[0];
 		}
 		return result.toArray(new String[result.size()]);
+	}
+	
+	public List<String> getLabels(Author author) {
+		// TODO Include author in the search
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/labels");
+
+		Type collectionType = new TypeToken<List<String>>() {}.getType();
+		return RestClient.loadCollection(requestUrl.toString(), collectionType);
 	}
 
 	public void createLabel(String name) {

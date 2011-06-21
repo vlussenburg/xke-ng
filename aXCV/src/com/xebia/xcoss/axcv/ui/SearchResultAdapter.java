@@ -86,16 +86,14 @@ public class SearchResultAdapter extends BaseAdapter {
 		ratingView.setText(FormatUtil.getText(rate));
 	}
 
-	public void createAuthorView(View row, Author author) {
-
-		int colorId = ctx.getResources().getColor(R.color.tc_itemdefault);
+	// TODO Move to helper class
+	public static void createAuthorView(View row, Author author) {
 
 		TextView nameView = (TextView) row.findViewById(R.id.author_name);
 		TextView mailView = (TextView) row.findViewById(R.id.author_mail);
 		TextView phoneView = (TextView) row.findViewById(R.id.author_phone);
 
 		nameView.setText(author.getName());
-		nameView.setTextColor(colorId);
 		mailView.setText(author.getMail());
 		phoneView.setText(author.getPhone());
 

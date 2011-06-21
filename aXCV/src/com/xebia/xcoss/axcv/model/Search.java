@@ -8,6 +8,7 @@ public class Search {
 	public enum Field {
 		FREETEXT,
 		NAME,
+		AUTHOR,
 		MAIL,
 	}
 	
@@ -19,6 +20,10 @@ public class Search {
 
 	public void onFreeText(String text) {
 		searchParms.put(Field.FREETEXT, text);
+	}
+
+	public void onAuthor(Author author) {
+		searchParms.put(Field.AUTHOR, author.getUserId());
 	}
 
 }
