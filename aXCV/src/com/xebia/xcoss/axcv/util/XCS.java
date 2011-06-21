@@ -18,7 +18,12 @@ public class XCS {
 	
 	public static class TAG {
 		public static final String LINK = "tag://xebia/";
-		public static final Pattern PATTERN = Pattern.compile("[a-zA-Z]+");
+		public static final Pattern PATTERN = Pattern.compile("[\\w]+");
+	}
+
+	public static class AUTHOR {
+		public static final String LINK = "author://xebia/";
+		public static final Pattern PATTERN = Pattern.compile("[\\w\\s]+");
 	}
 
 	public static class DIALOG {

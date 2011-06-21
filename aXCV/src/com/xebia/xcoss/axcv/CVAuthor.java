@@ -23,6 +23,7 @@ import com.xebia.xcoss.axcv.model.Search;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.SearchResultAdapter;
+import com.xebia.xcoss.axcv.ui.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class CVAuthor extends BaseActivity {
@@ -39,13 +40,27 @@ public class CVAuthor extends BaseActivity {
 		Author author = null;
 		String authorId = getIntent().getExtras().getString(IA_AUTHOR);
 		Author[] authors = getConferenceServer().getAllAuthors();
-		for (int i = 0; i < authors.length; i++) {
-			if (authorId.equals(authors[i].getUserId())) {
-				Log.v("XCS", "Match (" + authorId + "):" + authors[i].getUserId());
-				author = authors[i];
-				break;
+		if (StringUtil.isEmpty(authorId)) {
+			// From link
+			String authorName = getIntent().getDataString().replace(XCS.AUTHOR.LINK, "").trim();
+			Log.v("XCS", "From link (" + getIntent().getDataString() + "):" + authorName);
+			for (int i = 0; i < authors.length; i++) {
+				if (authorName.equals(authors[i].getName())) {
+					Log.v("XCS", "Match (" + authorName + "):" + authors[i].getName());
+					author = authors[i];
+					break;
+				}
+				Log.v("XCS", "No match (" + authorName + "):" + authors[i].getName());
 			}
-			Log.v("XCS", "No match (" + authorId + "):" + authors[i].getUserId());
+		} else {
+			for (int i = 0; i < authors.length; i++) {
+				if (authorId.equals(authors[i].getUserId())) {
+					Log.v("XCS", "Match (" + authorId + "):" + authors[i].getUserId());
+					author = authors[i];
+					break;
+				}
+				Log.v("XCS", "No match (" + authorId + "):" + authors[i].getUserId());
+			}
 		}
 		Search search = new Search();
 		search.onAuthor(author);
@@ -65,8 +80,8 @@ public class CVAuthor extends BaseActivity {
 			}
 		});
 
-//		TextView view = (TextView) findViewById(R.id.av_name);
-//		view.setText(author.getName());
+		// TextView view = (TextView) findViewById(R.id.av_name);
+		// view.setText(author.getName());
 		TextView view = (TextView) findViewById(R.id.av_labels);
 		HashSet<String> labels = new HashSet<String>();
 		labels.addAll(getConferenceServer().getLabels(author));

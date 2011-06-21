@@ -12,7 +12,18 @@
            "description": "Maupertuus",
            "id": "711",
            "standard": "true"
-	}
+	},
+	"authors" :[  {
+	    "userId":"marnix",
+	    "mail":"info@xebia.com",
+	    "name":"Marnix van Wendel de Joode"
+	  },
+	  {
+	    "userId":"gschoonheim",
+	    "mail":"info@xebia.com",
+	    "name":"Guido Schoonheim"
+	  }
+	]
   },
   {
     "title":"Diner break",
