@@ -93,6 +93,8 @@ public class CVSessionView extends BaseActivity implements SwipeActivity {
 		TextView labelView = (TextView) findViewById(R.id.scLabels);
 		Linkify.addLinks(labelView, XCS.TAG.PATTERN, XCS.TAG.LINK);
 
+		Linkify.addLinks(sessionAuthor, XCS.AUTHOR.PATTERN, XCS.AUTHOR.LINK);
+		
 		ConferenceServer server = getConferenceServer();
 
 		OnClickListener lRate = new OnClickListener() {

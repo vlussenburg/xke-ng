@@ -47,8 +47,7 @@ public class GsonDateTimeAdapter implements JsonSerializer<DateTime>, JsonDeseri
 
 	@Override
 	public JsonElement serialize(DateTime dt, Type type, JsonSerializationContext ctx) {
-		String value = dt.format("YYYY-MM-DDThh:mm:ss.fffZ");
+		String value = dt.format("YYYY-MM-DD|T|hh:mm:ss.fff|Z|");
 		return new JsonPrimitive(value);
 	}
-
 }
