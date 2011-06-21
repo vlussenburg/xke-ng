@@ -62,5 +62,14 @@
 			android:name="CVSearch"
 			android:theme="@android:style/Theme.NoTitleBar">
 		</activity>
+		<activity
+			android:name="CVTag"
+			android:theme="@android:style/Theme.NoTitleBar">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<data android:scheme="tag" android:host="xebia" />
+			</intent-filter>
+		</activity>
 	</application>
 </manifest>

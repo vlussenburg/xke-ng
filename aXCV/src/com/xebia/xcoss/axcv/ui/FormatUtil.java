@@ -31,6 +31,10 @@ public class FormatUtil {
 	}
 
 	public static <T> String getList(Set<T> data) {
+		return getList(data, true);
+	}
+
+	public static <T> String getList(Set<T> data, boolean emptyIndication) {
 		if ( data == null ) {
 			return null;
 		}
@@ -42,7 +46,7 @@ public class FormatUtil {
 		if ( sb.length() > 0 ) {
 			return sb.substring(0, sb.length()-2);
 		}
-		return "<None>";
+		return emptyIndication ? "<None>" : "";
 	}
 
 	public static CharSequence getText(String value) {

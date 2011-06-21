@@ -1,6 +1,7 @@
 package com.xebia.xcoss.axcv.ui;
 
 import android.content.Intent;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.CVSessionAdd;
 import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class SessionAdapter extends BaseAdapter {
@@ -61,20 +63,23 @@ public class SessionAdapter extends BaseAdapter {
 
 		titleView.setText(session.getTitle());
 		titleView.setTextColor(colorId);
-//			titleView.setTypeface(titleView.getTypeface(), Typeface.BOLD);
 
-		String authors = FormatUtil.getList(session.getAuthors());
+		String authors = FormatUtil.getList(session.getAuthors(), false);
 		if ( StringUtil.isEmpty(authors) ) {
 			authorView.setVisibility(View.GONE);
+			row.findViewById(R.id.ses_author_label).setVisibility(View.GONE);
 		} else {
-			authorView.setText("Author: " + authors);
+			authorView.setText(authors);
 		}
 
-		String labels = FormatUtil.getList(session.getLabels());
+		String labels = FormatUtil.getList(session.getLabels(), false);
 		if ( StringUtil.isEmpty(labels) ) {
 			labelView.setVisibility(View.GONE);
+			row.findViewById(R.id.ses_labels_label).setVisibility(View.GONE);
 		} else {
-			labelView.setText("Labels: " + labels);
+			labelView.setText(labels);
+			Linkify.addLinks(labelView, XCS.TAG.PATTERN, XCS.TAG.LINK);
+			labelView.setFocusable(false);
 		}
 		
 		locDateView.setText(getLocationAndDate(session));

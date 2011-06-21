@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -19,20 +19,27 @@ import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Search;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.ui.SearchResultAdapter;
-import com.xebia.xcoss.axcv.ui.StringUtil;
+import com.xebia.xcoss.axcv.util.XCS;
 
-public class CVSearch extends BaseActivity {
+public class CVTag extends BaseActivity {
 
 	private List<Object> searchResults;
 	private SearchResultAdapter searchAdapter;
-	private ImageView searchButton;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.search);
 
+		String tag = getIntent().getDataString().replace(XCS.TAG.LINK, "");
+
+		Search search = new Search();
+		search.onFreeText(tag.trim());
+		// TODO Try/catch handle CommException
+
 		searchResults = new ArrayList<Object>();
+		searchResults.addAll(getConferenceServer().searchSessions(search));
+		searchResults.addAll(getConferenceServer().searchAuthors(search));
 
 		searchAdapter = new SearchResultAdapter(this, searchResults);
 		searchAdapter.addType(Session.class, R.layout.session_item_small);
@@ -46,36 +53,13 @@ public class CVSearch extends BaseActivity {
 			}
 		});
 
-		searchButton = (ImageView) findViewById(R.id.searchAction);
-		searchButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View paramView) {
-				searchResults.clear();
-				String text = ((TextView) findViewById(R.id.searchTerm)).getText().toString();
-				if (!StringUtil.isEmpty(text)) {
-					Search search = new Search();
-					search.onFreeText(text.trim());
-					// TODO Try/catch handle CommException
+		// Specific for tags
+		findViewById(R.id.searchBlock).setVisibility(View.GONE);
+		findViewById(R.id.firstDivider).setVisibility(View.GONE);
 
-					searchResults.addAll(getConferenceServer().searchSessions(search));
-					searchResults.addAll(getConferenceServer().searchAuthors(search));
-				}
-				searchAdapter.notifyDataSetChanged();
-			}
-		});
-
-		TextView input = (TextView) findViewById(R.id.searchTerm);
-		input.setOnKeyListener(new View.OnKeyListener() {
-			@Override
-			public boolean onKey(View view, int keyCode, KeyEvent event) {
-				if (keyCode == KeyEvent.KEYCODE_ENTER) {
-					searchButton.performClick();
-					return true;
-				}
-				return false;
-			}
-
-		});
+		TextView view = (TextView) findViewById(R.id.searchTitle);
+		view.setText(tag);
+		
 		super.onCreate(savedInstanceState);
 	}
 

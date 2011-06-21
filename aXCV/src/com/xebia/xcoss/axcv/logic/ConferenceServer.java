@@ -284,7 +284,6 @@ public class ConferenceServer {
 		requestUrl.append("/search/sessions");
 
 		List<Session> result = RestClient.searchObjects(requestUrl.toString(), "sessions", Session.class, search);
-		System.out.println("Sessions returned: " + result);
 		if (result == null) {
 			return new ArrayList<Session>();
 		}

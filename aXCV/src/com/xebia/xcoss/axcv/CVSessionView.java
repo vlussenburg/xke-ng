@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -68,10 +69,13 @@ public class CVSessionView extends BaseActivity {
 
 		// Optional fields (hide when not available)
 		updateTextField(R.id.scAudience, R.id.scAudienceLabel, session.getIntendedAudience());
-		updateTextField(R.id.scLabels, R.id.scLabelsLabel, FormatUtil.getList(session.getLabels()));
+		updateTextField(R.id.scLabels, R.id.scLabelsLabel, FormatUtil.getList(session.getLabels(), false));
 		updateTextField(R.id.scLanguage, R.id.scLanguageLabel, FormatUtil.getList(session.getLanguages()));
 		updateTextField(R.id.scLimit, R.id.scLimitLabel, session.getLimit());
 		updateTextField(R.id.scPreparation, R.id.scPreparationLabel, session.getPreparation());
+
+		TextView labelView = (TextView) findViewById(R.id.scLabels);
+		Linkify.addLinks(labelView, XCS.TAG.PATTERN, XCS.TAG.LINK);
 
 		ConferenceServer server = getConferenceServer();
 

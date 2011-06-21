@@ -8,8 +8,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import android.util.Log;
+
 import com.google.gson.annotations.SerializedName;
 import com.xebia.xcoss.axcv.ui.StringUtil;
+import com.xebia.xcoss.axcv.util.XCS;
 
 public class Session implements Serializable {
 
@@ -189,7 +192,7 @@ public class Session implements Serializable {
 		if (id == 0) {
 			this.type = type;
 		} else {
-			System.err.println("Could not set type to "+type+", id = " + id);
+			Log.w(XCS.LOG.PROPERTIES, "Could not set type to "+type+", id = " + id);
 		}
 	}
 

@@ -51,8 +51,7 @@
 		android:background="@color/linebreak" />
 	<LinearLayout
 		android:layout_width="fill_parent"
-		android:id="@+id/linearLayout1"
-		android:layout_height="wrap_content">
+		android:layout_height="wrap_content" android:id="@+id/searchBlock">
 		<AutoCompleteTextView
 			android:layout_weight="1"
 			android:layout_width="wrap_content"

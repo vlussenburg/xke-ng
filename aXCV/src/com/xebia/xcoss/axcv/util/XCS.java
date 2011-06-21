@@ -1,6 +1,7 @@
 package com.xebia.xcoss.axcv.util;
 
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 import android.view.Menu;
 
@@ -10,11 +11,17 @@ public class XCS {
 
 	public static final TimeZone TZ = TimeZone.getDefault();
 
-	public class SETTING {
+
+	public static class SETTING {
 		public static final String URL = "http://10.0.2.2:9000";
 	}
+	
+	public static class TAG {
+		public static final String LINK = "tag://xebia/";
+		public static final Pattern PATTERN = Pattern.compile("[a-zA-Z]+");
+	}
 
-	public class DIALOG {
+	public static class DIALOG {
 		public static final int ADD_RATING        = DIALOGID;
 		public static final int CREATE_REVIEW     = DIALOGID + 1;
 		public static final int CONNECT_FAILED    = DIALOGID + 2;
@@ -34,7 +41,7 @@ public class XCS {
 		public static final int INPUT_TYPE        = DIALOGID + 16;
 	}
 	
-	public class LOG {
+	public static class LOG {
 		public static final String SECURITY = "XCS";
 		public static final String PROPERTIES = "XCS";
 		public static final String ALL = "XCS";
@@ -43,7 +50,7 @@ public class XCS {
 		public static final String CACHE = "XCS";
 	}
 
-	public class MENU {
+	public static class MENU {
 		public static final int SETTINGS = Menu.FIRST;
 		public static final int SEARCH   = Menu.FIRST+1;
 		public static final int OVERVIEW = Menu.FIRST+2;

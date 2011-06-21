@@ -152,7 +152,6 @@ public abstract class BaseActivity extends Activity {
 		}
 		catch (Exception e) {
 			Log.w(LOG.ALL, "No session with ID " + identifier + " or conference not found.");
-			e.printStackTrace();
 		}
 		if (session == null && useDefault) {
 			Log.w(LOG.ALL, "Conference default : " + (conference == null ? "NULL" : conference.getTitle()));

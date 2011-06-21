@@ -46,7 +46,6 @@ public class ConferenceStatus {
 		}
 		catch (Exception e) {
 			Log.e(LOG.ALL, "Status fail: " + e.getMessage());
-			e.printStackTrace();
 		}
 		return "";
 	}

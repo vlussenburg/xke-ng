@@ -1,10 +1,12 @@
 package com.xebia.xcoss.axcv;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.webkit.MimeTypeMap;
 
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -21,6 +23,7 @@ public class CVSplashLoader extends BaseActivity {
 			DataRetriever task = new DataRetriever(this);
 			task.execute();
 		}
+
 		super.onCreate(savedInstanceState);
 	}
 
@@ -41,7 +44,7 @@ public class CVSplashLoader extends BaseActivity {
 		getIntent().fillIn(intent, Intent.FILL_IN_DATA);
 		super.onNewIntent(intent);
 	}
-	
+
 	@Override
 	protected void onRestart() {
 		// When revived, check for an exit code
