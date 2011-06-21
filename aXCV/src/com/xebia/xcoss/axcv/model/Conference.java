@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import android.util.Log;
@@ -38,7 +39,7 @@ public class Conference implements Serializable {
 	private DateTime startTime = DateTime.forTimeOnly(16, 0, 0, 0);
 	private DateTime endTime = DateTime.forTimeOnly(21, 0, 0, 0);
 	private Set<Location> locations;
-	private transient Set<Session> sessions;
+	private transient SortedSet<Session> sessions;
 
 	public Conference() {
 		resetSessions();
@@ -67,7 +68,7 @@ public class Conference implements Serializable {
 		return id;
 	}
 
-	public Set<Session> getSessions() {
+	public SortedSet<Session> getSessions() {
 		if (sessions.isEmpty()) {
 			try {
 				List<Session> list = ConferenceServer.getInstance().getSessions(this);

@@ -1,5 +1,8 @@
 package com.xebia.xcoss.axcv;
 
+import java.util.ArrayList;
+import java.util.SortedSet;
+
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +16,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -23,25 +27,37 @@ import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.RatingValue;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.ui.ActivitySwipeDetector;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.StringUtil;
+import com.xebia.xcoss.axcv.ui.SwipeActivity;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 
-public class CVSessionView extends BaseActivity {
+public class CVSessionView extends BaseActivity implements SwipeActivity {
 
-	private Conference conference;
-	private Session session;
+	private Session currentSession;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.session);
+		
+		ActivitySwipeDetector activitySwipeDetector = new ActivitySwipeDetector(this);
+		RelativeLayout lowestLayout = (RelativeLayout) this.findViewById(R.id.relativeLayoutLowest);
+		lowestLayout.setOnTouchListener(activitySwipeDetector);
 
-		conference = getConference();
-		session = getSession(conference);
 
+		Conference conference = getConference();
+		currentSession = getSession(conference);
+
+		fill(conference, currentSession);
+//		view2.setText(server.getRemarks(session));
+		super.onCreate(savedInstanceState);
+	}
+
+	private void fill(Conference conference, Session session) {
 		TextView title = (TextView) findViewById(R.id.conferenceTitle);
 		title.setText(conference.getTitle());
 
@@ -139,7 +155,7 @@ public class CVSessionView extends BaseActivity {
 				Toast.makeText(CVSessionView.this, "Slide next session", Toast.LENGTH_SHORT).show();
 			}
 		});
-		super.onCreate(savedInstanceState);
+		
 	}
 
 	@Override
@@ -151,7 +167,7 @@ public class CVSessionView extends BaseActivity {
 				dialog.setContentView(R.layout.dialog_rating);
 				dialog.setTitle("Your rating");
 				TextView text = (TextView) dialog.findViewById(R.id.drSessionTitle);
-				text.setText(session.getTitle());
+				text.setText(currentSession.getTitle());
 
 				Button submit = (Button) dialog.findViewById(R.id.drSubmit);
 				final SeekBar seekbar = (SeekBar) dialog.findViewById(R.id.drSessionRate);
@@ -163,7 +179,7 @@ public class CVSessionView extends BaseActivity {
 					@Override
 					public void onClick(View paramView) {
 						int rate = 1 + seekbar.getProgress();
-						getConferenceServer().registerRate(session, rate);
+						getConferenceServer().registerRate(currentSession, rate);
 						dismissDialog(XCS.DIALOG.ADD_RATING);
 					}
 				});
@@ -188,7 +204,7 @@ public class CVSessionView extends BaseActivity {
 				dialog.setContentView(R.layout.dialog_review);
 				dialog.setTitle("Your remark");
 				text = (TextView) dialog.findViewById(R.id.dvSessionTitle);
-				text.setText(session.getTitle());
+				text.setText(currentSession.getTitle());
 
 				submit = (Button) dialog.findViewById(R.id.dvSubmit);
 				final TextView edit = (TextView) dialog.findViewById(R.id.dvEditText);
@@ -226,17 +242,51 @@ public class CVSessionView extends BaseActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Add or edit a session
 		Intent intent = new Intent(this, CVSessionAdd.class);
-		intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
+		intent.putExtra(BaseActivity.IA_CONFERENCE, getConference().getId());
 
 		if (item.getItemId() == XCS.MENU.ADD) {
 			startActivity(intent);
 			return true;
 		}
 		if (item.getItemId() == XCS.MENU.EDIT) {
-			intent.putExtra(BaseActivity.IA_SESSION, session.getId());
+			intent.putExtra(BaseActivity.IA_SESSION, currentSession.getId());
 			startActivity(intent);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void bottomToUpSwipe() {		
+		SortedSet<Session> sessionsSet = this.getConference().getSessions();
+		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet); 
+		int index = sessions.indexOf(currentSession);
+		if (index < sessions.size() -1) {
+			currentSession = sessions.get(++index);
+			fill(this.getConference(), currentSession);
+		}
+	}
+
+	@Override
+	public void leftToRightSwipe() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void rightToLeftSwipe() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void upToBottomSwipe() {
+		SortedSet<Session> sessionsSet = this.getConference().getSessions();
+		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet); 
+		int index = sessions.indexOf(currentSession);
+		if (index > 0) {
+			currentSession = sessions.get(--index);
+			fill(this.getConference(), currentSession);
+		}
 	}
 }
