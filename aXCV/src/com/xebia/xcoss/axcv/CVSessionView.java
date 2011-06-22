@@ -5,12 +5,6 @@ import java.util.SortedSet;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.gesture.Gesture;
-import android.gesture.GestureLibraries;
-import android.gesture.GestureLibrary;
-import android.gesture.GestureOverlayView;
-import android.gesture.GestureOverlayView.OnGesturePerformedListener;
-import android.gesture.Prediction;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -37,24 +31,17 @@ import com.xebia.xcoss.axcv.ui.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 
-public class CVSessionView extends BaseActivity implements OnGesturePerformedListener {
+public class CVSessionView extends SwipeActivity {
 
 	private Session currentSession;
-	private GestureLibrary mLibrary;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.session);
-		mLibrary = GestureLibraries.fromRawResource(this, R.raw.swipegestures);
-        if (!mLibrary.load()) {
-        	finish();
-        }
-        Log.i(XCS.LOG.SWIPE, "mLibrary.getGestureEntries()" + mLibrary.getGestureEntries().size());
 
-        GestureOverlayView gestures = (GestureOverlayView) findViewById(R.id.swipegestures);
-        gestures.addOnGesturePerformedListener(this);
-        
+		addGestureDetection(R.id.relativeLayoutLowest);
+
 		Conference conference = getConference();
 		currentSession = getSession(conference);
 
@@ -97,9 +84,8 @@ public class CVSessionView extends BaseActivity implements OnGesturePerformedLis
 
 		TextView labelView = (TextView) findViewById(R.id.scLabels);
 		Linkify.addLinks(labelView, XCS.TAG.PATTERN, XCS.TAG.LINK);
-
 		Linkify.addLinks(sessionAuthor, XCS.AUTHOR.PATTERN, XCS.AUTHOR.LINK);
-		
+
 		ConferenceServer server = getConferenceServer();
 
 		OnClickListener lRate = new OnClickListener() {
@@ -131,7 +117,7 @@ public class CVSessionView extends BaseActivity implements OnGesturePerformedLis
 				Log.e(LOG.ALL, "Clicked on " + view);
 			}
 		});
-		
+
 		// Slide buttons
 		ImageView im;
 		im = (ImageView) findViewById(R.id.slideLocationMin);
@@ -162,7 +148,7 @@ public class CVSessionView extends BaseActivity implements OnGesturePerformedLis
 				onSwipeBottomToTop();
 			}
 		});
-		
+
 	}
 
 	@Override
@@ -190,16 +176,16 @@ public class CVSessionView extends BaseActivity implements OnGesturePerformedLis
 						dismissDialog(XCS.DIALOG.ADD_RATING);
 					}
 				});
-				
+
 				seekbar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 					@Override
 					public void onStopTrackingTouch(SeekBar paramSeekBar) {
 					}
-					
+
 					@Override
 					public void onStartTrackingTouch(SeekBar paramSeekBar) {
 					}
-					
+
 					@Override
 					public void onProgressChanged(SeekBar paramSeekBar, int paramInt, boolean paramBoolean) {
 						rateText.setText(RatingValue.message(paramInt));
@@ -263,55 +249,25 @@ public class CVSessionView extends BaseActivity implements OnGesturePerformedLis
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void onSwipeBottomToTop() {		
+	public void onSwipeBottomToTop() {
+		super.onSwipeBottomToTop();
 		SortedSet<Session> sessionsSet = this.getConference().getSessions();
-		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet); 
+		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
 		int index = sessions.indexOf(currentSession);
-		if (index < sessions.size() -1) {
+		if (index < sessions.size() - 1) {
 			currentSession = sessions.get(++index);
 			fill(this.getConference(), currentSession);
 		}
 	}
 
-	public void onSwipeLeftToRight() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void onSwipeRightToLeft() {
-		// TODO Auto-generated method stub
-	}
-
 	public void onSwipeTopToBottom() {
+		super.onSwipeTopToBottom();
 		SortedSet<Session> sessionsSet = this.getConference().getSessions();
-		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet); 
+		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
 		int index = sessions.indexOf(currentSession);
 		if (index > 0) {
 			currentSession = sessions.get(--index);
 			fill(this.getConference(), currentSession);
-		}
-	}
-
-	public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
-		ArrayList<Prediction> predictions = mLibrary.recognize(gesture);
-		Log.i(XCS.LOG.SWIPE, "predictions.size=" + predictions.size());
-		if (predictions.size() > 0) {
-			if (predictions.get(0).score > 1.0) {
-				String action = predictions.get(0).name;
-				if ("onSwipeBottomToTop".equals(action)) {
-					Log.i(XCS.LOG.SWIPE, "onSwipeBottomToTop!");
-					this.onSwipeBottomToTop();
-				} else if ("onSwipeTopToBottom".equals(action)) {
-					Log.i(XCS.LOG.SWIPE, "onSwipeTopToBottom!");
-					this.onSwipeTopToBottom();
-				} else if ("onSwipeRightToLeft".equals(action)) {
-					Log.i(XCS.LOG.SWIPE, "onSwipeRightToLeft!");
-					this.onSwipeRightToLeft();
-				} else if ("onSwipeLeftToRight".equals(action)) {
-					Log.i(XCS.LOG.SWIPE, "onSwipeLeftToRight!");
-					this.onSwipeLeftToRight();
-				}
-			}
 		}
 	}
 }

@@ -1,11 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.gesture.GestureOverlayView xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/swipegestures"
-	android:layout_width="fill_parent" 
-    android:layout_height="fill_parent"
-	android:gestureStrokeType="single"
-    android:eventsInterceptionEnabled="true"
-    android:orientation="horizontal">
 <RelativeLayout
 	android:id="@+id/relativeLayoutLowest"
 	android:layout_width="fill_parent"
@@ -116,22 +109,30 @@
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
 				android:src="@drawable/location_previous"
-				android:id="@+id/slideLocationMin" android:padding="1sp" android:layout_weight="1"></ImageView>
+				android:id="@+id/slideLocationMin"
+				android:padding="1sp"
+				android:layout_weight="1"></ImageView>
 			<ImageView
 				android:layout_height="wrap_content"
 				android:src="@drawable/time_previous"
 				android:layout_width="wrap_content"
-				android:id="@+id/slideTimeMin" android:padding="1sp" android:layout_weight="1"></ImageView>
+				android:id="@+id/slideTimeMin"
+				android:padding="1sp"
+				android:layout_weight="1"></ImageView>
 			<ImageView
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
 				android:src="@drawable/time_next"
-				android:id="@+id/slideTimePlus" android:padding="1sp" android:layout_weight="1"></ImageView>
+				android:id="@+id/slideTimePlus"
+				android:padding="1sp"
+				android:layout_weight="1"></ImageView>
 			<ImageView
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
 				android:src="@drawable/location_next"
-				android:id="@+id/slideLocationPlus" android:padding="1sp" android:layout_weight="1"></ImageView>
+				android:id="@+id/slideLocationPlus"
+				android:padding="1sp"
+				android:layout_weight="1"></ImageView>
 		</LinearLayout>
 	</LinearLayout>
 	<!-- Content part of the session -->
@@ -346,4 +347,3 @@
 		</LinearLayout>
 	</ScrollView>
 </RelativeLayout>
-</android.gesture.GestureOverlayView>

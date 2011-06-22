@@ -221,8 +221,8 @@ public class RestClient {
 
 	private static HttpClient getHttpClient() {
 		HttpParams httpParams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpParams, 1300);
-		HttpConnectionParams.setSoTimeout(httpParams, 1300);
+		HttpConnectionParams.setConnectionTimeout(httpParams, 2000);
+		HttpConnectionParams.setSoTimeout(httpParams, 2000);
 		return new DefaultHttpClient(httpParams);
 	}
 
