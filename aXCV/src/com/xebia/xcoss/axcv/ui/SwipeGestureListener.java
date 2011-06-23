@@ -19,7 +19,7 @@ public class SwipeGestureListener extends SimpleOnGestureListener {
 		swipeThresholdVelocity = vc.getScaledMinimumFlingVelocity();
 		activity = swipeable;
 	}
-
+	
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 		if (e1 == null || e2 == null) return false;
@@ -33,6 +33,7 @@ public class SwipeGestureListener extends SimpleOnGestureListener {
 					activity.onSwipeRightToLeft();
 				else
 					activity.onSwipeLeftToRight();
+				return true;
 			}
 		} else {
 			// Up/down swipe
@@ -41,6 +42,7 @@ public class SwipeGestureListener extends SimpleOnGestureListener {
 					activity.onSwipeBottomToTop();
 				else
 					activity.onSwipeTopToBottom();
+				return true;
 			}
 		}
 		return false;

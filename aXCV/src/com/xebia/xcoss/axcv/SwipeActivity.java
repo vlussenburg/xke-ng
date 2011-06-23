@@ -9,12 +9,13 @@ import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.ui.SwipeGestureListener;
 
-public class SwipeActivity extends BaseActivity {
+public abstract class SwipeActivity extends BaseActivity {
 
 	private GestureDetector gestureDetector;
 
 	protected void addGestureDetection(int viewId) {
 		gestureDetector = new GestureDetector(new SwipeGestureListener(this));
+		gestureDetector.setIsLongpressEnabled(false);
 		View.OnTouchListener gestureListener = new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent event) {
 				if (gestureDetector.onTouchEvent(event)) {
@@ -28,30 +29,24 @@ public class SwipeActivity extends BaseActivity {
 	}
 
 	private void assignGestureListener(ViewGroup group, OnTouchListener listener) {
+		group.setOnTouchListener(listener);
+		// This is needed to detect the swipe
+		group.setClickable(true);
 		int count = group.getChildCount();
 		for (int i = 0; i < count; i++) {
 			View child = group.getChildAt(i);
 			if (child instanceof ViewGroup) {
 				assignGestureListener((ViewGroup) child, listener);
+			} else {
+				child.setOnTouchListener(listener);
+				// Do not make the elements clickable. It shows (on texts)
+				// child.setClickable(true);
 			}
-			child.setOnTouchListener(listener);
 		}
-		group.setOnTouchListener(listener);
 	}
 
-	public void onSwipeBottomToTop() {
-		Toast.makeText(this, "Top Swipe", Toast.LENGTH_SHORT).show();
-	}
-
-	public void onSwipeLeftToRight() {
-		Toast.makeText(this, "Right Swipe", Toast.LENGTH_SHORT).show();
-	}
-
-	public void onSwipeRightToLeft() {
-		Toast.makeText(this, "Left Swipe", Toast.LENGTH_SHORT).show();
-	}
-
-	public void onSwipeTopToBottom() {
-		Toast.makeText(this, "Bottom Swipe", Toast.LENGTH_SHORT).show();
-	}
+	abstract public void onSwipeBottomToTop();
+	abstract public void onSwipeLeftToRight();
+	abstract public void onSwipeRightToLeft();
+	abstract public void onSwipeTopToBottom();
 }

@@ -1,15 +1,9 @@
 package com.xebia.xcoss.axcv.ui;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import android.opengl.Visibility;
-import android.text.Html;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -25,15 +19,13 @@ import com.xebia.xcoss.axcv.util.XCS;
 public class SearchResultAdapter extends BaseAdapter {
 
 	private BaseActivity ctx;
-	private List<Object> data;
+	private List<?> data;
 	private ScreenTimeUtil timeUtil;
-	private Map<Class<?>, Integer> classMapping;
 
-	public SearchResultAdapter(BaseActivity context, List<Object> data) {
+	public SearchResultAdapter(BaseActivity context, List<?> data) {
 		this.ctx = context;
 		this.data = data;
 		this.timeUtil = new ScreenTimeUtil(context);
-		this.classMapping = new HashMap<Class<?>, Integer>();
 	}
 
 	@Override
@@ -41,15 +33,18 @@ public class SearchResultAdapter extends BaseAdapter {
 
 		Object selected = getItem(paramInt);
 		LayoutInflater inflater = ctx.getLayoutInflater();
-		View row = inflater.inflate(classMapping.get(selected.getClass()), parent, false);
+		View row;
 
 		if (selected instanceof Author) {
+			row = inflater.inflate(R.layout.author_item, parent, false);
 			createAuthorView(row, (Author) selected);
-		}
-		if (selected instanceof Session) {
+		} else if (selected instanceof Session) {
+			row = inflater.inflate(R.layout.session_item_small, parent, false);
 			createSessionView(row, (Session) selected);
+		} else {
+			row = inflater.inflate(R.layout.text_item, parent, false);
+			createTextView(row, selected);
 		}
-
 		return row;
 	}
 
@@ -67,7 +62,7 @@ public class SearchResultAdapter extends BaseAdapter {
 
 		String list = FormatUtil.getList(session.getLabels(), false);
 		labelView.setText(list);
-		if ( StringUtil.isEmpty(list) ) {
+		if (StringUtil.isEmpty(list)) {
 			row.findViewById(R.id.ses_separator).setVisibility(View.GONE);
 		} else {
 			Linkify.addLinks(labelView, XCS.TAG.PATTERN, XCS.TAG.LINK);
@@ -75,7 +70,7 @@ public class SearchResultAdapter extends BaseAdapter {
 			// If linkified without, the list item will not be clickable any more...
 			labelView.setFocusable(false);
 		}
-		if ( session.getDate() == null ) {
+		if (session.getDate() == null) {
 			row.findViewById(R.id.ses_separator).setVisibility(View.GONE);
 			dateView.setVisibility(View.GONE);
 		} else {
@@ -107,22 +102,27 @@ public class SearchResultAdapter extends BaseAdapter {
 		// icon.setImageBitmap(null);
 	}
 
+	public static void createTextView(View row, Object object) {
+		TextView textView = (TextView) row.findViewById(R.id.itemtext);
+		textView.setText(object.toString());
+	}
+
 	@Override
 	public int getCount() {
+		if ( data.size() == 0 )
+			return 1;
 		return data.size();
 	}
 
 	@Override
 	public Object getItem(int paramInt) {
+		if ( data.size() == 0 )
+			return "No results.";
 		return data.get(paramInt);
 	}
 
 	@Override
 	public long getItemId(int paramInt) {
 		return paramInt;
-	}
-
-	public void addType(Class<?> class1, int layoutId) {
-		classMapping.put(class1, layoutId);
 	}
 }

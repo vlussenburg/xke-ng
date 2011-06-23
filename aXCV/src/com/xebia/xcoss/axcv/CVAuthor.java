@@ -28,7 +28,7 @@ import com.xebia.xcoss.axcv.util.XCS;
 
 public class CVAuthor extends BaseActivity {
 
-	private List<Object> searchResults;
+	private List<Session> searchResults;
 	private SearchResultAdapter searchAdapter;
 
 	/** Called when the activity is first created. */
@@ -36,47 +36,18 @@ public class CVAuthor extends BaseActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.author);
 
-		// TODO Author => null and getting author by ID.
-		Author author = null;
-		String authorId = getIntent().getExtras().getString(IA_AUTHOR);
-		Author[] authors = getConferenceServer().getAllAuthors();
-		if (StringUtil.isEmpty(authorId)) {
-			// From link
-			String authorName = getIntent().getDataString().replace(XCS.AUTHOR.LINK, "").trim();
-			Log.v("XCS", "From link (" + getIntent().getDataString() + "):" + authorName);
-			for (int i = 0; i < authors.length; i++) {
-				if (authorName.equals(authors[i].getName())) {
-					Log.v("XCS", "Match (" + authorName + "):" + authors[i].getName());
-					author = authors[i];
-					break;
-				}
-				Log.v("XCS", "No match (" + authorName + "):" + authors[i].getName());
-			}
-		} else {
-			for (int i = 0; i < authors.length; i++) {
-				if (authorId.equals(authors[i].getUserId())) {
-					Log.v("XCS", "Match (" + authorId + "):" + authors[i].getUserId());
-					author = authors[i];
-					break;
-				}
-				Log.v("XCS", "No match (" + authorId + "):" + authors[i].getUserId());
-			}
-		}
+		Author author = findAuthor();
 		Search search = new Search();
 		search.onAuthor(author);
-		// TODO Try/catch handle CommException
 
-		searchResults = new ArrayList<Object>();
-		searchResults.addAll(getConferenceServer().searchSessions(search));
-
+		searchResults = getConferenceServer().searchSessions(search);
 		searchAdapter = new SearchResultAdapter(this, searchResults);
-		searchAdapter.addType(Session.class, R.layout.session_item_small);
 		ListView sessionList = (ListView) findViewById(R.id.searchResults);
 		sessionList.setAdapter(searchAdapter);
 		sessionList.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
-				show(paramInt);
+				showSession(paramInt);
 			}
 		});
 
@@ -97,18 +68,36 @@ public class CVAuthor extends BaseActivity {
 		super.onCreate(savedInstanceState);
 	}
 
-	private void show(int index) {
-		Object selected = searchResults.get(index);
-		if (selected instanceof Session) {
-			Session session = (Session) selected;
-			if (session.getDate() != null) {
-				Intent intent = new Intent(this, CVSessionView.class);
-				Conference conference = getConferenceServer().getConference(session.getDate());
-				intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
-				intent.putExtra(BaseActivity.IA_SESSION, session.getId());
-				startActivity(intent);
+	private Author findAuthor() {
+		String authorId = getIntent().getExtras().getString(IA_AUTHOR);
+		Author[] authors = getConferenceServer().getAllAuthors();
+		if (StringUtil.isEmpty(authorId)) {
+			// From link (which only contains the full name)
+			String authorName = getIntent().getDataString().replace(XCS.AUTHOR.LINK, "").trim();
+			for (int i = 0; i < authors.length; i++) {
+				if (authorName.equals(authors[i].getName())) {
+					return authors[i];
+				}
 			}
-			return;
+		} else {
+			// From the id passed via the intent
+			for (int i = 0; i < authors.length; i++) {
+				if (authorId.equals(authors[i].getUserId())) {
+					return authors[i];
+				}
+			}
+		}
+		return null;
+	}
+
+	private void showSession(int index) {
+		Session session = searchResults.get(index);
+		if (session.getDate() != null) {
+			Intent intent = new Intent(this, CVSessionView.class);
+			Conference conference = getConferenceServer().getConference(session.getDate());
+			intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
+			intent.putExtra(BaseActivity.IA_SESSION, session.getId());
+			startActivity(intent);
 		}
 	}
 

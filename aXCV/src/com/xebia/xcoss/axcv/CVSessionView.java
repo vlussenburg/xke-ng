@@ -20,6 +20,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
+import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Conference;
@@ -78,14 +79,15 @@ public class CVSessionView extends SwipeActivity {
 		// Optional fields (hide when not available)
 		updateTextField(R.id.scAudience, R.id.scAudienceLabel, session.getIntendedAudience());
 		updateTextField(R.id.scLabels, R.id.scLabelsLabel, FormatUtil.getList(session.getLabels(), false));
-		updateTextField(R.id.scLanguage, R.id.scLanguageLabel, FormatUtil.getList(session.getLanguages()));
+		updateTextField(R.id.scLanguage, R.id.scLanguageLabel, FormatUtil.getList(session.getLanguages(), false));
 		updateTextField(R.id.scLimit, R.id.scLimitLabel, session.getLimit());
 		updateTextField(R.id.scPreparation, R.id.scPreparationLabel, session.getPreparation());
 
 		TextView labelView = (TextView) findViewById(R.id.scLabels);
 		Linkify.addLinks(labelView, XCS.TAG.PATTERN, XCS.TAG.LINK);
-		Linkify.addLinks(sessionAuthor, XCS.AUTHOR.PATTERN, XCS.AUTHOR.LINK);
-
+		if (session.getAuthors().size() > 0) {
+			Linkify.addLinks(sessionAuthor, XCS.AUTHOR.PATTERN, XCS.AUTHOR.LINK);
+		}
 		ConferenceServer server = getConferenceServer();
 
 		OnClickListener lRate = new OnClickListener() {
@@ -250,7 +252,6 @@ public class CVSessionView extends SwipeActivity {
 	}
 
 	public void onSwipeBottomToTop() {
-		super.onSwipeBottomToTop();
 		SortedSet<Session> sessionsSet = this.getConference().getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
 		int index = sessions.indexOf(currentSession);
@@ -261,7 +262,6 @@ public class CVSessionView extends SwipeActivity {
 	}
 
 	public void onSwipeTopToBottom() {
-		super.onSwipeTopToBottom();
 		SortedSet<Session> sessionsSet = this.getConference().getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
 		int index = sessions.indexOf(currentSession);
@@ -269,5 +269,14 @@ public class CVSessionView extends SwipeActivity {
 			currentSession = sessions.get(--index);
 			fill(this.getConference(), currentSession);
 		}
+	}
+
+	public void onSwipeLeftToRight() {
+		Toast.makeText(this, "Swipe Right", Toast.LENGTH_SHORT).show();
+	}
+	
+	@Override
+	public void onSwipeRightToLeft() {
+		Toast.makeText(this, "Swipe Left", Toast.LENGTH_SHORT).show();
 	}
 }
