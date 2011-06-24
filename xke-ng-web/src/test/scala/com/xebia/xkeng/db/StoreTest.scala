@@ -1,4 +1,4 @@
-package com.xebia.xkeng.store
+package com.xebia.xkeng.db
 
 import org.joda.time.DateTime
 import org.junit.runner.RunWith
@@ -10,7 +10,7 @@ import com.amazonaws.auth.BasicAWSCredentials
 import collection.JavaConversions._
 import com.amazonaws.services.simpledb.model._
 import com.amazonaws.services.simpledb.{AmazonSimpleDB, AmazonSimpleDBClient}
-import com.xebia.rest.XKESession
+import com.xebia.xkeng.rest.XKESession
 
 @RunWith(classOf[JUnitRunner])
 class StoreTest extends FlatSpec with ShouldMatchers {
@@ -29,7 +29,7 @@ class StoreTest extends FlatSpec with ShouldMatchers {
   }
 
 
-  "SimpleDBStore" should " store Session correctly" in {
+  "SimpleDBStore" should " domain Session correctly" in {
     def map(sess:XKESession) = {
       sess.getClass.getDeclaredFields.foreach(a => {a.setAccessible(true);println(a.getName + "=" + a.get(sess) )})
     }

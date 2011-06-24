@@ -1,20 +1,12 @@
-package com.xebia.rest
+package com.xebia.xkeng.domain.rest
 
-import _root_.java.io.File
-import _root_.junit.framework._
-import Assert._
-import _root_.scala.xml.XML
-import _root_.net.liftweb.util._
-import _root_.net.liftweb.common._
 import org.joda.time.DateTime
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.{FlatSpec}
+import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
-import net.liftweb.json._
 import net.liftweb.json.JsonAST.JValue
-import net.liftweb.json.JsonDSL._
-
+import com.xebia.xkeng.rest.{Conversion, XKESession}
 
 @RunWith(classOf[JUnitRunner])
 class ConversionTest extends FlatSpec with ShouldMatchers {

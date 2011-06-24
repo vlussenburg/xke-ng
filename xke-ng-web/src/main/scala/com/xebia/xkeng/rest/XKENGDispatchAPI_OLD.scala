@@ -1,4 +1,4 @@
-package com.xebia.rest
+package com.xebia.xkeng.rest
 
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.common._
@@ -10,7 +10,7 @@ import collection.mutable.{ListBuffer => MList}
 import net.liftweb.json._
 import net.liftweb.json.JsonDSL._
 
-object XKENGDispatchAPI extends RestHelper with Logger {
+object XKENGDispatchAPI_OLD extends RestHelper with Logger {
   serve {
     case Req("xkeng" :: "sessions" :: Nil, _, GetRequest) =>
       handleReadAll

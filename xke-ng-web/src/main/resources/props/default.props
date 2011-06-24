@@ -1,1 +1,5 @@
 # Properties in this file will be read when running in dev mode
+mongo.host=127.0.0.1
+mongo.port=27017
+mongo.db.name=xkeng
+mongo.socket.timeout=10

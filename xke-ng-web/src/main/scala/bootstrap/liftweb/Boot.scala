@@ -4,8 +4,10 @@ import _root_.net.liftweb.common._
 import _root_.net.liftweb.http._
 import _root_.net.liftweb.http.provider._
 import _root_.net.liftweb.sitemap._
-import com.xebia.rest._
-
+import com.xebia.xkeng.rest.{Assembly, XKENGDispatchAPI}
+import net.liftweb.util.Props
+import net.liftweb.mongodb.{DefaultMongoIdentifier, MongoDB}
+import com.mongodb.{Mongo, MongoOptions, ServerAddress}
 
 /**
  * A class that's instantiated early and run.  It allows the application
@@ -15,20 +17,22 @@ class Boot {
   def boot {
 
     // where to search snippet
-    LiftRules.addToPackages("com.xebia")
+    LiftRules.addToPackages("com.xebia.xkeng")
 
     // Build SiteMap
-/*    def sitemap() = SiteMap(
+    /*    def sitemap() = SiteMap(
 
-      Menu("Home") / "index" >> User.AddUserMenusAfter, // Simple menu form
-      // Menu with special Link
-      Menu(Loc("Static", Link(List("static"), true, "/static/index"), 
-	       "Static Content")))
-*/
+          Menu("Home") / "index" >> User.AddUserMenusAfter, // Simple menu form
+          // Menu with special Link
+          Menu(Loc("Static", Link(List("static"), true, "/static/index"),
+             "Static Content")))
+    */
 
-//    LiftRules.setSiteMapFunc(() => User.sitemapMutator(sitemap()))
+    //    LiftRules.setSiteMapFunc(() => User.sitemapMutator(sitemap()))
 
-    LiftRules.dispatch.append(XKENGDispatchAPI)
+
+    Assembly.initMongoDB()
+    LiftRules.dispatch.append(Assembly.XKENGDispatchAPIAssembly)
     /*
      * Show the spinny image when an Ajax call starts
      */
@@ -50,4 +54,7 @@ class Boot {
   private def makeUtf8(req: HTTPRequest) {
     req.setCharacterEncoding("UTF-8")
   }
+
+
+
 }
