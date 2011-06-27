@@ -19,7 +19,7 @@ public class EditTextPreference extends android.preference.EditTextPreference {
 
 	@Override
 	public void setText(String text) {
-		super.setText(text);
-		setSummary(text);
+		super.setText(text.trim());
+		setSummary(text.trim());
 	}
 }

@@ -1,13 +1,11 @@
 package com.xebia.xcoss.axcv;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;

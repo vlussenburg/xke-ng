@@ -18,9 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
-import com.xebia.xcoss.axcv.logic.ServerException;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
@@ -54,7 +52,10 @@ public abstract class BaseActivity extends Activity {
 			conferenceButton.setOnLongClickListener(new View.OnLongClickListener() {
 				@Override
 				public boolean onLongClick(View v) {
-					kill();
+					Intent intent = new Intent(BaseActivity.this, CVSplashLoader.class);
+					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					intent.putExtra("exit", true);
+					startActivity(intent);
 					return true;
 				}
 			});
@@ -62,12 +63,9 @@ public abstract class BaseActivity extends Activity {
 		super.onCreate(savedInstanceState);
 	}
 
-	private boolean kill() {
-		Intent intent = new Intent(this, CVSplashLoader.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.putExtra("exit", true);
-		startActivity(intent);
-		return true;
+	protected void close() {
+		ConferenceServer.getInstance().close();
+		finish();
 	}
 
 	@Override
@@ -163,25 +161,13 @@ public abstract class BaseActivity extends Activity {
 
 	protected ConferenceServer getConferenceServer() {
 		ConferenceServer server = ConferenceServer.getInstance();
-		if (server == null) {
+		if (server == null || server.isLoggedIn() == false) {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			String user = sp.getString(XCS.PREF.USERNAME, null);
 			String password = SecurityUtils.decrypt(sp.getString(XCS.PREF.PASSWORD, ""));
 			server = ConferenceServer.createInstance(user, password, XCS.SETTING.URL);
 		}
-		if (!server.isLoggedIn()) {
-			showDialog(XCS.DIALOG.CONNECT_FAILED);
-		}
 		return server;
-	}
-
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		if (id == XCS.DIALOG.CONNECT_FAILED) {
-			return createDialog("Connection failed",
-					"The connection to the server failed. Either the server is down or your credentials are wrong.");
-		}
-		return super.onCreateDialog(id);
 	}
 
 	protected Dialog createDialog(String title, String message) {
@@ -229,12 +215,9 @@ public abstract class BaseActivity extends Activity {
 					conference.getSessions();
 				}
 			}
-			catch (ServerException e) {
-				Log.e(XCS.LOG.COMMUNICATE, "Fail on initial loading: " + e.getMessage());
+			catch (Exception e) {
+				Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Failure: " + e.getMessage());
 				return false;
-			}
-			catch (CommException e) {
-				Log.w(XCS.LOG.COMMUNICATE, "Problem while loading: " + e.getMessage());
 			}
 			return true;
 		}
@@ -244,24 +227,19 @@ public abstract class BaseActivity extends Activity {
 			dialog.cancel();
 
 			if (result) {
+				// Note, authentication may still be invalid.
 				ctx.onSuccess();
 			} else {
 				Dialog errorDialog = createDialog("Error", "Connection to server failed." + "\n" + XCS.SETTING.URL);
-				errorDialog.setOnCancelListener(new Dialog.OnCancelListener() {
-					@Override
-					public void onCancel(DialogInterface di) {
-						ctx.onFailure();
-					}
-				});
 				errorDialog.setOnDismissListener(new Dialog.OnDismissListener() {
 					@Override
-					public void onDismiss(DialogInterface paramDialogInterface) {
+					public void onDismiss(DialogInterface di) {
 						ctx.onFailure();
+						di.dismiss();
 					}
 				});
 				errorDialog.show();
 			}
 		}
 	}
-
 }

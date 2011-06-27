@@ -1,13 +1,14 @@
 package com.xebia.xcoss.axcv;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.webkit.MimeTypeMap;
 
+import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class CVSplashLoader extends BaseActivity {
@@ -28,10 +29,17 @@ public class CVSplashLoader extends BaseActivity {
 	}
 
 	@Override
+	public void onBackPressed() {
+		// Reset the credentials and force authentication next start
+		ConferenceServer.getInstance().close();
+		super.onBackPressed();
+	}
+
+	@Override
 	protected void onSuccess() {
 		loaded = true;
-		startActivity(new Intent(this, CVConferences.class));
-	};
+		navigateToStartscreen();
+	}
 
 	@Override
 	protected void onFailure() {
@@ -40,7 +48,7 @@ public class CVSplashLoader extends BaseActivity {
 
 	@Override
 	protected void onNewIntent(Intent intent) {
-		// Called upon creating an exit intent
+		// Called upon manually creating an exit intent
 		getIntent().fillIn(intent, Intent.FILL_IN_DATA);
 		super.onNewIntent(intent);
 	}
@@ -48,7 +56,9 @@ public class CVSplashLoader extends BaseActivity {
 	@Override
 	protected void onRestart() {
 		// When revived, check for an exit code
-		if (getIntent().getBooleanExtra("exit", false)) finish();
+		if (getIntent().getBooleanExtra("exit", false)) {
+			close();
+		}
 		super.onRestart();
 	}
 
@@ -73,9 +83,26 @@ public class CVSplashLoader extends BaseActivity {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if (loaded && event.getAction() == MotionEvent.ACTION_UP) {
-			startActivity(new Intent(this, CVConferences.class));
+			navigateToStartscreen();
 			return true;
 		}
 		return super.onTouchEvent(event);
 	}
+
+	private void navigateToStartscreen() {
+		// Use getConferenceServer to explicitly reissue the login
+		if (getConferenceServer().isLoggedIn()) {
+			startActivity(new Intent(this, CVConferences.class));
+		} else {
+			Dialog dialog = createDialog("Warning", "Authentication failed. Please set credentials.");
+			dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+				@Override
+				public void onDismiss(DialogInterface paramDialogInterface) {
+					startActivity(new Intent(CVSplashLoader.this, CVSettings.class));
+				}
+			});
+			dialog.show();
+		}
+	};
+
 }

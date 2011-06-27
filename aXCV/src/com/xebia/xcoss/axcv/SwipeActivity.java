@@ -5,7 +5,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.ui.SwipeGestureListener;
 

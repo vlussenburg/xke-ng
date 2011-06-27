@@ -1,6 +1,5 @@
 package com.xebia.xcoss.axcv.ui;
 
-import android.util.Log;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;

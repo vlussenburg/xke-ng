@@ -2,11 +2,11 @@ package com.xebia.xcoss.axcv.logic;
 
 import hirondelle.date4j.DateTime;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
@@ -62,9 +62,6 @@ public class RestClient {
 			Log.e(LOG.ALL, "Loaded: " + result);
 			return result;
 		}
-		catch (IOException e) {
-			throw new ServerException(url, e);
-		}
 		finally {
 			StreamUtil.close(reader);
 		}
@@ -76,9 +73,6 @@ public class RestClient {
 		try {
 			reader = getReader(new HttpGet(url));
 			return getGson().fromJson(reader, rvClass);
-		}
-		catch (IOException e) {
-			throw new ServerException(url, e);
 		}
 		finally {
 			StreamUtil.close(reader);
@@ -106,15 +100,12 @@ public class RestClient {
 			}
 			return results;
 		}
-		catch (IOException e) {
-			throw new ServerException(url, e);
-		}
 		finally {
 			StreamUtil.close(reader);
 		}
 	}
 
-	public static <T> int createObject(String url, T object) {
+	public static <T> int createObject(String url, T object)  {
 		Log.d(LOG.COMMUNICATE, "Creating [" + object.getClass().getSimpleName() + "] " + url);
 		Reader reader = null;
 		try {
@@ -123,15 +114,12 @@ public class RestClient {
 			reader = getReader(new HttpPut(url), postData);
 			return gson.fromJson(reader, int.class);
 		}
-		catch (IOException e) {
-			throw new ServerException(url, e);
-		}
 		finally {
 			StreamUtil.close(reader);
 		}
 	}
 
-	public static <T> void updateObject(String url, T object) {
+	public static <T> void updateObject(String url, T object)  {
 		Log.d(LOG.COMMUNICATE, "Updating [" + object.getClass().getSimpleName() + "] " + url);
 		Reader reader = null;
 		try {
@@ -139,29 +127,24 @@ public class RestClient {
 			String postData = gson.toJson(object);
 			reader = getReader(new HttpPost(url), postData);
 		}
-		catch (IOException e) {
-			throw new ServerException(url, e);
-		}
 		finally {
 			StreamUtil.close(reader);
 		}
 	}
 
-	public static void deleteObject(String url) {
+	public static void deleteObject(String url)  {
 		Log.d(LOG.COMMUNICATE, "Deleting [x] " + url);
 		Reader reader = null;
 		try {
 			reader = getReader(new HttpDelete(url));
 		}
-		catch (IOException e) {
-			throw new ServerException(url, e);
-		}
 		finally {
 			StreamUtil.close(reader);
 		}
 	}
 
-	public static <T> List<T> searchObjects(String url, String key, Class<T> rvClass, Object searchParms) {
+	public static <T> List<T> searchObjects(String url, String key, Class<T> rvClass, Object searchParms)
+			 {
 		Log.d(LOG.COMMUNICATE, "Searching [" + key + "[" + rvClass.getSimpleName() + "]] " + url);
 		Reader reader = null;
 		try {
@@ -183,38 +166,64 @@ public class RestClient {
 			}
 			return results;
 		}
-		catch (IOException e) {
-			throw new ServerException(url, e);
+		finally {
+			StreamUtil.close(reader);
+		}
+	}
+
+	public static <T, V> V postObject(String url, T object, Class<V> rvClass)  {
+		Log.d(LOG.COMMUNICATE, "Posting [" + object.getClass().getSimpleName() + "] " + url);
+		Reader reader = null;
+		try {
+			Gson gson = getGson();
+			String postData = gson.toJson(object);
+			reader = getReader(new HttpPost(url), postData);
+			return getGson().fromJson(reader, rvClass);
 		}
 		finally {
 			StreamUtil.close(reader);
 		}
 	}
 
-	private static Reader getReader(HttpEntityEnclosingRequestBase request, String content) throws IOException {
-		if (!StringUtil.isEmpty(content)) {
-			request.setEntity(new StringEntity(content));
+	private static Reader getReader(HttpEntityEnclosingRequestBase request, String content)  {
+		try {
+			if (!StringUtil.isEmpty(content)) {
+				request.setEntity(new StringEntity(content));
+			}
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new ServerException(request.getURI().toString(), e);
 		}
 		return getReader(request);
 	}
 
-	private static Reader getReader(HttpRequestBase request) throws IOException {
-		HttpResponse response = getHttpClient().execute(request);
+	private static Reader getReader(HttpRequestBase request)  {
+		try {
+			HttpResponse response = getHttpClient().execute(request);
 
-		handleResponse(request.getURI(), response.getStatusLine().getStatusCode());
-
-		HttpEntity entity = response.getEntity();
-		if (entity != null) {
-			StringBuilder result = new StringBuilder();
-			InputStreamReader str = new InputStreamReader(entity.getContent());
-			char[] buffer = new char[1024];
-			int read;
-			while ( (read = str.read(buffer, 0, 1024)) >= 0 ) {
-				result.append(buffer, 0, read);
+			try {
+				handleResponse(request.getURI(), response.getStatusLine().getStatusCode());
 			}
-			str.close();
-			Log.i(XCS.LOG.COMMUNICATE, "Read: " + result.toString());
-			return new StringReader(result.toString());
+			catch (DataException e) {
+				return new StringReader("");
+			}
+
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				StringBuilder result = new StringBuilder();
+				InputStreamReader str = new InputStreamReader(entity.getContent());
+				char[] buffer = new char[1024];
+				int read;
+				while ((read = str.read(buffer, 0, 1024)) >= 0) {
+					result.append(buffer, 0, read);
+				}
+				StreamUtil.close(str);
+				Log.i(XCS.LOG.COMMUNICATE, "Read: " + result.toString());
+				return new StringReader(result.toString());
+			}
+		}
+		catch (IOException e) {
+			throw new ServerException(request.getURI().toString(), e);
 		}
 		return null;
 	}
@@ -226,18 +235,25 @@ public class RestClient {
 		return new DefaultHttpClient(httpParams);
 	}
 
-	private static void handleResponse(URI uri, int code) {
+	private static void handleResponse(URI uri, int code) throws DataException {
 		switch (code) {
 			case 200:
 				// This is an ok status
-				break;
+			break;
 			case 403:
+				Log.w(XCS.LOG.COMMUNICATE, "Not authenticated for URL '"+uri.toString()+"'.");
+				throw new DataException(DataException.Code.NOT_ALLOWED, uri);
 			case 404:
-				throw new CommException(uri, code);
+				Log.w(XCS.LOG.COMMUNICATE, "The URL '"+uri.toString()+"' was not found!");
+				throw new DataException(DataException.Code.NOT_FOUND, uri);
 			case 500:
+				Log.e(XCS.LOG.COMMUNICATE, "Server error on '"+uri.toString()+"'.");
 				throw new ServerException(uri.getPath());
 			default:
-				Log.d(XCS.LOG.ALL, "Return code = " + code);
+				if (code >= 400) {
+					Log.e(XCS.LOG.COMMUNICATE, "Error "+code+" on '"+uri.toString()+"'.");
+					throw new CommException(uri, code);
+				}
 			break;
 		}
 	}

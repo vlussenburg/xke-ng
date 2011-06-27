@@ -29,6 +29,7 @@ GET		/authors								Authors.show
 PUT		/label/{name}							Labels.create
 POST	/search/authors							Authors.search
 POST	/search/sessions						Session.search
+POST	/login									Login.authenticate
 
 
 # Catch all 

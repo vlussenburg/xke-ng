@@ -52,7 +52,7 @@ public class TextInputDialog extends Dialog {
 			@Override
 			public void onClick(View paramView) {
 				TextView text = (TextView) findViewById(R.id.seValue);
-				String result = text.getText().toString();
+				String result = text.getText().toString().trim();
 				activity.updateField(identifier, result, true);
 				dismiss();
 			}

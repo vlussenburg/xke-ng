@@ -5,15 +5,14 @@ import hirondelle.date4j.DateTime.Unit;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Credential;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Search;
@@ -30,16 +29,13 @@ public class ConferenceServer {
 	private ConferenceCache conferenceCache;
 
 	public static ConferenceServer getInstance() {
-		if (instance == null || instance.isLoggedIn() == false) {
-			return null;
-		}
 		return instance;
 	}
 
 	public static ConferenceServer createInstance(String user, String password, String url) {
-		ConferenceServer server = new ConferenceServerWrapper(url);
-		server.login(user, password);
+		ConferenceServer server = new ConferenceServer(url);
 		instance = server;
+		instance.login(user, password);
 		return instance;
 	}
 
@@ -48,10 +44,11 @@ public class ConferenceServer {
 		this.conferenceCache = new ConferenceCache();
 	}
 
-	public boolean login(String user, String password) {
-		// TODO implement
-		this.token = "test";
-		return isLoggedIn();
+	public void login(String user, String password) {
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/login");
+		this.token = RestClient.postObject(requestUrl.toString(), new Credential(user, password), String.class);
 	}
 
 	public boolean isLoggedIn() {
@@ -133,7 +130,7 @@ public class ConferenceServer {
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/conference");
-		
+
 		if (update) {
 			RestClient.updateObject(requestUrl.toString(), conference);
 			return -1;
@@ -232,10 +229,10 @@ public class ConferenceServer {
 		if (result == null) {
 			return new Location[0];
 		}
-		if ( defaultOnly ) {
+		if (defaultOnly) {
 			List<Location> base = new ArrayList<Location>();
 			for (Location location : result) {
-				if ( location.isStandard() ) {
+				if (location.isStandard()) {
 					base.add(location);
 				}
 			}
@@ -250,21 +247,23 @@ public class ConferenceServer {
 		requestUrl.append(baseUrl);
 		requestUrl.append("/labels");
 
-		Type collectionType = new TypeToken<List<String>>() {}.getType();
+		Type collectionType = new TypeToken<List<String>>() {
+		}.getType();
 		List<String> result = RestClient.loadCollection(requestUrl.toString(), collectionType);
 		if (result == null) {
 			return new String[0];
 		}
 		return result.toArray(new String[result.size()]);
 	}
-	
+
 	public List<String> getLabels(Author author) {
 		// TODO Include author in the search
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/labels");
 
-		Type collectionType = new TypeToken<List<String>>() {}.getType();
+		Type collectionType = new TypeToken<List<String>>() {
+		}.getType();
 		return RestClient.loadCollection(requestUrl.toString(), collectionType);
 	}
 
@@ -276,7 +275,6 @@ public class ConferenceServer {
 
 		RestClient.createObject(requestUrl.toString(), name);
 	}
-
 
 	public List<Author> searchAuthors(Search search) {
 		StringBuilder requestUrl = new StringBuilder();
@@ -375,5 +373,9 @@ public class ConferenceServer {
 			list.add(conference);
 		}
 		return list;
+	}
+
+	public void close() {
+		this.token = null;
 	}
 }

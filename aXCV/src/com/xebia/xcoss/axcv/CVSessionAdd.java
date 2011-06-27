@@ -152,7 +152,7 @@ public class CVSessionAdd extends AdditionActivity {
 				}
 				if (!conference.addSession(session)) {
 					Log.e(LOG.ALL, "Adding session failed.");
-					createDialog("No session added", "Session could not be added.");
+					createDialog("No session added", "Session could not be added.").show();
 				}
 				CVSessionAdd.this.finish();
 			}
