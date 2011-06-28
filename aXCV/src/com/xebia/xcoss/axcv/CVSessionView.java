@@ -257,7 +257,8 @@ public class CVSessionView extends SwipeActivity {
 		int index = sessions.indexOf(currentSession);
 		if (index < sessions.size() - 1) {
 			currentSession = sessions.get(++index);
-			fill(this.getConference(), currentSession);
+			startActivityCurrentSession();
+			overridePendingTransition(R.anim.slide_bottom_to_top, 0);
 		}
 	}
 
@@ -267,8 +268,19 @@ public class CVSessionView extends SwipeActivity {
 		int index = sessions.indexOf(currentSession);
 		if (index > 0) {
 			currentSession = sessions.get(--index);
-			fill(this.getConference(), currentSession);
+			startActivityCurrentSession();
+			overridePendingTransition(R.anim.slide_top_to_bottom, 0);
 		}
+	}
+
+	private void startActivityCurrentSession() {
+		findViewById(R.id.sessionList);
+
+		Intent intent = getIntent();
+		intent.putExtra(BaseActivity.IA_CONFERENCE, getConference().getId());
+		intent.putExtra(BaseActivity.IA_SESSION, currentSession.getId());
+		startActivity(intent);
+		
 	}
 
 	public void onSwipeLeftToRight() {
