@@ -20,8 +20,10 @@
 			android:launchMode="singleTop"
 			android:label="@string/app_name">
 			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
+				<action
+					android:name="android.intent.action.MAIN" />
+				<category
+					android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
 		<activity
@@ -66,19 +68,30 @@
 			android:name="CVAuthor"
 			android:theme="@android:style/Theme.NoTitleBar">
 			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<data android:scheme="author" android:host="xebia" />
+				<action
+					android:name="android.intent.action.VIEW" />
+				<category
+					android:name="android.intent.category.DEFAULT" />
+				<data
+					android:scheme="author"
+					android:host="xebia" />
 			</intent-filter>
 		</activity>
 		<activity
 			android:name="CVTag"
 			android:theme="@android:style/Theme.NoTitleBar">
 			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<data android:scheme="tag" android:host="xebia" />
+				<action
+					android:name="android.intent.action.VIEW" />
+				<category
+					android:name="android.intent.category.DEFAULT" />
+				<data
+					android:scheme="tag"
+					android:host="xebia" />
 			</intent-filter>
 		</activity>
+		<meta-data
+			android:name="com.xebia.xcoss.serverUrl"
+			android:value="http://10.0.2.2:9000" />
 	</application>
 </manifest>

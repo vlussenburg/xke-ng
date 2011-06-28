@@ -9,6 +9,10 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -24,6 +28,9 @@ import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
+
+import de.quist.app.errorreporter.ExceptionReportService;
+import de.quist.app.errorreporter.ReportingActivity;
 
 public abstract class BaseActivity extends Activity {
 
@@ -165,7 +172,7 @@ public abstract class BaseActivity extends Activity {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			String user = sp.getString(XCS.PREF.USERNAME, null);
 			String password = SecurityUtils.decrypt(sp.getString(XCS.PREF.PASSWORD, ""));
-			server = ConferenceServer.createInstance(user, password, XCS.SETTING.URL);
+			server = ConferenceServer.createInstance(user, password, getServerUrl());
 		}
 		return server;
 	}
@@ -197,6 +204,7 @@ public abstract class BaseActivity extends Activity {
 
 		private ProgressDialog dialog;
 		private BaseActivity ctx;
+		private Exception resultingException;
 
 		public DataRetriever(BaseActivity ctx) {
 			this.ctx = ctx;
@@ -216,6 +224,7 @@ public abstract class BaseActivity extends Activity {
 				}
 			}
 			catch (Exception e) {
+				resultingException = e;
 				Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Failure: " + e.getMessage());
 				return false;
 			}
@@ -230,7 +239,7 @@ public abstract class BaseActivity extends Activity {
 				// Note, authentication may still be invalid.
 				ctx.onSuccess();
 			} else {
-				Dialog errorDialog = createDialog("Error", "Connection to server failed." + "\n" + XCS.SETTING.URL);
+				Dialog errorDialog = createDialog("Error", "Connection to server failed ("+resultingException.getMessage()+").");
 				errorDialog.setOnDismissListener(new Dialog.OnDismissListener() {
 					@Override
 					public void onDismiss(DialogInterface di) {
@@ -240,6 +249,18 @@ public abstract class BaseActivity extends Activity {
 				});
 				errorDialog.show();
 			}
+		}
+	}
+
+	private String getServerUrl() {
+		try {
+			// Invoke trim to make sure the value is specified
+			ApplicationInfo ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
+			return ai.metaData.getString("com.xebia.xcoss.serverUrl").trim();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			throw new IllegalArgumentException("serverUrl is undefined");
 		}
 	}
 }
