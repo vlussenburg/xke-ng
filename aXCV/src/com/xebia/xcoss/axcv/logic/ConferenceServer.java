@@ -45,6 +45,11 @@ public class ConferenceServer {
 	}
 
 	public void login(String user, String password) {
+		try {
+			throw new Exception("Log trace");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/login");

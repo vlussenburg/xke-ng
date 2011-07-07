@@ -19,13 +19,13 @@ public class CVSplashLoader extends BaseActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.loader);
+		super.onCreate(savedInstanceState);
+		// Ignore terminated; this is the main screen
 
 		if (!loaded) {
 			DataRetriever task = new DataRetriever(this);
 			task.execute();
 		}
-
-		super.onCreate(savedInstanceState);
 	}
 
 	@Override
@@ -57,7 +57,9 @@ public class CVSplashLoader extends BaseActivity {
 	protected void onRestart() {
 		// When revived, check for an exit code
 		if (getIntent().getBooleanExtra("exit", false)) {
-			close();
+			ConferenceServer.getInstance().close();
+			finish();
+			return;
 		}
 		super.onRestart();
 	}

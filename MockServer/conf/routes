@@ -30,7 +30,7 @@ PUT		/label/{name}							Labels.create
 POST	/search/authors							Authors.search
 POST	/search/sessions						Session.search
 POST	/login									Login.authenticate
-
+POST	/error									Error.report
 
 # Catch all 
 *       /{controller}/{action}                  {controller}.{action}

@@ -27,6 +27,7 @@ public class CVConferences extends BaseActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.conferences);
+		super.onCreate(savedInstanceState);
 
 		DateTime dt = DateTime.today(XCS.TZ);
 		List<Conference> list = getConferenceServer().getConferences(dt.getYear());
@@ -54,7 +55,6 @@ public class CVConferences extends BaseActivity {
 		
 		TextView title = (TextView) findViewById(R.id.conferencesTitle);
 		title.setText(title.getText() + " " + dt.getYear());
-		super.onCreate(savedInstanceState);
 	}
 
 	private void switchTo(Conference conference) {

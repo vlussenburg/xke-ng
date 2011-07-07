@@ -6,31 +6,32 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.SparseArray;
+import android.view.AbsSavedState;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView.SavedState;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
+import com.xebia.xcoss.axcv.logic.ServerException;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.util.ProxyExceptionReporter;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
-
-import de.quist.app.errorreporter.ExceptionReportService;
-import de.quist.app.errorreporter.ReportingActivity;
 
 public abstract class BaseActivity extends Activity {
 
@@ -46,8 +47,23 @@ public abstract class BaseActivity extends Activity {
 	private MenuItem miAdd;
 	private MenuItem miEdit;
 
+	private static Activity rootActivity;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		ProxyExceptionReporter.register(this);
+
+		if ( rootActivity == null ) {
+			rootActivity = this;
+		}
+		Log.e("XCS", "========== ROOT activity [" + rootActivity.getLocalClassName() + "] ========== ");
+		if ( (rootActivity instanceof CVSplashLoader) == false ) {
+			Log.e("XCS", "========== ROOT activity RESET ========== ");
+			resetApplication(true);
+			return;
+		}
+
 		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);
 		if (conferenceButton != null) {
 			conferenceButton.setOnClickListener(new View.OnClickListener() {
@@ -59,20 +75,22 @@ public abstract class BaseActivity extends Activity {
 			conferenceButton.setOnLongClickListener(new View.OnLongClickListener() {
 				@Override
 				public boolean onLongClick(View v) {
-					Intent intent = new Intent(BaseActivity.this, CVSplashLoader.class);
-					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					intent.putExtra("exit", true);
-					startActivity(intent);
+					resetApplication(true);
 					return true;
 				}
 			});
 		}
-		super.onCreate(savedInstanceState);
 	}
 
-	protected void close() {
-		ConferenceServer.getInstance().close();
-		finish();
+	private void resetApplication(boolean exit) {
+		Log.e(LOG.ALL, "Reset application from " + this + " : " + exit);
+		rootActivity = null;
+		Intent intent = new Intent(BaseActivity.this, CVSplashLoader.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		if (exit) {
+			intent.putExtra("exit", true);
+		}
+		startActivity(intent);
 	}
 
 	@Override
@@ -140,7 +158,7 @@ public abstract class BaseActivity extends Activity {
 			conference = server.getUpcomingConference();
 			Log.w(LOG.ALL, "Conference default " + conference.getTitle());
 		}
-		Log.e("XCS", "[GET] Conference (on '" + identifier + "') = " + conference);
+//		Log.i("XCS", "[GET] Conference (on '" + identifier + "') = " + conference);
 		return conference;
 	}
 
@@ -181,7 +199,7 @@ public abstract class BaseActivity extends Activity {
 		return createDialog(this, title, message);
 	}
 
-	public static Dialog createDialog(Activity ctx, String title, String message) {
+	protected static Dialog createDialog(Activity ctx, String title, String message) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 		builder.setTitle(title).setMessage(message).setIcon(android.R.drawable.ic_dialog_alert)
 				.setPositiveButton("Close", new DialogInterface.OnClickListener() {
@@ -239,7 +257,8 @@ public abstract class BaseActivity extends Activity {
 				// Note, authentication may still be invalid.
 				ctx.onSuccess();
 			} else {
-				Dialog errorDialog = createDialog("Error", "Connection to server failed ("+resultingException.getMessage()+").");
+				Dialog errorDialog = createDialog("Error",
+						"Connection to server failed (" + resultingException.getMessage() + ").");
 				errorDialog.setOnDismissListener(new Dialog.OnDismissListener() {
 					@Override
 					public void onDismiss(DialogInterface di) {

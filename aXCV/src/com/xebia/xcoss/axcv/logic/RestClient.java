@@ -59,7 +59,6 @@ public class RestClient {
 		try {
 			reader = getReader(new HttpGet(url));
 			T result = getGson().fromJson(reader, rvClass);
-			Log.e(LOG.ALL, "Loaded: " + result);
 			return result;
 		}
 		finally {
