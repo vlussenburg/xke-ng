@@ -5,7 +5,9 @@ import java.util.SortedSet;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.util.Linkify;
@@ -25,6 +27,7 @@ import android.widget.Toast;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.RatingValue;
+import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
@@ -46,11 +49,11 @@ public class CVSessionView extends SwipeActivity {
 		Conference conference = getConference();
 		currentSession = getSession(conference);
 
-		fill(conference, currentSession);
+		fill(conference);
 		super.onCreate(savedInstanceState);
 	}
 
-	private void fill(Conference conference, Session session) {
+	private void fill(Conference conference) {
 		TextView title = (TextView) findViewById(R.id.conferenceTitle);
 		title.setText(conference.getTitle());
 
@@ -61,9 +64,9 @@ public class CVSessionView extends SwipeActivity {
 
 		TextView sessionDate = (TextView) findViewById(R.id.sessionTime);
 		StringBuilder sb = new StringBuilder();
-		sb.append(timeUtil.getAbsoluteTime(session.getStartTime()));
+		sb.append(timeUtil.getAbsoluteTime(currentSession.getStartTime()));
 		sb.append(" - ");
-		sb.append(timeUtil.getAbsoluteTime(session.getEndTime()));
+		sb.append(timeUtil.getAbsoluteTime(currentSession.getEndTime()));
 		sessionDate.setText(sb.toString());
 
 		TextView sessionLocation = ((TextView) findViewById(R.id.sessionLocation));
@@ -71,51 +74,50 @@ public class CVSessionView extends SwipeActivity {
 		TextView sessionDescription = (TextView) findViewById(R.id.scDescription);
 		TextView sessionAuthor = (TextView) findViewById(R.id.scAuthor);
 
-		sessionLocation.setText(session.getLocation().getDescription());
-		sessionTitle.setText(session.getTitle());
-		sessionDescription.setText(session.getDescription());
-		sessionAuthor.setText(FormatUtil.getList(session.getAuthors()));
+		sessionLocation.setText(currentSession.getLocation().getDescription());
+		sessionTitle.setText(currentSession.getTitle());
+		sessionDescription.setText(currentSession.getDescription());
+		sessionAuthor.setText(FormatUtil.getList(currentSession.getAuthors()));
 
 		// Optional fields (hide when not available)
-		updateTextField(R.id.scAudience, R.id.scAudienceLabel, session.getIntendedAudience());
-		updateTextField(R.id.scLabels, R.id.scLabelsLabel, FormatUtil.getList(session.getLabels(), false));
-		updateTextField(R.id.scLanguage, R.id.scLanguageLabel, FormatUtil.getList(session.getLanguages(), false));
-		updateTextField(R.id.scLimit, R.id.scLimitLabel, session.getLimit());
-		updateTextField(R.id.scPreparation, R.id.scPreparationLabel, session.getPreparation());
+		updateTextField(R.id.scAudience, R.id.scAudienceLabel, currentSession.getIntendedAudience());
+		updateTextField(R.id.scLabels, R.id.scLabelsLabel, FormatUtil.getList(currentSession.getLabels(), false));
+		updateTextField(R.id.scLanguage, R.id.scLanguageLabel, FormatUtil.getList(currentSession.getLanguages(), false));
+		updateTextField(R.id.scLimit, R.id.scLimitLabel, currentSession.getLimit());
+		updateTextField(R.id.scPreparation, R.id.scPreparationLabel, currentSession.getPreparation());
 
 		TextView labelView = (TextView) findViewById(R.id.scLabels);
 		Linkify.addLinks(labelView, XCS.TAG.PATTERN, XCS.TAG.LINK);
-		if (session.getAuthors().size() > 0) {
+		if (currentSession.getAuthors().size() > 0) {
 			Linkify.addLinks(sessionAuthor, XCS.AUTHOR.PATTERN, XCS.AUTHOR.LINK);
 		}
-		ConferenceServer server = getConferenceServer();
 
+		ConferenceServer server = getConferenceServer();
 		OnClickListener lRate = new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
 				showDialog(XCS.DIALOG.ADD_RATING);
 			}
 		};
-		TextView view = (TextView) findViewById(R.id.scRating);
-		view.setOnClickListener(lRate);
-		view.setText(FormatUtil.getText(server.getRate(session)));
-
-		findViewById(R.id.scRatingLayout).setOnClickListener(lRate);
-
 		OnClickListener lReview = new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
 				showDialog(XCS.DIALOG.CREATE_REVIEW);
 			}
 		};
+
+		TextView view = (TextView) findViewById(R.id.scRating);
+		view.setOnClickListener(lRate);
+		findViewById(R.id.scRatingLayout).setOnClickListener(lRate);
+
 		TextView view2 = (TextView) findViewById(R.id.scComments);
 		view2.setOnClickListener(lReview);
-		Spanned spannedContent = Html.fromHtml(FormatUtil.getHtml(server.getRemarks(session)));
-		view2.setText(spannedContent, BufferType.SPANNABLE);
+
 		ImageView button = (ImageView) findViewById(R.id.sessionMarkButton);
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				//TODO
 				Log.e(LOG.ALL, "Clicked on " + view);
 			}
 		});
@@ -154,6 +156,23 @@ public class CVSessionView extends SwipeActivity {
 	}
 
 	@Override
+	protected void onResume() {
+		refresh();
+		super.onResume();
+	}
+
+	private void refresh() {
+		ConferenceServer server = getConferenceServer();
+
+		TextView view = (TextView) findViewById(R.id.scRating);
+		view.setText(FormatUtil.getText(server.getRate(currentSession)));
+
+		TextView view2 = (TextView) findViewById(R.id.scComments);
+		Spanned spannedContent = Html.fromHtml(FormatUtil.getHtml(server.getRemarks(currentSession)));
+		view2.setText(spannedContent, BufferType.SPANNABLE);
+	}
+	
+	@Override
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog = null;
 		switch (id) {
@@ -176,6 +195,7 @@ public class CVSessionView extends SwipeActivity {
 						int rate = 1 + seekbar.getProgress();
 						getConferenceServer().registerRate(currentSession, rate);
 						dismissDialog(XCS.DIALOG.ADD_RATING);
+						refresh();
 					}
 				});
 
@@ -209,8 +229,11 @@ public class CVSessionView extends SwipeActivity {
 					@Override
 					public void onClick(View paramView) {
 						String remark = edit.getText().toString();
-						getConferenceServer().registerRemark(remark);
+						SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(CVSessionView.this);
+						String user = sp.getString(XCS.PREF.USERNAME, null);
+						getConferenceServer().registerRemark(currentSession, new Remark(user, remark));
 						dismissDialog(XCS.DIALOG.CREATE_REVIEW);
+						refresh();
 					}
 				});
 				return dialog;

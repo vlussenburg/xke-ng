@@ -104,14 +104,14 @@ public class RestClient {
 		}
 	}
 
-	public static <T> int createObject(String url, T object, String token)  {
+	public static <T,U> U createObject(String url, T object, Class<U> rvClass, String token)  {
 		Log.d(LOG.COMMUNICATE, "Creating [" + object.getClass().getSimpleName() + "] " + url);
 		Reader reader = null;
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
 			reader = getReader(new HttpPut(url), postData, token);
-			return gson.fromJson(reader, int.class);
+			return gson.fromJson(reader, rvClass);
 		}
 		finally {
 			StreamUtil.close(reader);

@@ -204,9 +204,9 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public void registerRemark(String remark) {
+	public void registerRemark(Session session, Remark remark) {
 		try {
-			super.registerRemark(remark);
+			super.registerRemark(session, remark);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "register remark", e);

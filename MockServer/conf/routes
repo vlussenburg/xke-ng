@@ -33,6 +33,10 @@ POST	/search/authors							Authors.search
 POST	/search/sessions						Session.search
 POST	/login									Login.authenticate
 POST	/error									Error.report
+GET		/feedback/{sessionId}/comment			Feedback.getComments
+PUT		/feedback/{sessionId}/comment			Feedback.createComment
+GET		/feedback/{sessionId}/rating			Feedback.getRating
+PUT		/feedback/{sessionId}/rating			Feedback.createRating
 
 # Catch all 
 *       /{controller}/{action}                  {controller}.{action}

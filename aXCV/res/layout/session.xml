@@ -329,12 +329,10 @@
 			</LinearLayout>
 			<ScrollView
 				android:layout_width="fill_parent"
-				android:layout_height="50sp"
-				android:scrollbarStyle="insideInset"
 				android:scrollbars="vertical"
 				android:background="@drawable/textbox"
 				android:scrollbarFadeDuration="0"
-				android:layout_margin="1sp">
+				android:layout_margin="1sp" android:layout_height="100sp" android:scrollbarStyle="insideOverlay">
 				<TextView
 					android:id="@+id/scComments"
 					android:layout_width="fill_parent"

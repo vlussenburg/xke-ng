@@ -25,6 +25,7 @@ public class ConferenceServer {
 	private static final String LOCATION_CACHE_KEY = "locscache--";
 	private static final String LABEL_CACHE_KEY = "labelcache--";
 	private static final String AUTHOR_LABEL_CACHE_KEY = "aulblcache--";
+	private static final String REMARK_CACHE_KEY = "remarkcache--";
 
 	private String baseUrl;
 	private String token;
@@ -140,7 +141,7 @@ public class ConferenceServer {
 			RestClient.updateObject(requestUrl.toString(), conference, token);
 			return -1;
 		}
-		return RestClient.createObject(requestUrl.toString(), conference, token);
+		return RestClient.createObject(requestUrl.toString(), conference, int.class, token);
 	}
 
 	public void deleteConference(Conference conference) {
@@ -197,7 +198,7 @@ public class ConferenceServer {
 			RestClient.updateObject(requestUrl.toString(), session, token);
 			return -1;
 		}
-		return RestClient.createObject(requestUrl.toString(), session, token);
+		return RestClient.createObject(requestUrl.toString(), session, int.class, token);
 	}
 
 	public void deleteSession(Session session, int conferenceId) {
@@ -233,7 +234,7 @@ public class ConferenceServer {
 		requestUrl.append(baseUrl);
 		requestUrl.append("/location");
 
-		return RestClient.createObject(requestUrl.toString(), location, token);
+		return RestClient.createObject(requestUrl.toString(), location, int.class, token);
 	}
 
 	public Location[] getLocations(boolean defaultOnly) {
@@ -268,7 +269,7 @@ public class ConferenceServer {
 		requestUrl.append("/label/");
 		requestUrl.append(name);
 
-		RestClient.createObject(requestUrl.toString(), name, token);
+		RestClient.createObject(requestUrl.toString(), name, void.class, token);
 	}
 
 	public String[] getLabels() {
@@ -331,27 +332,54 @@ public class ConferenceServer {
 	}
 
 	public void registerRate(Session session, int rate) {
-		// TODO implement
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/feedback/");
+		requestUrl.append(session.getId());
+		requestUrl.append("/rating");
+
+		RestClient.createObject(requestUrl.toString(), rate, void.class, token);
 	}
 
 	public double getRate(Session session) {
-		// TODO implement
-		return 5.6;
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/feedback/");
+		requestUrl.append(session.getId());
+		requestUrl.append("/rating");
+
+		return RestClient.loadObject(requestUrl.toString(), double.class, token);
 	}
 
 	public Remark[] getRemarks(Session session) {
-		// TODO implement
+		String key = REMARK_CACHE_KEY + session.getId();
+		List<Remark> result = (List<Remark>) conferenceCache.getObject(key);
+		if (result == null) {
+			StringBuilder requestUrl = new StringBuilder();
+			requestUrl.append(baseUrl);
+			requestUrl.append("/feedback/");
+			requestUrl.append(session.getId());
+			requestUrl.append("/comment");
 
-		Remark[] remarks = new Remark[3];
-		remarks[0] = new Remark("Erwin", "I've found better sessions to join");
-		remarks[1] = new Remark("Guido", "Cum on, positive feedback &copy;");
-		remarks[2] = new Remark("Marnix", "No, it is kidda cool this stuf");
-		return remarks;
+			result = RestClient.loadObjects(requestUrl.toString(), "comments", Remark.class, token);
+			if (result == null) {
+				return new Remark[0];
+			}
+			conferenceCache.addObject(key, result);
+		}
+		return result.toArray(new Remark[result.size()]);
 	}
 
-	public void registerRemark(String remark) {
-		// TODO Auto-generated method stub
-		Log.w(XCS.LOG.ALL, "Not implemented: " + remark);
+	public void registerRemark(Session session, Remark remark) {
+		String key = REMARK_CACHE_KEY + session.getId();
+		conferenceCache.removeObject(key);
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/feedback/");
+		requestUrl.append(session.getId());
+		requestUrl.append("/comment");
+
+		RestClient.createObject(requestUrl.toString(), remark, void.class, token);
 	}
 
 	/* Utility functions */
