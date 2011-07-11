@@ -31,7 +31,7 @@ public class CVSplashLoader extends BaseActivity {
 	@Override
 	public void onBackPressed() {
 		// Reset the credentials and force authentication next start
-		ConferenceServer.getInstance().close();
+		ConferenceServer.close();
 		super.onBackPressed();
 	}
 
@@ -57,9 +57,8 @@ public class CVSplashLoader extends BaseActivity {
 	protected void onRestart() {
 		// When revived, check for an exit code
 		if (getIntent().getBooleanExtra("exit", false)) {
-			ConferenceServer.getInstance().close();
+			ConferenceServer.close();
 			finish();
-			return;
 		}
 		super.onRestart();
 	}

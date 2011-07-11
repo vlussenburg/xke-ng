@@ -20,9 +20,8 @@ public abstract class AdditionActivity extends BaseActivity implements OnCancelL
 	private Intent authorIntent;
 	private Intent labelIntent;
 
-	public abstract void updateField(int field, Object selection, boolean state);
-
 	abstract protected void onTextClick(int field);
+	public abstract void updateField(int field, Object selection, boolean state);
 
 	protected Intent getAuthorIntent() {
 		if (authorIntent == null) {

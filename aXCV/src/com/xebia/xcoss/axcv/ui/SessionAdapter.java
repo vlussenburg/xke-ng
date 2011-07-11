@@ -14,6 +14,7 @@ import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.CVSessionAdd;
 import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 

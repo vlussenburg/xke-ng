@@ -2,7 +2,6 @@ package com.xebia.xcoss.axcv.util;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 
-import android.content.Intent;
 import android.util.Log;
 
 import com.xebia.xcoss.axcv.BaseActivity;
@@ -16,13 +15,11 @@ public class ProxyExceptionReporter implements UncaughtExceptionHandler {
 	private static ProxyExceptionReporter instance = new ProxyExceptionReporter();
 	
 	private ExceptionReporter exceptionReporter;
-	private BaseActivity mainContext;
 	
 	public static void register(BaseActivity ctx) {
 		UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
 		if ( !(handler instanceof ProxyExceptionReporter) ) {
 			Log.v(XCS.LOG.ALL, "Current uncaugt handler = " + handler);
-			instance.mainContext = ctx;
 			instance.exceptionReporter = ExceptionReporter.register(ctx);
 			Thread.setDefaultUncaughtExceptionHandler(instance);
 		}

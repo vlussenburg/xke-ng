@@ -24,7 +24,9 @@ POST	/conference/{id}/session				Session.update
 GET		/session/{id}							Session.show
 DELETE	/session/{id}							Session.delete
 GET		/locations								Locations.show
+PUT		/location								Locations.create
 GET		/labels									Labels.show
+GET		/labels/author/{id}						Labels.showOnAuthor
 GET		/authors								Authors.show
 PUT		/label/{name}							Labels.create
 POST	/search/authors							Authors.search

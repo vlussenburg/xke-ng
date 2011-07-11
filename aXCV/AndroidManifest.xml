@@ -94,10 +94,12 @@
 					android:host="xebia" />
 			</intent-filter>
 		</activity>
+		<!--
 		<activity
 			android:name="de.quist.app.errorreporter.ExceptionReportActivity"
 			android:process=":exceptionReporter"
 			android:theme="@android:style/Theme.NoDisplay" />
+		-->
 		<meta-data
 			android:name="com.xebia.xcoss.serverUrl"
 			android:value="http://10.0.2.2:9000" />

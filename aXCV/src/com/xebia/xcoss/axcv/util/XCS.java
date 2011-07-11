@@ -39,6 +39,7 @@ public class XCS {
 		public static final int INPUT_TITLE = DIALOGID + 14;
 		public static final int ERROR_SITUATION = DIALOGID + 15;
 		public static final int INPUT_TYPE = DIALOGID + 16;
+		public static final int CREATE_LOCATION = DIALOGID + 17;
 	}
 
 	public static class LOG {

@@ -8,6 +8,10 @@ public class Labels extends DefaultController {
     	handleResponse("", "labels");
     }
 
+    public static void showOnAuthor(String id) {
+    	handleResponse("", "labels");
+    }
+
     public static void create(String name) {
     	ok();
     }

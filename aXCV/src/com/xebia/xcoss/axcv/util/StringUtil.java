@@ -1,4 +1,4 @@
-package com.xebia.xcoss.axcv.ui;
+package com.xebia.xcoss.axcv.util;
 
 public class StringUtil {
 
@@ -17,5 +17,13 @@ public class StringUtil {
 			}
 		}
 		return ( sb.length() == 0 ? 0 : Integer.parseInt(sb.toString()));
+	}
+
+	public static String getExceptionMessage(Exception e) {
+		String message = e.getMessage();
+		if ( StringUtil.isEmpty(message)) {
+			message = e.getClass().getSimpleName().replaceFirst("Exception", "");
+		}
+		return message;
 	}
 }

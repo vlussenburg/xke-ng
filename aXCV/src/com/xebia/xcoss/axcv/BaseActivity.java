@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,20 +15,20 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.util.SparseArray;
-import android.view.AbsSavedState;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView.SavedState;
 
+import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
-import com.xebia.xcoss.axcv.logic.ServerException;
+import com.xebia.xcoss.axcv.logic.ConferenceServerProxy;
+import com.xebia.xcoss.axcv.logic.DataException;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.ProxyExceptionReporter;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
+import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 
@@ -185,7 +184,7 @@ public abstract class BaseActivity extends Activity {
 	}
 
 	protected ConferenceServer getConferenceServer() {
-		ConferenceServer server = ConferenceServer.getInstance();
+		ConferenceServer server = ConferenceServerProxy.getInstance(this);
 		if (server == null || server.isLoggedIn() == false) {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			String user = sp.getString(XCS.PREF.USERNAME, null);
@@ -241,9 +240,13 @@ public abstract class BaseActivity extends Activity {
 					conference.getSessions();
 				}
 			}
+			catch (DataException e) {
+				resultingException = e;
+			}
 			catch (Exception e) {
 				resultingException = e;
-				Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Failure: " + e.getMessage());
+				Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Failure: " + StringUtil.getExceptionMessage(e));
+				e.printStackTrace();
 				return false;
 			}
 			return true;
@@ -258,7 +261,7 @@ public abstract class BaseActivity extends Activity {
 				ctx.onSuccess();
 			} else {
 				Dialog errorDialog = createDialog("Error",
-						"Connection to server failed (" + resultingException.getMessage() + ").");
+						"Connection to server failed (" + StringUtil.getExceptionMessage(resultingException) + ").");
 				errorDialog.setOnDismissListener(new Dialog.OnDismissListener() {
 					@Override
 					public void onDismiss(DialogInterface di) {
@@ -281,5 +284,41 @@ public abstract class BaseActivity extends Activity {
 			e.printStackTrace();
 			throw new IllegalArgumentException("serverUrl is undefined");
 		}
+	}
+
+	public static void handleException(final Activity context, String activity, CommException e) {
+		if ( e instanceof DataException ) {
+			if ( ((DataException)e).missing() ) {
+				Log.w(XCS.LOG.COMMUNICATE, "No result for '" + activity + "'.");
+			} else {
+				// Authentication failure
+				if ( context != null ) {
+					AlertDialog.Builder builder = new AlertDialog.Builder(context);
+					builder
+						.setTitle("Not allowed!")
+						.setMessage("Access for " + activity + " is denied. Specify credentials?")
+						.setIcon(android.R.drawable.ic_dialog_alert)
+						.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+									dialog.dismiss();
+									context.startActivity(new Intent(context, CVSettings.class));
+								}
+							})
+						.setNegativeButton("Continue", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.dismiss();
+								// The next request will do the login again
+								ConferenceServer.close();
+							}
+						});
+					builder.create().show();
+				} else {
+					Log.e(XCS.LOG.COMMUNICATE, "Resource not found while " + activity + ".");
+				}
+			}
+			return;
+		}
+		Log.e(XCS.LOG.COMMUNICATE, "Communication failure on " + activity + ", due to " + e.getMessage());
+		throw new CommException("Failure on activity '"+activity+"'.", e);
 	}
 }

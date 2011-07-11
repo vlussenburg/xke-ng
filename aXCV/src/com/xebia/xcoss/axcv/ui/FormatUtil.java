@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.xebia.xcoss.axcv.model.Remark;
+import com.xebia.xcoss.axcv.util.StringUtil;
 
 public class FormatUtil {
 

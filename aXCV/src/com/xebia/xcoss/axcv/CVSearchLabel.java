@@ -22,7 +22,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.xebia.xcoss.axcv.ui.StringUtil;
+import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class CVSearchLabel extends BaseActivity {

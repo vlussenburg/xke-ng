@@ -31,11 +31,13 @@ import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.TextInputDialog;
+import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class CVConferenceAdd extends AdditionActivity {
 
+	private static final String ADD_NEW_LOCATION = "Add new...";
 	private ScreenTimeUtil timeFormatter;
 	private Conference originalConference;
 	private Conference conference;
@@ -136,18 +138,18 @@ public class CVConferenceAdd extends AdditionActivity {
 	 *            Identifier for the attribute on screen
 	 * @param value
 	 *            The value the user selected
-	 * @param state
+	 * @param checked
 	 *            Indicates a set (true) or a reset (false)
 	 */
-	public void updateField(int field, Object selection, boolean state) {
+	public void updateField(int field, Object selection, boolean checked) {
 		String value = selection.toString();
 		switch (field) {
 			case R.id.conferenceName:
 				conference.setTitle(value);
 			break;
-			 case R.id.conferenceDate:
-			 conference.setDate((DateTime) selection);
-			 break;
+			case R.id.conferenceDate:
+				conference.setDate((DateTime) selection);
+			break;
 			case R.id.conferenceStart:
 				conference.setStartTime((DateTime) selection);
 			break;
@@ -160,8 +162,18 @@ public class CVConferenceAdd extends AdditionActivity {
 			case R.id.conferenceOrganiser:
 				conference.setOrganiser((Author) selection);
 			break;
+			case R.id.conferenceLocText:
+				if (!StringUtil.isEmpty(value)) {
+					getConferenceServer().createLocation(value);
+				}
+			// fallThrough
 			case R.id.conferenceLocations:
-				if (state) {
+				if (checked) {
+					if (ADD_NEW_LOCATION.equals(value)) {
+						showDialog(XCS.DIALOG.CREATE_LOCATION);
+						removeDialog(XCS.DIALOG.INPUT_LOCATION);
+						return;
+					}
 					// Add the location
 					Location[] locations = getConferenceServer().getLocations(false);
 					Location selected = null;
@@ -174,7 +186,7 @@ public class CVConferenceAdd extends AdditionActivity {
 					if (selected != null) {
 						conference.getLocations().add(selected);
 					}
-				} else {
+				} else if (!ADD_NEW_LOCATION.equals(value)) {
 					Location contained = null;
 					Set<Location> locations = conference.getLocations();
 					for (Location location : locations) {
@@ -209,13 +221,22 @@ public class CVConferenceAdd extends AdditionActivity {
 			case XCS.DIALOG.INPUT_DESCRIPTION:
 				dialog = new TextInputDialog(this, R.id.conferenceDescription);
 			break;
+			case XCS.DIALOG.CREATE_LOCATION:
+				dialog = new TextInputDialog(this, R.id.conferenceLocText);
+			break;
 			case XCS.DIALOG.INPUT_LOCATION:
 				Location[] locations = getConferenceServer().getLocations(false);
-				items = new String[locations.length];
-				boolean[] check = new boolean[locations.length];
-				for (int i = 0; i < locations.length; i++) {
+				int size = locations.length + 1;
+
+				items = new String[size];
+				boolean[] check = new boolean[size];
+				
+				for (int i = 0; i < size-1; i++) {
 					items[i] = locations[i].getDescription();
+					check[i] = false;
 				}
+				items[size-1] = ADD_NEW_LOCATION;
+
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Select locations");
 				builder.setMultiChoiceItems(items, check, new DialogHandler(this, items, R.id.conferenceLocations));
@@ -255,10 +276,10 @@ public class CVConferenceAdd extends AdditionActivity {
 				OnDateSetListener dateSetListener = new OnDateSetListener() {
 					@Override
 					public void onDateSet(DatePicker paramDatePicker, int y, int m, int d) {
-						updateField(R.id.conferenceDate, DateTime.forDateOnly(y, m+1, d), true);
+						updateField(R.id.conferenceDate, DateTime.forDateOnly(y, m + 1, d), true);
 					}
 				};
-				dialog = new DatePickerDialog(this, dateSetListener, time.getYear(), time.getMonth()-1, time.getDay());
+				dialog = new DatePickerDialog(this, dateSetListener, time.getYear(), time.getMonth() - 1, time.getDay());
 			break;
 		}
 		if (dialog != null) {
@@ -282,25 +303,24 @@ public class CVConferenceAdd extends AdditionActivity {
 				tid.setDescription("Description");
 				tid.setValue(conference.getDescription());
 			break;
+			case XCS.DIALOG.CREATE_LOCATION:
+				tid = (TextInputDialog) dialog;
+				tid.setDescription("Location name");
+				tid.setValue("");
+				break;
 			case XCS.DIALOG.INPUT_LOCATION:
 				AlertDialog ad = (AlertDialog) dialog;
-				int size = ad.getListView().getCount();
 				Set<Location> locations = conference.getLocations();
 				Set<String> locNames = new HashSet<String>();
 				for (Location location : locations) {
 					locNames.add(location.getDescription());
 				}
+				int size = ad.getListView().getCount();
 				for (int idx = 0; idx < size; idx++) {
 					String loc = (String) ad.getListView().getItemAtPosition(idx);
 					ad.getListView().setItemChecked(idx, locNames.contains(loc));
 				}
 			break;
-			// case XCS.DIALOG.INPUT_TIME_START:
-			// break;
-			// case XCS.DIALOG.INPUT_TIME_END:
-			// break;
-			// case XCS.DIALOG.INPUT_DATE:
-			// break;
 		}
 		super.onPrepareDialog(id, dialog);
 	}

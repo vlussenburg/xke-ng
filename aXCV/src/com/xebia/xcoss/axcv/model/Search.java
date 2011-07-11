@@ -3,7 +3,7 @@ package com.xebia.xcoss.axcv.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.xebia.xcoss.axcv.ui.StringUtil;
+import com.xebia.xcoss.axcv.util.StringUtil;
 
 public class Search {
 

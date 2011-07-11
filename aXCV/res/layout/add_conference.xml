@@ -235,11 +235,10 @@
 					android:layout_height="wrap_content"
 					android:layout_width="wrap_content">
 					<TextView
-						android:id="@+id/TextView24"
 						android:layout_width="wrap_content"
 						android:text="Locations"
 						android:layout_height="wrap_content"
-						android:textSize="@dimen/ts_attribute"></TextView>
+						android:textSize="@dimen/ts_attribute" android:id="@+id/conferenceLocText"></TextView>
 					<TextView
 						android:padding="1sp"
 						android:id="@+id/conferenceLocations"

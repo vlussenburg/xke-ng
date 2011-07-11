@@ -44,8 +44,7 @@
 				android:layout_width="wrap_content"
 				android:background="@drawable/touchtext"
 				android:layout_height="wrap_content"
-				android:text="7.6"
-				android:layout_gravity="top|right" android:id="@+id/ses_rating"></TextView>
+				android:layout_gravity="top|right" android:id="@+id/ses_rating" android:text="\\?"></TextView>
 		</FrameLayout>
 	</LinearLayout>
 </LinearLayout>

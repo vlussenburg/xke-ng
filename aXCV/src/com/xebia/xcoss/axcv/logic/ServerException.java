@@ -1,5 +1,7 @@
 package com.xebia.xcoss.axcv.logic;
 
+import com.xebia.xcoss.axcv.util.StringUtil;
+
 
 public class ServerException extends CommException {
 
@@ -10,6 +12,6 @@ public class ServerException extends CommException {
 	}
 
 	public ServerException(String url, Exception e) {
-		super("Server failure on " + url + ": " + e.getMessage(), e);
+		super("Server failure on " + url + ": " + StringUtil.getExceptionMessage(e), e);
 	}
 }

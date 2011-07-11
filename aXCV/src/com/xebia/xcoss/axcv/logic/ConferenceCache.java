@@ -47,11 +47,13 @@ public class ConferenceCache {
 	private HashMap<Integer, CachedObject<Conference>> conferencesById;
 	private HashMap<Integer, CachedObject<Session>> sessionsById;
 	private HashMap<Integer, CachedObject<List<Conference>>> conferencesByYear;
+	private HashMap<String, CachedObject<Object>> cachedObjects;
 
 	protected ConferenceCache() {
 		this.conferencesById = new HashMap<Integer, CachedObject<Conference>>();
 		this.conferencesByYear = new HashMap<Integer, CachedObject<List<Conference>>>();
 		this.sessionsById = new HashMap<Integer, CachedObject<Session>>();
+		this.cachedObjects = new HashMap<String, CachedObject<Object>>();
 	}
 
 	public Conference getConference(DateTime date) {
@@ -134,6 +136,18 @@ public class ConferenceCache {
 		catch (Exception e) {
 			// ignore
 		}
+	}
+	
+	public void addObject(String key, Object value) {
+		cachedObjects.put(key, new CachedObject<Object>(value));
+	}
+	
+	public void removeObject(String key) {
+		cachedObjects.remove(key);
+	}
+	
+	public Object getObject(String key) {
+		return checkValid(cachedObjects.get(key));
 	}
 
 	public void remove(Session session) {

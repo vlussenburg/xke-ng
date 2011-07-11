@@ -11,7 +11,7 @@ import java.util.TreeSet;
 import android.util.Log;
 
 import com.google.gson.annotations.SerializedName;
-import com.xebia.xcoss.axcv.ui.StringUtil;
+import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class Session implements Serializable {

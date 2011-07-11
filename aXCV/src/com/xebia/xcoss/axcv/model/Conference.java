@@ -14,11 +14,13 @@ import java.util.TreeSet;
 
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.BaseActivity;
+import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
-import com.xebia.xcoss.axcv.ui.StringUtil;
+import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class Conference implements Serializable {
@@ -74,8 +76,8 @@ public class Conference implements Serializable {
 				List<Session> list = ConferenceServer.getInstance().getSessions(this);
 				sessions.addAll(list);
 			}
-			catch (Exception e) {
-				Log.w(XCS.LOG.COMMUNICATE, "No sessions for conference: " + e.getMessage());
+			catch (CommException e) {
+				BaseActivity.handleException(null, "retrieving sessions", e);
 			}
 		}
 		return sessions;
@@ -131,8 +133,13 @@ public class Conference implements Serializable {
 
 	public Set<Location> getLocations() {
 		if (locations.isEmpty()) {
-			Location[] list = ConferenceServer.getInstance().getLocations(true);
-			locations.addAll(Arrays.asList(list));
+			try {
+				Location[] list = ConferenceServer.getInstance().getLocations(true);
+				locations.addAll(Arrays.asList(list));
+			}
+			catch (CommException e) {
+				BaseActivity.handleException(null, "retrieving locations", e);
+			}
 		}
 		return locations;
 	}
@@ -183,27 +190,55 @@ public class Conference implements Serializable {
 	public boolean addSession(Session session) {
 		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + getTitle());
 		session.setDate(date);
-		int id = ConferenceServer.getInstance().storeSession(session, getId(), false);
-		resetSessions();
-		return id > 0;
+		try {
+			int id = ConferenceServer.getInstance().storeSession(session, getId(), false);
+			resetSessions();
+			return id > 0;
+		}
+		catch (CommException e) {
+			BaseActivity.handleException(null, "adding session", e);
+		}
+		return false;
 	}
 
 	public void deleteSession(Session session) {
 		sessions.remove(session);
-		ConferenceServer.getInstance().deleteSession(session, getId());
+		try {
+			ConferenceServer.getInstance().deleteSession(session, getId());
+		}
+		catch (CommException e) {
+			BaseActivity.handleException(null, "deleting session", e);
+		}
 	}
 
 	public static int create(Conference conference) {
-		return ConferenceServer.getInstance().storeConference(conference, false);
+		try {
+			return ConferenceServer.getInstance().storeConference(conference, false);
+		}
+		catch (CommException e) {
+			BaseActivity.handleException(null, "creating conference", e);
+		}
+		return 0;
 	}
 
 	public boolean update() {
-		ConferenceServer.getInstance().storeConference(this, true);
-		return true;
+		try {
+			ConferenceServer.getInstance().storeConference(this, true);
+			return true;
+		}
+		catch (CommException e) {
+			BaseActivity.handleException(null, "updating conference", e);
+		}
+		return false;
 	}
 
 	public void delete() {
-		ConferenceServer.getInstance().deleteConference(this);
+		try {
+			ConferenceServer.getInstance().deleteConference(this);
+		}
+		catch (CommException e) {
+			BaseActivity.handleException(null, "deleting conference", e);
+		}
 	}
 
 	public TimeSlot getNextAvailableTimeSlot(DateTime start, int duration, Location location) {
@@ -211,7 +246,7 @@ public class Conference implements Serializable {
 		int prefstart = Math.max(getTime(start), getTime(startTime));
 
 		for (Session session : sessions) {
-			if ( !location.equals(session.getLocation())) {
+			if (!location.equals(session.getLocation())) {
 				continue;
 			}
 			int sesstart = getTime(session.getStartTime());
@@ -305,9 +340,9 @@ public class Conference implements Serializable {
 		// TODO Auto-generated method stub
 		this.id = i;
 	}
-	
-//	@Override
-//	public String toString() {
-//		return "Conference [id=" + id + ", title=" + title + ", date=" + date + "]";
-//	}
+
+	// @Override
+	// public String toString() {
+	// return "Conference [id=" + id + ", title=" + title + ", date=" + date + "]";
+	// }
 }

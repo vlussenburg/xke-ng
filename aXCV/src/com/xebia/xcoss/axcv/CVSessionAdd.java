@@ -33,8 +33,8 @@ import com.xebia.xcoss.axcv.model.Session.Type;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.Identifiable;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
-import com.xebia.xcoss.axcv.ui.StringUtil;
 import com.xebia.xcoss.axcv.ui.TextInputDialog;
+import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 
