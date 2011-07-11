@@ -39,9 +39,7 @@ public class CVSessionList extends BaseActivity {
 		date.setText(val);
 
 		Log.w(LOG.ALL, "Conference has " + currentConference.getSessions().size() + " sessions.");
-		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, sessions);
 		ListView sessionList = (ListView) findViewById(R.id.sessionList);
-		sessionList.setAdapter(adapter);
 		sessionList.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
@@ -52,6 +50,13 @@ public class CVSessionList extends BaseActivity {
 		super.onCreate(savedInstanceState);
 	}
 
+	@Override
+	protected void onResume() {
+		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, sessions);
+		ListView sessionList = (ListView) findViewById(R.id.sessionList);
+		sessionList.setAdapter(adapter);
+		super.onResume();
+	}
 	
 	private void switchTo(Conference conference, int sessionIndex) {
 		Session session = sessions[sessionIndex];

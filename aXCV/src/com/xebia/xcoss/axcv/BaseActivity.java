@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -18,12 +19,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.logic.ConferenceServerProxy;
 import com.xebia.xcoss.axcv.logic.DataException;
+import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.ProxyExceptionReporter;
@@ -45,6 +48,7 @@ public abstract class BaseActivity extends Activity {
 	private MenuItem miList;
 	private MenuItem miAdd;
 	private MenuItem miEdit;
+	private MenuItem miTrack;
 
 	private static Activity rootActivity;
 
@@ -53,11 +57,11 @@ public abstract class BaseActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		ProxyExceptionReporter.register(this);
 
-		if ( rootActivity == null ) {
+		if (rootActivity == null) {
 			rootActivity = this;
 		}
 		Log.e("XCS", "========== ROOT activity [" + rootActivity.getLocalClassName() + "] ========== ");
-		if ( (rootActivity instanceof CVSplashLoader) == false ) {
+		if ((rootActivity instanceof CVSplashLoader) == false) {
 			Log.e("XCS", "========== ROOT activity RESET ========== ");
 			resetApplication(true);
 			return;
@@ -101,12 +105,14 @@ public abstract class BaseActivity extends Activity {
 		miList = menu.add(0, XCS.MENU.OVERVIEW, Menu.NONE, R.string.menu_overview);
 		miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
 		miSearch = menu.add(0, XCS.MENU.SEARCH, Menu.NONE, R.string.menu_search);
+		miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
 
 		miAdd.setIcon(android.R.drawable.ic_menu_add);
 		miEdit.setIcon(android.R.drawable.ic_menu_edit);
 		miSettings.setIcon(android.R.drawable.ic_menu_preferences);
 		miSearch.setIcon(android.R.drawable.ic_menu_search);
 		miList.setIcon(R.drawable.ic_menu_list);
+		miTrack.setIcon(android.R.drawable.ic_menu_agenda);
 
 		return true;
 	}
@@ -124,6 +130,9 @@ public abstract class BaseActivity extends Activity {
 			break;
 			case XCS.MENU.SEARCH:
 				startActivity(new Intent(this, CVSearch.class));
+			break;
+			case XCS.MENU.TRACK:
+				startActivity(new Intent(this, CVTrack.class));
 			break;
 		}
 		return true;
@@ -157,7 +166,7 @@ public abstract class BaseActivity extends Activity {
 			conference = server.getUpcomingConference();
 			Log.w(LOG.ALL, "Conference default " + conference.getTitle());
 		}
-//		Log.i("XCS", "[GET] Conference (on '" + identifier + "') = " + conference);
+		// Log.i("XCS", "[GET] Conference (on '" + identifier + "') = " + conference);
 		return conference;
 	}
 
@@ -209,11 +218,9 @@ public abstract class BaseActivity extends Activity {
 		return builder.create();
 	}
 
-	protected void onSuccess() {
-	}
+	protected void onSuccess() {}
 
-	protected void onFailure() {
-	}
+	protected void onFailure() {}
 
 	class DataRetriever extends AsyncTask<String, Void, Boolean> {
 
@@ -286,31 +293,39 @@ public abstract class BaseActivity extends Activity {
 		}
 	}
 
+	public void markSession(Session session, View view, boolean update) {
+		boolean hasMarked = update ? ProfileManager.markSession(getUser(), session.getId()) :
+			ProfileManager.isMarked(getUser(), session.getId());
+		
+		if (view instanceof ImageView) {
+			((ImageView) view).setImageResource(hasMarked ? android.R.drawable.btn_star_big_on
+					: android.R.drawable.btn_star_big_off);
+		}
+	}
+
 	public static void handleException(final Activity context, String activity, CommException e) {
-		if ( e instanceof DataException ) {
-			if ( ((DataException)e).missing() ) {
+		if (e instanceof DataException) {
+			if (((DataException) e).missing()) {
 				Log.w(XCS.LOG.COMMUNICATE, "No result for '" + activity + "'.");
 			} else {
 				// Authentication failure
-				if ( context != null ) {
+				if (context != null) {
 					AlertDialog.Builder builder = new AlertDialog.Builder(context);
-					builder
-						.setTitle("Not allowed!")
-						.setMessage("Access for " + activity + " is denied. Specify credentials?")
-						.setIcon(android.R.drawable.ic_dialog_alert)
-						.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+					builder.setTitle("Not allowed!")
+							.setMessage("Access for " + activity + " is denied. Specify credentials?")
+							.setIcon(android.R.drawable.ic_dialog_alert)
+							.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int id) {
 									dialog.dismiss();
 									context.startActivity(new Intent(context, CVSettings.class));
 								}
-							})
-						.setNegativeButton("Continue", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.dismiss();
-								// The next request will do the login again
-								ConferenceServer.close();
-							}
-						});
+							}).setNegativeButton("Continue", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+									dialog.dismiss();
+									// The next request will do the login again
+									ConferenceServer.close();
+								}
+							});
 					builder.create().show();
 				} else {
 					Log.e(XCS.LOG.COMMUNICATE, "Resource not found while " + activity + ".");
@@ -319,6 +334,12 @@ public abstract class BaseActivity extends Activity {
 			return;
 		}
 		Log.e(XCS.LOG.COMMUNICATE, "Communication failure on " + activity + ", due to " + e.getMessage());
-		throw new CommException("Failure on activity '"+activity+"'.", e);
+		throw new CommException("Failure on activity '" + activity + "'.", e);
+	}
+
+	protected String getUser() {
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		String user = sp.getString(XCS.PREF.USERNAME, null);
+		return user;
 	}
 }

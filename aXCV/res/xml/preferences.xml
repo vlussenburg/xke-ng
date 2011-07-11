@@ -40,6 +40,20 @@
 			android:defaultValue="false"
 			android:summaryOff="Use slide view"
 			android:summaryOn="Show sessions as schedule" />
+		<com.xebia.xcoss.axcv.preference.EditDateTimeFormatPreference
+			android:dialogTitle="Date format"
+			android:dialogMessage="Specify the date format in Java style"
+			android:key="DateFormat"
+			android:title="Date format"
+			android:summary="(default)"
+			android:defaultValue="d MMMM yyyy" />
+		<com.xebia.xcoss.axcv.preference.EditDateTimeFormatPreference
+			android:dialogTitle="Time format"
+			android:dialogMessage="Specify the time format in Java style"
+			android:key="TimeFormat"
+			android:title="Time format"
+			android:summary="(default)"
+			android:defaultValue="HH:mm'u'" />
 <!--
 		<ListPreference
 			android:title="Date format"

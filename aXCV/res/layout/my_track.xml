@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:background="@android:color/black"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<RelativeLayout
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:id="@+id/relativeLayout1">
+		<ImageView
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:src="@drawable/x_conference"
+			android:id="@+id/conferenceButton"
+			android:layout_alignParentLeft="true"></ImageView>
+		<TextView
+			android:paddingLeft="7sp"
+			android:layout_height="fill_parent"
+			android:layout_width="wrap_content"
+			android:layout_alignWithParentIfMissing="true"
+			android:gravity="center_vertical"
+			android:layout_toRightOf="@+id/conferenceButton"
+			android:layout_alignTop="@+id/conferenceButton"
+			android:layout_alignBottom="@+id/conferenceButton"
+			android:textSize="@dimen/textsize_title" android:id="@+id/trackTitle" android:text="@string/my_track_title"></TextView>
+		<ImageButton
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/x_conference"
+			android:id="@+id/imageButton5"
+			android:layout_toLeftOf="@+id/imageButton4"
+			android:layout_alignTop="@+id/imageButton4"
+			android:visibility="gone"
+			android:layout_alignBottom="@+id/imageButton4"></ImageButton>
+		<ImageButton
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/x_conference"
+			android:id="@+id/imageButton4"
+			android:visibility="gone"
+			android:layout_alignParentRight="true"></ImageButton>
+	</RelativeLayout>
+	<View
+		android:id="@+id/firstDivider"
+		android:layout_height="2dp"
+		android:layout_width="fill_parent"
+		android:background="@color/linebreak" />
+	<ListView
+		android:id="@+id/sessionList"
+		android:layout_height="fill_parent"
+		android:layout_width="fill_parent"></ListView>
+</LinearLayout>

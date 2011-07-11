@@ -2,7 +2,6 @@ package com.xebia.xcoss.axcv.ui;
 
 import android.content.Intent;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
-import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class SessionAdapter extends BaseAdapter {
 
@@ -25,12 +23,13 @@ public class SessionAdapter extends BaseAdapter {
 	private int alternativeViewResource;
 	private Session[] data;
 	private ScreenTimeUtil timeUtil;
+	private boolean includeDate = false;
 
 	public SessionAdapter(BaseActivity context, int viewResourceId, int altViewResourceId, Session[] data) {
 		this.ctx = context;
 		this.viewResource = viewResourceId;
 		this.alternativeViewResource = altViewResourceId;
-		this.data = data; //conference.getSessions().toArray(new Session[0]);
+		this.data = data;
 		timeUtil = new ScreenTimeUtil(context);
 	}
 
@@ -39,14 +38,12 @@ public class SessionAdapter extends BaseAdapter {
 
 		Session session = (Session) getItem(paramInt);
 		int colorId = ctx.getResources().getColor(R.color.tc_itemdefault);
-		boolean now = ScreenTimeUtil.isNow(session.getStartTime(), session.getEndTime());
-//		if (timeUtil.isHistory(session.getEndDate())) {
-//			colorId = ctx.getResources().getColor(R.color.tc_itemgone);
-//		} else if (now) {
-//			colorId = ctx.getResources().getColor(R.color.tc_itemactive);
-//		}
-
-		if ( session.isMandatory() ) {
+		if ( session.isExpired() ) {
+			colorId = ctx.getResources().getColor(R.color.tc_itemgone);
+		} else if ( session.isRunning() ) {
+			colorId = ctx.getResources().getColor(R.color.tc_itemactive);
+		}
+		if (session.isMandatory()) {
 			return constructMandatoryView(parent, session, colorId);
 		}
 		return constructSessionView(parent, session, colorId);
@@ -66,7 +63,7 @@ public class SessionAdapter extends BaseAdapter {
 		titleView.setTextColor(colorId);
 
 		String authors = FormatUtil.getList(session.getAuthors(), false);
-		if ( StringUtil.isEmpty(authors) ) {
+		if (StringUtil.isEmpty(authors)) {
 			authorView.setVisibility(View.GONE);
 			row.findViewById(R.id.ses_author_label).setVisibility(View.GONE);
 		} else {
@@ -74,7 +71,7 @@ public class SessionAdapter extends BaseAdapter {
 		}
 
 		String labels = FormatUtil.getList(session.getLabels(), false);
-		if ( StringUtil.isEmpty(labels) ) {
+		if (StringUtil.isEmpty(labels)) {
 			labelView.setVisibility(View.GONE);
 			row.findViewById(R.id.ses_labels_label).setVisibility(View.GONE);
 		} else {
@@ -82,23 +79,22 @@ public class SessionAdapter extends BaseAdapter {
 			Linkify.addLinks(labelView, XCS.TAG.PATTERN, XCS.TAG.LINK);
 			labelView.setFocusable(false);
 		}
-		
+
 		locDateView.setText(getLocationAndDate(session));
 
-		
 		ImageView button;
 		button = (ImageView) row.findViewById(R.id.markButton);
+		ctx.markSession(session, button, false);
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Log.e(LOG.ALL, "Clicked on " + view);
+				ctx.markSession(session, view, true);
 			}
 		});
 		button = (ImageView) row.findViewById(R.id.editButton);
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Log.e(LOG.ALL, "Clicked on " + view);
 				editSession(session);
 			}
 		});
@@ -116,12 +112,11 @@ public class SessionAdapter extends BaseAdapter {
 
 		titleView.setText(session.getTitle());
 		titleView.setTextColor(colorId);
-//			titleView.setTypeface(titleView.getTypeface(), Typeface.BOLD);
+		// titleView.setTypeface(titleView.getTypeface(), Typeface.BOLD);
 
 		locDateView.setText(getLocationAndDate(session));
 		return row;
 	}
-
 
 	private void editSession(Session session) {
 		Intent intent = new Intent(ctx, CVSessionAdd.class);
@@ -131,8 +126,12 @@ public class SessionAdapter extends BaseAdapter {
 	}
 
 	private CharSequence getLocationAndDate(Session session) {
-		
+
 		StringBuilder sb = new StringBuilder();
+		if ( includeDate ) {
+			sb.append(timeUtil.getAbsoluteDate(session.getDate()));
+			sb.append(" | ");
+		}
 		sb.append(session.getLocation().getDescription());
 		sb.append(" | ");
 		sb.append(timeUtil.getAbsoluteTime(session.getStartTime()));
@@ -154,5 +153,9 @@ public class SessionAdapter extends BaseAdapter {
 	@Override
 	public long getItemId(int paramInt) {
 		return paramInt;
+	}
+
+	public void setIncludeDate(boolean state) {
+		includeDate = state;
 	}
 }

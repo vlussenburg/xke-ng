@@ -1,6 +1,7 @@
 package com.xebia.xcoss.axcv.model;
 
 import hirondelle.date4j.DateTime;
+import hirondelle.date4j.DateTime.DayOverflow;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -240,5 +241,15 @@ public class Session implements Serializable {
 
 	public boolean isBreak() {
 		return (type != null && type == Type.BREAK);
+	}
+
+	public boolean isExpired() {
+		DateTime expired = getDate().plus(0, 0, 0, getEndTime().getHour(), getEndTime().getMinute(), 0, DayOverflow.Spillover);
+		return expired.isInThePast(XCS.TZ);
+	}
+
+	public boolean isRunning() {
+		DateTime started = getDate().plus(0, 0, 0, getStartTime().getHour(), getStartTime().getMinute(), 0, DayOverflow.Spillover);
+		return DateTime.now(XCS.TZ).gteq(started) && !isExpired(); 
 	}
 }

@@ -78,16 +78,4 @@ public class ScreenTimeUtil {
 		}
 		return null;
 	}
-	
-	public static boolean isNow(DateTime startTime, DateTime endTime) {
-		DateTime now = DateTime.now(XCS.TZ);
-		if (startTime.hasYearMonthDay() && !startTime.isSameDayAs(now)) {
-			return false;
-		}
-		if ( startTime.lteq(now) && endTime.gteq(now)) {
-			return true;
-		}
-		return false;
-	}
-
 }

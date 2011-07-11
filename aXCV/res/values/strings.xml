@@ -12,6 +12,7 @@
     <string name="menu_overview">Conferences</string>
     <string name="menu_add">Add</string>
     <string name="menu_edit">Edit</string>
+    <string name="menu_track">My Track</string>
 
     <string name="password_set">Password stored</string>
     <string name="password_unset">No password specified</string>
@@ -23,4 +24,5 @@
 
     <string name="empty_value">&lt;specify value&gt;</string>    
     <string name="default_input_text">&lt;start typing&gt;</string>    
+    <string name="my_track_title">My track list</string>    
 </resources>

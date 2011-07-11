@@ -19,7 +19,6 @@ import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
-import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -174,7 +173,7 @@ public class Conference implements Serializable {
 
 	public Session getUpcomingSession() {
 		for (Session session : sessions) {
-			if (ScreenTimeUtil.isNow(session.getStartTime(), session.getEndTime())) {
+			if (!session.isExpired()) {
 				return session;
 			}
 		}

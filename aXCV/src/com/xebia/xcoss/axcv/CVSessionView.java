@@ -5,13 +5,10 @@ import java.util.SortedSet;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,7 +30,6 @@ import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
-import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class CVSessionView extends SwipeActivity {
 
@@ -92,7 +88,6 @@ public class CVSessionView extends SwipeActivity {
 			Linkify.addLinks(sessionAuthor, XCS.AUTHOR.PATTERN, XCS.AUTHOR.LINK);
 		}
 
-		ConferenceServer server = getConferenceServer();
 		OnClickListener lRate = new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
@@ -117,8 +112,7 @@ public class CVSessionView extends SwipeActivity {
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				//TODO
-				Log.e(LOG.ALL, "Clicked on " + view);
+				markSession(currentSession, view, true);
 			}
 		});
 
@@ -170,6 +164,9 @@ public class CVSessionView extends SwipeActivity {
 		TextView view2 = (TextView) findViewById(R.id.scComments);
 		Spanned spannedContent = Html.fromHtml(FormatUtil.getHtml(server.getRemarks(currentSession)));
 		view2.setText(spannedContent, BufferType.SPANNABLE);
+
+		ImageView button = (ImageView) findViewById(R.id.sessionMarkButton);
+		markSession(currentSession, button, false);
 	}
 	
 	@Override
@@ -229,9 +226,7 @@ public class CVSessionView extends SwipeActivity {
 					@Override
 					public void onClick(View paramView) {
 						String remark = edit.getText().toString();
-						SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(CVSessionView.this);
-						String user = sp.getString(XCS.PREF.USERNAME, null);
-						getConferenceServer().registerRemark(currentSession, new Remark(user, remark));
+						getConferenceServer().registerRemark(currentSession, new Remark(getUser(), remark));
 						dismissDialog(XCS.DIALOG.CREATE_REVIEW);
 						refresh();
 					}
