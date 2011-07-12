@@ -42,13 +42,12 @@
 				android:layout_alignTop="@+id/imageButton4"
 				android:layout_alignBottom="@+id/imageButton4"
 				android:visibility="gone"></ImageButton>
-			<ImageButton
+			<ImageView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:src="@drawable/x_conference"
-				android:id="@+id/imageButton4"
 				android:layout_alignParentRight="true"
-				android:visibility="gone"></ImageButton>
+				android:src="@drawable/x_complete_1"
+				android:id="@+id/completeness" android:layout_margin="5sp"></ImageView>
 		</RelativeLayout>
 		<View
 			android:id="@+id/firstDivider"
@@ -327,11 +326,13 @@
 				android:background="@drawable/rateslider"
 				android:textSize="@dimen/ts_group"
 				android:textColor="@color/textcolor_header"
-				android:text="Details" android:id="@+id/detailsTitle"></TextView>
+				android:text="Details"
+				android:id="@+id/detailsTitle"></TextView>
 			<TableLayout
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
-				android:padding="6sp" android:id="@+id/detailsLayout">
+				android:padding="6sp"
+				android:id="@+id/detailsLayout">
 				<TableRow
 					android:layout_width="wrap_content"
 					android:id="@+id/TableRow03"
