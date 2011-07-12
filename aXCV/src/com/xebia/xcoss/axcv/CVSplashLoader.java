@@ -47,6 +47,11 @@ public class CVSplashLoader extends BaseActivity {
 	};
 
 	@Override
+	protected void onDestroy() {
+		getProfileManager().closeConnection();
+		super.onDestroy();
+	}
+	@Override
 	protected void onNewIntent(Intent intent) {
 		// Called upon manually creating an exit intent
 		getIntent().fillIn(intent, Intent.FILL_IN_DATA);

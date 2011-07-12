@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -19,7 +18,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.xebia.xcoss.axcv.logic.CommException;
@@ -51,6 +49,7 @@ public abstract class BaseActivity extends Activity {
 	private MenuItem miTrack;
 
 	private static Activity rootActivity;
+	private static ProfileManager profileManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -203,6 +202,14 @@ public abstract class BaseActivity extends Activity {
 		return server;
 	}
 
+	protected ProfileManager getProfileManager() {
+		if (profileManager == null) {
+			profileManager = new ProfileManager(rootActivity);
+		}
+		profileManager.openConnection();
+		return profileManager;
+	}
+
 	protected Dialog createDialog(String title, String message) {
 		return createDialog(this, title, message);
 	}
@@ -294,9 +301,19 @@ public abstract class BaseActivity extends Activity {
 	}
 
 	public void markSession(Session session, View view, boolean update) {
-		boolean hasMarked = update ? ProfileManager.markSession(getUser(), session.getId()) :
-			ProfileManager.isMarked(getUser(), session.getId());
-		
+		// Breaks are not supported for marking
+		if (session.getType() == Session.Type.BREAK) return;
+
+		ProfileManager pm = getProfileManager();
+		boolean hasMarked = pm.isMarked(getUser(), session.getId());
+		if (update) {
+			if (hasMarked) {
+				if (pm.unmarkSession(getUser(), session)) hasMarked = false;
+			} else {
+				if (pm.markSession(getUser(), session)) hasMarked = true;
+			}
+		}
+
 		if (view instanceof ImageView) {
 			((ImageView) view).setImageResource(hasMarked ? android.R.drawable.btn_star_big_on
 					: android.R.drawable.btn_star_big_off);

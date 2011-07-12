@@ -5,6 +5,7 @@ import java.util.SortedSet;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -109,13 +110,16 @@ public class CVSessionView extends SwipeActivity {
 		view2.setOnClickListener(lReview);
 
 		ImageView button = (ImageView) findViewById(R.id.sessionMarkButton);
-		button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				markSession(currentSession, view, true);
-			}
-		});
-
+		if ( currentSession.getType() == Session.Type.BREAK ) {
+			button.setVisibility(View.INVISIBLE);
+		} else {
+			button.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					markSession(currentSession, view, true);
+				}
+			});
+		}
 		// Slide buttons
 		ImageView im;
 		im = (ImageView) findViewById(R.id.slideLocationMin);

@@ -29,7 +29,7 @@ public class EditDateTimeFormatPreference extends EditTextPreference {
 			setSummary(value);
 		}
 		catch (Exception e) {
-			Toast.makeText(getContext(), "Invalid format!", Toast.LENGTH_LONG);
+			// Ignore (Toast does not work in dismissed dialog context)
 		}
 	}
 }
