@@ -296,8 +296,6 @@ public class CVSessionView extends SwipeActivity {
 	}
 
 	private void startActivityCurrentSession() {
-		findViewById(R.id.sessionList);
-
 		Intent intent = getIntent();
 		intent.putExtra(BaseActivity.IA_CONFERENCE, getConference().getId());
 		intent.putExtra(BaseActivity.IA_SESSION, currentSession.getId());

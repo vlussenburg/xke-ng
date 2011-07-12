@@ -5,9 +5,8 @@ import hirondelle.date4j.DateTime.Unit;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
-import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
 import com.xebia.xcoss.axcv.model.Author;
@@ -17,6 +16,8 @@ import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Search;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.model.util.ConferenceComparator;
+import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class ConferenceServer {
@@ -104,6 +105,7 @@ public class ConferenceServer {
 			}
 			conferenceCache.add(result);
 		}
+		Collections.sort(result, new ConferenceComparator());
 		return result;
 	}
 
@@ -128,6 +130,7 @@ public class ConferenceServer {
 			}
 			conferenceCache.add(result);
 		}
+		Collections.sort(result, new ConferenceComparator());
 		return result;
 	}
 
@@ -168,6 +171,7 @@ public class ConferenceServer {
 		}
 
 		conferenceCache.addSessions(result);
+		Collections.sort(result, new SessionComparator());
 		return result;
 	}
 
@@ -328,6 +332,7 @@ public class ConferenceServer {
 		if (result == null) {
 			return new ArrayList<Session>();
 		}
+		Collections.sort(result, new SessionComparator());
 		return result;
 	}
 
@@ -384,6 +389,44 @@ public class ConferenceServer {
 
 	/* Utility functions */
 
+	public Conference getNextConference(DateTime dt) {
+		List<Conference> list = getConferences(dt.getYear());
+
+		if (list.isEmpty()) {
+			return null;
+		}
+
+		for (Conference conference : list) {
+			DateTime cdate = conference.getDate();
+			if (cdate.lt(dt) || cdate.isSameDayAs(dt)) {
+				continue;
+			}
+			// List is sorted on date
+			return conference;
+		}
+		// No conference in this year.
+		return getNextConference(DateTime.forDateOnly(dt.getYear() + 1, 1, 1));
+	}
+	
+	public Conference getPreviousConference(DateTime dt) {
+		List<Conference> list = getConferences(dt.getYear());
+		if (list.isEmpty()) {
+			return null;
+		}
+
+		Collections.reverse(list);
+		for (Conference conference : list) {
+			DateTime cdate = conference.getDate();
+			if (cdate.gt(dt) || cdate.isSameDayAs(dt)) {
+				continue;
+			}
+			// List is reversed sorted on date
+			return conference;
+		}
+		// No conference in this year.
+		return getPreviousConference(DateTime.forDateOnly(dt.getYear() - 1, 1, 1));
+	}
+	
 	public List<Conference> getUpcomingConferences(int size) {
 		DateTime now = DateTime.today(XCS.TZ);
 		Integer yearValue = now.getYear();

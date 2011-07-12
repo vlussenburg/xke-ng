@@ -1,5 +1,6 @@
 package com.xebia.xcoss.axcv;
 
+import hirondelle.date4j.DateTime;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,7 +19,7 @@ import com.xebia.xcoss.axcv.ui.SessionAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 
-public class CVSessionList extends BaseActivity {
+public class CVSessionList extends SwipeActivity {
 
 	private Conference currentConference;
 	private Session[] sessions;
@@ -27,6 +28,7 @@ public class CVSessionList extends BaseActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.schedule);
+		addGestureDetection(R.id.scheduleSwipeBase);
 
 		currentConference = getConference();
 		sessions = currentConference.getSessions().toArray(new Session[0]);
@@ -95,4 +97,35 @@ public class CVSessionList extends BaseActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
+	@Override
+	public void onSwipeLeftToRight() {
+		Conference conference = getConferenceServer().getPreviousConference(currentConference.getDate());
+		if ( conference == null ) {
+			return;
+		}
+		Intent intent = getIntent();
+		intent.putExtra(IA_CONFERENCE, conference.getId());
+		startActivity(intent);
+		overridePendingTransition(R.anim.slide_right, 0);
+	}
+
+	@Override
+	public void onSwipeRightToLeft() {
+		Conference conference = getConferenceServer().getNextConference(currentConference.getDate());
+		if ( conference == null ) {
+			return;
+		}
+		Intent intent = getIntent();
+		intent.putExtra(IA_CONFERENCE, conference.getId());
+		startActivity(intent);
+		overridePendingTransition(R.anim.slide_left, 0);
+	}
+
+	@Override
+	public void onSwipeTopToBottom() {
+	}
+
+	@Override
+	public void onSwipeBottomToTop() {
+	}
 }

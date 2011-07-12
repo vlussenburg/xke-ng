@@ -21,16 +21,20 @@ import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.ui.ConferenceAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
 
-public class CVConferences extends BaseActivity {
+public class CVConferences extends SwipeActivity {
 
+	private int shownYear;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.conferences);
+		addGestureDetection(R.id.conferencesSwipeBase);
 		super.onCreate(savedInstanceState);
 
-		DateTime dt = DateTime.today(XCS.TZ);
-		List<Conference> list = getConferenceServer().getConferences(dt.getYear());
+		shownYear = getIntent().getIntExtra(IA_CONF_YEAR, DateTime.today(XCS.TZ).getYear());
+
+		List<Conference> list = getConferenceServer().getConferences(shownYear);
 		final Conference[] conferences = list.toArray(new Conference[list.size()]);
 		ConferenceAdapter adapter = new ConferenceAdapter(this, R.layout.conference_item, conferences);
 		ListView conferencesList = (ListView) findViewById(R.id.conferencesList);
@@ -45,7 +49,7 @@ public class CVConferences extends BaseActivity {
 		});
 
 		// Check for redirection. Not the case if menu option is used.
-		if (getIntent().getBooleanExtra("redirect", true)) {
+		if (getIntent().getBooleanExtra(IA_REDIRECT, true)) {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			if (sp.getBoolean(XCS.PREF.JUMPTOFIRST, true)) {
 				Log.i(XCS.LOG.NAVIGATE, "Jumping to first upcomming conference.");
@@ -54,7 +58,7 @@ public class CVConferences extends BaseActivity {
 		}
 		
 		TextView title = (TextView) findViewById(R.id.conferencesTitle);
-		title.setText(title.getText() + " " + dt.getYear());
+		title.setText(title.getText() + " " + shownYear);
 	}
 
 	private void switchTo(Conference conference) {
@@ -82,4 +86,29 @@ public class CVConferences extends BaseActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
+	@Override
+	public void onSwipeLeftToRight() {
+		Intent intent = getIntent();
+		intent.putExtra(IA_REDIRECT, false);
+		intent.putExtra(IA_CONF_YEAR, shownYear-1);
+		startActivity(intent);
+		overridePendingTransition(R.anim.slide_right, 0);
+	}
+
+	@Override
+	public void onSwipeRightToLeft() {
+		Intent intent = getIntent();
+		intent.putExtra(IA_REDIRECT, false);
+		intent.putExtra(IA_CONF_YEAR, shownYear+1);
+		startActivity(intent);
+		overridePendingTransition(R.anim.slide_left, 0);
+	}
+
+	@Override
+	public void onSwipeTopToBottom() {
+	}
+
+	@Override
+	public void onSwipeBottomToTop() {
+	}
 }

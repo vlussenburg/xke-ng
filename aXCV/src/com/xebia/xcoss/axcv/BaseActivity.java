@@ -40,6 +40,8 @@ public abstract class BaseActivity extends Activity {
 	public static final String IA_AUTHORS = "ID-authors";
 	public static final String IA_AUTHOR = "ID-author";
 	public static final String IA_LABELS = "ID-labels";
+	public static final String IA_CONF_YEAR = "ID-year";
+	public static final String IA_REDIRECT = "ID-redirect";
 
 	private MenuItem miSettings;
 	private MenuItem miSearch;
@@ -139,7 +141,7 @@ public abstract class BaseActivity extends Activity {
 
 	private void showConferencesList() {
 		Intent intent = new Intent(this, CVConferences.class);
-		intent.putExtra("redirect", false);
+		intent.putExtra(IA_REDIRECT, false);
 		// Clears out the activity call stack
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
