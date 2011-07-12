@@ -15,11 +15,13 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils.TruncateAt;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -92,6 +94,7 @@ public class CVSessionAdd extends AdditionActivity {
 
 			view = (TextView) findViewById(R.id.sessionDescription);
 			view.setText(FormatUtil.getText(session.getDescription()));
+			view.setEllipsize(TruncateAt.END);
 
 			if (startTime != null) {
 				view = (TextView) findViewById(R.id.sessionStart);
@@ -125,6 +128,16 @@ public class CVSessionAdd extends AdditionActivity {
 
 			view = (TextView) findViewById(R.id.sessionType);
 			view.setText(FormatUtil.getText(session.getType()));
+			
+			ImageView iv = (ImageView) findViewById(R.id.completeness);
+			int completeness = session.calculateCompleteness(8);
+			if ( completeness == 0 ) {
+				iv.setVisibility(View.INVISIBLE);
+			} else {
+				iv.setVisibility(View.VISIBLE);
+				iv.setImageResource(R.drawable.x_complete_1 + completeness - 1);
+				iv.invalidate();
+			}
 		}
 	}
 
@@ -278,7 +291,7 @@ public class CVSessionAdd extends AdditionActivity {
 			case R.id.sessionType:
 				Type type = (Type)selection;
 				session.setType(type);
-				activateDetails(type == Type.STANDARD);
+				activateDetails(type.hasDetails());
 			break;
 			default:
 				Log.w(LOG.NAVIGATE, "Don't know how to process: " + field);

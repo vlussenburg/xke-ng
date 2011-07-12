@@ -18,13 +18,24 @@ import com.xebia.xcoss.axcv.util.XCS;
 public class Session implements Serializable {
 
 	public enum Type {
-		STANDARD ("Standard session"), 
-		MANDATORY ("Mandatory session"), 
+		STANDARD ("Presentation"), 
+		WORKSHOP ("Workshop"),
+		BRAINSTORM ("Brainstorm"),
+		BOOK ("Book review"),
+		SUMMARY ("Report"),
+		STRATEGIC ("Strategy"),
+		INCUBATOR ("Incubator"),
+		
+		MANDATORY ("Corporate (mandatory)"), 
 		BREAK ("Break"); // This is also Mandatory
 		
 		private String text;
 		private Type(String txt) { this.text = txt; }
-		public String toString() { return text; } 
+		public String toString() { return text; }
+		
+		public boolean hasDetails() {
+			return (this != MANDATORY && this != BREAK);
+		} 
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -225,6 +236,58 @@ public class Session implements Serializable {
 			messages.add("Location");
 		}
 		return (messages.size() == 0);
+	}
+
+	public int calculateCompleteness(int maxInclusive) {
+		int value = 0;
+		// Title: Max 10
+		if ( !StringUtil.isEmpty(title) ) {
+			value += Math.min(10, title.length()/2);
+			Log.v(XCS.LOG.ALL, "Title boosted value to " + value);
+		}
+		// Description: Max 35
+		if ( !StringUtil.isEmpty(description) ) {
+			value += Math.min(35, description.replaceAll("\\w", "").length()*1.4);
+			Log.v(XCS.LOG.ALL, "Description boosted value to " + value);
+		}
+		// startTime: Max 5
+		if ( startTime != null ) {
+			value += 5;
+			Log.v(XCS.LOG.ALL, "Start time boosted value to " + value);
+		}
+		// Location: Max 5
+		if ( location != null ) {
+			value += 5;
+			Log.v(XCS.LOG.ALL, "Location boosted value to " + value);
+		}
+		// Author: Max 5
+		if ( authors != null && authors.size() > 0) {
+			value += 5;
+			Log.v(XCS.LOG.ALL, "Authors boosted value to " + value);
+		}
+		// Labels: Max 10
+		if ( labels != null ) {
+			value += Math.min(10, labels.size()*3);
+			Log.v(XCS.LOG.ALL, "Labels boosted value to " + value);
+		}
+		// Languages: Max 5
+		if ( languages != null && languages.size() > 0) {
+			value += 5;
+			Log.v(XCS.LOG.ALL, "Languages boosted value to " + value);
+		}
+		// Preparation: Max 5
+		if ( !StringUtil.isEmpty(preparation) ) {
+			value += Math.min(5, preparation.length()/3);
+			Log.v(XCS.LOG.ALL, "Preparation boosted value to " + value);
+		}
+		// intendedAudience: Max 20
+		if ( !StringUtil.isEmpty(intendedAudience) ) {
+			value += Math.min(20, intendedAudience.length());
+			Log.v(XCS.LOG.ALL, "Audience boosted value to " + value);
+		}
+		Log.i(XCS.LOG.ALL, "Completeness (100) = " + value);
+
+		return value == 0 ? 0 : Math.max(1, (value*maxInclusive)/100);
 	}
 
 	@Override
