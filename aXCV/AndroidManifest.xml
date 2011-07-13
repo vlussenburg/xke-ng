@@ -18,6 +18,9 @@
 		<service
 			android:name="de.quist.app.errorreporter.ExceptionReportService"
 			android:process=":exceptionReporter" />
+		<service
+			android:enabled="true"
+			android:name=".service.NotificationService" />
 		<activity
 			android:name="CVSplashLoader"
 			android:theme="@android:style/Theme.NoTitleBar"

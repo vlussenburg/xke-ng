@@ -74,13 +74,15 @@
 			android:showSilent="true"
 			android:summary="Sound used for notification"
 		/>
-		<CheckBoxPreference
+		<com.xebia.xcoss.axcv.preference.CheckBoxPreference
+			signalRetriever=".service.NotificationServiceManager"
 			android:key="NotifyOwned"
 			android:title="My presentations"
 			android:defaultValue="false"
 			android:summaryOff="Do not notify me if someone modifies my presentation"
 			android:summaryOn="Notify me if someone modifies my presentation" />
-		<CheckBoxPreference
+		<com.xebia.xcoss.axcv.preference.CheckBoxPreference
+			signalRetriever=".service.NotificationServiceManager"
 			android:key="NotifyTrack"
 			android:title="My track"
 			android:defaultValue="false"

@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
+import com.xebia.xcoss.axcv.service.NotificationService;
+import com.xebia.xcoss.axcv.service.NotificationServiceManager;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class CVSplashLoader extends BaseActivity {
@@ -38,6 +40,7 @@ public class CVSplashLoader extends BaseActivity {
 	@Override
 	protected void onSuccess() {
 		loaded = true;
+		new NotificationServiceManager().onSignal(this);
 		navigateToStartscreen();
 	}
 
@@ -51,6 +54,7 @@ public class CVSplashLoader extends BaseActivity {
 		getProfileManager().closeConnection();
 		super.onDestroy();
 	}
+
 	@Override
 	protected void onNewIntent(Intent intent) {
 		// Called upon manually creating an exit intent
