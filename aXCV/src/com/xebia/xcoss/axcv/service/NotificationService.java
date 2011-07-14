@@ -14,11 +14,14 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore.Audio;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -37,6 +40,7 @@ public class NotificationService extends Service {
 
 	private static final String TAG_OWNED = "id-owned_ses";
 	private static final String TAG_TRACKED = "id-track-ses";
+	private static final long[] VIBRATE_PATTERN = new long[] { 1000, 200, 1000 };
 
 	private Timer notifyTimer;
 	private Thread authorThread;
@@ -213,13 +217,16 @@ public class NotificationService extends Service {
 	private void notifyChange(Bundle bundle) {
 		Context ctx = NotificationService.this;
 		long currentTimeMillis = System.currentTimeMillis();
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(NotificationService.this);
 		
 		// This pending intent brings the current app to the front.
 		Intent intent = new Intent(ctx, CVSplashLoader.class);
 		intent.setAction("android.intent.action.MAIN");
 		intent.addCategory("android.intent.category.LAUNCHER");
 		PendingIntent clickIntent = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		
+		String soundUri = sp.getString(XCS.PREF.NOTIFYSOUND, null);
+		AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+		boolean silent = (am.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) || (am.getMode() != AudioManager.MODE_NORMAL);
 		NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
 		int[] sessionIds = bundle.getIntArray(TAG_TRACKED);
@@ -230,6 +237,11 @@ public class NotificationService extends Service {
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
 				Notification noty = new Notification(R.drawable.x_stat_track, title, currentTimeMillis);
 				noty.setLatestEventInfo(ctx, title, message, clickIntent);
+				if ( silent ) {
+					noty.vibrate = VIBRATE_PATTERN;
+				} else if ( !StringUtil.isEmpty(soundUri)) {
+					noty.sound = Uri.parse(soundUri);
+				}
 				// Use session id for notifyCount - This way there is one per session.
 				mgr.notify(sessionIds[i], noty);
 			}
@@ -243,6 +255,11 @@ public class NotificationService extends Service {
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
 				Notification noty = new Notification(R.drawable.x_stat_owned, title, currentTimeMillis);
 				noty.setLatestEventInfo(ctx, title, message, clickIntent);
+				if ( silent ) {
+					noty.vibrate = VIBRATE_PATTERN;
+				} else if ( !StringUtil.isEmpty(soundUri)) {
+					noty.sound = Uri.parse(soundUri);
+				}
 				// Use session id for notifyCount - This way there is one per session.
 				mgr.notify(sessionIds[i], noty);
 			}

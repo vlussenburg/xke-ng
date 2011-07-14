@@ -67,7 +67,7 @@
 	<PreferenceCategory
 		android:title="Notification">
 		<RingtonePreference
-			android:ringtoneType="notification"
+			android:ringtoneType="all"
 			android:key="NotificationSound"
 			android:title="Notification sound"
 			android:showDefault="true"
@@ -92,11 +92,11 @@
 	<PreferenceCategory android:title="About">
 		<Preference
 			android:key="ApplicationName"
-			android:title="XCoSS"/>
+			android:title="Xebia Conference Viewer"/>
 		<Preference
 			android:key="ApplicationVersion"
 			android:title="Version"
-			android:summary="0.1"/>
+			android:summary="0.3"/>
 		<Preference
 			android:key="ApplicationHelp"
 			android:title="Show tutorial"
