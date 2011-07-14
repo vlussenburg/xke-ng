@@ -5,7 +5,6 @@ import java.util.SortedSet;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -280,7 +279,7 @@ public class CVSessionView extends SwipeActivity {
 		if (index < sessions.size() - 1) {
 			currentSession = sessions.get(++index);
 			startActivityCurrentSession();
-			overridePendingTransition(R.anim.slide_bottom_to_top, 0);
+			overridePendingTransition(R.anim.slide_bottom_to_top, R.anim.slide_bottom_to_top_exit);
 		}
 	}
 
@@ -291,7 +290,7 @@ public class CVSessionView extends SwipeActivity {
 		if (index > 0) {
 			currentSession = sessions.get(--index);
 			startActivityCurrentSession();
-			overridePendingTransition(R.anim.slide_top_to_bottom, 0);
+			overridePendingTransition(R.anim.slide_top_to_bottom, R.anim.slide_top_to_bottom_exit);
 		}
 	}
 
@@ -300,7 +299,8 @@ public class CVSessionView extends SwipeActivity {
 		intent.putExtra(BaseActivity.IA_CONFERENCE, getConference().getId());
 		intent.putExtra(BaseActivity.IA_SESSION, currentSession.getId());
 		startActivity(intent);
-		
+		// Finish this activity to let the back button go directly to the overview page
+		finish();
 	}
 
 	public void onSwipeLeftToRight() {

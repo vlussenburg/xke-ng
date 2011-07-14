@@ -19,15 +19,23 @@ public class ProfileManager extends SQLiteOpenHelper {
 
 	private static final String DATABASE_NAME = "xkeng.db";
 	private static final String TRACK_TABLE = "Track";
-	private static final String TRACK_COL_ID = "id";
-	private static final String TRACK_COL_USER = "user";
-	private static final String TRACK_COL_SESSION = "sid";
-	private static final String TRACK_COL_DATE = "date";
+	private static final String OWNED_TABLE = "Owned";
+	private static final String SES_COL_ID = "id";
+	private static final String SES_COL_USER = "user";
+	private static final String SES_COL_SESSION = "sid";
+	private static final String SES_COL_DATE = "date";
 
-	private static final String TRACK_QUERY_SELECT = TRACK_COL_USER + " = ? AND " + TRACK_COL_SESSION + " = ?";
-	private static final String TRACK_QUERY_NAME = TRACK_COL_USER + " = ?";
-	private static final String TRACK_QUERY_PRUNE = TRACK_COL_DATE + " < ?";
+	private static final String SES_QUERY_SELECT = SES_COL_USER + " = ? AND " + SES_COL_SESSION + " = ?";
+	private static final String SES_QUERY_UPDATE = SES_COL_SESSION + " = ?";
+	private static final String SES_QUERY_NAME = SES_COL_USER + " = ?";
+	private static final String SES_QUERY_PRUNE = SES_COL_DATE + " < ?";
 
+	public class Trackable {
+		public DateTime when;
+		public int sessionId;
+		public String userId;
+	};
+	
 	private SQLiteDatabase database = null;
 
 	public ProfileManager(Context context) {
@@ -72,14 +80,28 @@ public class ProfileManager extends SQLiteOpenHelper {
 		create.append("create table ");
 		create.append(TRACK_TABLE);
 		create.append(" (");
-		create.append(TRACK_COL_ID);
+		create.append(SES_COL_ID);
 		create.append(" integer primary key autoincrement, ");
-		create.append(TRACK_COL_USER);
+		create.append(SES_COL_USER);
 		create.append(" text not null, ");
-		create.append(TRACK_COL_SESSION);
+		create.append(SES_COL_SESSION);
 		create.append(" integer not null, ");
-		create.append(TRACK_COL_DATE);
-		create.append(" timestamp);");
+		create.append(SES_COL_DATE);
+		create.append(" datetime);");
+		db.execSQL(create.toString());
+		
+		create = new StringBuilder();
+		create.append("create table ");
+		create.append(OWNED_TABLE);
+		create.append(" (");
+		create.append(SES_COL_ID);
+		create.append(" integer primary key autoincrement, ");
+		create.append(SES_COL_USER);
+		create.append(" text not null, ");
+		create.append(SES_COL_SESSION);
+		create.append(" integer not null, ");
+		create.append(SES_COL_DATE);
+		create.append(" datetime);");
 		db.execSQL(create.toString());
 	}
 
@@ -88,9 +110,9 @@ public class ProfileManager extends SQLiteOpenHelper {
 		try {
 			checkConnection();
 			ContentValues row = new ContentValues();
-			row.put(TRACK_COL_USER, user);
-			row.put(TRACK_COL_SESSION, session.getId());
-			row.put(TRACK_COL_DATE, session.getDate().getMilliseconds(XCS.TZ));
+			row.put(SES_COL_USER, user);
+			row.put(SES_COL_SESSION, session.getId());
+			row.put(SES_COL_DATE, session.getDate().getMilliseconds(XCS.TZ));
 			long rv = database.insert(TRACK_TABLE, null, row);
 			return rv >= 0;
 		}
@@ -107,7 +129,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 			String[] whereArgs = new String[2];
 			whereArgs[0] = user;
 			whereArgs[1] = String.valueOf(session.getId());
-			int rv = database.delete(TRACK_TABLE, TRACK_QUERY_SELECT, whereArgs);
+			int rv = database.delete(TRACK_TABLE, SES_QUERY_SELECT, whereArgs);
 			return rv > 0;
 		}
 		catch (Exception e) {
@@ -122,7 +144,8 @@ public class ProfileManager extends SQLiteOpenHelper {
 			checkConnection();
 			String[] whereArgs = new String[1];
 			whereArgs[0] = String.valueOf(today.getMilliseconds(XCS.TZ));
-			database.delete(TRACK_TABLE, TRACK_QUERY_PRUNE, whereArgs);
+			database.delete(TRACK_TABLE, SES_QUERY_PRUNE, whereArgs);
+			database.delete(OWNED_TABLE, SES_QUERY_PRUNE, whereArgs);
 		}
 		catch (Exception e) {
 			Log.w(XCS.LOG.COMMUNICATE, "Pruning database failed: " + StringUtil.getExceptionMessage(e));
@@ -136,7 +159,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 			String[] whereArgs = new String[2];
 			whereArgs[0] = user;
 			whereArgs[1] = String.valueOf(sessionId);
-			Cursor query = database.query(TRACK_TABLE, new String[] { TRACK_COL_ID }, TRACK_QUERY_SELECT, whereArgs,
+			Cursor query = database.query(TRACK_TABLE, new String[] { SES_COL_ID }, SES_QUERY_SELECT, whereArgs,
 					null, null, null);
 			boolean hasMark = query.getCount() > 0;
 			query.close();
@@ -154,12 +177,12 @@ public class ProfileManager extends SQLiteOpenHelper {
 			checkConnection();
 			String[] whereArgs = new String[1];
 			whereArgs[0] = user;
-			Cursor query = database.query(TRACK_TABLE, new String[] { TRACK_COL_SESSION }, TRACK_QUERY_NAME,
-					new String[] { user }, null, null, TRACK_COL_DATE + " ASC");
+			Cursor query = database.query(TRACK_TABLE, new String[] { SES_COL_SESSION }, SES_QUERY_NAME,
+					new String[] { user }, null, null, SES_COL_DATE + " ASC");
 			int[] result = new int[query.getCount()];
 			int i = 0;
 			for (query.moveToFirst(); !query.isAfterLast(); query.moveToNext()) {
-				result[i++] = query.getInt(query.getColumnIndex(TRACK_COL_SESSION));
+				result[i++] = query.getInt(query.getColumnIndex(SES_COL_SESSION));
 			}
 			query.close();
 			return result;
@@ -169,9 +192,78 @@ public class ProfileManager extends SQLiteOpenHelper {
 			return new int[0];
 		}
 	}
+	
+	public Trackable[] getMarkedSessions(String user) {
+		return getSessions(user, TRACK_TABLE);
+	}
 
+	public Trackable[] getOwnedSessions(String user) {
+		return getSessions(user, OWNED_TABLE);
+	}
+
+	public void updateMarkedSession(Trackable trackable) {
+		updateSession(trackable, TRACK_TABLE);
+	}
+
+	public void updateOwnedSession(Trackable trackable) {
+		updateSession(trackable, OWNED_TABLE);
+	}
+
+	private Trackable[] getSessions(String user, String table) {
+		Log.v(XCS.LOG.COMMUNICATE, "Get all sessions for user " + user + " from " + table);
+		try {
+			checkConnection();
+			String[] whereArgs = new String[1];
+			whereArgs[0] = user;
+			Cursor query = database.query(table, new String[] { SES_COL_SESSION, SES_COL_DATE }, SES_QUERY_NAME,
+					new String[] { user }, null, null, SES_COL_DATE + " ASC");
+			Trackable[] result = new Trackable[query.getCount()];
+			int i = 0;
+			for (query.moveToFirst(); !query.isAfterLast(); query.moveToNext()) {
+				Trackable trackable = new Trackable();
+				trackable.sessionId = query.getInt(query.getColumnIndex(SES_COL_SESSION));
+				trackable.when = DateTime.forInstant(query.getLong(query.getColumnIndex(SES_COL_DATE)), XCS.TZ);
+				trackable.userId = user;
+				result[i++] = trackable;
+			}
+			query.close();
+			return result;
+		}
+		catch (Exception e) {
+			Log.w(XCS.LOG.COMMUNICATE, "Retrieval failed: " + StringUtil.getExceptionMessage(e));
+			return new Trackable[0];
+		}
+	}
+
+	private void updateSession(Trackable trackable, String table) {
+		int update = -1;
+		ContentValues values = new ContentValues();
+
+		try {
+			checkConnection();
+			String[] whereArgs = new String[1];
+			values.put(SES_COL_DATE, trackable.when.getMilliseconds(XCS.TZ));
+			whereArgs[0] = String.valueOf(trackable.sessionId);
+			update = database.update(table, values, SES_QUERY_UPDATE, whereArgs);
+		}
+		catch (Exception e) {
+			Log.w(XCS.LOG.COMMUNICATE, "Update failed: " + StringUtil.getExceptionMessage(e));
+		}
+		if ( update == 0 ) {
+			try {
+			values.put(SES_COL_USER, trackable.userId);
+			values.put(SES_COL_SESSION, trackable.sessionId);
+			database.insert(table, null, values);
+			}
+			catch (Exception e) {
+				Log.w(XCS.LOG.COMMUNICATE, "Insert failed: " + StringUtil.getExceptionMessage(e));
+			}
+		}
+	}
+	
 	@Override
 	public void onUpgrade(SQLiteDatabase paramSQLiteDatabase, int paramInt1, int paramInt2) {
 		// TODO Auto-generated method stub
 	}
+
 }

@@ -1,6 +1,5 @@
 package com.xebia.xcoss.axcv;
 
-import hirondelle.date4j.DateTime;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -106,7 +105,7 @@ public class CVSessionList extends SwipeActivity {
 		Intent intent = getIntent();
 		intent.putExtra(IA_CONFERENCE, conference.getId());
 		startActivity(intent);
-		overridePendingTransition(R.anim.slide_right, 0);
+		overridePendingTransition(R.anim.slide_right, R.anim.slide_left);
 	}
 
 	@Override
@@ -118,7 +117,7 @@ public class CVSessionList extends SwipeActivity {
 		Intent intent = getIntent();
 		intent.putExtra(IA_CONFERENCE, conference.getId());
 		startActivity(intent);
-		overridePendingTransition(R.anim.slide_left, 0);
+		overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
 	}
 
 	@Override

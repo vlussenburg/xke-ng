@@ -4,6 +4,7 @@ import hirondelle.date4j.DateTime;
 import hirondelle.date4j.DateTime.Unit;
 
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -271,7 +272,7 @@ public class ConferenceServer {
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/label/");
-		requestUrl.append(name);
+		requestUrl.append(URLEncoder.encode(name));
 
 		RestClient.createObject(requestUrl.toString(), name, void.class, token);
 	}

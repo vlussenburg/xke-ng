@@ -353,7 +353,7 @@ public abstract class BaseActivity extends Activity {
 			return;
 		}
 		Log.e(XCS.LOG.COMMUNICATE, "Communication failure on " + activity + ", due to " + e.getMessage());
-		throw new CommException("Failure on activity '" + activity + "'.", e);
+		throw new CommException("Failure on activity '" + activity + "': " + StringUtil.getExceptionMessage(e), e);
 	}
 
 	protected String getUser() {

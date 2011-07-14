@@ -98,7 +98,7 @@ public class CVConferences extends SwipeActivity {
 		intent.putExtra(IA_REDIRECT, false);
 		intent.putExtra(IA_CONF_YEAR, shownYear-1);
 		startActivity(intent);
-		overridePendingTransition(R.anim.slide_right, 0);
+		overridePendingTransition(R.anim.slide_right, R.anim.slide_left);
 	}
 
 	@Override
@@ -107,7 +107,7 @@ public class CVConferences extends SwipeActivity {
 		intent.putExtra(IA_REDIRECT, false);
 		intent.putExtra(IA_CONF_YEAR, shownYear+1);
 		startActivity(intent);
-		overridePendingTransition(R.anim.slide_left, 0);
+		overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
 	}
 
 	@Override

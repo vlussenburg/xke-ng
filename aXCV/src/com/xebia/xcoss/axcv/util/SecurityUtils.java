@@ -26,6 +26,10 @@ public class SecurityUtils {
 			0x5e, 0x0c, 0x0d, 0x15, 0x16, 0x33, 0x17, 0x12, 0x5D, 0x14, 0x0e, 0x0f, 0x10, 0x11 };
 
 	public static String encrypt(String cleartext) {
+		if ( StringUtil.isEmpty(cleartext) ) {
+			return null;
+		}
+		
 		try {
 			byte[] rawKey = getRawKey(seed);
 			byte[] result = encrypt(rawKey, cleartext.getBytes());
@@ -38,6 +42,10 @@ public class SecurityUtils {
 	}
 
 	public static String decrypt(String encrypted) {
+		if ( StringUtil.isEmpty(encrypted) ) {
+			return null;
+		}
+		
 		try {
 			byte[] rawKey = getRawKey(seed);
 			byte[] enc = toByte(encrypted);

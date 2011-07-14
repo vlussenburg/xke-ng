@@ -5,7 +5,6 @@ import java.util.Date;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.Toast;
 
 public class EditDateTimeFormatPreference extends EditTextPreference {
 

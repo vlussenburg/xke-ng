@@ -51,6 +51,8 @@ public class Session implements Serializable {
 	private DateTime date;
 	private DateTime startTime;
 	private DateTime endTime;
+	private DateTime lastUpdate;
+	private DateTime lastReschedule;
 
 	@SerializedName("audience")
 	private String intendedAudience;
@@ -220,6 +222,14 @@ public class Session implements Serializable {
 			duration = end - start;
 		}
 		return duration;
+	}
+	
+	public DateTime getLastUpdate() {
+		return lastUpdate;
+	}
+	
+	public DateTime getLastReschedule() {
+		return lastReschedule;
 	}
 
 	public boolean check(List<String> messages) {

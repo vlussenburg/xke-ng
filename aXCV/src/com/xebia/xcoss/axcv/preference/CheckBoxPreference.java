@@ -1,7 +1,6 @@
 package com.xebia.xcoss.axcv.preference;
 
 import android.content.Context;
-import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -37,7 +36,7 @@ public class CheckBoxPreference extends android.preference.CheckBoxPreference {
 						srname = getContext().getPackageName() + srname;
 					}
 					try {
-						Class srClass = Class.forName(srname);
+						Class<?> srClass = Class.forName(srname);
 						Object instance = srClass.newInstance();
 						if (instance instanceof SignalRetriever) {
 							Log.v(XCS.LOG.ALL, "Signal retriever recognized");

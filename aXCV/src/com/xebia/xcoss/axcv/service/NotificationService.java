@@ -1,5 +1,9 @@
 package com.xebia.xcoss.axcv.service;
 
+import hirondelle.date4j.DateTime;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -21,6 +25,10 @@ import android.widget.Toast;
 import com.xebia.xcoss.axcv.CVSplashLoader;
 import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
+import com.xebia.xcoss.axcv.logic.ProfileManager;
+import com.xebia.xcoss.axcv.logic.ProfileManager.Trackable;
+import com.xebia.xcoss.axcv.model.Author;
+import com.xebia.xcoss.axcv.model.Search;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -73,7 +81,7 @@ public class NotificationService extends Service {
 		if (notifyTimer == null) {
 			try {
 				notifyTimer = new Timer("ConferenceNotifier");
-				notifyTimer.scheduleAtFixedRate(notifyTask, 0, 15 * 1000);
+				notifyTimer.scheduleAtFixedRate(notifyTask, 0, 30 * 1000);
 			}
 			catch (Exception e) {
 				Log.w(XCS.LOG.COMMUNICATE, "Timer start issue: " + StringUtil.getExceptionMessage(e));
@@ -132,29 +140,92 @@ public class NotificationService extends Service {
 	}
 
 	protected int[] getChangesInOwnedSessions() {
-		// TODO Auto-generated method stub
-		return new int[] { 8801 };
+		List<Integer> modified = new ArrayList<Integer>();
+		ProfileManager pm = new ProfileManager(this);
+		try {
+			pm.openConnection();
+			ConferenceServer server = ConferenceServer.getInstance();
+			DateTime now = DateTime.now(XCS.TZ);
+
+			// Not all owned sessions need to be locally available.
+			Trackable[] ids = pm.getOwnedSessions(getUser());
+			Search search = new Search().onAuthor(new Author(getUser(), null, null, null)).onDateStart(now);
+			List<Session> sessions = server.searchSessions(search);
+			for (Session session : sessions) {
+				DateTime lastNotification = null;
+				for (int i = 0; i < ids.length; i++) {
+					if (ids[i].sessionId == session.getId()) {
+						lastNotification = ids[i].when;
+						if (session.getLastUpdate() != null && session.getLastUpdate().gt(lastNotification)) {
+							pm.updateOwnedSession(ids[i]);
+							modified.add(session.getId());
+						}
+						break;
+					}
+				}
+				// What to do with sessions added elsewhere? We notify for now...
+				if (lastNotification == null) {
+					Trackable add = pm.new Trackable();
+					add.when = now;
+					add.sessionId = session.getId();
+					add.userId = getUser();
+					pm.updateOwnedSession(add);
+					modified.add(session.getId());
+				}
+			}
+			int[] result = new int[modified.size()];
+			for (int i = 0; i < result.length; i++) {
+				result[i] = modified.get(i);
+			}
+			return result;
+		}
+		finally {
+			pm.closeConnection();
+		}
 	}
 
 	protected int[] getChangesInTrackedSessions() {
-		// TODO Auto-generated method stub
-		return new int[] { 8802 };
+		List<Integer> modified = new ArrayList<Integer>();
+		ConferenceServer server = ConferenceServer.getInstance();
+		ProfileManager pm = new ProfileManager(this);
+		try {
+			pm.openConnection();
+			Trackable[] ids = pm.getMarkedSessions(getUser());
+			for (int i = 0; i < ids.length; i++) {
+				Session session = server.getSession(ids[i].sessionId);
+				if (session.getLastReschedule() != null && session.getLastReschedule().gt(ids[i].when)) {
+					ids[i].when = DateTime.now(XCS.TZ);
+					pm.updateMarkedSession(ids[i]);
+					modified.add(session.getId());
+				}
+			}
+			int[] result = new int[modified.size()];
+			for (int i = 0; i < result.length; i++) {
+				result[i] = modified.get(i);
+			}
+			return result;
+		}
+		finally {
+			pm.closeConnection();
+		}
 	}
 
 	private void notifyChange(Bundle bundle) {
-		// Context ctx = getApplicationContext();
-		// if (ctx == null) ctx = NotificationService.this;
-
 		Context ctx = NotificationService.this;
 		long currentTimeMillis = System.currentTimeMillis();
+		
+		// This pending intent brings the current app to the front.
 		Intent intent = new Intent(ctx, CVSplashLoader.class);
-		PendingIntent clickIntent = PendingIntent.getActivity(ctx, 0, intent, 0);
+		intent.setAction("android.intent.action.MAIN");
+		intent.addCategory("android.intent.category.LAUNCHER");
+		PendingIntent clickIntent = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		
 		NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
 		int[] sessionIds = bundle.getIntArray(TAG_TRACKED);
 		if (sessionIds != null) {
 			for (int i = 0; i < sessionIds.length; i++) {
-				String title = "Track changed";
+				String title = "Track rescheduled";
 				String message = getSessionChange(sessionIds[i]);
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
 				Notification noty = new Notification(R.drawable.x_stat_track, title, currentTimeMillis);
@@ -167,7 +238,7 @@ public class NotificationService extends Service {
 		sessionIds = bundle.getIntArray(TAG_OWNED);
 		if (sessionIds != null) {
 			for (int i = 0; i < sessionIds.length; i++) {
-				String title = "Session tamper!";
+				String title = "Session change!";
 				String message = getSessionChange(sessionIds[i]);
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
 				Notification noty = new Notification(R.drawable.x_stat_owned, title, currentTimeMillis);
@@ -191,5 +262,11 @@ public class NotificationService extends Service {
 			Log.w(XCS.LOG.ALL, "Could not retrieve session " + id + ": " + StringUtil.getExceptionMessage(e));
 			return "No session information (" + id + ")";
 		}
+	}
+
+	protected String getUser() {
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		String user = sp.getString(XCS.PREF.USERNAME, null);
+		return user;
 	}
 }

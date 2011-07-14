@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
-import com.xebia.xcoss.axcv.service.NotificationService;
 import com.xebia.xcoss.axcv.service.NotificationServiceManager;
 import com.xebia.xcoss.axcv.util.XCS;
 

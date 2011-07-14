@@ -1,9 +1,9 @@
 package com.xebia.xcoss.axcv.logic;
 
+import hirondelle.date4j.DateTime;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import hirondelle.date4j.DateTime;
 
 import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.model.Author;
@@ -29,6 +29,16 @@ public class ConferenceServerProxy extends ConferenceServer {
 			return proxy;
 		}
 		return null;
+	}
+
+	@Override
+	public void login(String user, String password) {
+		try {
+			super.login(user, password);
+		}
+		catch (CommException e) {
+			BaseActivity.handleException(activity, "login", e);
+		}
 	}
 
 	@Override

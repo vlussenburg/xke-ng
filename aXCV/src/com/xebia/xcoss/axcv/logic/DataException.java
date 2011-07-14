@@ -4,6 +4,8 @@ import java.net.URI;
 
 public class DataException extends CommException {
 
+	private static final long serialVersionUID = 539794302349294965L;
+
 	private Code code;
 	
 	public enum Code {

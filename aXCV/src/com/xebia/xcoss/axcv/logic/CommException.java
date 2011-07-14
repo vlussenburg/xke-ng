@@ -4,6 +4,8 @@ import java.net.URI;
 
 public class CommException extends RuntimeException {
 
+	private static final long serialVersionUID = 2550831166577996704L;
+
 	public CommException(String message) {
 		super(message);
 	}
