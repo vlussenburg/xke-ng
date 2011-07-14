@@ -62,7 +62,13 @@ public class CVConferences extends SwipeActivity {
 	}
 
 	private void switchTo(Conference conference) {
-		Intent intent = new Intent(this, CVSessionList.class);
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		Intent intent = null;
+		if (sp.getBoolean(XCS.PREF.SESSIONLIST, true)) {
+			intent = new Intent(this, CVSessionList.class);
+		} else {
+			intent = new Intent(this, CVSessionView.class);
+		}
 		intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
 		startActivity(intent);
 	}
