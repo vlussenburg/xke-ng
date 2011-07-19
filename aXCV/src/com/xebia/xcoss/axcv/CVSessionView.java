@@ -280,6 +280,8 @@ public class CVSessionView extends SwipeActivity {
 			currentSession = sessions.get(++index);
 			startActivityCurrentSession();
 			overridePendingTransition(R.anim.slide_bottom_to_top, R.anim.slide_bottom_to_top_exit);
+		} else {
+			Toast.makeText(this, "Next session", Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -291,6 +293,8 @@ public class CVSessionView extends SwipeActivity {
 			currentSession = sessions.get(--index);
 			startActivityCurrentSession();
 			overridePendingTransition(R.anim.slide_top_to_bottom, R.anim.slide_top_to_bottom_exit);
+		} else {
+			Toast.makeText(this, "Previous session", Toast.LENGTH_LONG).show();
 		}
 	}
 
