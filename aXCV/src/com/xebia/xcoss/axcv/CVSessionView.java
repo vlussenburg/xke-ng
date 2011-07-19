@@ -281,7 +281,7 @@ public class CVSessionView extends SwipeActivity {
 			startActivityCurrentSession();
 			overridePendingTransition(R.anim.slide_bottom_to_top, R.anim.slide_bottom_to_top_exit);
 		} else {
-			Toast.makeText(this, "No later session1", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "No later session", Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -294,7 +294,7 @@ public class CVSessionView extends SwipeActivity {
 			startActivityCurrentSession();
 			overridePendingTransition(R.anim.slide_top_to_bottom, R.anim.slide_top_to_bottom_exit);
 		} else {
-			Toast.makeText(this, "No earlier session1", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "No earlier session", Toast.LENGTH_LONG).show();
 		}
 	}
 
