@@ -23,6 +23,11 @@ public class Conference extends DefaultController {
     	ok();
     }
 
+    public static void delete(int id) {
+    	System.out.println("Delete: " + id);
+    	ok();
+    }
+    
     public static void create(JsonObject body) {
     	System.out.println("Create: " + body);
     	renderText(new Random().nextInt());

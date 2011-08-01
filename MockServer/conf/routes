@@ -16,6 +16,7 @@ GET		/conferences/{year}/{month}				Conferences.show
 GET		/conferences/{year}/{month}/{day}		Conferences.show
 GET		/conference/on/{yearmonthday}			Conference.showOnDate
 GET		/conference/{id}						Conference.showOnId
+DELETE	/conference/{id}						Conference.delete
 PUT		/conference								Conference.create
 POST	/conference								Conference.update
 GET		/conference/{id}/sessions				Conference.sessions
@@ -28,7 +29,7 @@ PUT		/location								Locations.create
 GET		/labels									Labels.show
 GET		/labels/author/{id}						Labels.showOnAuthor
 GET		/authors								Authors.show
-PUT		/label/{name}							Labels.create
+PUT		/label									Labels.create
 POST	/search/authors							Authors.search
 POST	/search/sessions						Session.search
 POST	/login									Login.authenticate

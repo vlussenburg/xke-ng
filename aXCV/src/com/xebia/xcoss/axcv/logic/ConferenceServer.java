@@ -64,18 +64,23 @@ public class ConferenceServer {
 	}
 
 	public Conference getConference(DateTime date) {
-		Conference result = conferenceCache.getConference(date);
-		if (result == null) {
-			StringBuilder requestUrl = new StringBuilder();
-			requestUrl.append(baseUrl);
-			requestUrl.append("/conference/on/");
-			// Oeps, the framework does not support concatenations. Using escape for nothing.
-			requestUrl.append(date.format("YYYY||MM||DD"));
-
-			result = RestClient.loadObject(requestUrl.toString(), Conference.class, token);
-			conferenceCache.add(result);
+		List<Conference> conferences = getConferences(date);
+		if ( conferences == null || conferences.isEmpty() ) {
+			return null;
 		}
-		return result;
+		return conferences.get(0);
+//		Conference result = conferenceCache.getConference(date);
+//		if (result == null) {
+//			StringBuilder requestUrl = new StringBuilder();
+//			requestUrl.append(baseUrl);
+//			requestUrl.append("/conference/on/");
+//			// Oeps, the framework does not support concatenations. Using escape for nothing.
+//			requestUrl.append(date.format("YYYY||MM||DD"));
+//
+//			result = RestClient.loadObject(requestUrl.toString(), Conference.class, token);
+//			conferenceCache.add(result);
+//		}
+//		return result;
 	}
 
 	public Conference getConference(int id) {
@@ -271,8 +276,8 @@ public class ConferenceServer {
 		conferenceCache.removeObject(LABEL_CACHE_KEY);
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
-		requestUrl.append("/label/");
-		requestUrl.append(URLEncoder.encode(name));
+		requestUrl.append("/label");
+//		requestUrl.append(URLEncoder.encode(name));
 
 		RestClient.createObject(requestUrl.toString(), name, void.class, token);
 	}
