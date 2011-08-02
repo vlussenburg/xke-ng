@@ -233,11 +233,10 @@ public class NotificationService extends Service {
 		int[] sessionIds = bundle.getIntArray(TAG_TRACKED);
 		if (sessionIds != null) {
 			for (int i = 0; i < sessionIds.length; i++) {
-				Notification noty = null;
 				String title = "Track rescheduled";
 				String message = getSessionChange(sessionIds[i]);
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
-				noty = new Notification(R.drawable.x_stat_track, title, currentTimeMillis);
+				Notification noty = new Notification(R.drawable.x_stat_track, title, currentTimeMillis);
 				noty.setLatestEventInfo(ctx, title, message, clickIntent);
 				if ( silent ) {
 					noty.vibrate = VIBRATE_PATTERN;

@@ -8,6 +8,7 @@
     "lastReschedule":"2011-12-12T17:58:54.812Z",
     "id":"8802",
     "limit":"10 people",
+    "type":"STRATEGIC",
 	"location": {
            "description": "Library",
            "id": "714",

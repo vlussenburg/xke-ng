@@ -10,6 +10,7 @@
     "date":"2011-11-07T00:00:00.000Z",
     "id":"8801",
     "audience":"Everybody",
+	"type":"WORKSHOP",
 	"location": {
            "description": "Maupertuus",
            "id": "711",
@@ -45,6 +46,7 @@
            "id": "712",
            "standard": "true"
 	},
+	"type":"STRATEGIC",
 	"labels": ["Android","REST"]
   }
   ]

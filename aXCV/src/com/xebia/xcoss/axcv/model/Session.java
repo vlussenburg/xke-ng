@@ -73,6 +73,7 @@ public class Session implements Serializable {
 		this();
 
 		id = original.id;
+		type = original.type;
 
 		title = original.title;
 		location = original.location;

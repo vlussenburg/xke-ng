@@ -15,6 +15,7 @@
            "id": "711",
            "standard": "true"
 	},
+	"type":"WORKSHOP",
 	"authors" :[  {
 	    "userId":"marnix",
 	    "mail":"info@xebia.com",
@@ -51,6 +52,7 @@
     "lastReschedule":"2011-12-12T17:58:54.812Z",
     "id":"8802",
     "limit":"10 people",
+	"type":"STRATEGIC",
 	"location": {
            "description": "Laap",
            "id": "712",
