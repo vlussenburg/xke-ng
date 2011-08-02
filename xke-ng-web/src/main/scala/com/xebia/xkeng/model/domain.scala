@@ -74,15 +74,13 @@ object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps
 
   override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
 
-  def apply(name: String, date: DateTime, slots: List[Slot], locations: List[Location]): Conference = {
-    Conference(ObjectId.get, name, date, slots, locations)
+  def apply(name: String, begin: DateTime, end: DateTime, slots: List[Slot], locations: List[Location]): Conference = {
+    Conference(ObjectId.get, name, begin, end, slots, locations)
   }
-
-
 }
 
 
-case class Conference(_id: ObjectId, name: String, date: DateTime, var slots: List[Slot], var locations: List[Location]) extends MongoDocument[Conference] {
+case class Conference(_id: ObjectId, name: String, begin: DateTime, end: DateTime, var slots: List[Slot], var locations: List[Location]) extends MongoDocument[Conference] {
   def meta = Conference
 
   type EmbeddedElem = {def id: Long; def serializeToJson: JValue}

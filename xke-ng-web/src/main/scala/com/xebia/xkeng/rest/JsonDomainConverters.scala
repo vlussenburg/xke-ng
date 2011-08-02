@@ -40,13 +40,13 @@ import net.liftweb.json.JsonAST.{JValue, JArray}
 object JsonDomainConverters {
    val fmt = ISODateTimeFormat.dateTime()
 
-  def conferenceToJValue(conference: Conference):JValue = {
+  implicit def conferenceToJValue(conference: Conference):JValue = {
       //TODO add start and end time
       ("id" -> conference._id.toString) ~
         ("title" -> conference.name) ~
-        ("date" -> fmt.print(conference.date)) ~
-        ("startTime" -> fmt.print(conference.date)) ~
-        ("endTime" -> fmt.print(conference.date)) ~
+        ("date" -> fmt.print(conference.begin)) ~
+        ("startTime" -> fmt.print(conference.begin)) ~
+        ("endTime" -> fmt.print(conference.end)) ~
      ("locations" -> conference.locations.map(locationToJValue(_)))
     }
 

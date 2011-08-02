@@ -4,7 +4,7 @@ import com.xebia.xkeng.dao.{RepositoryComponent, ConferenceRepository}
 import net.liftweb.mongodb.{DefaultMongoIdentifier, MongoDB}
 import com.mongodb.{Mongo, MongoOptions, ServerAddress}
 
-object TestRepositoryAssembly extends RepositoryComponent {
+object RepositoryTestAssembly extends RepositoryComponent {
   val srvr = new ServerAddress("127.0.0.1", 27017)
   val mo = new MongoOptions
   mo.socketTimeout = 10

@@ -12,6 +12,7 @@ import com.xebia.xkeng.dao.RepositoryComponent
 import JsonDomainConverters._
 import net.liftweb.http._
 import org.omg.CosNaming.NamingContextPackage.NotFound
+import net.liftweb.util.BasicTypesHelpers._
 
 trait XKENGDispatchAPI extends RestHelper with Logger {
 	this: RepositoryComponent =>
@@ -20,19 +21,20 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
 
 	serve {
 		// GET /conferences/<year>[/<month>[/<day>]]
-		case Req("conferences" :: year :: Nil, _, GetRequest) =>
-			handleConferencesQuery(year.toInt, -1, -1)
-		case Req("conferences" :: year :: month :: Nil, _, GetRequest) =>
-			handleConferencesQuery(year.toInt, month.toInt, -1)
-		case Req("conferences" :: year :: month :: day :: Nil, _, GetRequest) =>
-			handleConferencesQuery(year.toInt, month.toInt, day.toInt)
-
+    case Req("conferences" :: Nil, _, GetRequest) =>
+      asJsonResp(conferenceRepository.findConferences(new DateTime().getYear))
+		case Req("conferences" :: AsInt(year) :: Nil, _, GetRequest) =>
+      asJsonResp(conferenceRepository.findConferences(year))
+		case Req("conferences" :: AsInt(year) :: AsInt(month) :: Nil, _, GetRequest) =>
+      asJsonResp(conferenceRepository.findConferences(year, month))
+		case Req("conferences" :: AsInt(year) :: AsInt(month) :: AsInt(day) :: Nil, _, GetRequest) =>
+      asJsonResp(conferenceRepository.findConference(year, month, day))
 		// POST /conference
 		case req @ Req("conference" :: Nil, _, PostRequest) =>
 			handleConferenceCreate(req.body.toOption)
 		// GET /conference/<id>
 		case Req("conference" :: id :: Nil, _, GetRequest) =>
-			handleConferenceRead(id.toInt)
+      asJsonResp(conferenceRepository.findConference(id))
 		// PUT /conference
 		case req @ Req("conference" :: Nil, _, PutRequest) =>
 		  handleConferenceUpdate(req.body.toOption)
@@ -104,10 +106,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
 		  handleRatingCreate(sessionId.toInt, req.body.toOption)
 	}
 
-	private def handleConferencesQuery(year: Int, month: Int, day: Int) = {
-		println("Handling Conferences[" + year + "/" + month + "/" + day)
-		Full(JsonResponse(conferenceRepository.findConferences(year)))
-	}
+  private def asJsonResp(json : JValue) = Full(JsonResponse(json))
 
 	private def handleConferenceCreate(jsonBody:Option[Array[Byte]]) = { Full(NotFoundResponse()) }
 	private def handleConferenceRead(conferenceId:Int) = { Full(NotFoundResponse()) }

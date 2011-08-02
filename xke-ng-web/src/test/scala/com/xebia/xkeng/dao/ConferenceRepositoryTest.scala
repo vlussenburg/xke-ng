@@ -11,7 +11,7 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 import org.joda.time.DateTime
 import com.xebia.xkeng.model._
 import org.joda.time.format._
-import com.xebia.xkeng.dao.TestRepositoryAssembly._
+import com.xebia.xkeng.dao.RepositoryTestAssembly._
 
 @RunWith(classOf[JUnitRunner])
 class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeAndAfterEach {
@@ -34,13 +34,13 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
   }
 
   override def afterEach() {
-    conferences.foreach(_.delete)
+    //conferences.foreach(_.delete)
   }
 
   private def createTestConference(startDate:DateTime) = {
     val s1 = Slot(startDate, startDate.plusMinutes(60), l1, "Mongo rocks", "amooi@xebia.com", None)
     val s2 = Slot(startDate, startDate.plusMinutes(60), l2, "Scala rocks even more", "upeter@xebia.com", None)
-    val c = Conference(ObjectId.get, "XKE", startDate, List(s1, s2), List(l1, l2))
+    val c = Conference(ObjectId.get, "XKE", startDate, startDate.plusHours(4), List(s1, s2), List(l1, l2))
     c.save
     c
   }

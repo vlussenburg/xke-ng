@@ -32,7 +32,7 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
     sess1.save
     val s1 = Slot(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "amooi@xebia.com", None)
     val s2 = Slot(xkeStartDate, xkeStartDate.plusMinutes(60), l2, "Scala rocks even more", "upeter@xebia.com", Some(sess1._id))
-    val c = Conference(ObjectId.get, "XKE", xkeStartDate, List(s1, s2), List(l1, l2))
+    val c = Conference(ObjectId.get, "XKE", xkeStartDate, xkeStartDate.plusHours(4), List(s1, s2), List(l1, l2))
     c.save
     (sess1, s1, s2, c)
 
