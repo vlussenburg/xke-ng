@@ -16,6 +16,8 @@ import org.omg.CosNaming.NamingContextPackage.NotFound
 trait XKENGDispatchAPI extends RestHelper with Logger {
 	this: RepositoryComponent =>
 
+	// TODO. If specified path/ without argument, it errors on the toInt
+
 	serve {
 		// GET /conferences/<year>[/<month>[/<day>]]
 		case Req("conferences" :: year :: Nil, _, GetRequest) =>

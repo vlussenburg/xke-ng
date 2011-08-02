@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -128,10 +130,10 @@ public class CVSessionAdd extends AdditionActivity {
 
 			view = (TextView) findViewById(R.id.sessionType);
 			view.setText(FormatUtil.getText(session.getType()));
-			
+
 			ImageView iv = (ImageView) findViewById(R.id.completeness);
 			int completeness = session.calculateCompleteness(8);
-			if ( completeness == 0 ) {
+			if (completeness == 0) {
 				iv.setVisibility(View.INVISIBLE);
 			} else {
 				iv.setVisibility(View.VISIBLE);
@@ -146,8 +148,8 @@ public class CVSessionAdd extends AdditionActivity {
 				R.id.sessionCount, R.id.sessionDescription, R.id.sessionDuration, R.id.sessionLabels,
 				R.id.sessionLanguage, R.id.sessionLocation, R.id.sessionPreps, R.id.sessionStart, R.id.sessionTitle };
 
-		if ( create ) {
-			activateViews(new int[] { R.id.sessionType } );
+		if (create) {
+			activateViews(new int[] { R.id.sessionType });
 		} else {
 			passivateView(R.id.sessionType);
 		}
@@ -187,8 +189,9 @@ public class CVSessionAdd extends AdditionActivity {
 		button.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
-				if ( rescheduleSession(0) == null ) {
-					createDialog("Rescheduling failed", "The session cannot be scheduled. Minimize duration or use another location.").show();
+				if (rescheduleSession(0) == null) {
+					createDialog("Rescheduling failed",
+							"The session cannot be scheduled. Minimize duration or use another location.").show();
 				}
 				showConference();
 				showSession();
@@ -197,35 +200,42 @@ public class CVSessionAdd extends AdditionActivity {
 	}
 
 	private TimeSlot rescheduleSession(int duration) {
-		if ( conference == null ) {
+		if (conference == null) {
 			return null;
 		}
-		if ( duration == 0 ) {
+		if (duration == 0) {
 			duration = session.getDuration();
 		}
 		Set<Location> locations = null;
-		if ( session.getLocation() != null ) {
+		if (session.getLocation() != null) {
 			locations = new HashSet<Location>();
 			locations.add(session.getLocation());
 		} else {
 			locations = conference.getLocations();
 		}
-		
+
 		TimeSlot slot = null;
 		Iterator<Location> iterator = locations.iterator();
 		while (slot == null && iterator.hasNext()) {
 			Location next = iterator.next();
 			slot = conference.getNextAvailableTimeSlot(session.getStartTime(), duration, next);
-			Log.v("XCS", "Reschedule [" + session.getStartTime() + ", " + duration + ", " + next.getDescription() + "] => "
-					+ (slot == null ? "NONE" : slot.start.format("h:mm") + " till " + slot.end.format("h:mm") + " @ " + slot.location.getDescription()));
+			Log.v("XCS", "Reschedule ["
+					+ session.getStartTime()
+					+ ", "
+					+ duration
+					+ ", "
+					+ next.getDescription()
+					+ "] => "
+					+ (slot == null ? "NONE" : slot.start.format("h:mm") + " till " + slot.end.format("h:mm") + " @ "
+							+ slot.location.getDescription()));
 		}
 		// Move up to the next conference and call this method recursively
 		if (slot == null) {
 			conference = getConferenceServer().getUpcomingConference(conference.getDate().plusDays(1));
 			slot = rescheduleSession(duration);
 		}
-		
-		if ( slot != null ) {
+
+		if (slot != null) {
 			session.setStartTime(slot.start);
 			session.setEndTime(slot.end);
 			session.setLocation(slot.location);
@@ -233,6 +243,7 @@ public class CVSessionAdd extends AdditionActivity {
 		}
 		return slot;
 	}
+
 	/**
 	 * Takes the chosen attribute and converts this (String) value to a value for the object
 	 * 
@@ -289,7 +300,7 @@ public class CVSessionAdd extends AdditionActivity {
 				session.setLocation((Location) selection);
 			break;
 			case R.id.sessionType:
-				Type type = (Type)selection;
+				Type type = (Type) selection;
 				session.setType(type);
 				activateDetails(type.hasDetails());
 			break;
@@ -328,14 +339,16 @@ public class CVSessionAdd extends AdditionActivity {
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.INPUT_TIME_START:
-				List<TimeSlot> tslist = conference.getAvailableTimeSlots();
-				items = new String[tslist.size()];
+				List<TimeSlot> tslist = session.getLocation() == null ? conference.getAvailableTimeSlots() : conference
+						.getAvailableTimeSlots(session.getLocation());
+				SortedSet<String> set = new TreeSet<String>();
 				idx = 0;
 				for (TimeSlot timeSlot : tslist) {
-					items[idx++] = timeFormatter.getAbsoluteTime(timeSlot.start);
+					set.add(timeFormatter.getAbsoluteTime(timeSlot.start));
 				}
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Pick a start time");
+				items = set.toArray(new String[set.size()]);
 				if (items.length == 0) {
 					builder.setMessage("This conference is fully booked!");
 					builder.setIcon(android.R.drawable.ic_dialog_alert);
@@ -362,7 +375,7 @@ public class CVSessionAdd extends AdditionActivity {
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.INPUT_LOCATION:
-				Location[] locations = getConferenceServer().getLocations(false);
+				Location[] locations = conference.getLocations().toArray(new Location[0]);
 
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Select location");
@@ -404,7 +417,7 @@ public class CVSessionAdd extends AdditionActivity {
 	protected void onPrepareDialog(int id, Dialog dialog) {
 		TextInputDialog tid;
 		ListView lv;
-		
+
 		switch (id) {
 			case XCS.DIALOG.INPUT_AUDIENCE:
 				tid = (TextInputDialog) dialog;
@@ -457,7 +470,7 @@ public class CVSessionAdd extends AdditionActivity {
 						}
 					}
 				}
-				break;
+			break;
 		}
 		super.onPrepareDialog(id, dialog);
 	}

@@ -38,6 +38,7 @@ import com.xebia.xcoss.axcv.util.XCS;
 
 public class NotificationService extends Service {
 
+	private static final int NOTIFICATION_PERIOD = 30 * 1000;
 	private static final String TAG_OWNED = "id-owned_ses";
 	private static final String TAG_TRACKED = "id-track-ses";
 	private static final long[] VIBRATE_PATTERN = new long[] { 1000, 200, 1000 };
@@ -85,7 +86,7 @@ public class NotificationService extends Service {
 		if (notifyTimer == null) {
 			try {
 				notifyTimer = new Timer("ConferenceNotifier");
-				notifyTimer.scheduleAtFixedRate(notifyTask, 0, 30 * 1000);
+				notifyTimer.scheduleAtFixedRate(notifyTask, 0, NOTIFICATION_PERIOD);
 			}
 			catch (Exception e) {
 				Log.w(XCS.LOG.COMMUNICATE, "Timer start issue: " + StringUtil.getExceptionMessage(e));
@@ -232,10 +233,11 @@ public class NotificationService extends Service {
 		int[] sessionIds = bundle.getIntArray(TAG_TRACKED);
 		if (sessionIds != null) {
 			for (int i = 0; i < sessionIds.length; i++) {
+				Notification noty = null;
 				String title = "Track rescheduled";
 				String message = getSessionChange(sessionIds[i]);
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
-				Notification noty = new Notification(R.drawable.x_stat_track, title, currentTimeMillis);
+				noty = new Notification(R.drawable.x_stat_track, title, currentTimeMillis);
 				noty.setLatestEventInfo(ctx, title, message, clickIntent);
 				if ( silent ) {
 					noty.vibrate = VIBRATE_PATTERN;

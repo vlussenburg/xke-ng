@@ -25,6 +25,7 @@ import com.xebia.xcoss.axcv.util.XCS;
 public class Conference implements Serializable {
 
 	public class TimeSlot {
+		public static final int LENGTH = 30;
 		public DateTime start;
 		public DateTime end;
 		public Location location;
@@ -276,15 +277,20 @@ public class Conference implements Serializable {
 
 	public List<TimeSlot> getAvailableTimeSlots() {
 		ArrayList<TimeSlot> list = new ArrayList<TimeSlot>();
-
-		final int length = 30;
-		TimeSlot t;
 		for (Location loc : locations) {
-			DateTime start = startTime;
-			while ((t = getNextAvailableTimeSlot(start, length, loc)) != null) {
-				list.add(t);
-				start = start.plus(0, 0, 0, 0, length, 0, DayOverflow.Spillover);
-			}
+			list.addAll(getAvailableTimeSlots(loc));
+		}
+		return list;
+	}
+
+	public List<TimeSlot> getAvailableTimeSlots(Location loc) {
+		ArrayList<TimeSlot> list = new ArrayList<TimeSlot>();
+
+		TimeSlot t;
+		DateTime start = startTime;
+		while ((t = getNextAvailableTimeSlot(start, TimeSlot.LENGTH, loc)) != null) {
+			list.add(t);
+			start = start.plus(0, 0, 0, 0, TimeSlot.LENGTH, 0, DayOverflow.Spillover);
 		}
 		return list;
 	}
