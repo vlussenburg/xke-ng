@@ -342,12 +342,6 @@ public class Conference implements Serializable {
 	}
 
 	public void setId(int i) {
-		// TODO Auto-generated method stub
 		this.id = i;
 	}
-
-	// @Override
-	// public String toString() {
-	// return "Conference [id=" + id + ", title=" + title + ", date=" + date + "]";
-	// }
 }

@@ -58,13 +58,11 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
     confs should not be (Nil)
     confs.size should be(1)
 
-    var conf = conferenceRepository.findConference(xke2011_05_03.getYear, xke2011_05_03.getMonthOfYear, xke2011_05_03.getDayOfMonth)
-    conf should not be (None)
+    confs = conferenceRepository.findConferences(xke2011_05_03.getYear, xke2011_05_03.getMonthOfYear, xke2011_05_03.getDayOfMonth)
+	confs should not be (Nil)
+	confs.size should be(1)
     
-    conf = conferenceRepository.findConferenceOn(outputFmt.print(xke2011_05_03))
-    conf should not be (None)
-
-    conf = conferenceRepository.findConference(conferences.head._id.toString)
+    var conf = conferenceRepository.findConference(conferences.head._id.toString)
     conf should not be (None)
   }
 

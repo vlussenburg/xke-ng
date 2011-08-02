@@ -2,7 +2,6 @@ package com.xebia.xkeng.rest
 
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.common._
-import org.joda.time.DateTime
 import net.liftweb.json.ext.JodaTimeSerializers
 
 import collection.mutable.{ListBuffer => MList}
@@ -12,6 +11,11 @@ import com.xebia.xkeng.dao.RepositoryComponent
 import JsonDomainConverters._
 import net.liftweb.http._
 import org.omg.CosNaming.NamingContextPackage.NotFound
+import net.liftweb.util.BasicTypesHelpers.AsInt
+import net.liftweb.http.JsonResponse._
+import java.util.Date
+import org.joda.time.{DateTime, DateTimeUtils}
+import com.xebia.xkeng.model.Conference
 
 trait XKENGDispatchAPI extends RestHelper with Logger {
 	this: RepositoryComponent =>
@@ -106,7 +110,13 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
 
 	private def handleConferencesQuery(year: Int, month: Int, day: Int) = {
 		println("Handling Conferences[" + year + "/" + month + "/" + day)
-		Full(JsonResponse(conferenceRepository.findConferences(year)))
+		var result:List[Conference] = null
+		if (year == -1) result = conferenceRepository.findConferences(new DateTime().year().get())
+		else if (month == -1) result = conferenceRepository.findConferences(year)
+		else if (day == -1) result = conferenceRepository.findConferences(year, month)
+		else result = conferenceRepository.findConferences(year, month, day)
+
+		Full(JsonResponse(result))
 	}
 
 	private def handleConferenceCreate(jsonBody:Option[Array[Byte]]) = { Full(NotFoundResponse()) }
