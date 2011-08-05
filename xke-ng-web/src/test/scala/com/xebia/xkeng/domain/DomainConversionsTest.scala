@@ -33,7 +33,7 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     println(Printer.pretty(JsonAST.render(s1.serializeToJson)))
     val expected:JValue = ("start" -> "2011-06-27T09:57:47.945Z") ~
       ("end" -> "2011-06-27T10:57:47.945Z") ~
-      ("locationRefId" -> l1.id) ~
+      ("location" -> l1.serializeToJson) ~
       ("title" -> "Mongo rocks") ~
       ("presenter" -> "amooi@xebia.com") ~
       ("id" -> s1.id)

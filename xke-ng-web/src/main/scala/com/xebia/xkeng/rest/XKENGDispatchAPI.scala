@@ -10,7 +10,8 @@ import net.liftweb.json.JsonDSL._
 import com.xebia.xkeng.dao.RepositoryComponent
 import JsonDomainConverters._
 import net.liftweb.http._
-import org.omg.CosNaming.NamingContextPackage.NotFound
+import org.joda.time._
+import net.liftweb.util.BasicTypesHelpers._
 
 trait XKENGDispatchAPI extends RestHelper with Logger {
 	this: RepositoryComponent =>
@@ -26,7 +27,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
 		case Req("conferences" :: AsInt(year) :: AsInt(month) :: Nil, _, GetRequest) =>
       asJsonResp(conferenceRepository.findConferences(year, month))
 		case Req("conferences" :: AsInt(year) :: AsInt(month) :: AsInt(day) :: Nil, _, GetRequest) =>
-      asJsonResp(conferenceRepository.findConference(year, month, day))
+      asJsonResp(conferenceRepository.findConferences(year, month, day))
 		// POST /conference
 		case req @ Req("conference" :: Nil, _, PostRequest) =>
 			handleConferenceCreate(req.body.toOption)
@@ -104,11 +105,9 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
 		  handleRatingCreate(sessionId.toInt, req.body.toOption)
 	}
 
-	private def handleConferencesQuery(year: Int, month: Int, day: Int) = {
-		println("Handling Conferences[" + year + "/" + month + "/" + day)
-		Full(JsonResponse(conferenceRepository.findConferences(year)))
-	}
 
+	private def asJsonResp(json:JValue) = Full(JsonResponse(json))
+	
 	private def handleConferenceCreate(jsonBody:Option[Array[Byte]]) = { Full(NotFoundResponse()) }
 	private def handleConferenceRead(conferenceId:Int) = { Full(NotFoundResponse()) }
 	private def handleConferenceUpdate(jsonBody:Option[Array[Byte]]) = { Full(NotFoundResponse()) }

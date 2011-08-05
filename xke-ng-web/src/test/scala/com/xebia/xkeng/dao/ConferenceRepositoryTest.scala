@@ -34,7 +34,7 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
   }
 
   override def afterEach() {
-    //conferences.foreach(_.delete)
+    conferences.foreach(_.delete)
   }
 
   private def createTestConference(startDate:DateTime) = {
@@ -47,21 +47,21 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
 
   it should "find conference by year" in {
     var confs = conferenceRepository.findConferences(xke2011_06_03.getYear)
+    println("found :  " +confs)
     confs should not be (Nil)
     confs.size should be(3)
-
-    confs = conferenceRepository.findConferences(xke2011_06_03.getYear, xke2011_06_03.getMonthOfYear)
+  }
+  it should "find conference by year and month" in {
+    var confs = conferenceRepository.findConferences(xke2011_06_03.getYear, xke2011_06_03.getMonthOfYear)
     confs should not be (Nil)
     confs.size should be(2)
-
-    confs = conferenceRepository.findConferences(xke2011_05_03.getYear, xke2011_05_03.getMonthOfYear)
-    confs should not be (Nil)
-    confs.size should be(1)
-
-    confs = conferenceRepository.findConferences(xke2011_05_03.getYear, xke2011_05_03.getMonthOfYear, xke2011_05_03.getDayOfMonth)
+  }
+   it should "find conference by year and month and day" in {
+    var confs = conferenceRepository.findConferences(xke2011_05_03.getYear, xke2011_05_03.getMonthOfYear, xke2011_05_03.getDayOfMonth)
 	confs should not be (Nil)
 	confs.size should be(1)
-    
+   }
+   it should "find conference by id" in {
     var conf = conferenceRepository.findConference(conferences.head._id.toString)
     conf should not be (None)
   }

@@ -84,10 +84,10 @@ case class Conference(_id: ObjectId, name: String, begin: DateTime, end: DateTim
   def meta = Conference
 
   type EmbeddedElem = {def id: Long; def serializeToJson: JValue}
-  slots = slots.map(s => {
-    s.location = Some(locations.find(_.id == s.locationRefId).get); s
-  })
-
+//  slots = slots.map(s => {
+//    s.location = Some(locations.find(_.id == s.locationRefId).get); s
+//  })
+//
   def saveOrUpdate(slot: Slot) = {
     doSaveOrUpdate("slots", slots, slot)
     slots = slot :: (slots - slot)
@@ -100,14 +100,14 @@ case class Conference(_id: ObjectId, name: String, begin: DateTime, end: DateTim
     slots
   }
 
-  def saveOrUpdate(location: Location) = {
+  def saveOrUpdate(location: Location) = { 
     doSaveOrUpdate("locations", locations, location)
     locations = location :: (locations - location)
     locations
   }
-
+ 
   def remove(location: Location) = {
-    if(slots.exists(_.locationRefId == location.id)) {
+    if(slots.exists(_.location.id == location.id)) {
       throw new IllegalArgumentException("The following slots: %s still depend on the location: %s you want to remove. A location can only be removed if it has no references to slots." format(slots, location))
     }
     doRemove("locations", location)
@@ -129,28 +129,27 @@ case class Conference(_id: ObjectId, name: String, begin: DateTime, end: DateTim
 
 }
 
-case class Slot(id: Long, start: DateTime, end: DateTime, locationRefId: Long, title: String, presenter: String, sessionRefId: Option[ObjectId]) extends ToJsonSerializer[Slot] {
-  var location: Option[Location] = None
-
-  def this(start: DateTime, end: DateTime, loc: Location, title: String, presenter: String, sessionRefId: Option[ObjectId]) {
-    this (nextSeq, start, end, loc.id, title, presenter, sessionRefId)
-    location = Some(loc)
-  }
-
+case class Slot(val id: Long, val start: DateTime, val end: DateTime, val location:Location, val title: String, val presenter: String, val sessionRefId: Option[ObjectId]) extends ToJsonSerializer[Slot] {
+ 
   def period = new Period(start.getMillis, end.getMillis)
+
+ 
+
 }
 
 object Slot extends FromJsonDeserializer[Slot] {
-  def apply(start: DateTime, end: DateTime, loc: Location, title: String, presenter: String, sessionRefId: Option[ObjectId]) = {
-    new Slot(start, end, loc, title, presenter, sessionRefId)
+
+ def apply(start: DateTime, end: DateTime, location: Location, title: String, presenter: String, sessionRefId: Option[ObjectId]) = {
+    new Slot(nextSeq, start, end, location, title, presenter, sessionRefId)
   }
+
 }
 
 case class Location(id: Long, name: String, capacity: Int) extends ToJsonSerializer[Location]
 
 object Location {
   def apply(name: String, capacity: Int): Location = {
-    Location(nextSeq, name, capacity)
+    Location(nextSeq.toInt, name, capacity)
   }
 }
 

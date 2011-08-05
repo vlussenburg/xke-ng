@@ -25,24 +25,24 @@ trait RepositoryComponent {
 
       val fmt = DateTimeFormat.forPattern("yyyyMMdd");
 
-    private def dateRegexpQry(date:String) = {
-      ("date" -> ("$regex" -> ("^%s.*".format(date))))
+    private def dateRegexpQry(begin:String) = {
+      ("begin" -> ("$regex" -> ("^%s.*".format(begin))))
     }
 
 
 
     /**
-     * db.confs.find( { date : { $regex : "^<year>.*" } } );
+     * db.confs.find( { begin : { $regex : "^<year>.*" } } );
      */
     def findConferences(year: Int) = Conference.findAll(dateRegexpQry("%04d" format(year)))
 
     /**
-     * db.confs.find( { date : { $regex : "^<year>-<month>.*" } } );
+     * db.confs.find( { begin : { $regex : "^<year>-<month>.*" } } );
      */
     def findConferences(year: Int, month: Int) = Conference.findAll(dateRegexpQry("%04d-%02d" format(year, month)))
 
     /**
-     * db.confs.find( { date : { $regex : "^<year>-<month>-<day>.*" } } );
+     * db.confs.find( { begin : { $regex : "^<year>-<month>-<day>.*" } } );
      */
     def findConferences(year: Int, month: Int, day: Int) = Conference.findAll(dateRegexpQry("%04d-%02d-%02d" format(year, month, day)))
 
