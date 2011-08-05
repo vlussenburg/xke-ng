@@ -68,20 +68,20 @@ object JsonDomainConverters {
   def fromConferenceJson(jsonString: String): Conference = {
     val JObject(jsonValue) = JsonParser.parse(jsonString)
     def toConf(confJson: JValue) = {
-      val id:Option[String] = (confJson \\ "id") match { 
+      val id: Option[String] = (confJson \\ "id") match {
         case JString(id) => Some(id)
         case _ => None
       }
       val JString(title) = confJson \\ "title"
       val JString(AsDateTime(begin)) = confJson \\ "begin"
-      val JString(AsDateTime(end)) = confJson \\ "end"      
-      val locations:List[Location] = (confJson \\ "locations") match { 
-        case JArray(locs) => locs.map((v:JValue) => deserialize(Printer.pretty(JsonAST.render(v))))
+      val JString(AsDateTime(end)) = confJson \\ "end"
+      val locations: List[Location] = (confJson \\ "locations") match {
+        case JArray(locs) => locs.map((v: JValue) => deserialize[Location](Printer.pretty(JsonAST.render(v))))
         case _ => Nil
       }
+      val conference = Conference(title, begin, end, Nil, locations)
+      id.map(Conference(_, title, begin, end, Nil, locations)).getOrElse(conference)
 
-     Conference(title, begin, end, Nil, locations)
-     
     }
 
     toConf(jsonValue)

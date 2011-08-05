@@ -53,5 +53,16 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     begin should be(fmt.parseDateTime("2011-11-07T16:00:00.000Z"))
     end should be(fmt.parseDateTime("2011-11-07T21:00:00.000Z"))
   }
+   it should "deserialize a conference with locations with json correctly" in {
+    val jsonString = """{"title":"TED-style XKE","begin":"2011-11-07T16:00:00.000Z", "end":"2011-11-07T21:00:00.000Z", "locations" : [{"id" : -1706815601, "name" : "Maup", "capacity" : 20 }]}"""
+    val result = fromConferenceJson(jsonString)
+    val Conference(_, title, begin, end, _, locations) = result
+    title should be("TED-style XKE")
+    begin should be(fmt.parseDateTime("2011-11-07T16:00:00.000Z"))
+    end should be(fmt.parseDateTime("2011-11-07T21:00:00.000Z"))
+    locations.size should not be (0)
+    locations.head should be (Location(-1706815601, "Maup", 20))           
+  } 
+  
 
 }

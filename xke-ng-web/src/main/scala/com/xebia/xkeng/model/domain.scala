@@ -77,6 +77,10 @@ object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps
   def apply(name: String, begin: DateTime, end: DateTime, slots: List[Slot], locations: List[Location]): Conference = {
     Conference(ObjectId.get, name, begin, end, slots, locations)
   }
+  
+    def apply(idStr:String, name: String, begin: DateTime, end: DateTime, slots: List[Slot], locations: List[Location]): Conference = {
+    Conference(new ObjectId(idStr), name, begin, end, slots, locations)
+  }
 }
 
 

@@ -109,11 +109,17 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
 
   private def handleConferenceCreate(jsonBody: Option[Array[Byte]]) = {
     val conference = fromConferenceJson(new String(jsonBody.get))
+    //TODO: this does not update the entire document but create a new one
+    //fix it
     conference.save
     asJsonResp(conference)
 
   }
-  private def handleConferenceUpdate(jsonBody: Option[Array[Byte]]) = { Full(NotFoundResponse()) }
+  private def handleConferenceUpdate(jsonBody: Option[Array[Byte]]) = { 
+   val conference = fromConferenceJson(new String(jsonBody.get))
+   conference.save
+   asJsonResp(conference)
+  }
   private def handleConferenceDelete(conferenceId: String) = {
     conferenceRepository.findConference(conferenceId).map(_.delete)
     Full(OkResponse())
