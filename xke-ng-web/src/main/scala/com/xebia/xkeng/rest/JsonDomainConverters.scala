@@ -52,7 +52,7 @@ object JsonDomainConverters {
 
   implicit def conferenceToJValue(conference: Conference): JValue = {
     ("id" -> conference._id.toString) ~
-      ("title" -> conference.name) ~
+      ("title" -> conference.title) ~
       ("begin" -> fmt.print(conference.begin)) ~
       ("end" -> fmt.print(conference.end)) ~
       ("locations" -> conference.locations.map(locationToJValue(_)))
@@ -80,8 +80,8 @@ object JsonDomainConverters {
         case _ => Nil
       }
       val conference = Conference(title, begin, end, Nil, locations)
-      id.map(Conference(_, title, begin, end, Nil, locations)).getOrElse(conference)
-
+      //id.map(Conference(_, title, begin, end, Nil, locations)).getOrElse(conference)
+      conference
     }
 
     toConf(jsonValue)
