@@ -35,8 +35,8 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     case Req("conference" :: id :: Nil, _, GetRequest) =>
       asJsonResp(conferenceRepository.findConference(id))
     // PUT /conference
-    case req @ Req("conference" :: Nil, _, PutRequest) =>
-      handleConferenceUpdate(req.body.toOption)
+    case req @ Req("conference" :: id :: Nil, _, PutRequest) =>
+      handleConferenceUpdate(id, req.body.toOption)
     // DELETE /conference/<id>
     case Req("conference" :: id :: Nil, _, DeleteRequest) =>
       handleConferenceDelete(id)
@@ -107,18 +107,23 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
 
   private def asJsonResp(json: JValue) = Full(JsonResponse(json))
 
-  private def handleConferenceCreate(jsonBody: Option[Array[Byte]]) = {
-    val conference = fromConferenceJson(new String(jsonBody.get))
-    //TODO: this does not update the entire document but create a new one
-    //fix it
-    conference.save
-    asJsonResp(conference)
+  private def handleConferenceUpdate(id: String, jsonBody: Option[Array[Byte]]) = {
+    conferenceRepository.findConference(id) match {
+      case Some(confToUpdate) => {
+        val confFromJson = fromConferenceJson(new String(jsonBody.get))
+        val updatedConf = confFromJson.copy(_id = confToUpdate._id)
+        updatedConf.save
+        asJsonResp(updatedConf)
+
+      }
+      case None => Full(BadResponse())
+    }
 
   }
-  private def handleConferenceUpdate(jsonBody: Option[Array[Byte]]) = { 
-   val conference = fromConferenceJson(new String(jsonBody.get))
-   conference.save
-   asJsonResp(conference)
+  private def handleConferenceCreate(jsonBody: Option[Array[Byte]]) = {
+    val conference = fromConferenceJson(new String(jsonBody.get))
+    conference.save
+    asJsonResp(conference)
   }
   private def handleConferenceDelete(conferenceId: String) = {
     conferenceRepository.findConference(conferenceId).map(_.delete)

@@ -1,0 +1,12 @@
+{ "id" : "4e3c58d80364b4b8de3560d6", "title" : "TED-style XKE", "begin" : "2011-11-07T16:00:00.000Z", "end" : "2011-11-07T21:00:00.000Z", "locations" : [
+        {
+	                "id" : -1706815601,
+			                "name" : "Maup 2",
+					                "capacity" : 20
+							        },
+								        {
+									                "id" : -1706815564,
+											                "name" : "Laap 2",
+													                "capacity" : 30
+															        }
+																] }
