@@ -69,7 +69,7 @@ trait EmbeddedDocumentOps[T] {
 
 }
 
-object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps[Conference] {
+object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps[Conference]  {
   override def collectionName = "confs"
 
   override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
@@ -147,7 +147,7 @@ object Slot extends FromJsonDeserializer[Slot] {
 
 case class Location(id: Long, name: String, capacity: Int) extends ToJsonSerializer[Location]
 
-object Location {
+object Location extends FromJsonDeserializer[Location]{
   def apply(name: String, capacity: Int): Location = {
     Location(nextSeq.toInt, name, capacity)
   }
