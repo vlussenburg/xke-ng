@@ -10,6 +10,7 @@ object Assembly  {
 
   object XKENGDispatchAPIAssembly  extends XKENGDispatchAPI with RepositoryComponent {
       val conferenceRepository = new ConferenceRepositoryImpl
+      val sessionRepository = new SessionRepositoryImpl
   }
 
 

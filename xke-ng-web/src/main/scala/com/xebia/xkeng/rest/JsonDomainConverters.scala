@@ -4,9 +4,9 @@ import net.liftweb.json.JsonDSL._
 import net.liftweb.json._
 import org.joda.time.format._
 import org.joda.time.DateTime
-import com.xebia.xkeng.model.{ Location, Conference }
 import net.liftweb.json.JsonAST.{ JValue, JArray }
 import net.liftweb.json.ext.JodaTimeSerializers
+import com.xebia.xkeng.model.{Session, Location, Conference}
 
 /**
  * {
@@ -48,6 +48,13 @@ object JsonDomainConverters {
       }
 
     }
+  }
+
+  implicit def sessionToJValue(session: Session): JValue = {
+    ("id" -> session._id.toString) ~
+    ("title" -> session.title) ~
+    ("presenter" -> session.presenter) ~
+    ("descr" -> session.descr)
   }
 
   implicit def conferenceToJValue(conference: Conference): JValue = {

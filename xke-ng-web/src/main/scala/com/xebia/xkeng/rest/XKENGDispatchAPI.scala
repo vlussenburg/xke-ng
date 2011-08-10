@@ -40,37 +40,40 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     // DELETE /conference/<id>
     case Req("conference" :: id :: Nil, _, DeleteRequest) =>
       handleConferenceDelete(id)
-
     // GET /conference/<id>/sessions
     case Req("conference" :: id :: "sessions" :: Nil, _, GetRequest) =>
       handleSessionsList(id.toInt)
-
     // POST /conference/<id>/session
     case req @ Req("conference" :: id :: "session" :: Nil, _, PostRequest) =>
       handleSessionCreate(id.toInt, req.body.toOption)
-    // GET /session/<id>
-    case Req("session" :: id :: Nil, _, GetRequest) =>
-      handleSessionRead(id.toInt)
     // PUT /conference/<id>/session
     case req @ Req("conference" :: id :: "session" :: Nil, _, PutRequest) =>
       handleSessionUpdate(id.toInt, req.body.toOption)
+
+
+    // GET /session/<id>
+    case Req("session" :: id :: Nil, _, GetRequest) =>
+      handleSessionRead(id)
     // DELETE /session/<sid>
     case Req("session" :: id :: Nil, _, DeleteRequest) =>
       handleSessionDelete(id.toInt)
 
+
+
     // GET /locations
     case Req("locations" :: Nil, _, GetRequest) =>
       handleLocations
+
     // GET /authors
     case Req("authors" :: Nil, _, GetRequest) =>
       handleAuthors
+
     // GET /labels
     case Req("labels" :: Nil, _, GetRequest) =>
       handleLabels
     // GET /labels/author/<id>
     case Req("labels" :: "author" :: authorId :: Nil, _, GetRequest) =>
       handleLabels(authorId)
-
     // PUT /label/<name>
     case req @ Req("label" :: name :: Nil, _, PutRequest) =>
       handleLabelUpdate(name, req.body.toOption)
@@ -84,6 +87,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     // POST /search/sessions
     case req @ Req("search" :: "sessions" :: Nil, _, PostRequest) =>
       handleSearchSessions(req.body.toOption)
+
     // POST /login
     case req @ Req("login" :: Nil, _, PostRequest) =>
       handleLogin(req.body.toOption)
@@ -131,7 +135,8 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
   }
   private def handleSessionsList(conferenceId: Int) = { Full(NotFoundResponse()) }
   private def handleSessionCreate(sessionId: Int, jsonBody: Option[Array[Byte]]) = { Full(NotFoundResponse()) }
-  private def handleSessionRead(sessionId: Int) = { Full(NotFoundResponse()) }
+  private def handleSessionRead(sessionId: String) = { asJsonResp(sessionRepository.findSession(sessionId))}
+
   private def handleSessionUpdate(sessionId: Int, jsonBody: Option[Array[Byte]]) = { Full(NotFoundResponse()) }
   private def handleSessionDelete(sessionId: Int) = { Full(NotFoundResponse()) }
   private def handleLocations = { Full(NotFoundResponse()) }

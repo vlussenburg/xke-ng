@@ -15,4 +15,5 @@ object RepositoryTestAssembly extends RepositoryComponent {
   def init() =  MongoDB.defineDb(DefaultMongoIdentifier, new Mongo(srvr, mo), "xkeng")
 
   val conferenceRepository = new ConferenceRepositoryImpl
+  val sessionRepository = new SessionRepositoryImpl
 }

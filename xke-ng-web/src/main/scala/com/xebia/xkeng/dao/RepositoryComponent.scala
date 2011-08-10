@@ -1,9 +1,9 @@
 package com.xebia.xkeng.dao
 
-import com.xebia.xkeng.model.Conference
 import net.liftweb.json.JsonDSL._
 import org.joda.time.format._
 import org.joda.time.DateTime
+import com.xebia.xkeng.model.{Session, Conference}
 
 trait ConferenceRepository {
   def findConferences(year: Int): List[Conference]
@@ -16,9 +16,14 @@ trait ConferenceRepository {
 
 }
 
+trait SessionRepository {
+  def findSession(id: String): Option[Session]
+}
+
 trait RepositoryComponent {
 
   val conferenceRepository:ConferenceRepository
+  val sessionRepository:SessionRepository
 
 
   class ConferenceRepositoryImpl extends ConferenceRepository {
@@ -52,6 +57,10 @@ trait RepositoryComponent {
      */
     def findConference(id: String) = Conference.find(id)
 
+  }
+
+  class SessionRepositoryImpl extends SessionRepository {
+    def findSession(id: String) = Session.find(id)
   }
 
 }
