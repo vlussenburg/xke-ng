@@ -1,20 +1,23 @@
-## Welcome to the XKE-NG project.
+# Welcome to the XKE-NG project.
 
 This project is a study on the use of Android and REST services from a more
 architectural point of view. It is also meant to gain knowledge about the use
 of the Android API and REST services in an enterprise way.
 
 Basically it consists of the following components:
+
 * Android front-end to browse through conference talks
 * REST services to manage talks
 
-There are three projects:
+There are five projects:
 
   1. XCoSS (Xebia Conference Scheduling System - Java)
   2. aXCV (Xebia Conference Viewer for Android)
   3. iXCV (Xebia Conference Viewer for iPhone/iPad)
   4. xke-ng-web (Xebia Conference Scheduling System - Scala)
   5. MockServer (Mocks the xke-ng-web)
+
+The projects are explained below:
 
 * XCoSS 
 is the server component with a web interface and REST services,
