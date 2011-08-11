@@ -36,7 +36,14 @@ class SessionRepositoryTest extends FlatSpec with ShouldMatchers with BeforeAndA
   }
 
   it should "find session by id" in {
-    var sess = sessionRepository.findSession(exampleSession._id.toString)
+    val sess = sessionRepository.findSession(exampleSession._id.toString)
     sess should not be (None)
+  }
+
+  it should "delete session with id" in  {
+    val sess = sessionRepository.findSession(exampleSession._id.toString)
+    sess.map(_.delete)
+    val newSess = sessionRepository.findSession(exampleSession._id.toString)
+    newSess should be (None)
   }
 }

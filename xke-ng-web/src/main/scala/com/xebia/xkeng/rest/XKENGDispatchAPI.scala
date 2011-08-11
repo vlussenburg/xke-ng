@@ -56,7 +56,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
       handleSessionRead(id)
     // DELETE /session/<sid>
     case Req("session" :: id :: Nil, _, DeleteRequest) =>
-      handleSessionDelete(id.toInt)
+      handleSessionDelete(id)
 
 
 
@@ -138,7 +138,11 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
   private def handleSessionRead(sessionId: String) = { asJsonResp(sessionRepository.findSession(sessionId))}
 
   private def handleSessionUpdate(sessionId: Int, jsonBody: Option[Array[Byte]]) = { Full(NotFoundResponse()) }
-  private def handleSessionDelete(sessionId: Int) = { Full(NotFoundResponse()) }
+  private def handleSessionDelete(sessionId: String) = {
+    sessionRepository.findSession(sessionId).map(_.delete)
+    Full(OkResponse()) //don't we need to handle errors?
+  }
+
   private def handleLocations = { Full(NotFoundResponse()) }
   private def handleAuthors = { Full(NotFoundResponse()) }
   private def handleLabels = { Full(NotFoundResponse()) }
