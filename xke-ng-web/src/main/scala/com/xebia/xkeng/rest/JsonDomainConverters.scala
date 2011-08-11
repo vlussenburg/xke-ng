@@ -87,7 +87,6 @@ object JsonDomainConverters {
         case _ => Nil
       }
       val conference = Conference(title, begin, end, Nil, locations)
-      //id.map(Conference(_, title, begin, end, Nil, locations)).getOrElse(conference)
       conference
     }
 

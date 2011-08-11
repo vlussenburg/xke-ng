@@ -25,6 +25,4 @@ class ConversionTest extends FlatSpec with ShouldMatchers {
      println(xkeSession)
     //json should be(expected)
   }
-
-
 }
