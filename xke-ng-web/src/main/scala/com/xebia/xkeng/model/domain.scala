@@ -116,6 +116,11 @@ case class Conference(_id: ObjectId, title: String, begin: DateTime, end: DateTi
     locations
   }
 
+  override def delete {
+    this.slots //hmm this is not needed
+    super.delete
+  }
+
   private def doSaveOrUpdate(nameMongoArray: String, mongoArray: List[EmbeddedElem], elem: EmbeddedElem) = {
     if (!mongoArray.exists(_.id == elem.id)) {
       meta.pushToArray(_id, nameMongoArray, elem.serializeToJson)
@@ -131,11 +136,7 @@ case class Conference(_id: ObjectId, title: String, begin: DateTime, end: DateTi
 }
 
 case class Slot(val id: Long, val start: DateTime, val end: DateTime, val location:Location, val title: String, val presenter: String, val sessionRefId: Option[ObjectId]) extends ToJsonSerializer[Slot] {
- 
   def period = new Period(start.getMillis, end.getMillis)
-
- 
-
 }
 
 object Slot extends FromJsonDeserializer[Slot] {
