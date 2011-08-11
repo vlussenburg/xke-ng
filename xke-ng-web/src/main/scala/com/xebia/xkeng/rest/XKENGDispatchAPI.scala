@@ -28,6 +28,8 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
       asJsonResp(conferenceRepository.findConferences(year, month))
     case Req("conferences" :: AsInt(year) :: AsInt(month) :: AsInt(day) :: Nil, _, GetRequest) =>
       asJsonResp(conferenceRepository.findConferences(year, month, day))
+
+
     // POST /conference
     case req @ Req("conference" :: Nil, _, PostRequest) =>
       handleConferenceCreate(req.body.toOption)
@@ -74,9 +76,11 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     // GET /labels/author/<id>
     case Req("labels" :: "author" :: authorId :: Nil, _, GetRequest) =>
       handleLabels(authorId)
+
     // PUT /label/<name>
     case req @ Req("label" :: name :: Nil, _, PutRequest) =>
       handleLabelUpdate(name, req.body.toOption)
+
     // PUT /location
     case req @ Req("location" :: Nil, _, PutRequest) =>
       handleLocationUpdate(req.body.toOption)

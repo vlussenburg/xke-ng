@@ -5,6 +5,9 @@ version := "1.0"
 
 organization := "com.xebia.xke"
 
+// set the Scala version used for the project
+scalaVersion := "2.9.0-1"
+
 resolvers += "Local Maven Repository" at "file://"+Path.userHome+"/.m2/repository"
 
 resolvers += "Java.net Maven2 Repository" at "http://download.java.net/maven/2/"
@@ -16,8 +19,10 @@ libraryDependencies ++= Seq(
     "net.liftweb" %% "lift-mapper" % "2.4-M1" % "compile->default",
     "net.liftweb" %% "lift-wizard" % "2.4-M1" % "compile->default")
 
+libraryDependencies += "org.scalatest" % "scalatest_2.9.0" % "1.6.1" 
+
 // add a test dependency on ScalaCheck
-libraryDependencies += "org.scala-tools.testing" %% "scalacheck" % "1.8" % "test"
+// libraryDependencies += "org.scala-tools.testing" %% "scalacheck" % "1.8" % "test"
 
 // reduce the maximum number of errors shown by the Scala compiler
 maxErrors := 20
@@ -36,14 +41,14 @@ seq(webSettings :_*)
 libraryDependencies ++= {
   val liftVersion = "2.4-M2"
   Seq(
-  "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
-   "net.liftweb" %% "lift-mongodb" % liftVersion % "compile->default",
+    "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
+    "net.liftweb" %% "lift-mongodb" % liftVersion % "compile->default",
     "net.liftweb" %% "lift-mongodb-record" % liftVersion % "compile->default",
-    "org.mortbay.jetty" % "jetty" % "6.1.22" % "jetty",
     "junit" % "junit" % "4.5" % "test->default",
     "ch.qos.logback" % "logback-classic" % "0.9.26",
     "org.scala-tools.testing" %% "specs" % "1.6.8" % "test->default",
-    "com.h2database" % "h2" % "1.2.138"
+    "com.h2database" % "h2" % "1.2.138",
+    "com.amazonaws" % "aws-java-sdk" % "1.2.0" % "test->default"
   )
 }
 

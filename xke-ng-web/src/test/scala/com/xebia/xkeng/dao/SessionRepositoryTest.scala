@@ -24,8 +24,7 @@ class SessionRepositoryTest extends FlatSpec with ShouldMatchers with BeforeAndA
   }
 
   override def afterEach() {
-    if (exampleSession != null)
-      exampleSession.delete
+     exampleSession.delete
   }
 
   private def createTestSession() = {
@@ -46,4 +45,6 @@ class SessionRepositoryTest extends FlatSpec with ShouldMatchers with BeforeAndA
     val newSess = sessionRepository.findSession(exampleSession._id.toString)
     newSess should be (None)
   }
+
+  type ? = this.type
 }

@@ -31,6 +31,7 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
   }
 
   override def afterEach() {
+    //should also clear children (slots)..
     conferences.foreach(_.delete)
   }
 
