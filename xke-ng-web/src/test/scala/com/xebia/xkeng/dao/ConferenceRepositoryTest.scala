@@ -65,4 +65,6 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
     val conf = conferenceRepository.findConference(conferences.head._id.toString)
     conf should not be (None)
   }
+
+  type ? = this.type
 }

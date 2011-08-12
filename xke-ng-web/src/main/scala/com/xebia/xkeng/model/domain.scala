@@ -116,11 +116,6 @@ case class Conference(_id: ObjectId, title: String, begin: DateTime, end: DateTi
     locations
   }
 
-  override def delete {
-    this.slots //hmm this is not needed
-    super.delete
-  }
-
   private def doSaveOrUpdate(nameMongoArray: String, mongoArray: List[EmbeddedElem], elem: EmbeddedElem) = {
     if (!mongoArray.exists(_.id == elem.id)) {
       meta.pushToArray(_id, nameMongoArray, elem.serializeToJson)

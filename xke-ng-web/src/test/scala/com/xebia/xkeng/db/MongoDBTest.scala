@@ -48,6 +48,7 @@ object SlotDoc extends SlotDoc with MongoMetaRecord[SlotDoc] {
 
 @RunWith(classOf[JUnitRunner])
 class MongoDBTest extends FlatSpec with ShouldMatchers with BeforeAndAfterEach {
+  var md1 = SlotDoc.createRecord.from("16:00").duration(60)
 
   override def beforeEach() {
     val srvr = new ServerAddress("127.0.0.1", 27017)
@@ -56,9 +57,13 @@ class MongoDBTest extends FlatSpec with ShouldMatchers with BeforeAndAfterEach {
     MongoDB.defineDb(DefaultMongoIdentifier, new Mongo(srvr, mo), "xkeng")
   }
 
+  override def afterEach() {
+    SlotDoc.delete("_id", md1.id.is)
+  }
+
   it should " embed correctly" in {
     val loc1 = LocationDoc.createRecord.name("Maup").persons(20)
-    val md1 = SlotDoc.createRecord.from("16:00").duration(60).location(loc1).save
+    md1 = SlotDoc.createRecord.from("16:00").duration(60).location(loc1).save
     val md = SlotDoc.find("_id", md1.id.is)
     md.get.location.get.name.is should be("Maup")
   }
