@@ -21,6 +21,9 @@ package object domain {
 import domain._
 
 
+/**
+ * Traits for serialisation and deserialisation to/from JSON
+ */
 trait FromJsonDeserializer[T] {
   implicit val formats: Formats = Serialization.formats(NoTypeHints) ++ JodaTimeSerializers.all
   def apply(json: String)(implicit m: Manifest[T]): T = {
@@ -69,6 +72,9 @@ trait EmbeddedDocumentOps[T] {
 
 }
 
+/**
+ * Defines the structure of a Conference.
+ */
 object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps[Conference]  {
   override def collectionName = "confs"
 
@@ -80,7 +86,10 @@ object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps
   
 }
 
-
+/**
+ * Represents a Conference, a conference has a number of locations, where slots are available.
+ * This class is a case class, due to net.liftweb.mongodb requirements.
+ */
 case class Conference(_id: ObjectId, title: String, begin: DateTime, end: DateTime, var slots: List[Slot], var locations: List[Location]) extends MongoDocument[Conference] {
   def meta = Conference
 
@@ -130,10 +139,16 @@ case class Conference(_id: ObjectId, title: String, begin: DateTime, end: DateTi
 
 }
 
+/**
+ * Represents a slot at a location. A slot is an indication of time and space.
+ */
 case class Slot(val id: Long, val start: DateTime, val end: DateTime, val location:Location, val title: String, val presenter: String, val sessionRefId: Option[ObjectId]) extends ToJsonSerializer[Slot] {
   def period = new Period(start.getMillis, end.getMillis)
 }
 
+/**
+ * defines the structure of a slot
+ */
 object Slot extends FromJsonDeserializer[Slot] {
 
  def apply(start: DateTime, end: DateTime, location: Location, title: String, presenter: String, sessionRefId: Option[ObjectId]) = {
@@ -142,6 +157,9 @@ object Slot extends FromJsonDeserializer[Slot] {
 
 }
 
+/**
+ * Represents a location, a physical space.
+ */
 case class Location(id: Long, name: String, capacity: Int) extends ToJsonSerializer[Location]
 
 object Location extends FromJsonDeserializer[Location]{
@@ -150,6 +168,13 @@ object Location extends FromJsonDeserializer[Location]{
   }
 }
 
+/**
+ * Represents a Session, a talk/workshop/demo about a topic.
+ */
+case class Session(_id: ObjectId, title: String, presenter: String, descr: String) extends MongoDocument[Session] {
+  def meta = Session
+
+}
 object Session extends MongoDocumentMeta[Session] {
   override def collectionName = "session"
 
@@ -158,10 +183,5 @@ object Session extends MongoDocumentMeta[Session] {
   def apply(title: String, presenter: String, descr: String): Session = {
     Session(ObjectId.get, title, presenter, descr)
   }
-
-}
-
-case class Session(_id: ObjectId, title: String, presenter: String, descr: String) extends MongoDocument[Session] {
-  def meta = Session
 
 }

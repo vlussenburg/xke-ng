@@ -21,6 +21,7 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
   val xke2011_06_17 = fmt.parseDateTime("2011-06-17T16:00:00.000Z")
   val xke2011_05_03 = fmt.parseDateTime("2011-05-03T16:00:00.000Z")
   val xke2010_05_01 = fmt.parseDateTime("2010-05-01T16:00:00.000Z")
+  //val session = Session("Clojure is it!", "Sander", "why Clojure exists")
   var conferences: List[Conference] = Nil
 
 
@@ -65,6 +66,9 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
     val conf = conferenceRepository.findConference(conferences.head._id.toString)
     conf should not be (None)
   }
-
+  it should  "find session of a conference by id" in {
+    val session = conferenceRepository.findSessionsOfConference(conferences.head._id.toString)
+    session should not be (None)
+  }
   type ? = this.type
 }

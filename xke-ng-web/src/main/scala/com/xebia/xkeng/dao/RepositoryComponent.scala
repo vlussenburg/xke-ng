@@ -14,6 +14,8 @@ trait ConferenceRepository {
 
   def findConference(id: String): Option[Conference]
 
+  def findSessionsOfConference(id: String): List[Session]
+
 }
 
 trait SessionRepository {
@@ -28,13 +30,23 @@ trait RepositoryComponent {
 
   class ConferenceRepositoryImpl extends ConferenceRepository {
 
-      val fmt = DateTimeFormat.forPattern("yyyyMMdd");
+    val fmt = DateTimeFormat.forPattern("yyyyMMdd");
 
     private def dateRegexpQry(begin:String) = {
       ("begin" -> ("$regex" -> ("^%s.*".format(begin))))
     }
 
-
+    def findSessionsOfConference(conferenceId: String): List[Session] = {
+      this.findConference(conferenceId) match {
+        case Some(conf) => {
+          //get the sessions
+          val sessionIds = conf.slots.map(_.sessionRefId).flatten
+          val sessions: List[Session] = sessionIds.map(id => sessionRepository.findSession(id.toString)).flatten //objectId to string.. does that work?
+          sessions
+        }
+        case None => Nil
+      }
+    }
 
     /**
      * db.confs.find( { begin : { $regex : "^<year>.*" } } );
