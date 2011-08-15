@@ -19,10 +19,7 @@ libraryDependencies ++= Seq(
     "net.liftweb" %% "lift-mapper" % "2.4-M1" % "compile->default",
     "net.liftweb" %% "lift-wizard" % "2.4-M1" % "compile->default")
 
-libraryDependencies += "org.scalatest" % "scalatest_2.9.0" % "1.6.1" 
-
-// add a test dependency on ScalaCheck
-// libraryDependencies += "org.scala-tools.testing" %% "scalacheck" % "1.8" % "test"
+libraryDependencies += "org.scalatest" % "scalatest_2.9.0" % "1.6.1"
 
 // reduce the maximum number of errors shown by the Scala compiler
 maxErrors := 20
