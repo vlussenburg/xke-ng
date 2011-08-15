@@ -98,7 +98,7 @@
 		<Preference
 			android:key="ApplicationVersion"
 			android:title="Version"
-			android:summary="0.3"/>
+			android:summary="0.4"/>
 		<com.xebia.xcoss.axcv.preference.LinkPreference
 			url="http://www.xebiamobile.com/"
 			android:key="ApplicationHelp"

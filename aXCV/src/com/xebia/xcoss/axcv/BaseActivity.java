@@ -155,9 +155,9 @@ public abstract class BaseActivity extends Activity {
 		Conference conference = null;
 		ConferenceServer server = getConferenceServer();
 
-		int identifier = -1;
+		String identifier = null;
 		try {
-			identifier = getIntent().getExtras().getInt(IA_CONFERENCE);
+			identifier = getIntent().getExtras().getString(IA_CONFERENCE);
 			conference = server.getConference(identifier);
 		}
 		catch (Exception e) {
@@ -177,9 +177,9 @@ public abstract class BaseActivity extends Activity {
 
 	protected Session getSession(Conference conference, boolean useDefault) {
 		Session session = null;
-		int identifier = -1;
+		String identifier = null;
 		try {
-			identifier = getIntent().getExtras().getInt(IA_SESSION);
+			identifier = getIntent().getExtras().getString(IA_SESSION);
 			session = conference.getSessionById(identifier);
 		}
 		catch (Exception e) {

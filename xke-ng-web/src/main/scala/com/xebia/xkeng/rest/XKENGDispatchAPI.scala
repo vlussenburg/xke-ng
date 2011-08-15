@@ -195,7 +195,9 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
   }
 
   private def handleLogin(jsonBody: Option[Array[Byte]]) = {
-    Full(NotFoundResponse())
+    val confFromJson = fromCredentialJson(new String(jsonBody.get))
+	// TODO Validate the credential object
+   asJsonResp("token")
   }
 
   private def handleError(paramBody: Option[Array[Byte]]) = {

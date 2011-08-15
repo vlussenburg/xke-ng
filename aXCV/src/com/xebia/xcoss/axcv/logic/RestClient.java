@@ -78,8 +78,8 @@ public class RestClient {
 		}
 	}
 
-	public static <T> List<T> loadObjects(String url, String key, Class<T> rvClass, String token) {
-		Log.d(LOG.COMMUNICATE, "Loading [" + key + "[" + rvClass.getSimpleName() + "]] " + url);
+	public static <T> List<T> loadObjects(String url, Class<T> rvClass, String token) {
+		Log.d(LOG.COMMUNICATE, "Loading [[" + rvClass.getSimpleName() + "]] " + url);
 		Reader reader = null;
 		try {
 			reader = getReader(new HttpGet(url), token);
@@ -87,8 +87,8 @@ public class RestClient {
 			JsonElement parse = parser.parse(reader);
 
 			ArrayList<T> results = new ArrayList<T>();
-			if (parse.isJsonObject()) {
-				JsonArray jsonArray = parse.getAsJsonObject().get(key).getAsJsonArray();
+			if (parse.isJsonArray()) {
+				JsonArray jsonArray = parse.getAsJsonArray();
 				Iterator<JsonElement> iterator = jsonArray.iterator();
 
 				Gson gson = getGson();
@@ -96,6 +96,8 @@ public class RestClient {
 					JsonElement element = iterator.next();
 					results.add(gson.fromJson(element, rvClass));
 				}
+			} else {
+				Log.d(LOG.COMMUNICATE, "Expecting JsonArray, was " + parse.getClass().getSimpleName());
 			}
 			return results;
 		}

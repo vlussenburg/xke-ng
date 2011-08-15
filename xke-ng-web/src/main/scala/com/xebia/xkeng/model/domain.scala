@@ -154,7 +154,12 @@ object Slot extends FromJsonDeserializer[Slot] {
  def apply(start: DateTime, end: DateTime, location: Location, title: String, presenter: String, sessionRefId: Option[ObjectId]) = {
     new Slot(nextSeq, start, end, location, title, presenter, sessionRefId)
   }
+}
 
+/**
+ * Represents credentials used for authentication
+ */
+case class Credential(val user: String, val cryptedPassword: String) extends ToJsonSerializer[Credential] {
 }
 
 /**

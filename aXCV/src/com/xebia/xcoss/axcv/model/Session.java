@@ -42,9 +42,10 @@ public class Session implements Serializable {
 
 	// Auto mapped
 	private String title;
-	private int id;
+	private String id;
 	private Type type = Type.STANDARD;
 
+	@SerializedName("descr")
 	private String description;
 
 	private Location location;
@@ -90,7 +91,7 @@ public class Session implements Serializable {
 		languages.addAll(original.languages);
 	}
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
@@ -204,7 +205,7 @@ public class Session implements Serializable {
 	 * Only allow the type to be set if it has no id yet.
 	 */
 	public void setType(Type type) {
-		if (id == 0) {
+		if (StringUtil.isEmpty(id)) {
 			this.type = type;
 		} else {
 			Log.w(XCS.LOG.PROPERTIES, "Could not set type to "+type+", id = " + id);

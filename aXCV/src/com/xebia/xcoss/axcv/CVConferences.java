@@ -24,7 +24,7 @@ import com.xebia.xcoss.axcv.util.XCS;
 public class CVConferences extends SwipeActivity {
 
 	private int shownYear;
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -56,21 +56,23 @@ public class CVConferences extends SwipeActivity {
 				switchTo(getConferenceServer().getUpcomingConference());
 			}
 		}
-		
+
 		TextView title = (TextView) findViewById(R.id.conferencesTitle);
 		title.setText(title.getText() + " " + shownYear);
 	}
 
 	private void switchTo(Conference conference) {
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-		Intent intent = null;
-		if (sp.getBoolean(XCS.PREF.SESSIONLIST, true)) {
-			intent = new Intent(this, CVSessionList.class);
-		} else {
-			intent = new Intent(this, CVSessionView.class);
+		if (conference != null) {
+			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+			Intent intent = null;
+			if (sp.getBoolean(XCS.PREF.SESSIONLIST, true)) {
+				intent = new Intent(this, CVSessionList.class);
+			} else {
+				intent = new Intent(this, CVSessionView.class);
+			}
+			intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
+			startActivity(intent);
 		}
-		intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
-		startActivity(intent);
 	}
 
 	@Override
@@ -96,7 +98,7 @@ public class CVConferences extends SwipeActivity {
 	public void onSwipeLeftToRight() {
 		Intent intent = getIntent();
 		intent.putExtra(IA_REDIRECT, false);
-		intent.putExtra(IA_CONF_YEAR, shownYear-1);
+		intent.putExtra(IA_CONF_YEAR, shownYear - 1);
 		startActivity(intent);
 		overridePendingTransition(R.anim.slide_right, R.anim.slide_left);
 	}
@@ -105,16 +107,14 @@ public class CVConferences extends SwipeActivity {
 	public void onSwipeRightToLeft() {
 		Intent intent = getIntent();
 		intent.putExtra(IA_REDIRECT, false);
-		intent.putExtra(IA_CONF_YEAR, shownYear+1);
+		intent.putExtra(IA_CONF_YEAR, shownYear + 1);
 		startActivity(intent);
 		overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
 	}
 
 	@Override
-	public void onSwipeTopToBottom() {
-	}
+	public void onSwipeTopToBottom() {}
 
 	@Override
-	public void onSwipeBottomToTop() {
-	}
+	public void onSwipeBottomToTop() {}
 }

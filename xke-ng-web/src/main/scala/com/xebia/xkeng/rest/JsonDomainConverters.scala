@@ -6,7 +6,8 @@ import org.joda.time.format._
 import org.joda.time.DateTime
 import net.liftweb.json.JsonAST.{ JValue, JArray }
 import net.liftweb.json.ext.JodaTimeSerializers
-import com.xebia.xkeng.model.{Session, Location, Conference}
+import javax.security.auth.login.LoginContext
+import com.xebia.xkeng.model.{Credential, Session, Location, Conference}
 
 /**
  * {
@@ -91,7 +92,14 @@ object JsonDomainConverters {
     }
 
     toConf(jsonValue)
+  }
 
+  def fromCredentialJson(jsonString: String): Credential = {
+	  val JObject(jsonValue) = JsonParser.parse(jsonString)
+	  val JString(name) = jsonValue \\ "name"
+	  val JString(pwd) = jsonValue \\ "cryptedPassword"
+
+	  Credential(name, pwd)
   }
 
   implicit val formats: Formats = Serialization.formats(NoTypeHints) ++ JodaTimeSerializers.all
