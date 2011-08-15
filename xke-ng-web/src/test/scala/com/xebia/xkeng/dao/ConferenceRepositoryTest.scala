@@ -15,6 +15,7 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
 
   val l1 = Location("Maup", 20)
   val l2 = Location("Laap", 30)
+  val l3 = Location("New", 100)
   val fmt = ISODateTimeFormat.dateTime()
   val outputFmt = DateTimeFormat.forPattern("yyyyMMdd");
   val xke2011_06_03 = fmt.parseDateTime("2011-06-03T16:00:00.000Z")
@@ -39,7 +40,7 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
   private def createTestConference(startDate: DateTime) = {
     val s1 = Slot(startDate, startDate.plusMinutes(60), l1, "Mongo rocks", "amooi@xebia.com", None)
     val s2 = Slot(startDate, startDate.plusMinutes(60), l2, "Scala rocks even more", "upeter@xebia.com", None)
-    val c = Conference(ObjectId.get, "XKE", startDate, startDate.plusHours(4), List(s1, s2), List(l1, l2))
+    val c = Conference(ObjectId.get, "XKE", startDate, startDate.plusHours(4), List(s1, s2), List(l1, l2, l3))
     c.save
     c
   }
@@ -69,6 +70,10 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
   it should  "find session of a conference by id" in {
     val session = conferenceRepository.findSessionsOfConference(conferences.head._id.toString)
     session should not be (None)
+  }
+  it should "find two locations" in {
+    val locations = conferenceRepository.findAllLocations
+    locations.size should be(3)
   }
   type ? = this.type
 }

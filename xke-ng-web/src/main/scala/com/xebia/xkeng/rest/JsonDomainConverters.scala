@@ -65,12 +65,29 @@ object JsonDomainConverters {
       ("locations" -> conference.locations.map(locationToJValue(_)))
   }
 
-  def locationToJValue(location: Location): JValue = {
-    //TODO add location type
-    location.serializeToJson merge ("standard" -> "true")
+  /**
+   *
+    "locations" : [
+	    {
+		    "id" : -1098499121,
+		    "name" : "Maup",
+		    "capacity" : 20
+	    },
+	    {
+		    "id" : -1098499119,
+		    "name" : "Laap",
+		    "capacity" : 30
+	    }
+    ]
+   */
+  implicit def locationToJValue(location: Location): JValue = {
+    ("id" -> location.id) ~
+      ("name" -> location.name) ~
+      ("capacity" -> location.capacity)
   }
 
   implicit def conferencesToJArray(conferences: List[Conference]): JValue = new JArray(conferences.map(conferenceToJValue))
+  implicit def locationsToJArray(locations: List[Location]): JValue = new JArray(locations.map(locationToJValue))
 
   def fromConferenceJson(jsonString: String): Conference = {
     val JObject(jsonValue) = JsonParser.parse(jsonString)
