@@ -28,7 +28,7 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
 
   }
 
-  it should "serialize a converence correctly" in {
+  it should "serialize a conference correctly" in {
     val s1 = Slot(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "amooi@xebia.com", None)
     println(Printer.pretty(JsonAST.render(s1.serializeToJson)))
     val expected: JValue = ("start" -> "2011-06-27T09:57:47.945Z") ~
@@ -62,7 +62,14 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     end should be(fmt.parseDateTime("2011-11-07T21:00:00.000Z"))
     locations.size should not be (0)
     locations.head should be (Location(-1706815601, "Maup", 20))           
-  } 
-  
-
+  }
+  it should "serialize a location correctly" in {
+    val expected: JValue = ("id" -> l1.id) ~
+      ("name" -> "Maup") ~
+      ("capacity" -> 20)
+    println(Printer.pretty(JsonAST.render(l1.serializeToJson)))
+    println(Printer.pretty(JsonAST.render(expected)))
+      //"""{"id" : -1706815601, "name" : "Maup", "capacity" : 20 }"""
+    l1.serializeToJson should be(expected)
+  }
 }

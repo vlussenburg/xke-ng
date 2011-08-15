@@ -23,7 +23,7 @@ class LocationDoc private() extends BsonRecord[LocationDoc] {
 
   object name extends StringField(this, 100)
 
-  object persons extends IntField(this)
+  object people extends IntField(this)
 
 }
 
@@ -62,7 +62,7 @@ class MongoDBTest extends FlatSpec with ShouldMatchers with BeforeAndAfterEach {
   }
 
   it should " embed correctly" in {
-    val loc1 = LocationDoc.createRecord.name("Maup").persons(20)
+    val loc1 = LocationDoc.createRecord.name("Maup").people(20)
     md1 = SlotDoc.createRecord.from("16:00").duration(60).location(loc1).save
     val md = SlotDoc.find("_id", md1.id.is)
     md.get.location.get.name.is should be("Maup")

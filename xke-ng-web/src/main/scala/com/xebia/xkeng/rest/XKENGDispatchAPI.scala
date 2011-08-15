@@ -163,7 +163,8 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
   }
 
   private def handleLocations = {
-    Full(NotFoundResponse())
+    val a = conferenceRepository.findAllLocations
+    asJsonResp(a)
   }
 
   private def handleAuthors = {
