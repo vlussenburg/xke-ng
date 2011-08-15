@@ -319,11 +319,17 @@ public class Session implements Serializable {
 	}
 
 	public boolean isExpired() {
+		if ( getDate() == null ) {
+			return false;
+		}
 		DateTime expired = getDate().plus(0, 0, 0, getEndTime().getHour(), getEndTime().getMinute(), 0, DayOverflow.Spillover);
 		return expired.isInThePast(XCS.TZ);
 	}
 
 	public boolean isRunning() {
+		if ( getDate() == null ) {
+			return false;
+		}
 		DateTime started = getDate().plus(0, 0, 0, getStartTime().getHour(), getStartTime().getMinute(), 0, DayOverflow.Spillover);
 		return DateTime.now(XCS.TZ).gteq(started) && !isExpired(); 
 	}
