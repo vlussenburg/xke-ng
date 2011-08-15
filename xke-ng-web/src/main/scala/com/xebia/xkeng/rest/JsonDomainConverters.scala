@@ -90,13 +90,32 @@ object JsonDomainConverters {
   implicit def conferencesToJArray(conferences: List[Conference]): JValue = new JArray(conferences.map(conferenceToJValue))
   implicit def locationsToJArray(locations: List[Location]): JValue = new JArray(locations.map(locationToJValue))
 
+
+  def fromSessionJson(jsonString: String): Session = {
+    val JObject(jsonValue) = JsonParser.parse(jsonString)
+    def toSession(sessJson: JValue) = {
+      val id: Option[String] = (sessJson \\ "id") match {
+        case JString(id) => Some(id)
+        case _ => None
+      }
+      val JString(title) = sessJson \\ "title"
+      val JString(presenter) = sessJson \\ "presenter"
+      val JString(description) = sessJson \\ "descr"
+
+      val session =
+        Session(title, presenter, description)
+      session
+    }
+    toSession(jsonValue)
+  }
+
   def fromConferenceJson(jsonString: String): Conference = {
     val JObject(jsonValue) = JsonParser.parse(jsonString)
     def toConf(confJson: JValue) = {
       val id: Option[String] = (confJson \\ "id") match {
         case JString(id) => Some(id)
         case _ => None
-      }
+      }  //why parse Id if u don't use it?
       val JString(title) = confJson \\ "title"
       val JString(AsDateTime(begin)) = confJson \\ "begin"
       val JString(AsDateTime(end)) = confJson \\ "end"

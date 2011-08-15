@@ -16,12 +16,16 @@ import net.liftweb.json.JsonDSL._
 import net.liftweb.json._
 import org.joda.time.format.ISODateTimeFormat
 import com.xebia.xkeng.rest.JsonDomainConverters._
+import org.codehaus.jackson.annotate.JsonValue
+import org.mortbay.util.ajax.JSON
+import tools.nsc.doc.model.comment.Title
 
 @RunWith(classOf[JUnitRunner])
 class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndAfterEach {
 
   val l1 = Location("Maup", 20)
   val l2 = Location("Laap", 30)
+  val sess3: Session = Session("Clojure is Cool", "svdberg", "Clojure for world domination")
   val fmt = ISODateTimeFormat.dateTime()
   val xkeStartDate = fmt.parseDateTime("2011-06-27T09:57:47.945Z")
   override def beforeEach() {
@@ -42,7 +46,7 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     s1 should be(s2)
     val t = ("standard" -> "true") ~ ("a" -> "b")
     println(Printer.pretty(JsonAST.render(t)))
-
+    //TODO. This doesn't test conference serialization!!
   }
 
   it should "deserialize a conference with json correctly" in {
@@ -69,7 +73,27 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
       ("capacity" -> 20)
     println(Printer.pretty(JsonAST.render(l1.serializeToJson)))
     println(Printer.pretty(JsonAST.render(expected)))
-      //"""{"id" : -1706815601, "name" : "Maup", "capacity" : 20 }"""
     l1.serializeToJson should be(expected)
+  }
+  it should "serialize a session correctly" in {
+
+    val expected: JValue = ("id" -> sess3._id.toString) ~
+      ("title" -> sess3.title) ~
+      ("presenter" -> sess3.presenter) ~
+      ("descr" -> sess3.descr)
+
+    val json: JValue = sess3 //use implicits to convert to JSON
+    println(Printer.pretty(JsonAST.render(json)))
+    json should be(expected)
+
+  }
+  it should "deserialize a session correctly" in {
+    val jsonString = """{"id":"4e49258f09d02ddc451de365","title":"Clojure is Cool","presenter":"svdberg","descr":"Clojure for world domination"}"""
+    val result = fromSessionJson(jsonString)
+    val Session(_,title, presenter, descr) = result //use pattern-matching to bind the values
+    title should be("Clojure is Cool")
+    presenter should be("svdberg")
+    descr should be("Clojure for world domination")
+
   }
 }

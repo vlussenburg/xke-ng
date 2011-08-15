@@ -46,7 +46,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
       handleSessionsList(id)
     // POST /conference/<id>/session
     case req@Req("conference" :: id :: "session" :: Nil, _, PostRequest) =>
-      handleSessionCreate(id.toInt, req.body.toOption)
+      handleSessionCreate(id, req.body.toOption)
     // PUT /conference/<id>/session
     case req@Req("conference" :: id :: "session" :: Nil, _, PutRequest) =>
       handleSessionUpdate(id.toInt, req.body.toOption)
@@ -145,8 +145,19 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     //Full(OkResponse())
   }
 
-  private def handleSessionCreate(sessionId: Int, jsonBody: Option[Array[Byte]]) = {
-    Full(NotFoundResponse())
+  private def handleSessionCreate(conferenceId: String, jsonBody: Option[Array[Byte]]) = {
+    //construct the session
+    val session = fromSessionJson(new String(jsonBody.get))
+    session.save
+
+    //find the conference
+    var conference = conferenceRepository.findConference(conferenceId).get
+
+    //TODO. fix this, how do sessions and conferences relate?
+    //combine the new session with the conference
+    //conference.slots.head.sessionRefId = session._id
+    conference.save
+    Full(OkResponse())
   }
 
   private def handleSessionRead(sessionId: String) = {
