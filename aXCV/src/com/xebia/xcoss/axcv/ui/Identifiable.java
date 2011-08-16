@@ -2,9 +2,9 @@ package com.xebia.xcoss.axcv.ui;
 
 public class Identifiable {
 	private String text;
-	private int identifier;
+	private String identifier;
 	
-	public Identifiable(String value, int id) {
+	public Identifiable(String value, String id) {
 		this.text = value;
 		this.identifier = id;
 	}
@@ -14,7 +14,7 @@ public class Identifiable {
 		return text;
 	}
 	
-	public int getIdentifier() {
+	public String getIdentifier() {
 		return identifier;
 	}
 

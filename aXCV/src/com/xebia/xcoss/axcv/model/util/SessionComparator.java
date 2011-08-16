@@ -29,7 +29,13 @@ public class SessionComparator implements Comparator<Session>, Serializable {
 			}
 		}
 		if (result == 0) {
-			result = s1.getLocation().toString().compareTo(s2.getLocation().toString());
+			if (s1.getLocation() == null) {
+				result = (s2.getLocation() == null) ? 0 : -1;
+			} else if (s2.getLocation() == null ) {
+				result = 1;
+			} else {
+				result = s1.getLocation().toString().compareTo(s2.getLocation().toString());
+			}
 		}
 		return result;
 	}

@@ -2,12 +2,16 @@ package com.xebia.xcoss.axcv.model;
 
 import java.io.Serializable;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Location implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private int id;
+	@SerializedName("name")
 	private String description;
+	private int capacity;
 	private boolean standard;
 
 	public Location(int id, String place, boolean isBase) {
@@ -22,7 +26,7 @@ public class Location implements Serializable {
 
 	@Override
 	public String toString() {
-		return description;
+		return "Loc: " + description;
 	}
 
 	public boolean isStandard() {

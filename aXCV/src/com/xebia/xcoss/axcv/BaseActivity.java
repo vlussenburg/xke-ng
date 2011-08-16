@@ -42,6 +42,7 @@ public abstract class BaseActivity extends Activity {
 	public static final String IA_LABELS = "ID-labels";
 	public static final String IA_CONF_YEAR = "ID-year";
 	public static final String IA_REDIRECT = "ID-redirect";
+	public static final String IA_LOCATION_ID = "ID-location";
 
 	private MenuItem miSettings;
 	private MenuItem miSearch;
@@ -49,6 +50,7 @@ public abstract class BaseActivity extends Activity {
 	private MenuItem miAdd;
 	private MenuItem miEdit;
 	private MenuItem miTrack;
+	private MenuItem miExit;
 
 	private static Activity rootActivity;
 	private static ProfileManager profileManager;
@@ -76,13 +78,13 @@ public abstract class BaseActivity extends Activity {
 					showConferencesList();
 				}
 			});
-			conferenceButton.setOnLongClickListener(new View.OnLongClickListener() {
-				@Override
-				public boolean onLongClick(View v) {
-					resetApplication(true);
-					return true;
-				}
-			});
+//			conferenceButton.setOnLongClickListener(new View.OnLongClickListener() {
+//				@Override
+//				public boolean onLongClick(View v) {
+//					resetApplication(true);
+//					return true;
+//				}
+//			});
 		}
 	}
 
@@ -103,17 +105,19 @@ public abstract class BaseActivity extends Activity {
 
 		miAdd = menu.add(0, XCS.MENU.ADD, Menu.NONE, R.string.menu_add);
 		miEdit = menu.add(0, XCS.MENU.EDIT, Menu.NONE, R.string.menu_edit);
-		miList = menu.add(0, XCS.MENU.OVERVIEW, Menu.NONE, R.string.menu_overview);
+//		miList = menu.add(0, XCS.MENU.OVERVIEW, Menu.NONE, R.string.menu_overview);
 		miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
 		miSearch = menu.add(0, XCS.MENU.SEARCH, Menu.NONE, R.string.menu_search);
 		miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
-
+		miExit = menu.add(0, XCS.MENU.EXIT, Menu.NONE, R.string.menu_exit);
+		
 		miAdd.setIcon(android.R.drawable.ic_menu_add);
 		miEdit.setIcon(android.R.drawable.ic_menu_edit);
 		miSettings.setIcon(android.R.drawable.ic_menu_preferences);
 		miSearch.setIcon(android.R.drawable.ic_menu_search);
-		miList.setIcon(R.drawable.ic_menu_list);
+//		miList.setIcon(R.drawable.ic_menu_list);
 		miTrack.setIcon(android.R.drawable.ic_menu_agenda);
+		miExit.setIcon(R.drawable.ic_menu_exit);
 
 		return true;
 	}
@@ -135,6 +139,9 @@ public abstract class BaseActivity extends Activity {
 			case XCS.MENU.TRACK:
 				startActivity(new Intent(this, CVTrack.class));
 			break;
+			case XCS.MENU.EXIT:
+				resetApplication(true);
+			break;
 		}
 		return true;
 	}
@@ -155,9 +162,9 @@ public abstract class BaseActivity extends Activity {
 		Conference conference = null;
 		ConferenceServer server = getConferenceServer();
 
-		int identifier = -1;
+		String identifier = null;
 		try {
-			identifier = getIntent().getExtras().getInt(IA_CONFERENCE);
+			identifier = getIntent().getExtras().getString(IA_CONFERENCE);
 			conference = server.getConference(identifier);
 		}
 		catch (Exception e) {
@@ -177,9 +184,9 @@ public abstract class BaseActivity extends Activity {
 
 	protected Session getSession(Conference conference, boolean useDefault) {
 		Session session = null;
-		int identifier = -1;
+		String identifier = null;
 		try {
-			identifier = getIntent().getExtras().getInt(IA_SESSION);
+			identifier = getIntent().getExtras().getString(IA_SESSION);
 			session = conference.getSessionById(identifier);
 		}
 		catch (Exception e) {

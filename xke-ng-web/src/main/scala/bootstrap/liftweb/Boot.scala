@@ -32,6 +32,7 @@ class Boot {
 
 
     Assembly.initMongoDB()
+	Assembly.purgeAndPushTestdata()
     LiftRules.dispatch.append(Assembly.XKENGDispatchAPIAssembly)
     /*
      * Show the spinny image when an Ajax call starts

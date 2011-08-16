@@ -1,8 +1,19 @@
 {
-    "id":"892",
-    "title":"TED-style XKE",
-    "date":"2011-11-07T00:00:00.000Z",
-    "startTime":"0000-00-00T16:00:00.000Z",
-    "endTime":"0000-00-00T21:00:00.000Z"
+  "id":"4e4a0c48b39c8578c8f7b6d2",
+  "title":"XKE",
+  "begin":"2011-11-23T16:00:56.527+02:00",
+  "end":"2011-11-23T20:00:56.527+02:00",
+  "locations":[{
+    "id":-784335934,
+    "name":"Maup",
+    "capacity":20
+  },{
+    "id":-784335933,
+    "name":"Laap",
+    "capacity":30
+  },{
+    "id":-784335932,
+    "name":"Library",
+    "capacity":10
+  }]
 }
-

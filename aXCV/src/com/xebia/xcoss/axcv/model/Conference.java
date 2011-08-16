@@ -14,6 +14,7 @@ import java.util.TreeSet;
 
 import android.util.Log;
 
+import com.google.gson.annotations.SerializedName;
 import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
@@ -33,12 +34,15 @@ public class Conference implements Serializable {
 
 	private static final long serialVersionUID = 2L;
 
-	private int id;
+	private String id;
 	private String title;
 	private String description;
 	private Author organiser;
+	@SerializedName("begin")
 	private DateTime date;
+	@SerializedName("begin")
 	private DateTime startTime = DateTime.forTimeOnly(16, 0, 0, 0);
+	@SerializedName("end")
 	private DateTime endTime = DateTime.forTimeOnly(21, 0, 0, 0);
 	private Set<Location> locations;
 	private transient SortedSet<Session> sessions;
@@ -66,7 +70,7 @@ public class Conference implements Serializable {
 
 	// Getters and setters
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
@@ -81,6 +85,23 @@ public class Conference implements Serializable {
 			}
 		}
 		return sessions;
+	}
+
+	public SortedSet<Session> getSessions(Location loc) {
+		if (loc == null) {
+			return getSessions();
+		}
+		SortedSet<Session> result = new TreeSet<Session>();
+		for (Session session : getSessions()) {
+			// If the session has no location, it never shows ...
+			// TODO Remove no-location check
+			if (loc.equals(session.getLocation())) {
+				result.add(session);
+			} else {
+				Log.w("XCS", "No location: " + session.getLocation());
+			}
+		}
+		return result;
 	}
 
 	public String getTitle() {
@@ -163,7 +184,7 @@ public class Conference implements Serializable {
 		sessions = new TreeSet<Session>(new SessionComparator());
 	}
 
-	public Session getSessionById(int id) {
+	public Session getSessionById(String id) {
 		for (Session session : getSessions()) {
 			if (id == session.getId()) {
 				return session;
@@ -341,7 +362,7 @@ public class Conference implements Serializable {
 				+ FormatUtil.getList(locations) + ", sessions=" + FormatUtil.getList(sessions) + "]";
 	}
 
-	public void setId(int i) {
+	public void setId(String i) {
 		this.id = i;
 	}
 }

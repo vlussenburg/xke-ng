@@ -44,15 +44,15 @@ public class ConferenceCache {
 
 	};
 
-	private HashMap<Integer, CachedObject<Conference>> conferencesById;
-	private HashMap<Integer, CachedObject<Session>> sessionsById;
+	private HashMap<String, CachedObject<Conference>> conferencesById;
+	private HashMap<String, CachedObject<Session>> sessionsById;
 	private HashMap<Integer, CachedObject<List<Conference>>> conferencesByYear;
 	private HashMap<String, CachedObject<Object>> cachedObjects;
 
 	protected ConferenceCache() {
-		this.conferencesById = new HashMap<Integer, CachedObject<Conference>>();
+		this.conferencesById = new HashMap<String, CachedObject<Conference>>();
 		this.conferencesByYear = new HashMap<Integer, CachedObject<List<Conference>>>();
-		this.sessionsById = new HashMap<Integer, CachedObject<Session>>();
+		this.sessionsById = new HashMap<String, CachedObject<Session>>();
 		this.cachedObjects = new HashMap<String, CachedObject<Object>>();
 	}
 
@@ -65,7 +65,7 @@ public class ConferenceCache {
 		return null;
 	}
 
-	public Conference getConference(int id) {
+	public Conference getConference(String id) {
 		return checkValid(conferencesById.get(id));
 	}
 
@@ -91,7 +91,7 @@ public class ConferenceCache {
 		return result;
 	}
 
-	public Session getSession(int id) {
+	public Session getSession(String id) {
 		return checkValid(sessionsById.get(id));
 	}
 

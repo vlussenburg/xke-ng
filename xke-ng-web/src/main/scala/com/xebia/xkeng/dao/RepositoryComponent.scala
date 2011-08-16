@@ -1,9 +1,9 @@
 package com.xebia.xkeng.dao
 
-import com.xebia.xkeng.model.Conference
 import net.liftweb.json.JsonDSL._
 import org.joda.time.format._
 import org.joda.time.DateTime
+import com.xebia.xkeng.model.{Location, Session, Conference}
 
 trait ConferenceRepository {
   def findConferences(year: Int): List[Conference]
@@ -14,22 +14,41 @@ trait ConferenceRepository {
 
   def findConference(id: String): Option[Conference]
 
+  def findSessionsOfConference(id: String): List[Session]
+
+  def findAllLocations: List[Location]
+
+}
+
+trait SessionRepository {
+  def findSession(id: String): Option[Session]
 }
 
 trait RepositoryComponent {
 
   val conferenceRepository:ConferenceRepository
+  val sessionRepository:SessionRepository
 
 
   class ConferenceRepositoryImpl extends ConferenceRepository {
 
-      val fmt = DateTimeFormat.forPattern("yyyyMMdd");
+    val fmt = DateTimeFormat.forPattern("yyyyMMdd");
 
     private def dateRegexpQry(begin:String) = {
       ("begin" -> ("$regex" -> ("^%s.*".format(begin))))
     }
 
-
+    def findSessionsOfConference(conferenceId: String): List[Session] = {
+      this.findConference(conferenceId) match {
+        case Some(conf) => {
+          //get the sessions
+          val sessionIds = conf.slots.map(_.sessionRefId).flatten
+          val sessions: List[Session] = sessionIds.map(id => sessionRepository.findSession(id.toString)).flatten //objectId to string.. does that work?
+          sessions
+        }
+        case None => Nil
+      }
+    }
 
     /**
      * db.confs.find( { begin : { $regex : "^<year>.*" } } );
@@ -52,6 +71,18 @@ trait RepositoryComponent {
      */
     def findConference(id: String) = Conference.find(id)
 
+    def findAllLocations = {
+      val conferences = Conference.findAll
+      var locations: Set[Location] = Set()
+      conferences.foreach { locationCol =>
+        locations = locations ++ locationCol.locations;
+      }
+      locations.toList
+    }
+  }
+
+  class SessionRepositoryImpl extends SessionRepository {
+    def findSession(id: String) = Session.find(id)
   }
 
 }

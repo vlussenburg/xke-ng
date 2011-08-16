@@ -4,9 +4,10 @@ import net.liftweb.json.JsonDSL._
 import net.liftweb.json._
 import org.joda.time.format._
 import org.joda.time.DateTime
-import com.xebia.xkeng.model.{ Location, Conference }
 import net.liftweb.json.JsonAST.{ JValue, JArray }
 import net.liftweb.json.ext.JodaTimeSerializers
+import javax.security.auth.login.LoginContext
+import com.xebia.xkeng.model.{Credential, Session, Location, Conference}
 
 /**
  * {
@@ -50,6 +51,13 @@ object JsonDomainConverters {
     }
   }
 
+  implicit def sessionToJValue(session: Session): JValue = {
+    ("id" -> session._id.toString) ~
+    ("title" -> session.title) ~
+    ("presenter" -> session.presenter) ~
+    ("descr" -> session.descr)
+  }
+
   implicit def conferenceToJValue(conference: Conference): JValue = {
     ("id" -> conference._id.toString) ~
       ("title" -> conference.title) ~
@@ -58,12 +66,48 @@ object JsonDomainConverters {
       ("locations" -> conference.locations.map(locationToJValue(_)))
   }
 
-  def locationToJValue(location: Location): JValue = {
-    //TODO add location type
-    location.serializeToJson merge ("standard" -> "true")
+  /**
+   *
+    "locations" : [
+	    {
+		    "id" : -1098499121,
+		    "name" : "Maup",
+		    "capacity" : 20
+	    },
+	    {
+		    "id" : -1098499119,
+		    "name" : "Laap",
+		    "capacity" : 30
+	    }
+    ]
+   */
+  implicit def locationToJValue(location: Location): JValue = {
+    ("id" -> location.id) ~
+      ("name" -> location.name) ~
+      ("capacity" -> location.capacity)
   }
 
   implicit def conferencesToJArray(conferences: List[Conference]): JValue = new JArray(conferences.map(conferenceToJValue))
+  implicit def locationsToJArray(locations: List[Location]): JValue = new JArray(locations.map(locationToJValue))
+
+
+  def fromSessionJson(jsonString: String): Session = {
+    val JObject(jsonValue) = JsonParser.parse(jsonString)
+    def toSession(sessJson: JValue) = {
+      val id: Option[String] = (sessJson \\ "id") match {
+        case JString(id) => Some(id)
+        case _ => None
+      }
+      val JString(title) = sessJson \\ "title"
+      val JString(presenter) = sessJson \\ "presenter"
+      val JString(description) = sessJson \\ "descr"
+
+      val session =
+        Session(title, presenter, description)
+      session
+    }
+    toSession(jsonValue)
+  }
 
   def fromConferenceJson(jsonString: String): Conference = {
     val JObject(jsonValue) = JsonParser.parse(jsonString)
@@ -71,7 +115,7 @@ object JsonDomainConverters {
       val id: Option[String] = (confJson \\ "id") match {
         case JString(id) => Some(id)
         case _ => None
-      }
+      }  //why parse Id if u don't use it?
       val JString(title) = confJson \\ "title"
       val JString(AsDateTime(begin)) = confJson \\ "begin"
       val JString(AsDateTime(end)) = confJson \\ "end"
@@ -80,12 +124,18 @@ object JsonDomainConverters {
         case _ => Nil
       }
       val conference = Conference(title, begin, end, Nil, locations)
-      //id.map(Conference(_, title, begin, end, Nil, locations)).getOrElse(conference)
       conference
     }
 
     toConf(jsonValue)
+  }
 
+  def fromCredentialJson(jsonString: String): Credential = {
+	  val JObject(jsonValue) = JsonParser.parse(jsonString)
+	  val JString(name) = jsonValue \\ "name"
+	  val JString(pwd) = jsonValue \\ "cryptedPassword"
+
+	  Credential(name, pwd)
   }
 
   implicit val formats: Formats = Serialization.formats(NoTypeHints) ++ JodaTimeSerializers.all

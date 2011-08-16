@@ -32,7 +32,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 
 	public class Trackable {
 		public DateTime when;
-		public int sessionId;
+		public String sessionId;
 		public String userId;
 	};
 	
@@ -85,7 +85,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 		create.append(SES_COL_USER);
 		create.append(" text not null, ");
 		create.append(SES_COL_SESSION);
-		create.append(" integer not null, ");
+		create.append(" text not null, ");
 		create.append(SES_COL_DATE);
 		create.append(" datetime);");
 		db.execSQL(create.toString());
@@ -99,7 +99,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 		create.append(SES_COL_USER);
 		create.append(" text not null, ");
 		create.append(SES_COL_SESSION);
-		create.append(" integer not null, ");
+		create.append(" text not null, ");
 		create.append(SES_COL_DATE);
 		create.append(" datetime);");
 		db.execSQL(create.toString());
@@ -152,7 +152,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 		}
 	}
 
-	public boolean isMarked(String user, int sessionId) {
+	public boolean isMarked(String user, String sessionId) {
 		Log.v(XCS.LOG.COMMUNICATE, "Check if marked " + sessionId + " for user " + user);
 		try {
 			checkConnection();
@@ -171,7 +171,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 		}
 	}
 
-	public int[] getMarkedSessionIds(String user) {
+	public String[] getMarkedSessionIds(String user) {
 		Log.v(XCS.LOG.COMMUNICATE, "Get all marked sessions for user " + user);
 		try {
 			checkConnection();
@@ -179,17 +179,17 @@ public class ProfileManager extends SQLiteOpenHelper {
 			whereArgs[0] = user;
 			Cursor query = database.query(TRACK_TABLE, new String[] { SES_COL_SESSION }, SES_QUERY_NAME,
 					new String[] { user }, null, null, SES_COL_DATE + " ASC");
-			int[] result = new int[query.getCount()];
+			String[] result = new String[query.getCount()];
 			int i = 0;
 			for (query.moveToFirst(); !query.isAfterLast(); query.moveToNext()) {
-				result[i++] = query.getInt(query.getColumnIndex(SES_COL_SESSION));
+				result[i++] = query.getString(query.getColumnIndex(SES_COL_SESSION));
 			}
 			query.close();
 			return result;
 		}
 		catch (Exception e) {
 			Log.w(XCS.LOG.COMMUNICATE, "Retrieval failed: " + StringUtil.getExceptionMessage(e));
-			return new int[0];
+			return new String[0];
 		}
 	}
 	
@@ -221,7 +221,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 			int i = 0;
 			for (query.moveToFirst(); !query.isAfterLast(); query.moveToNext()) {
 				Trackable trackable = new Trackable();
-				trackable.sessionId = query.getInt(query.getColumnIndex(SES_COL_SESSION));
+				trackable.sessionId = query.getString(query.getColumnIndex(SES_COL_SESSION));
 				trackable.when = DateTime.forInstant(query.getLong(query.getColumnIndex(SES_COL_DATE)), XCS.TZ);
 				trackable.userId = user;
 				result[i++] = trackable;
