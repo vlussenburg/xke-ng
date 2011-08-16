@@ -87,6 +87,23 @@ public class Conference implements Serializable {
 		return sessions;
 	}
 
+	public SortedSet<Session> getSessions(Location loc) {
+		if (loc == null) {
+			return getSessions();
+		}
+		SortedSet<Session> result = new TreeSet<Session>();
+		for (Session session : getSessions()) {
+			// If the session has no location, it never shows ...
+			// TODO Remove no-location check
+			if (loc.equals(session.getLocation())) {
+				result.add(session);
+			} else {
+				Log.w("XCS", "No location: " + session.getLocation());
+			}
+		}
+		return result;
+	}
+
 	public String getTitle() {
 		return title;
 	}

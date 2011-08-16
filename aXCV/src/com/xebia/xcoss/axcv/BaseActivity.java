@@ -42,6 +42,7 @@ public abstract class BaseActivity extends Activity {
 	public static final String IA_LABELS = "ID-labels";
 	public static final String IA_CONF_YEAR = "ID-year";
 	public static final String IA_REDIRECT = "ID-redirect";
+	public static final String IA_LOCATION_ID = "ID-location";
 
 	private MenuItem miSettings;
 	private MenuItem miSearch;
