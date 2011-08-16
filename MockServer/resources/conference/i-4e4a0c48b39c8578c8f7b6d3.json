@@ -1,0 +1,19 @@
+{
+  "id":"4e4a0c48b39c8578c8f7b6d3",
+  "title":"XKE",
+  "begin":"2011-08-23T16:00:56.527+02:00",
+  "end":"2011-08-23T20:00:56.527+02:00",
+  "locations":[{
+    "id":-784335918,
+    "name":"Maup",
+    "capacity":20
+  },{
+    "id":-784335917,
+    "name":"Laap",
+    "capacity":30
+  },{
+    "id":-784335916,
+    "name":"Library",
+    "capacity":10
+  }]
+}
