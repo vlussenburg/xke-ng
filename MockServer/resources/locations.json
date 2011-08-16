@@ -2,22 +2,22 @@
   "locations":[
   {
     "id":"701",
-    "description":"Maupertuus",
+    "name":"Maupertuus",
     "standard":"true"
   },
   {
     "id":"702",
-    "description":"Library",
+    "name":"Library",
     "standard":"true"
   },
   {
     "id":"703",
-    "description":"Laap",
+    "name":"Laap",
     "standard":"true"
   },
   {
     "id":"704",
-    "description":"Attic",
+    "name":"Attic",
     "standard":"false"
   }
   ]

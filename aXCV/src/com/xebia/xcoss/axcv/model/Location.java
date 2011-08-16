@@ -26,7 +26,7 @@ public class Location implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Loc: " + description;
+		return description;
 	}
 
 	public boolean isStandard() {
@@ -37,6 +37,10 @@ public class Location implements Serializable {
 		return id;
 	}
 
+	public int getCapacity() {
+		return capacity;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

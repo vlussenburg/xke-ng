@@ -109,7 +109,7 @@
 		-->
 		<meta-data
 			android:name="com.xebia.xcoss.serverUrl"
-			android:value="http://10.0.2.2:8080" />
+			android:value="http://10.0.2.2:9000" />
 		<meta-data
 			android:name="de.quist.app.errorreporter.targetUrl"
 			android:value="http://10.0.2.2:9000/error" />
