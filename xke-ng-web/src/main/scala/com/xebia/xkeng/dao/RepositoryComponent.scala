@@ -21,7 +21,8 @@ trait ConferenceRepository {
 }
 
 trait SessionRepository {
-  def findSession(id: String): Option[Session]
+  def findSessionById(id: Long): Option[(Conference, Session)]
+  def deleteSessionById(id:Long):Unit
 }
 
 trait RepositoryComponent {
@@ -39,15 +40,7 @@ trait RepositoryComponent {
     }
 
     def findSessionsOfConference(conferenceId: String): List[Session] = {
-      this.findConference(conferenceId) match {
-        case Some(conf) => {
-          //get the sessions
-          val sessionIds = conf.slots.map(_.sessionRefId).flatten
-          val sessions: List[Session] = sessionIds.map(id => sessionRepository.findSession(id.toString)).flatten //objectId to string.. does that work?
-          sessions
-        }
-        case None => Nil
-      }
+      this.findConference(conferenceId).map(_.sessions).getOrElse(Nil)
     }
 
     /**
@@ -82,7 +75,13 @@ trait RepositoryComponent {
   }
 
   class SessionRepositoryImpl extends SessionRepository {
-    def findSession(id: String) = Session.find(id)
+    def findSessionById(id: Long):Option[(Conference, Session)] = {
+      Conference.find(("sessions.id" -> id)).map(c => (c, c.sessions.find(_.id == id).get))
+    }
+     def deleteSessionById(id: Long):Unit = {
+      val conf = Conference.find(("sessions.id" -> id))
+      conf.map(c => c.remove(c.getSessionById(id).get))
+    }
   }
-
+  
 }

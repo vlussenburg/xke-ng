@@ -22,7 +22,7 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
   val xke2011_06_17 = fmt.parseDateTime("2011-06-17T16:00:00.000Z")
   val xke2011_05_03 = fmt.parseDateTime("2011-05-03T16:00:00.000Z")
   val xke2010_05_01 = fmt.parseDateTime("2010-05-01T16:00:00.000Z")
-  //val session = Session("Clojure is it!", "Sander", "why Clojure exists")
+
   var conferences: List[Conference] = Nil
 
 
@@ -38,8 +38,8 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
   }
 
   private def createTestConference(startDate: DateTime) = {
-    val s1 = Slot(startDate, startDate.plusMinutes(60), l1, "Mongo rocks", "amooi@xebia.com", None)
-    val s2 = Slot(startDate, startDate.plusMinutes(60), l2, "Scala rocks even more", "upeter@xebia.com", None)
+    val s1 = Session(startDate, startDate.plusMinutes(60), l1, "Mongo rocks", "Mongo rocks like a stone", "amooi@xebia.com")
+    val s2 = Session(startDate, startDate.plusMinutes(60), l2, "Scala rocks even more", "Scala is great and consice" , "upeter@xebia.com")
     val c = Conference(ObjectId.get, "XKE", startDate, startDate.plusHours(4), List(s1, s2), List(l1, l2, l3))
     c.save
     c
