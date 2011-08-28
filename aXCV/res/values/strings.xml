@@ -25,4 +25,6 @@
     <string name="empty_value">&lt;specify value&gt;</string>    
     <string name="default_input_text">&lt;start typing&gt;</string>    
     <string name="my_track_title">My track list</string>    
+    <string name="context_menu_author_view">View author</string>    
+    <string name="context_menu_author_remove">Remove author</string>    
 </resources>
