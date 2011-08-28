@@ -2,8 +2,8 @@
 <manifest
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.xebia.xcoss.axcv"
-	android:versionName="0.3"
-	android:versionCode="3">
+	android:versionName="0.4"
+	android:versionCode="4">
 	<uses-sdk
 		android:minSdkVersion="4" />
 	<uses-permission
@@ -109,7 +109,7 @@
 		-->
 		<meta-data
 			android:name="com.xebia.xcoss.serverUrl"
-			android:value="http://10.0.2.2:9000" />
+			android:value="http://10.0.2.2:8080" />
 		<meta-data
 			android:name="de.quist.app.errorreporter.targetUrl"
 			android:value="http://10.0.2.2:9000/error" />

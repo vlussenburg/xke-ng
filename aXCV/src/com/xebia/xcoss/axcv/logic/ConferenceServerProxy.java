@@ -62,7 +62,7 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public void deleteSession(Session session, int conferenceId) {
+	public void deleteSession(Session session, String conferenceId) {
 		try {
 			super.deleteSession(session, conferenceId);
 		}
@@ -94,7 +94,7 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public Conference getConference(int id) {
+	public Conference getConference(String id) {
 		try {
 			return super.getConference(id);
 		}
@@ -182,7 +182,7 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public Session getSession(int id) {
+	public Session getSession(String id) {
 		try {
 			return super.getSession(id);
 		}
@@ -257,7 +257,7 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public int storeSession(Session session, int conferenceId, boolean update) {
+	public int storeSession(Session session, String conferenceId, boolean update) {
 		try {
 			return super.storeSession(session, conferenceId, update);
 		}

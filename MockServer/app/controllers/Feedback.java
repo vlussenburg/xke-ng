@@ -12,15 +12,15 @@ public class Feedback extends DefaultController {
     	renderText(Math.round(100*new Random().nextFloat())/10.0);
     }
 
-    public static void getComments(int sessionId) {
+    public static void getComments(String sessionId) {
     	handleResponse("", "comments");
     }
 
-    public static void createComment(int sessionId, JsonObject body) {
+    public static void createComment(String sessionId, JsonObject body) {
     	ok();
     }
 
-    public static void createRating(int sessionId, double rate) {
+    public static void createRating(String sessionId, double rate) {
     	ok();
     }
 }

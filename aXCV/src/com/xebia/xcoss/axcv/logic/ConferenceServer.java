@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import android.util.Log;
+
 import com.google.gson.reflect.TypeToken;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
@@ -20,6 +22,7 @@ import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.util.ConferenceComparator;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.util.XCS;
+import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class ConferenceServer {
 
@@ -64,21 +67,14 @@ public class ConferenceServer {
 	}
 
 	public Conference getConference(DateTime date) {
-		Conference result = conferenceCache.getConference(date);
-		if (result == null) {
-			StringBuilder requestUrl = new StringBuilder();
-			requestUrl.append(baseUrl);
-			requestUrl.append("/conference/on/");
-			// Oeps, the framework does not support concatenations. Using escape for nothing.
-			requestUrl.append(date.format("YYYY||MM||DD"));
-
-			result = RestClient.loadObject(requestUrl.toString(), Conference.class, token);
-			conferenceCache.add(result);
+		List<Conference> conferences = getConferences(date);
+		if ( conferences == null || conferences.isEmpty() ) {
+			return null;
 		}
-		return result;
+		return conferences.get(0);
 	}
 
-	public Conference getConference(int id) {
+	public Conference getConference(String id) {
 		Conference result = conferenceCache.getConference(id);
 		if (result == null) {
 			StringBuilder requestUrl = new StringBuilder();
@@ -100,13 +96,16 @@ public class ConferenceServer {
 			requestUrl.append("/conferences/");
 			requestUrl.append(year);
 
-			result = RestClient.loadObjects(requestUrl.toString(), "conferences", Conference.class, token);
+			result = RestClient.loadObjects(requestUrl.toString(), Conference.class, token);
 			if (result == null) {
 				return new ArrayList<Conference>();
 			}
 			conferenceCache.add(result);
 		}
 		Collections.sort(result, new ConferenceComparator());
+		for (Conference conference : result) {
+			Log.w(LOG.ALL, "[result] " + conference);
+		}
 		return result;
 	}
 
@@ -125,7 +124,7 @@ public class ConferenceServer {
 					requestUrl.append(date.getDay());
 				}
 			}
-			result = RestClient.loadObjects(requestUrl.toString(), "conferences", Conference.class, token);
+			result = RestClient.loadObjects(requestUrl.toString(), Conference.class, token);
 			if (result == null) {
 				return new ArrayList<Conference>();
 			}
@@ -166,7 +165,7 @@ public class ConferenceServer {
 		requestUrl.append(conference.getId());
 		requestUrl.append("/sessions");
 
-		List<Session> result = RestClient.loadObjects(requestUrl.toString(), "sessions", Session.class, token);
+		List<Session> result = RestClient.loadObjects(requestUrl.toString(), Session.class, token);
 		if (result == null) {
 			return new ArrayList<Session>();
 		}
@@ -176,7 +175,7 @@ public class ConferenceServer {
 		return result;
 	}
 
-	public Session getSession(int id) {
+	public Session getSession(String id) {
 		Session result = conferenceCache.getSession(id);
 		if (result == null) {
 			StringBuilder requestUrl = new StringBuilder();
@@ -190,7 +189,7 @@ public class ConferenceServer {
 		return result;
 	}
 
-	public int storeSession(Session session, int conferenceId, boolean update) {
+	public int storeSession(Session session, String conferenceId, boolean update) {
 		conferenceCache.remove(session);
 		conferenceCache.remove(conferenceCache.getConference(conferenceId));
 		StringBuilder requestUrl = new StringBuilder();
@@ -206,7 +205,7 @@ public class ConferenceServer {
 		return RestClient.createObject(requestUrl.toString(), session, int.class, token);
 	}
 
-	public void deleteSession(Session session, int conferenceId) {
+	public void deleteSession(Session session, String conferenceId) {
 		conferenceCache.remove(session);
 		conferenceCache.remove(conferenceCache.getConference(conferenceId));
 		StringBuilder requestUrl = new StringBuilder();
@@ -224,7 +223,7 @@ public class ConferenceServer {
 			requestUrl.append(baseUrl);
 			requestUrl.append("/authors");
 
-			result = RestClient.loadObjects(requestUrl.toString(), "authors", Author.class, token);
+			result = RestClient.loadObjects(requestUrl.toString(), Author.class, token);
 			if (result == null) {
 				return new Author[0];
 			}
@@ -249,7 +248,7 @@ public class ConferenceServer {
 			requestUrl.append(baseUrl);
 			requestUrl.append("/locations");
 
-			result = RestClient.loadObjects(requestUrl.toString(), "locations", Location.class, token);
+			result = RestClient.loadObjects(requestUrl.toString(), Location.class, token);
 			if (result == null) {
 				return new Location[0];
 			}
@@ -271,8 +270,8 @@ public class ConferenceServer {
 		conferenceCache.removeObject(LABEL_CACHE_KEY);
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
-		requestUrl.append("/label/");
-		requestUrl.append(URLEncoder.encode(name));
+		requestUrl.append("/label");
+//		requestUrl.append(URLEncoder.encode(name));
 
 		RestClient.createObject(requestUrl.toString(), name, void.class, token);
 	}
@@ -367,7 +366,7 @@ public class ConferenceServer {
 			requestUrl.append(session.getId());
 			requestUrl.append("/comment");
 
-			result = RestClient.loadObjects(requestUrl.toString(), "comments", Remark.class, token);
+			result = RestClient.loadObjects(requestUrl.toString(), Remark.class, token);
 			if (result == null) {
 				return new Remark[0];
 			}

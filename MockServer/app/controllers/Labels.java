@@ -12,7 +12,7 @@ public class Labels extends DefaultController {
     	handleResponse("", "labels");
     }
 
-    public static void create(String name) {
+    public static void create() {
     	ok();
     }
 }

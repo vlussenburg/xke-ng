@@ -19,13 +19,15 @@
 			android:password="true"
 			android:title="Password"
 			android:summary="None set" />
+<!-- 
 		<CheckBoxPreference
 			android:dependency="Username"
 			android:key="StorePassword"
 			android:title="Store Password"
 			android:defaultValue="true"
 			android:summary="Save the password encrypted on the device" />
-  	</PreferenceCategory>
+ -->
+   	</PreferenceCategory>
 	<PreferenceCategory
 		android:title="Preferences">
 		<CheckBoxPreference
@@ -96,8 +98,9 @@
 		<Preference
 			android:key="ApplicationVersion"
 			android:title="Version"
-			android:summary="0.3"/>
-		<Preference
+			android:summary="0.4"/>
+		<com.xebia.xcoss.axcv.preference.LinkPreference
+			url="http://www.xebiamobile.com/"
 			android:key="ApplicationHelp"
 			android:title="Show tutorial"
 			android:summary="Online tutorial on xebia.com"/>

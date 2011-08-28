@@ -10,7 +10,7 @@ import de.quist.app.errorreporter.ExceptionReporter;
 
 public class ProxyExceptionReporter implements UncaughtExceptionHandler {
 
-	public static final String TOKEN = "com.xebia.Exception";
+//	public static final String TOKEN = "com.xebia.Exception";
 
 	private static ProxyExceptionReporter instance = new ProxyExceptionReporter();
 	
@@ -27,6 +27,7 @@ public class ProxyExceptionReporter implements UncaughtExceptionHandler {
 
 	@Override
 	public void uncaughtException(Thread t, Throwable throwable) {
+		Log.e(XCS.LOG.ALL, "[FATAL] Fault in application: " + throwable);
 		exceptionReporter.reportException(t, throwable);
 
         // System.exit causes an undesired restart of only the current activity.

@@ -41,12 +41,12 @@ public class CVTrack extends BaseActivity {
 	protected void onResume() {
 		List<Session> selectedSessions = new ArrayList<Session>();
 		ConferenceServer server = getConferenceServer();
-		int[] markedSessions = getProfileManager().getMarkedSessionIds(getUser());
+		String[] markedSessions = getProfileManager().getMarkedSessionIds(getUser());
 		boolean hasExpiredSession = false;
 		DateTime today = DateTime.today(XCS.TZ);
-		for (int i : markedSessions) {
+		for (String id : markedSessions) {
 			try {
-				Session session = server.getSession(i);
+				Session session = server.getSession(id);
 				if (session != null) {
 					// session.isExpired() works also on the day itself
 					if (today.gt(session.getDate())) {
@@ -57,7 +57,7 @@ public class CVTrack extends BaseActivity {
 				}
 			}
 			catch (Exception e) {
-				Log.v(XCS.LOG.COMMUNICATE, "No marked session with id " + i);
+				Log.v(XCS.LOG.COMMUNICATE, "No marked session with id " + id);
 			}
 		}
 		if ( hasExpiredSession ) {

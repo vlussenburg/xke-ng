@@ -10,11 +10,11 @@ public class Conference extends DefaultController {
     	handleResponse("conference", "d-" + yearmonthday);
     }
 
-    public static void showOnId(int id) {
+    public static void showOnId(String id) {
     	handleResponse("conference", "i-" + id);
     }
 
-    public static void sessions(int id) {
+    public static void sessions(String id) {
     	handleResponse("sessions", "" + id);
     }
 
@@ -23,6 +23,11 @@ public class Conference extends DefaultController {
     	ok();
     }
 
+    public static void delete(String id) {
+    	System.out.println("Delete: " + id);
+    	ok();
+    }
+    
     public static void create(JsonObject body) {
     	System.out.println("Create: " + body);
     	renderText(new Random().nextInt());

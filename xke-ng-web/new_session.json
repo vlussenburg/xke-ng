@@ -1,1 +1,16 @@
-{"title":"Scala takes over","desc":"BladiBla","presenter":"evanderkoogh","room":"Maup","from":"2011-05-04T17:55:34.968Z","to":"2011-05-04T18:55:34.968Z","id":""}
+{
+    "title":"The power of Android",
+    "description":"No easy task to develop for Android, due to all the stuff.
+	Join this session to have some info.",
+    "startTime":"2011-07-01T17:58:54.812Z",
+    "endTime":"2011-07-01T21:58:54.812Z",
+    "lastUpdate":"2011-07-01T17:58:54.812Z",
+    "lastReschedule":"2011-12-12T17:58:54.812Z",
+    "limit":"10 people",
+    "type":"STRATEGIC",
+	"location": {
+           "description": "Library",
+           "id": 714,
+           "capacity":20 
+	}
+}

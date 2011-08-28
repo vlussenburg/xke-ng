@@ -59,6 +59,7 @@ public class XCS {
 		public static final int ADD = Menu.FIRST + 3;
 		public static final int EDIT = Menu.FIRST + 4;
 		public static final int TRACK = Menu.FIRST + 5;
+		public static final int EXIT = Menu.FIRST + 6;
 	}
 
 	public class PREF {

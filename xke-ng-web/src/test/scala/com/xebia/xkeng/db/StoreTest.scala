@@ -1,16 +1,13 @@
 package com.xebia.xkeng.db
 
-import org.joda.time.DateTime
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
-import net.liftweb.json.JsonAST.JValue
 import com.amazonaws.auth.BasicAWSCredentials
 import collection.JavaConversions._
 import com.amazonaws.services.simpledb.model._
 import com.amazonaws.services.simpledb.{AmazonSimpleDB, AmazonSimpleDBClient}
-import com.xebia.xkeng.rest.XKESession
 
 @RunWith(classOf[JUnitRunner])
 class StoreTest extends FlatSpec with ShouldMatchers {
@@ -28,13 +25,15 @@ class StoreTest extends FlatSpec with ShouldMatchers {
     client.deleteDomain(new DeleteDomainRequest("test"))
   }
 
-
+  //no longer in the code, commented out so we can use it later?
+  /*
   "SimpleDBStore" should " domain Session correctly" in {
     def map(sess:XKESession) = {
       sess.getClass.getDeclaredFields.foreach(a => {a.setAccessible(true);println(a.getName + "=" + a.get(sess) )})
     }
     map(XKESession("Scala takes over", "BladiBla", "evanderkoogh", "Maup", new DateTime(), new DateTime().plusHours(1), "1234"))
   }
+  */
 
 
 

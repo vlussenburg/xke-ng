@@ -28,54 +28,46 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
   }
 
   private def createTestConference() = {
-    val sess1 = Session(ObjectId.get, "Scala rocks even more", "upeter@xebia.com", "Scala is a scalable programming language")
-    sess1.save
-    val s1 = Slot(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "amooi@xebia.com", None)
-    val s2 = Slot(xkeStartDate, xkeStartDate.plusMinutes(60), l2, "Scala rocks even more", "upeter@xebia.com", Some(sess1._id))
-    val c = Conference(ObjectId.get, "XKE", xkeStartDate, List(s1, s2), List(l1, l2))
+    val s1 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "Mongo is a nosql db", "amooi@xebia.com")
+    val s2 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l2, "Scala rocks even more", "Scala is a scalable programming language", "upeter@xebia.com")
+    val c = Conference(ObjectId.get, "XKE", xkeStartDate, xkeStartDate.plusHours(4), List(s1, s2), List(l1, l2))
     c.save
-    (sess1, s1, s2, c)
+    (s1, s2, c)
 
   }
 
   it should "save a converence correctly" in {
-    val (sess1, s1, s2, c) = createTestConference()
+    val (s1, s2, c) = createTestConference()
 
     var pFromDb = Conference.find(c._id)
     pFromDb should not be (None)
     pFromDb.get._id should be(c._id)
 
-    val sRef = pFromDb.get.slots.filter(_.sessionRefId != None).head.sessionRefId.get
-    val sFromDb = Session.find(sRef)
-
-    sFromDb should not be (None)
-    sFromDb.get._id should be(sRef)
-
     c.delete
-    sess1.delete
+    
   }
 
-  it should "add a slot correctly" in {
-    val (sess1, s1, s2, cOriginal) = createTestConference()
+  it should "add a session correctly" in {
+    val (s1, s2, cOriginal) = createTestConference()
 
     var cFromDb = Conference.find(cOriginal._id)
     cFromDb should not be (None)
     var c = cFromDb.get
-    c.slots.size should be(2)
+    c.sessions.size should be(2)
 
-    c.saveOrUpdate(Slot(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Git rocks", "amooi@xebia.com", None))
+    c.saveOrUpdate(Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Git rocks", "Git is the star among cvs","amooi@xebia.com"))
 
     cFromDb = Conference.find(c._id)
     c = cFromDb.get
-    c.slots.size should be(3)
-    c.slots(0).location should not be (None)
+    c.sessions.size should be(3)
+    c.sessions(0).location should not be (None)
 
     c.delete
-    sess1.delete
+    
   }
 
-  it should "remove a slot correctly" in {
-    val (sess1, s1, s2, cOriginal) = createTestConference()
+  it should "remove a session correctly" in {
+    val (s1, s2, cOriginal) = createTestConference()
 
     var cFromDb = Conference.find(cOriginal._id)
     cFromDb should not be (None)
@@ -85,35 +77,35 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
     cFromDb = Conference.find(c._id)
     cFromDb should not be (None)
     c = cFromDb.get
-    c.slots.size should be(1)
+    c.sessions.size should be(1)
 
     c.delete
-    sess1.delete
+    
   }
 
 
-  it should "update a slot correctly" in {
-    val (sess1, s1, s2, cOriginal) = createTestConference()
+  it should "update a session correctly" in {
+    val (s1, s2, cOriginal) = createTestConference()
 
     var cFromDb = Conference.find(cOriginal._id)
     cFromDb should not be (None)
     var c = cFromDb.get
-    c.slots.size should be(2)
+    c.sessions.size should be(2)
 
     c.saveOrUpdate(s2.copy(title = "another title"))
 
     cFromDb = Conference.find(c._id)
     c = cFromDb.get
-    c.slots.size should be(2)
-    c.slots.exists(_.title == "another title") should be(true)
-    c.slots(0).location should not be (None)
+    c.sessions.size should be(2)
+    c.sessions.exists(_.title == "another title") should be(true)
+    c.sessions(0).location should not be (None)
 
     c.delete
-    sess1.delete
+    
   }
 
   it should "update a location correctly" in {
-    val (sess1, s1, s2, cOriginal) = createTestConference()
+    val (s1, s2, cOriginal) = createTestConference()
 
     var cFromDb = Conference.find(cOriginal._id)
     cFromDb should not be (None)
@@ -128,12 +120,12 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
     c.locations.exists(_.capacity == 50) should be(true)
 
     c.delete
-    sess1.delete
+    
   }
 
 
   it should "add a location correctly" in {
-    val (sess1, s1, s2, cOriginal) = createTestConference()
+    val (s1, s2, cOriginal) = createTestConference()
 
     var cFromDb = Conference.find(cOriginal._id)
     cFromDb should not be (None)
@@ -147,11 +139,11 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
     c.locations.size should be(3)
 
     c.delete
-    sess1.delete
+    
   }
 
   it should "remove a location correctly" in {
-    val (sess1, s1, s2, cOriginal) = createTestConference()
+    val (s1, s2, cOriginal) = createTestConference()
 
     var cFromDb = Conference.find(cOriginal._id)
     cFromDb should not be (None)
@@ -174,7 +166,7 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
     c.locations.size should be(2)
 
     c.delete
-    sess1.delete
+    
   }
 
 

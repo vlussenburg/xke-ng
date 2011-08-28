@@ -14,6 +14,7 @@ import java.util.TreeSet;
 
 import android.util.Log;
 
+import com.google.gson.annotations.SerializedName;
 import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
@@ -25,6 +26,7 @@ import com.xebia.xcoss.axcv.util.XCS;
 public class Conference implements Serializable {
 
 	public class TimeSlot {
+		public static final int LENGTH = 30;
 		public DateTime start;
 		public DateTime end;
 		public Location location;
@@ -32,12 +34,15 @@ public class Conference implements Serializable {
 
 	private static final long serialVersionUID = 2L;
 
-	private int id;
+	private String id;
 	private String title;
 	private String description;
 	private Author organiser;
+	@SerializedName("begin")
 	private DateTime date;
+	@SerializedName("begin")
 	private DateTime startTime = DateTime.forTimeOnly(16, 0, 0, 0);
+	@SerializedName("end")
 	private DateTime endTime = DateTime.forTimeOnly(21, 0, 0, 0);
 	private Set<Location> locations;
 	private transient SortedSet<Session> sessions;
@@ -65,7 +70,7 @@ public class Conference implements Serializable {
 
 	// Getters and setters
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
@@ -80,6 +85,23 @@ public class Conference implements Serializable {
 			}
 		}
 		return sessions;
+	}
+
+	public SortedSet<Session> getSessions(Location loc) {
+		if (loc == null) {
+			return getSessions();
+		}
+		SortedSet<Session> result = new TreeSet<Session>();
+		for (Session session : getSessions()) {
+			// If the session has no location, it never shows ...
+			// TODO Remove no-location check
+			if (loc.equals(session.getLocation())) {
+				result.add(session);
+			} else {
+				Log.w("XCS", "No location: " + session.getLocation());
+			}
+		}
+		return result;
 	}
 
 	public String getTitle() {
@@ -162,7 +184,7 @@ public class Conference implements Serializable {
 		sessions = new TreeSet<Session>(new SessionComparator());
 	}
 
-	public Session getSessionById(int id) {
+	public Session getSessionById(String id) {
 		for (Session session : getSessions()) {
 			if (id == session.getId()) {
 				return session;
@@ -276,15 +298,20 @@ public class Conference implements Serializable {
 
 	public List<TimeSlot> getAvailableTimeSlots() {
 		ArrayList<TimeSlot> list = new ArrayList<TimeSlot>();
-
-		final int length = 30;
-		TimeSlot t;
 		for (Location loc : locations) {
-			DateTime start = startTime;
-			while ((t = getNextAvailableTimeSlot(start, length, loc)) != null) {
-				list.add(t);
-				start = start.plus(0, 0, 0, 0, length, 0, DayOverflow.Spillover);
-			}
+			list.addAll(getAvailableTimeSlots(loc));
+		}
+		return list;
+	}
+
+	public List<TimeSlot> getAvailableTimeSlots(Location loc) {
+		ArrayList<TimeSlot> list = new ArrayList<TimeSlot>();
+
+		TimeSlot t;
+		DateTime start = startTime;
+		while ((t = getNextAvailableTimeSlot(start, TimeSlot.LENGTH, loc)) != null) {
+			list.add(t);
+			start = start.plus(0, 0, 0, 0, TimeSlot.LENGTH, 0, DayOverflow.Spillover);
 		}
 		return list;
 	}
@@ -335,13 +362,7 @@ public class Conference implements Serializable {
 				+ FormatUtil.getList(locations) + ", sessions=" + FormatUtil.getList(sessions) + "]";
 	}
 
-	public void setId(int i) {
-		// TODO Auto-generated method stub
+	public void setId(String i) {
 		this.id = i;
 	}
-
-	// @Override
-	// public String toString() {
-	// return "Conference [id=" + id + ", title=" + title + ", date=" + date + "]";
-	// }
 }
