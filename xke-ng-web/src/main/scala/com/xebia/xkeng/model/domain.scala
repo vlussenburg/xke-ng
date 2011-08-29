@@ -80,34 +80,35 @@ object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps
 
   override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
 
-  def apply(title: String, begin: DateTime, end: DateTime, slots: List[Slot], locations: List[Location]): Conference = {
-    Conference(ObjectId.get, title, begin, end, slots, locations)
+  def apply(title: String, begin: DateTime, end: DateTime, sessions: List[Session], locations: List[Location]): Conference = {
+    Conference(ObjectId.get, title, begin, end, sessions, locations)
   }
   
 }
 
 /**
- * Represents a Conference, a conference has a number of locations, where slots are available.
+ * Represents a Conference, a conference has a number of locations, where sessions are available.
  * This class is a case class, due to net.liftweb.mongodb requirements.
  */
-case class Conference(_id: ObjectId, title: String, begin: DateTime, end: DateTime, var slots: List[Slot], var locations: List[Location]) extends MongoDocument[Conference] {
+case class Conference(_id: ObjectId, title: String, begin: DateTime, end: DateTime, var sessions: List[Session], var locations: List[Location]) extends MongoDocument[Conference] {
   def meta = Conference
 
   type EmbeddedElem = {def id: Long; def serializeToJson: JValue}
-//  slots = slots.map(s => {
+//  sessions = sessions.map(s => {
 //    s.location = Some(locations.find(_.id == s.locationRefId).get); s
 //  })
 //
-  def saveOrUpdate(slot: Slot) = {
-    doSaveOrUpdate("slots", slots, slot)
-    slots = slot :: (slots - slot)
-    slots
+  
+  def saveOrUpdate(session: Session) = {
+    doSaveOrUpdate("sessions", sessions, session)
+    sessions = session :: (sessions - session)
+    sessions
   }
 
-  def remove(slot: Slot) = {
-    doRemove("slots", slot)
-    slots = slots.filter(_.id != slot.id)
-    slots
+  def remove(session: Session) = {
+    doRemove("sessions", session)
+    sessions = sessions.filter(_.id != session.id)
+    sessions
   }
 
   def saveOrUpdate(location: Location) = { 
@@ -117,13 +118,18 @@ case class Conference(_id: ObjectId, title: String, begin: DateTime, end: DateTi
   }
  
   def remove(location: Location) = {
-    if(slots.exists(_.location.id == location.id)) {
-      throw new IllegalArgumentException("The following slots: %s still depend on the location: %s you want to remove. A location can only be removed if it has no references to slots." format(slots, location))
+    if(sessions.exists(_.location.id == location.id)) {
+      throw new IllegalArgumentException("The following sessions: %s still depend on the location: %s you want to remove. A location can only be removed if it has no references to sessions." format(sessions, location))
     }
     doRemove("locations", location)
     locations = locations.filter(_.id != location.id)
     locations
   }
+
+  def getLocationById(id:Long):Option[Location] = locations.find(_.id == id)
+  
+  def getSessionById(id:Long):Option[Session] = sessions.find(_.id == id)
+
 
   private def doSaveOrUpdate(nameMongoArray: String, mongoArray: List[EmbeddedElem], elem: EmbeddedElem) = {
     if (!mongoArray.exists(_.id == elem.id)) {
@@ -140,19 +146,19 @@ case class Conference(_id: ObjectId, title: String, begin: DateTime, end: DateTi
 }
 
 /**
- * Represents a slot at a location. A slot is an indication of time and space.
+ * Represents a Session at a location. A Session contains time, space and session properties.
  */
-case class Slot(val id: Long, val start: DateTime, val end: DateTime, val location:Location, val title: String, val presenter: String, val sessionRefId: Option[ObjectId]) extends ToJsonSerializer[Slot] {
+case class Session(val id: Long, val start: DateTime, val end: DateTime, val location:Location, val title: String, val description:String, val presenter: String) extends ToJsonSerializer[Session] {
   def period = new Period(start.getMillis, end.getMillis)
 }
 
 /**
- * defines the structure of a slot
+ * defines the structure of a session
  */
-object Slot extends FromJsonDeserializer[Slot] {
+object Session extends FromJsonDeserializer[Session] {
 
- def apply(start: DateTime, end: DateTime, location: Location, title: String, presenter: String, sessionRefId: Option[ObjectId]) = {
-    new Slot(nextSeq, start, end, location, title, presenter, sessionRefId)
+ def apply(start: DateTime, end: DateTime, location: Location, title: String, description:String, presenter: String) = {
+    new Session(nextSeq, start, end, location, title, description, presenter)
   }
 }
 
@@ -165,7 +171,7 @@ case class Credential(val user: String, val cryptedPassword: String) extends ToJ
 /**
  * Represents a location, a physical space.
  */
-case class Location(id: Long, name: String, capacity: Int) extends ToJsonSerializer[Location]
+case class Location(id: Long, description: String, capacity: Int) extends ToJsonSerializer[Location]
 
 object Location extends FromJsonDeserializer[Location]{
   def apply(name: String, capacity: Int): Location = {
@@ -173,20 +179,3 @@ object Location extends FromJsonDeserializer[Location]{
   }
 }
 
-/**
- * Represents a Session, a talk/workshop/demo about a topic.
- */
-case class Session(_id: ObjectId, title: String, presenter: String, descr: String) extends MongoDocument[Session] {
-  def meta = Session
-
-}
-object Session extends MongoDocumentMeta[Session] {
-  override def collectionName = "session"
-
-  override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
-
-  def apply(title: String, presenter: String, descr: String): Session = {
-    Session(ObjectId.get, title, presenter, descr)
-  }
-
-}

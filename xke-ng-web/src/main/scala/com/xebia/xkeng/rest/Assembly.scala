@@ -6,7 +6,7 @@ import net.liftweb.mongodb.{DefaultMongoIdentifier, MongoDB}
 import com.mongodb.{Mongo, MongoOptions, ServerAddress}
 import org.joda.time.DateTime
 import org.bson.types.ObjectId
-import com.xebia.xkeng.model.{Session, Slot, Location, Conference}
+import com.xebia.xkeng.model.{Session, Location, Conference}
 
 object Assembly {
 
@@ -27,22 +27,14 @@ object Assembly {
 
 	def purgeAndPushTestdata() = {
 
-		Session.drop
+
 		Conference.drop
 
 		val today = new DateTime().hourOfDay.setCopy(16).minuteOfHour.setCopy(0)
 		val prevWeek = today.minusWeeks(1)
 		val nextWeek = today.plusWeeks(1)
 
-		p1 = Session("Mongo rocks", "amooi@xebia.com", "Mongo is a paperless document database")
-		p2 = Session("Scala rocks even more", "upeter@xebia.com", "Scala is a codeless programming language")
-		p3 = Session("Scala quirks", "upeter@xebia.com", "No such thing as a free ride when doing scala")
-		p1.save
-		p2.save
-		p3.save
-
 		val dates = today :: prevWeek :: nextWeek :: Nil
-		val sessions = p1 :: p2 :: Product13 :: Nil
 
 		dates.map(createTestConference(_))
 	}
@@ -53,9 +45,9 @@ object Assembly {
 		val l2 = Location("Laap", 30)
 		val l3 = Location("Library", 10)
 
-		val s1 = Slot(startDate, startDate.plusMinutes(60), l1, "Mongo rocks", "amooi@xebia.com", Option(p1._id))
-		val s2 = Slot(startDate, startDate.plusMinutes(60), l2, "Scala rocks even more", "upeter@xebia.com", Option(p2._id))
-		val s3 = Slot(startDate, startDate.plusMinutes(120), l2, "Scala quirks", "upeter@xebia.com", Option(p3._id))
+		val s1 = Session(startDate, startDate.plusMinutes(60), l1, "Mongo rocks", "Mongo is a paperless document database", "amooi@xebia.com")
+		val s2 = Session(startDate, startDate.plusMinutes(60), l2, "Scala rocks even more", "Scala is a codeless programming language", "upeter@xebia.com")
+		val s3 = Session(startDate, startDate.plusMinutes(120), l2, "Scala quirks", "No such thing as a free ride when doing scala", "upeter@xebia.com")
 		val c = Conference(ObjectId.get, "XKE", startDate, startDate.plusHours(4), List(s1, s2, s3), List(l1, l2, l3))
 		c.save
 	}

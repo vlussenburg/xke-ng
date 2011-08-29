@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:enabled="true" android:title="@string/context_menu_author_view" android:visible="true" android:id="@+id/view"></item>
+    <item android:title="@string/context_menu_author_remove" android:id="@+id/remove" android:enabled="true" android:visible="true"></item>
+
+</menu>

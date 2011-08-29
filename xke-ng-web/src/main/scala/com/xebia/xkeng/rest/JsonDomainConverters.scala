@@ -51,13 +51,53 @@ object JsonDomainConverters {
     }
   }
 
+  /**
+   * {
+    "title":"The power of Android",
+    "description":"No easy task to develop for Android, due to all the stuff.
+	Join this session to have some info.",
+    "startTime":"0000-00-00T18:00:00.000Z",
+    "endTime":"0000-00-00T19:00:00.000Z",
+    "lastUpdate":"2011-07-01T17:58:54.812Z",
+    "lastReschedule":"2011-12-12T17:58:54.812Z",
+    "id":"8802",
+    "limit":"10 people",
+    "type":"STRATEGIC",
+	"location": {
+           "description": "Library",
+           "id": "714",
+           "standard": "true"
+	}
+    }
+   */
+  //TODO: lastUpdate, lastReschedule, limit, type
   implicit def sessionToJValue(session: Session): JValue = {
-    ("id" -> session._id.toString) ~
+    ("id" -> session.id) ~
     ("title" -> session.title) ~
+    ("description" -> session.description) ~
+    ("startTime" -> fmt.print(session.start)) ~
+    ("endTime" -> fmt.print(session.end)) ~
     ("presenter" -> session.presenter) ~
-    ("descr" -> session.descr)
+    ("lastUpdate" -> fmt.print(session.start)) ~
+    ("lastReschedule" -> fmt.print(session.start)) ~
+    ("limit" -> "10 people") ~
+    ("type" -> "STRATEGIC") ~
+    ("location" -> locationToJValue(session.location))
   }
-
+  
+  /**
+   * 
+  "id":"4e4a0c48b39c8578c8f7b6d2",
+  "title":"XKE",
+  "begin":"2011-08-09T16:00:56.527+02:00",
+  "end":"2011-08-09T20:00:56.527+02:00",
+  "locations":[{
+    "id":-784335934,
+    "name":"Maup",
+    "capacity":20
+  	}]
+  }
+   */
   implicit def conferenceToJValue(conference: Conference): JValue = {
     ("id" -> conference._id.toString) ~
       ("title" -> conference.title) ~
@@ -83,7 +123,7 @@ object JsonDomainConverters {
    */
   implicit def locationToJValue(location: Location): JValue = {
     ("id" -> location.id) ~
-      ("name" -> location.name) ~
+      ("description" -> location.description) ~
       ("capacity" -> location.capacity)
   }
 
@@ -91,22 +131,27 @@ object JsonDomainConverters {
   implicit def locationsToJArray(locations: List[Location]): JValue = new JArray(locations.map(locationToJValue))
 
 
-  def fromSessionJson(jsonString: String): Session = {
-    val JObject(jsonValue) = JsonParser.parse(jsonString)
-    def toSession(sessJson: JValue) = {
-      val id: Option[String] = (sessJson \\ "id") match {
-        case JString(id) => Some(id)
-        case _ => None
-      }
+  def fromSessionJson(isNew:Boolean)(jsonString: String): Session = {
+    val JObject(sessJson) = JsonParser.parse(jsonString)
+   
+    val JString(AsDateTime(start)) = sessJson \\ "startTime"
+      val JString(AsDateTime(end)) = sessJson \\ "endTime"      
       val JString(title) = sessJson \\ "title"
-      val JString(presenter) = sessJson \\ "presenter"
-      val JString(description) = sessJson \\ "descr"
-
-      val session =
-        Session(title, presenter, description)
-      session
-    }
-    toSession(jsonValue)
+      
+      //TODO: check where the presenter went to...
+      //val JString(presenter) = sessJson \\ "presenter"
+      val presenter = "scal@man.com"
+      val JString(description) = sessJson \ "description"
+      val location =  deserialize[Location](Printer.pretty(JsonAST.render(sessJson \\ "location")))
+      val session =  Session(start, end, location, title, description, presenter)
+      if(!isNew) {
+        val JInt(id) = (sessJson \ "id")
+        session.copy(id = id.toLong)
+      } else {
+        session
+      }
+    
+  
   }
 
   def fromConferenceJson(jsonString: String): Conference = {

@@ -14,32 +14,39 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.xebia.xcoss.axcv.logic.ConferenceServer;
+import com.xebia.xcoss.axcv.logic.ConferenceServerProxy;
 import com.xebia.xcoss.axcv.model.Author;
+import com.xebia.xcoss.axcv.ui.AuthorAdapter;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class CVSearchAuthor extends BaseActivity {
 
 	private List<Author> selectedAuthors;
-	private ArrayAdapter<Author> listAdapter;
+	private AuthorAdapter authorAdapter;
 	private AutoCompleteTextView view;
 	private HashMap<String, Author> allAuthors;
 	private boolean singleMode;
 
+	protected ConferenceServer getConferenceServer() {
+		ConferenceServer server = ConferenceServerProxy.getInstance();
+		return server;
+	}
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.search_items);
 		view = (AutoCompleteTextView) findViewById(R.id.ssa_text);
-		ListView authorList = (ListView) findViewById(R.id.ssa_list);
 		final String startText = getResources().getString(R.string.default_input_text);
 		view.setSelection(0, startText.length());
 		initSelectedAuthors();
@@ -79,16 +86,7 @@ public class CVSearchAuthor extends BaseActivity {
 			}
 
 		});
-
-		listAdapter = new ArrayAdapter<Author>(this, android.R.layout.simple_list_item_1, selectedAuthors);
-		authorList.setAdapter(listAdapter);
-		authorList.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> adapter, View view, int i, long l) {
-				listAdapter.remove(listAdapter.getItem(i));
-				Toast.makeText(getApplicationContext(), "Author removed", Toast.LENGTH_SHORT).show();
-			}
-		});
+		
 		super.onCreate(savedInstanceState);
 	}
 
@@ -115,7 +113,7 @@ public class CVSearchAuthor extends BaseActivity {
 						public void onClick(DialogInterface dialog, int i) {
 							selectedAuthors.clear();
 							selectedAuthors.add(author);
-							listAdapter.notifyDataSetChanged();
+							authorAdapter.notifyDataSetChanged();
 							dialog.dismiss();
 						}
 					});
@@ -129,7 +127,7 @@ public class CVSearchAuthor extends BaseActivity {
 				} else {
 					selectedAuthors.add(author);
 					Collections.sort(selectedAuthors);
-					listAdapter.notifyDataSetChanged();
+					authorAdapter.notifyDataSetChanged();
 				}
 			}
 			return true;
@@ -155,6 +153,9 @@ public class CVSearchAuthor extends BaseActivity {
 	@Override
 	protected void onResume() {
 		initSelectedAuthors();
+		authorAdapter = new AuthorAdapter(this, R.layout.author_item_small, selectedAuthors);
+		ListView authorList = (ListView) findViewById(R.id.ssa_list);
+		authorList.setAdapter(authorAdapter);
 		super.onResume();
 	}
 
@@ -166,9 +167,26 @@ public class CVSearchAuthor extends BaseActivity {
 		setResult(RESULT_OK, result);
 		finish();
 	}
-
+	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		return true;
+	public boolean onContextItemSelected(MenuItem menuItem) {
+		int position = menuItem.getGroupId();
+		
+		switch (menuItem.getItemId()) {
+			case R.id.view:
+				Author author = selectedAuthors.get(position);
+				Intent intent = new Intent(this, CVAuthor.class);
+				intent.putExtra(BaseActivity.IA_AUTHOR, author.getUserId());
+				startActivity(intent);
+				return true;
+			case R.id.remove:
+				selectedAuthors.remove(position);
+				authorAdapter.notifyDataSetChanged();
+				Toast.makeText(getApplicationContext(), "Author removed", Toast.LENGTH_SHORT).show();
+				return true;
+			default:
+				return super.onContextItemSelected(menuItem);
+		}		
 	}
+
 }
