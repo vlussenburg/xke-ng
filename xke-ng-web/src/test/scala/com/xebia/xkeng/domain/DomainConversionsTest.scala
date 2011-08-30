@@ -83,8 +83,6 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
       ("startTime" -> fmt.print(s1.start)) ~
       ("endTime" -> fmt.print(s1.end)) ~
       ("presenter" -> s1.presenter) ~
-      ("lastUpdate" -> fmt.print(s1.start)) ~
-      ("lastReschedule" -> fmt.print(s1.start)) ~
       ("limit" -> "10 people") ~
       ("type" -> "STRATEGIC") ~
       ("location" -> l1.serializeToJson)
@@ -99,8 +97,6 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     "description":"Android descr",
     "startTime":"2011-07-01T17:58:54.812Z",
     "endTime":"2011-07-01T21:58:54.812Z",
-    "lastUpdate":"2011-07-01T17:58:54.812Z",
-    "lastReschedule":"2011-12-12T17:58:54.812Z",
     "limit":"10 people",
     "type":"STRATEGIC",
         "location": {
