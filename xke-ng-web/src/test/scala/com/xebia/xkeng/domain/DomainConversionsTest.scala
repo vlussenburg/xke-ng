@@ -32,14 +32,14 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
   }
 
   it should "serialize a conference correctly" in {
-    val s1 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "Mongo for world domination", "amooi@xebia.com")
+    val s1 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "Mongo for world domination", "10 people")
     println(Printer.pretty(JsonAST.render(s1.serializeToJson)))
     val expected: JValue = ("start" -> "2011-06-27T09:57:47.945Z") ~
       ("end" -> "2011-06-27T10:57:47.945Z") ~
       ("location" -> l1.serializeToJson) ~
       ("title" -> "Mongo rocks") ~
       ("description" -> "Mongo for world domination") ~
-      ("presenter" -> "amooi@xebia.com") ~
+      ("limit" -> "10 people") ~
       ("id" -> s1.id)
     println(s1.serializeToJson)
     println(Printer.pretty(JsonAST.render(expected)))
@@ -75,15 +75,16 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
   }
 
   it should "serialize a session correctly" in {
-    val s1 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "Mongo for world domination", "amooi@xebia.com")
+    
+    val s1 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "Mongo for world domination", "10 people")
 
     val expected: JValue = ("id" -> s1.id) ~
       ("title" -> s1.title) ~
       ("description" -> s1.description) ~
       ("startTime" -> fmt.print(s1.start)) ~
       ("endTime" -> fmt.print(s1.end)) ~
-      ("presenter" -> s1.presenter) ~
-      ("limit" -> "10 people") ~
+      //("presenter" -> s1.presenter) ~
+      ("limit" -> s1.limit) ~
       ("type" -> "STRATEGIC") ~
       ("location" -> l1.serializeToJson)
 

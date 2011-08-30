@@ -75,8 +75,7 @@ object JsonDomainConverters {
     ("description" -> session.description) ~
     ("startTime" -> fmt.print(session.start)) ~
     ("endTime" -> fmt.print(session.end)) ~
-    ("presenter" -> session.presenter) ~
-    ("limit" -> "10 people") ~
+    ("limit" -> session.limit) ~
     ("type" -> "STRATEGIC") ~
     ("location" -> locationToJValue(session.location))
   }
