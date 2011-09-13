@@ -191,7 +191,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     conferenceRepository.findConference(confId) match {
       case Some(conf) => {
         val updatedSession = fromSessionJson(false)(new String(jsonBody.get))
-        conf.saveOrUpdate(updatedSession.copy(id = updatedSession.id))
+        conf.saveOrUpdate(updatedSession)
         Full(OkResponse())
       }
       case _ => Full(BadResponse())

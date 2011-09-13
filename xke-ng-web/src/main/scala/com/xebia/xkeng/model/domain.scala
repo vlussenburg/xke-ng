@@ -148,7 +148,7 @@ case class Conference(_id: ObjectId, title: String, begin: DateTime, end: DateTi
 /**
  * Represents a Session at a location. A Session contains time, space and session properties.
  */
-case class Session(val id: Long, val start: DateTime, val end: DateTime, val location:Location, val title: String, val description:String, val presenter: String) extends ToJsonSerializer[Session] {
+case class Session(val id: Long, val start: DateTime, val end: DateTime, val location:Location, val title: String, val description:String, val limit: String) extends ToJsonSerializer[Session] {
   def period = new Period(start.getMillis, end.getMillis)
 }
 
@@ -157,8 +157,8 @@ case class Session(val id: Long, val start: DateTime, val end: DateTime, val loc
  */
 object Session extends FromJsonDeserializer[Session] {
 
- def apply(start: DateTime, end: DateTime, location: Location, title: String, description:String, presenter: String) = {
-    new Session(nextSeq, start, end, location, title, description, presenter)
+ def apply(start: DateTime, end: DateTime, location: Location, title: String, description:String, limit: String) = {
+    new Session(nextSeq, start, end, location, title, description, limit)
   }
 }
 

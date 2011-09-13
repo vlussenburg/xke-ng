@@ -58,8 +58,6 @@ object JsonDomainConverters {
 	Join this session to have some info.",
     "startTime":"0000-00-00T18:00:00.000Z",
     "endTime":"0000-00-00T19:00:00.000Z",
-    "lastUpdate":"2011-07-01T17:58:54.812Z",
-    "lastReschedule":"2011-12-12T17:58:54.812Z",
     "id":"8802",
     "limit":"10 people",
     "type":"STRATEGIC",
@@ -77,10 +75,7 @@ object JsonDomainConverters {
     ("description" -> session.description) ~
     ("startTime" -> fmt.print(session.start)) ~
     ("endTime" -> fmt.print(session.end)) ~
-    ("presenter" -> session.presenter) ~
-    ("lastUpdate" -> fmt.print(session.start)) ~
-    ("lastReschedule" -> fmt.print(session.start)) ~
-    ("limit" -> "10 people") ~
+    ("limit" -> session.limit) ~
     ("type" -> "STRATEGIC") ~
     ("location" -> locationToJValue(session.location))
   }
