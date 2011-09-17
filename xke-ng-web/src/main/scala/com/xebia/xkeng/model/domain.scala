@@ -10,38 +10,15 @@ import scala.Long
 import net.liftweb.mongodb.{MongoDocument, ObjectIdSerializer, MongoDocumentMeta}
 import net.liftweb.json.JsonDSL._
 import java.lang.IllegalArgumentException
+import com.xebia.xkeng.serialization._
+import util._
 
-package object domain {
-  val counter = new AtomicLong((System.currentTimeMillis() % 11).abs)
-
+package object helper {
+  private val counter = new AtomicLong((System.currentTimeMillis() % 11).abs)
   def nextSeq = System.currentTimeMillis() + counter.getAndIncrement
 }
 
-
-import domain._
-
-
-/**
- * Traits for serialisation and deserialisation to/from JSON
- */
-trait FromJsonDeserializer[T] {
-  implicit val formats: Formats = Serialization.formats(NoTypeHints) ++ JodaTimeSerializers.all
-  def apply(json: String)(implicit m: Manifest[T]): T = {
-    Serialization.read[T](json)
-  }
-
-}
-
-trait ToJsonSerializer[T] {
-  implicit val formats: Formats = Serialization.formats(NoTypeHints) ++ JodaTimeSerializers.all
-  def serializeToJson: JValue = {
-    parse(serializeToJsonStr)
-  }
-  def serializeToJsonStr: String = {
-    Serialization.write(this)
-  }
-}
-
+import helper._
 
 trait EmbeddedDocumentOps[T] {
   self: MongoDocumentMeta[T] =>
@@ -148,7 +125,7 @@ case class Conference(_id: ObjectId, title: String, begin: DateTime, end: DateTi
 /**
  * Represents a Session at a location. A Session contains time, space and session properties.
  */
-case class Session(val id: Long, val start: DateTime, val end: DateTime, val location:Location, val title: String, val description:String, val limit: String) extends ToJsonSerializer[Session] {
+case class Session(val id: Long, val start: DateTime, val end: DateTime, val location:Location, val title: String, val description:String, sessionType:String, val limit: String, authors:List[Author]) extends ToJsonSerializer[Session] {
   def period = new Period(start.getMillis, end.getMillis)
 }
 
@@ -157,10 +134,18 @@ case class Session(val id: Long, val start: DateTime, val end: DateTime, val loc
  */
 object Session extends FromJsonDeserializer[Session] {
 
- def apply(start: DateTime, end: DateTime, location: Location, title: String, description:String, limit: String) = {
-    new Session(nextSeq, start, end, location, title, description, limit)
+ def apply(start: DateTime, end: DateTime, location: Location, title: String, description:String, sessionType:String, limit: String, authors:List[Author]) = {
+    new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors)
+  }
+  def apply(start: DateTime, end: DateTime, location: Location, title: String, description:String, sessionType:String, limit: String) = {
+    new Session(nextSeq, start, end, location, title, description, sessionType, limit, Nil)
   }
 }
+
+/**
+ * Represents an author
+ */
+case class Author(userId:String, mail:String, name:String) extends ToJsonSerializer[Author]
 
 /**
  * Represents credentials used for authentication
@@ -177,5 +162,5 @@ object Location extends FromJsonDeserializer[Location]{
   def apply(name: String, capacity: Int): Location = {
     Location(nextSeq.toInt, name, capacity)
   }
-}
+} 
 

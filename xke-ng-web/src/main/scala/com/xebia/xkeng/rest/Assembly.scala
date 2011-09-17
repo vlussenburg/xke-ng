@@ -6,11 +6,9 @@ import net.liftweb.mongodb.{DefaultMongoIdentifier, MongoDB}
 import com.mongodb.{Mongo, MongoOptions, ServerAddress}
 import org.joda.time.DateTime
 import org.bson.types.ObjectId
-import com.xebia.xkeng.model.{Session, Location, Conference}
+import com.xebia.xkeng.model.{Session, Location, Conference, Author}
 
 object Assembly {
-
-	var p1, p2, p3 : Session =  null.asInstanceOf[Session]
 
 	object XKENGDispatchAPIAssembly extends XKENGDispatchAPI with RepositoryComponent {
 		val conferenceRepository = new ConferenceRepositoryImpl
@@ -45,9 +43,13 @@ object Assembly {
 		val l2 = Location("Laap", 30)
 		val l3 = Location("Library", 10)
 
-		val s1 = Session(startDate, startDate.plusMinutes(60), l1, "Mongo rocks", "Mongo is a paperless document database", "amooi@xebia.com")
-		val s2 = Session(startDate, startDate.plusMinutes(60), l2, "Scala rocks even more", "Scala is a codeless programming language", "upeter@xebia.com")
-		val s3 = Session(startDate, startDate.plusMinutes(120), l2, "Scala quirks", "No such thing as a free ride when doing scala", "upeter@xebia.com")
+    val a1 = Author("peteru", "upeter@xebia.com", "Urs Peter")
+    val a2 = Author("amooy", "amooy@xebia.com", "Age Mooy")
+
+
+		val s1 = Session(startDate, startDate.plusMinutes(60), l1, "Mongo rocks", "Mongo is a paperless document database", "STRATEGIC", "10 people", List(a1))
+		val s2 = Session(startDate, startDate.plusMinutes(60), l2, "Scala rocks even more", "Scala is a codeless programming language", "STRATEGIC","10 people", List(a2))
+		val s3 = Session(startDate, startDate.plusMinutes(120), l2, "Scala quirks", "No such thing as a free ride when doing scala", "STRATEGIC", "10 people", List(a1, a2))
 		val c = Conference(ObjectId.get, "XKE", startDate, startDate.plusHours(4), List(s1, s2, s3), List(l1, l2, l3))
 		c.save
 	}

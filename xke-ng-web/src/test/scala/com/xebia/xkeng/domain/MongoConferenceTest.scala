@@ -3,33 +3,32 @@ package com.xebia.xkeng.domain
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
-import com.mongodb.{Mongo, MongoOptions, ServerAddress}
+import com.mongodb.{ Mongo, MongoOptions, ServerAddress }
 import net.liftweb._
 import mongodb._
 import org.bson.types.ObjectId
-import org.scalatest.{BeforeAndAfterEach, FlatSpec}
+import org.scalatest.{ BeforeAndAfterEach, FlatSpec }
 import org.joda.time.DateTime
 import com.xebia.xkeng.model._
-
+import com.xebia.xkeng.dao.MongoTestConnection
 
 @RunWith(classOf[JUnitRunner])
-class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAfterEach {
+class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAfterEach with MongoTestConnection {
 
   val l1 = Location("Maup", 20)
   val l2 = Location("Laap", 30)
+  val a1 = Author("peteru", "upeter@xebia.com", "Urs Peter")
+  val a2 = Author("amooy", "amooy@xebia.com", "Age Mooy")
   val xkeStartDate = new DateTime().plusDays(3)
 
   override def beforeEach() {
-    val srvr = new ServerAddress("127.0.0.1", 27017)
-    val mo = new MongoOptions
-    mo.socketTimeout = 10
-
-    MongoDB.defineDb(DefaultMongoIdentifier, new Mongo(srvr, mo), "xkeng")
+    init()
+    Conference.drop
   }
 
   private def createTestConference() = {
-    val s1 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "Mongo is a nosql db", "amooi@xebia.com")
-    val s2 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l2, "Scala rocks even more", "Scala is a scalable programming language", "upeter@xebia.com")
+    val s1 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "Mongo is a nosql db", "STRATEGIC", "10 people")
+    val s2 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l2, "Scala rocks even more", "Scala is a scalable programming language", "STRATEGIC", "20 people", List(a1, a2))
     val c = Conference(ObjectId.get, "XKE", xkeStartDate, xkeStartDate.plusHours(4), List(s1, s2), List(l1, l2))
     c.save
     (s1, s2, c)
@@ -44,7 +43,7 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
     pFromDb.get._id should be(c._id)
 
     c.delete
-    
+
   }
 
   it should "add a session correctly" in {
@@ -55,7 +54,7 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
     var c = cFromDb.get
     c.sessions.size should be(2)
 
-    c.saveOrUpdate(Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Git rocks", "Git is the star among cvs","amooi@xebia.com"))
+    c.saveOrUpdate(Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Git rocks", "Git is the star among cvs", "STRATEGIC", "20 people"))
 
     cFromDb = Conference.find(c._id)
     c = cFromDb.get
@@ -63,7 +62,7 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
     c.sessions(0).location should not be (None)
 
     c.delete
-    
+
   }
 
   it should "remove a session correctly" in {
@@ -80,9 +79,8 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
     c.sessions.size should be(1)
 
     c.delete
-    
-  }
 
+  }
 
   it should "update a session correctly" in {
     val (s1, s2, cOriginal) = createTestConference()
@@ -101,7 +99,7 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
     c.sessions(0).location should not be (None)
 
     c.delete
-    
+
   }
 
   it should "update a location correctly" in {
@@ -120,9 +118,8 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
     c.locations.exists(_.capacity == 50) should be(true)
 
     c.delete
-    
-  }
 
+  }
 
   it should "add a location correctly" in {
     val (s1, s2, cOriginal) = createTestConference()
@@ -139,7 +136,7 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
     c.locations.size should be(3)
 
     c.delete
-    
+
   }
 
   it should "remove a location correctly" in {
@@ -166,8 +163,7 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
     c.locations.size should be(2)
 
     c.delete
-    
-  }
 
+  }
 
 }

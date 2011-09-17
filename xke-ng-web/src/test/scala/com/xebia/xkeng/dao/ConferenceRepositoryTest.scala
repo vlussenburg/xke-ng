@@ -11,7 +11,7 @@ import org.joda.time.format._
 import com.xebia.xkeng.dao.RepositoryTestAssembly._
 
 @RunWith(classOf[JUnitRunner])
-class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeAndAfterEach {
+class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeAndAfterEach with MongoTestConnection {
 
   val l1 = Location("Maup", 20)
   val l2 = Location("Laap", 30)
@@ -28,18 +28,14 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
 
   override def beforeEach() {
     init()
+    Conference.drop
     val dates = xke2010_05_01 :: xke2011_05_03 :: xke2011_06_03 :: xke2011_06_17 :: Nil
     conferences = dates.map(createTestConference(_))
   }
 
-  override def afterEach() {
-    //should also clear children (slots)..
-    conferences.foreach(_.delete)
-  }
-
   private def createTestConference(startDate: DateTime) = {
-    val s1 = Session(startDate, startDate.plusMinutes(60), l1, "Mongo rocks", "Mongo rocks like a stone", "amooi@xebia.com")
-    val s2 = Session(startDate, startDate.plusMinutes(60), l2, "Scala rocks even more", "Scala is great and consice" , "upeter@xebia.com")
+    val s1 = Session(startDate, startDate.plusMinutes(60), l1, "Mongo rocks", "Mongo rocks like a stone", "STRATEGIC", "10 people")
+    val s2 = Session(startDate, startDate.plusMinutes(60), l2, "Scala rocks even more", "Scala is great and consice" , "STRATEGIC", "20 people")
     val c = Conference(ObjectId.get, "XKE", startDate, startDate.plusHours(4), List(s1, s2), List(l1, l2, l3))
     c.save
     c
@@ -47,7 +43,6 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
 
   it should "find conference by year" in {
     val confs = conferenceRepository.findConferences(xke2011_06_03.getYear)
-    println("found :  " + confs + " , size: " + confs.size)
     confs.isEmpty should not be true
     confs.size should equal(3)
   }
@@ -62,6 +57,7 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
     val confs = conferenceRepository.findConferences(xke2011_05_03.getYear, xke2011_05_03.getMonthOfYear, xke2011_05_03.getDayOfMonth)
     confs should not be (Nil)
     confs.size should be(1)
+     confs.head.sessions.size should be(2)
   }
   it should "find conference by id" in {
     val conf = conferenceRepository.findConference(conferences.head._id.toString)
