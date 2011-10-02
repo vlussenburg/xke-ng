@@ -35,7 +35,10 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
       handleConferenceCreate(req.body.toOption)
     // GET /conference/<id>
     case Req("conference" :: id :: Nil, _, GetRequest) =>
-      asJsonResp(conferenceRepository.findConference(id))
+      conferenceRepository.findConference(id) match {
+        case Some(c) => asJsonResp(c)
+        case _ => Full(NotFoundResponse())
+      }
     // PUT /conference
     case req @ Req("conference" :: id :: Nil, _, PutRequest) =>
       handleConferenceUpdate(id, req.body.toOption)
@@ -59,7 +62,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
       handleSessionUpdate(id, req.body.toOption)
     // GET /session/<id>
     case Req("session" :: AsLong(id) :: Nil, _, GetRequest) =>
-      asJsonResp(sessionRepository.findSessionById(id).map(_._2))
+      asJsonResp(Some(sessionRepository.findSessionById(id).map(_._2)))
     // DELETE /session/<sid>
     case Req("session" :: AsLong(id) :: Nil, _, DeleteRequest) =>
       handleSessionDelete(id)
@@ -143,8 +146,13 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
       handleRatingCreate(sessionId.toInt, req.body.toOption)
   }
 
-  private def asJsonResp(json: JValue) = Full(JsonResponse(json))
+  private def asJsonResp(json: Option[JValue]):Box[LiftResponse] = json match {
+    case Some(v) => asJsonResp(v)
+    case _ => Full(NotFoundResponse())
+  }
 
+    private def asJsonResp(json: JValue):Box[LiftResponse] =  Full(JsonResponse(json))
+  
   private def handleConferenceUpdate(id: String, jsonBody: Option[Array[Byte]]) = {
     conferenceRepository.findConference(id) match {
       case Some(confToUpdate) => {
@@ -152,9 +160,8 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
         val updatedConf = confFromJson.copy(_id = confToUpdate._id)
         updatedConf.save
         asJsonResp(updatedConf)
-
       }
-      case None => Full(BadResponse())
+      case None => Full(NotFoundResponse())
     }
 
   }
@@ -170,7 +177,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     Full(OkResponse())
   }
 
-  private def handleSessionsList(conferenceId: String): Full[LiftResponse] = {
+  private def handleSessionsList(conferenceId: String): Box[LiftResponse] = {
     //should return the sessions of a single conference.
     asJsonResp(conferenceRepository.findSessionsOfConference(conferenceId))
 
@@ -183,7 +190,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
         conf.saveOrUpdate(session)
         asJsonResp(session)
       }
-      case _ => Full(BadResponse())
+      case _ => Full(NotFoundResponse())
     }
   }
 
@@ -194,7 +201,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
         conf.saveOrUpdate(updatedSession)
         Full(OkResponse())
       }
-      case _ => Full(BadResponse())
+      case _ => Full(NotFoundResponse())
 
     }
   }

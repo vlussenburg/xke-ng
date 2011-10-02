@@ -6,9 +6,10 @@ import net.liftweb.mongodb.{DefaultMongoIdentifier, MongoDB}
 import com.mongodb.{Mongo, MongoOptions, ServerAddress}
 import org.joda.time.DateTime
 import org.bson.types.ObjectId
+import net.liftweb.common._
 import com.xebia.xkeng.model.{Session, Location, Conference, Author}
 
-object Assembly {
+object Assembly extends Logger {
 
 	object XKENGDispatchAPIAssembly extends XKENGDispatchAPI with RepositoryComponent {
 		val conferenceRepository = new ConferenceRepositoryImpl
@@ -19,22 +20,23 @@ object Assembly {
 	def initMongoDB() = {
 		val srvr = new ServerAddress(Props.get("mongo.host").getOrElse("127.0.0.1"), Props.get("mongo.port").map(_.toInt).getOrElse(27017))
 		val mo = new MongoOptions
-		mo.socketTimeout = Props.get("mongo.socket.timeout").map(_.toInt).getOrElse(10)
+		mo.socketTimeout = Props.get("mongo.socket.timeout").map(_.toInt).getOrElse(30000)
+		info("MongoDB connect properties= " + srvr) 
+		info("MongoDB properties= " + mo) 
 		MongoDB.defineDb(DefaultMongoIdentifier, new Mongo(srvr, mo), Props.get("mongo.db.name").getOrElse("xkeng"))
 	}
 
-	def purgeAndPushTestdata() = {
-
-
-		Conference.drop
-
-		val today = new DateTime().hourOfDay.setCopy(16).minuteOfHour.setCopy(0)
-		val prevWeek = today.minusWeeks(1)
-		val nextWeek = today.plusWeeks(1)
-
-		val dates = today :: prevWeek :: nextWeek :: Nil
-
-		dates.map(createTestConference(_))
+	def purgeAndPushTestdata(forcePurge:Boolean = false) = {
+		if(Conference.count == 0 || forcePurge) {
+			Conference.drop
+	
+			val today = new DateTime().hourOfDay.setCopy(16).minuteOfHour.setCopy(0)
+			val prevWeek = today.minusWeeks(1)
+			val nextWeek = today.plusWeeks(1)
+			val dates = today :: prevWeek :: nextWeek :: Nil
+	
+			dates.map(createTestConference(_))
+		}
 	}
 
 	private def createTestConference(startDate: DateTime) = {
