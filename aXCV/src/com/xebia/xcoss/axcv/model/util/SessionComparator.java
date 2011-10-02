@@ -12,20 +12,20 @@ public class SessionComparator implements Comparator<Session>, Serializable {
 	@Override
 	public int compare(Session s1, Session s2) {
 		int result = 0;
-		if (s1.getDate() == null) {
-			result = (s2.getDate() == null) ? 0 : -1;
-		} else if (s2.getDate() == null ) {
+		if (s1.getStartTime() == null) {
+			result = (s2.getStartTime() == null) ? 0 : -1;
+		} else if (s2.getStartTime() == null ) {
 			result = 1;
 		} else {
-			result = s1.getDate().compareTo(s2.getDate());
+			result = s1.getStartTime().compareTo(s2.getStartTime());
 		}
 		if ( result == 0 ) {
-			if (s1.getStartTime() == null) {
-				result = (s2.getStartTime() == null) ? 0 : -1;
-			} else if (s2.getStartTime() == null ) {
+			if (s1.getEndTime() == null) {
+				result = (s2.getEndTime() == null) ? 0 : -1;
+			} else if (s2.getEndTime() == null ) {
 				result = 1;
 			} else {
-				result = s1.getStartTime().compareTo(s2.getStartTime());
+				result = s1.getEndTime().compareTo(s2.getEndTime());
 			}
 		}
 		if (result == 0) {

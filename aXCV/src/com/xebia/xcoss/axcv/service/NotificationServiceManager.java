@@ -12,7 +12,7 @@ public class NotificationServiceManager implements SignalRetriever {
 
 	@Override
 	public void onSignal(Context ctx) {
-		Log.v(XCS.LOG.ALL, "Signal received");
+		Log.v(XCS.LOG.ALL, "Notification signal received");
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
 		boolean onOwned = sp.getBoolean(XCS.PREF.NOTIFYOWNED, false);
 		boolean onMarked = sp.getBoolean(XCS.PREF.NOTIFYTRACK, false);

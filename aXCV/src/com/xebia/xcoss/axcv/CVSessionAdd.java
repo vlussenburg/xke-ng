@@ -236,10 +236,10 @@ public class CVSessionAdd extends AdditionActivity {
 		}
 
 		if (slot != null) {
+			session.setStartTime(conference.getDate());
 			session.setStartTime(slot.start);
 			session.setEndTime(slot.end);
 			session.setLocation(slot.location);
-			session.setDate(conference.getDate());
 		}
 		return slot;
 	}
@@ -260,8 +260,7 @@ public class CVSessionAdd extends AdditionActivity {
 			case R.id.conferenceName:
 				Identifiable ident = (Identifiable) selection;
 				conference = getConferenceServer().getConference(ident.getIdentifier());
-				session.setDate(conference.getDate());
-				// session.setConference(conference);
+				session.setStartTime(conference.getDate());
 				showConference();
 			break;
 			case R.id.sessionStart:

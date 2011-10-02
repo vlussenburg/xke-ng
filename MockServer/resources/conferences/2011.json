@@ -1,55 +1,232 @@
 [{
-  "id":"4e4a0c48b39c8578c8f7b6d1",
+  "id":"4e73ecece4b0d424ee3905ce",
   "title":"XKE",
-  "begin":"2011-08-16T16:00:56.527+02:00",
-  "end":"2011-08-16T20:00:56.527+02:00",
+  "begin":"2011-09-17T16:00:20.546Z",
+  "end":"2011-09-17T20:00:20.546Z",
+  "sessions":[{
+    "id":1316220140589,
+    "title":"Mongo rocks",
+    "description":"Mongo is a paperless document database",
+    "startTime":"2011-09-17T16:00:20.546Z",
+    "endTime":"2011-09-17T17:00:20.546Z",
+    "limit":"10 people",
+    "type":"STRATEGIC",
+    "authors":[{
+      "userId":"peteru",
+      "mail":"upeter@xebia.com",
+      "name":"Urs Peter"
+    }],
+    "location":{
+      "id":1960148007,
+      "description":"Maup",
+      "capacity":20
+    }
+  },{
+    "id":1316220140590,
+    "title":"Scala rocks even more",
+    "description":"Scala is a codeless programming language",
+    "startTime":"2011-09-17T16:00:20.546Z",
+    "endTime":"2011-09-17T17:00:20.546Z",
+    "limit":"10 people",
+    "type":"STRATEGIC",
+    "authors":[{
+      "userId":"amooy",
+      "mail":"amooy@xebia.com",
+      "name":"Age Mooy"
+    }],
+    "location":{
+      "id":1960148009,
+      "description":"Laap",
+      "capacity":30
+    }
+  },{
+    "id":1316220140591,
+    "title":"Scala quirks",
+    "description":"No such thing as a free ride when doing scala",
+    "startTime":"2011-09-17T16:00:20.546Z",
+    "endTime":"2011-09-17T18:00:20.546Z",
+    "limit":"10 people",
+    "type":"STRATEGIC",
+    "authors":[{
+      "userId":"peteru",
+      "mail":"upeter@xebia.com",
+      "name":"Urs Peter"
+    },{
+      "userId":"amooy",
+      "mail":"amooy@xebia.com",
+      "name":"Age Mooy"
+    }],
+    "location":{
+      "id":1960148009,
+      "description":"Laap",
+      "capacity":30
+    }
+  }],
   "locations":[{
-    "id":-784335963,
-    "name":"Maupertuus",
+    "id":1960148007,
+    "description":"Maup",
     "capacity":20
   },{
-    "id":-784335962,
-    "name":"Laap",
+    "id":1960148009,
+    "description":"Laap",
     "capacity":30
   },{
-    "id":-784335961,
-    "name":"Library",
+    "id":1960148010,
+    "description":"Library",
     "capacity":10
   }]
 },{
-  "id":"4e4a0c48b39c8578c8f7b6d2",
+  "id":"4e73ecece4b0d424ee3905cf",
   "title":"XKE",
-  "begin":"2011-08-09T16:00:56.527+02:00",
-  "end":"2011-08-09T20:00:56.527+02:00",
+  "begin":"2011-09-10T16:00:20.546Z",
+  "end":"2011-09-10T20:00:20.546Z",
+  "sessions":[{
+    "id":1316220140755,
+    "title":"Mongo rocks",
+    "description":"Mongo is a paperless document database",
+    "startTime":"2011-09-10T16:00:20.546Z",
+    "endTime":"2011-09-10T17:00:20.546Z",
+    "limit":"10 people",
+    "type":"STRATEGIC",
+    "authors":[{
+      "userId":"peteru",
+      "mail":"upeter@xebia.com",
+      "name":"Urs Peter"
+    }],
+    "location":{
+      "id":1960148176,
+      "description":"Maup",
+      "capacity":20
+    }
+  },{
+    "id":1316220140756,
+    "title":"Scala rocks even more",
+    "description":"Scala is a codeless programming language",
+    "startTime":"2011-09-10T16:00:20.546Z",
+    "endTime":"2011-09-10T17:00:20.546Z",
+    "limit":"10 people",
+    "type":"STRATEGIC",
+    "authors":[{
+      "userId":"amooy",
+      "mail":"amooy@xebia.com",
+      "name":"Age Mooy"
+    }],
+    "location":{
+      "id":1960148177,
+      "description":"Laap",
+      "capacity":30
+    }
+  },{
+    "id":1316220140757,
+    "title":"Scala quirks",
+    "description":"No such thing as a free ride when doing scala",
+    "startTime":"2011-09-10T16:00:20.546Z",
+    "endTime":"2011-09-10T18:00:20.546Z",
+    "limit":"10 people",
+    "type":"STRATEGIC",
+    "authors":[{
+      "userId":"peteru",
+      "mail":"upeter@xebia.com",
+      "name":"Urs Peter"
+    },{
+      "userId":"amooy",
+      "mail":"amooy@xebia.com",
+      "name":"Age Mooy"
+    }],
+    "location":{
+      "id":1960148177,
+      "description":"Laap",
+      "capacity":30
+    }
+  }],
   "locations":[{
-    "id":-784335934,
-    "name":"Maupertuus",
+    "id":1960148176,
+    "description":"Maup",
     "capacity":20
   },{
-    "id":-784335933,
-    "name":"Laap",
+    "id":1960148177,
+    "description":"Laap",
     "capacity":30
   },{
-    "id":-784335932,
-    "name":"Library",
+    "id":1960148178,
+    "description":"Library",
     "capacity":10
   }]
 },{
-  "id":"4e4a0c48b39c8578c8f7b6d3",
+  "id":"4e73ecece4b0d424ee3905d0",
   "title":"XKE",
-  "begin":"2011-08-23T16:00:56.527+02:00",
-  "end":"2011-08-23T20:00:56.527+02:00",
+  "begin":"2011-09-24T16:00:20.546Z",
+  "end":"2011-09-24T20:00:20.546Z",
+  "sessions":[{
+    "id":1316220140780,
+    "title":"Mongo rocks",
+    "description":"Mongo is a paperless document database",
+    "startTime":"2011-09-24T16:00:20.546Z",
+    "endTime":"2011-09-24T17:00:20.546Z",
+    "limit":"10 people",
+    "type":"STRATEGIC",
+    "authors":[{
+      "userId":"peteru",
+      "mail":"upeter@xebia.com",
+      "name":"Urs Peter"
+    }],
+    "location":{
+      "id":1960148201,
+      "description":"Maup",
+      "capacity":20
+    }
+  },{
+    "id":1316220140781,
+    "title":"Scala rocks even more",
+    "description":"Scala is a codeless programming language",
+    "startTime":"2011-09-24T16:00:20.546Z",
+    "endTime":"2011-09-24T17:00:20.546Z",
+    "limit":"10 people",
+    "type":"STRATEGIC",
+    "authors":[{
+      "userId":"amooy",
+      "mail":"amooy@xebia.com",
+      "name":"Age Mooy"
+    }],
+    "location":{
+      "id":1960148202,
+      "description":"Laap",
+      "capacity":30
+    }
+  },{
+    "id":1316220140782,
+    "title":"Scala quirks",
+    "description":"No such thing as a free ride when doing scala",
+    "startTime":"2011-09-24T16:00:20.546Z",
+    "endTime":"2011-09-24T18:00:20.546Z",
+    "limit":"10 people",
+    "type":"STRATEGIC",
+    "authors":[{
+      "userId":"peteru",
+      "mail":"upeter@xebia.com",
+      "name":"Urs Peter"
+    },{
+      "userId":"amooy",
+      "mail":"amooy@xebia.com",
+      "name":"Age Mooy"
+    }],
+    "location":{
+      "id":1960148202,
+      "description":"Laap",
+      "capacity":30
+    }
+  }],
   "locations":[{
-    "id":-784335918,
-    "name":"Maupertuus",
+    "id":1960148201,
+    "description":"Maup",
     "capacity":20
   },{
-    "id":-784335917,
-    "name":"Laap",
+    "id":1960148202,
+    "description":"Laap",
     "capacity":30
   },{
-    "id":-784335916,
-    "name":"Library",
+    "id":1960148203,
+    "description":"Library",
     "capacity":10
   }]
 }]

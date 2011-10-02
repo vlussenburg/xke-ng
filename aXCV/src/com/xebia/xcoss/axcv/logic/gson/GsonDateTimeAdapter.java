@@ -1,10 +1,8 @@
 package com.xebia.xcoss.axcv.logic.gson;
 
 import hirondelle.date4j.DateTime;
-import hirondelle.date4j.DateTime.DayOverflow;
 
 import java.lang.reflect.Type;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +14,6 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.xebia.xcoss.axcv.util.StringUtil;
-import com.xebia.xcoss.axcv.util.XCS;
 
 public class GsonDateTimeAdapter implements JsonSerializer<DateTime>, JsonDeserializer<DateTime> {
 

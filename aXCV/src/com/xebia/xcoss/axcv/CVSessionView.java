@@ -38,6 +38,7 @@ public class CVSessionView extends SwipeActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 		setContentView(R.layout.session);
 
 		addGestureDetection(R.id.relativeLayoutLowest);
@@ -46,7 +47,6 @@ public class CVSessionView extends SwipeActivity {
 		currentSession = getSession(conference);
 
 		fill(conference);
-		super.onCreate(savedInstanceState);
 	}
 
 	private void fill(Conference conference) {

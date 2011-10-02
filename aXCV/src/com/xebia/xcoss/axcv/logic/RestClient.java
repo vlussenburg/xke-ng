@@ -178,6 +178,7 @@ public class RestClient {
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
+			Log.d(LOG.COMMUNICATE, "Posting: " + postData);
 			reader = getReader(new HttpPost(url), postData, token);
 			return getGson().fromJson(reader, rvClass);
 		}
@@ -226,8 +227,9 @@ public class RestClient {
 
 	private static HttpClient getHttpClient() {
 		HttpParams httpParams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpParams, 2000);
-		HttpConnectionParams.setSoTimeout(httpParams, 2000);
+		// TODO Set timeout to 20 seconds (instead of 2) for EC2.
+		HttpConnectionParams.setConnectionTimeout(httpParams, 20000);
+		HttpConnectionParams.setSoTimeout(httpParams, 20000);
 		
 		return new DefaultHttpClient(httpParams);
 	}

@@ -6,9 +6,10 @@ public class Author implements Serializable, Comparable<Author> {
 
 	private static final long serialVersionUID = -4692100737600425470L;
 
+	private String userId;
 	private String mail;
 	private String name;
-	private String userId;
+	// TODO No mapping yet from server
 	private String phone;
 
 	public Author(String id, String name, String mail, String phone) {

@@ -4,7 +4,6 @@ import hirondelle.date4j.DateTime;
 import hirondelle.date4j.DateTime.Unit;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import android.util.Log;
@@ -13,64 +12,37 @@ import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.XCS;
 
-public class ConferenceCache {
+public abstract class ConferenceCache {
+	protected static final long CACHETIME = 30 * 60 * 1000;
 
-	private static final long CACHETIME = 30 * 60 * 1000;
+	public <T> T getObject(String key, Class<T> type) {
+		return checkValid(doGetCachedObject(key, type));
+	}
 
-	class CachedObject<T> {
-		public T object;
-		public long moment;
-		public boolean dirty;
+	public Conference getConference(String id) {
+		return checkValid(doGetCachedObject(id, Conference.class));
+	}
 
-		public CachedObject(T data) {
-			this.object = data;
-			this.dirty = false;
-			this.moment = System.currentTimeMillis();
+	public List<Conference> getConferences(Integer year) {
+		List<Conference> result = new ArrayList<Conference>();
+		for (CachedObject<Conference> co : doGetCachedObjects(Conference.class)) {
+			if (co.object.getDate().getYear().equals(year)) {
+				// Not checking on validity...
+				if (co.object != null) {
+					result.add(co.object);
+				}
+			}
 		}
-
-		@Override
-		public int hashCode() {
-			return object == null ? 0 : object.hashCode();
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) return true;
-			if (obj == null) return false;
-			if (getClass() != obj.getClass()) return false;
-			CachedObject<T> other = (CachedObject<T>) obj;
-			return object == null ? other.object == null : object.equals(other.object);
-		}
-
-	};
-
-	private HashMap<String, CachedObject<Conference>> conferencesById;
-	private HashMap<String, CachedObject<Session>> sessionsById;
-	private HashMap<Integer, CachedObject<List<Conference>>> conferencesByYear;
-	private HashMap<String, CachedObject<Object>> cachedObjects;
-
-	protected ConferenceCache() {
-		this.conferencesById = new HashMap<String, CachedObject<Conference>>();
-		this.conferencesByYear = new HashMap<Integer, CachedObject<List<Conference>>>();
-		this.sessionsById = new HashMap<String, CachedObject<Session>>();
-		this.cachedObjects = new HashMap<String, CachedObject<Object>>();
+		return result;
 	}
 
 	public Conference getConference(DateTime date) {
-		for (CachedObject<Conference> co : conferencesById.values()) {
+		for (CachedObject<Conference> co : doGetCachedObjects(Conference.class)) {
 			if (co.object.getDate().equals(date)) {
 				return checkValid(co);
 			}
 		}
 		return null;
-	}
-
-	public Conference getConference(String id) {
-		return checkValid(conferencesById.get(id));
-	}
-
-	public List<Conference> getConferences(Integer year) {
-		return checkValid(conferencesByYear.get(year));
 	}
 
 	public List<Conference> getConferences(DateTime date) {
@@ -92,74 +64,58 @@ public class ConferenceCache {
 	}
 
 	public Session getSession(String id) {
-		return checkValid(sessionsById.get(id));
-	}
-
-	public void add(Conference result) {
-		conferencesById.put(result.getId(), new CachedObject<Conference>(result));
-		try {
-			Integer key = result.getDate().getYear();
-			CachedObject<List<Conference>> cachedObject = conferencesByYear.get(key);
-			if (cachedObject == null) {
-				cachedObject = new CachedObject<List<Conference>>(new ArrayList<Conference>());
-				conferencesByYear.put(key, cachedObject);
-			}
-			cachedObject.object.add(result);
-		}
-		catch (Exception e) {
-			// ignore
-		}
-	}
-
-	public void add(List<Conference> result) {
-		for (Conference conference : result) {
-			add(conference);
-		}
+		return checkValid(doGetCachedObject(id, Session.class));
 	}
 
 	public void add(Session result) {
-		// Assume conferences are updated via server.
-		sessionsById.put(result.getId(), new CachedObject<Session>(result));
+		doPutCachedObject(result.getId(), new CachedObject<Session>(result));
 	}
 
-	public void addSessions(List<Session> result) {
-		for (Session session : result) {
-			add(session);
-		}
+	public void add(Conference result) {
+		CachedObject<Conference> cachedObject = new CachedObject<Conference>(result);
+		doPutCachedObject(result.getId(), cachedObject);
 	}
 
-	public void remove(Conference conference) {
-		try {
-			conferencesById.remove(conference.getId());
-			conferencesByYear.get(conference.getDate().getYear()).object.remove(conference);
-		}
-		catch (Exception e) {
-			// ignore
-		}
-	}
-	
-	public void addObject(String key, Object value) {
-		cachedObjects.put(key, new CachedObject<Object>(value));
-	}
-	
-	public void removeObject(String key) {
-		cachedObjects.remove(key);
-	}
-	
-	public Object getObject(String key) {
-		return checkValid(cachedObjects.get(key));
+	public <T> void addObject(String key, T o) {
+		doPutCachedObject(key, new CachedObject<T>(o));
 	}
 
 	public void remove(Session session) {
-		try {
-			sessionsById.remove(session.getId());
-		}
-		catch (Exception e) {
-			// ignore
-		}
+		doRemoveCachedObject(session.getId(), Session.class);
 	}
 
-	private <T> T checkValid(CachedObject<T> co) {
+	public void remove(Conference conference) {
+		doRemoveCachedObject(conference.getId(), Session.class);
+	}
+
+	public void removeObject(String key, Class<?> type) {
+		doRemoveCachedObject(key, type);
+	}
+
+	public void init() {}
+
+	public void destroy() {}
+
+	public abstract <T> CachedObject<T> doGetCachedObject(String key, Class<T> type);
+
+	public abstract <T> List<CachedObject<T>> doGetCachedObjects(Class<T> type);
+
+	public abstract <T> void doPutCachedObject(String key, CachedObject<T> cachedObject);
+
+	public abstract <T> void doRemoveCachedObject(String key, Class<T> type);
+
+	protected <T> List<T> checkValid(List<CachedObject<T>> co) {
+		ArrayList<T> result = new ArrayList<T>();
+		for (CachedObject<T> t : co) {
+			T valid = checkValid(t);
+			if (valid != null) {
+				result.add(valid);
+			}
+		}
+		return result;
+	}
+
+	protected <T> T checkValid(CachedObject<T> co) {
 		if (co == null) {
 			return null;
 		}

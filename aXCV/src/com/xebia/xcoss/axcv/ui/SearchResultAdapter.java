@@ -72,11 +72,11 @@ public class SearchResultAdapter extends BaseAdapter {
 			// If linkified without, the list item will not be clickable any more...
 			labelView.setFocusable(false);
 		}
-		if (session.getDate() == null) {
+		if (session.getStartTime() == null) {
 			row.findViewById(R.id.ses_separator).setVisibility(View.GONE);
 			dateView.setVisibility(View.GONE);
 		} else {
-			dateView.setText(timeUtil.getAbsoluteDate(session.getDate()));
+			dateView.setText(timeUtil.getAbsoluteDate(session.getStartTime()));
 		}
 
 		try {

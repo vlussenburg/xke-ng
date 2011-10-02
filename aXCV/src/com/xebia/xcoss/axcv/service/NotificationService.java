@@ -1,7 +1,5 @@
 package com.xebia.xcoss.axcv.service;
 
-import hirondelle.date4j.DateTime;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -21,7 +19,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore.Audio;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -150,18 +147,21 @@ public class NotificationService extends Service {
 		try {
 			pm.openConnection();
 			ConferenceServer server = ConferenceServer.getInstance();
-			DateTime now = DateTime.now(XCS.TZ);
 
 			// Not all owned sessions need to be locally available.
 			Trackable[] ids = pm.getOwnedSessions(getUser());
-			Search search = new Search().onAuthor(new Author(getUser(), null, null, null)).onDateStart(now);
+			Search search = new Search().onAuthor(new Author(getUser(), null, null, null));
 			List<Session> sessions = server.searchSessions(search);
 			for (Session session : sessions) {
-				DateTime lastNotification = null;
+				boolean sessionFoundInMarkList = false;
+				long lastNotification = session.getModificationHash();
+				String id = session.getId();
 				for (int i = 0; i < ids.length; i++) {
-					if (session.getId().equals(ids[i].sessionId)) {
-						lastNotification = ids[i].when;
-						if (session.getLastUpdate() != null && session.getLastUpdate().gt(lastNotification)) {
+					if (id.equals(ids[i].sessionId)) {
+						sessionFoundInMarkList = true;
+						if ( ids[i].hash != lastNotification) {
+							ids[i].hash = lastNotification;
+							ids[i].date = session.getStartTime();
 							pm.updateOwnedSession(ids[i]);
 							modified.add(session.getId());
 						}
@@ -169,11 +169,12 @@ public class NotificationService extends Service {
 					}
 				}
 				// What to do with sessions added elsewhere? We notify for now...
-				if (lastNotification == null) {
+				if (!sessionFoundInMarkList) {
 					Trackable add = pm.new Trackable();
-					add.when = now;
+					add.date = session.getStartTime();
 					add.sessionId = session.getId();
 					add.userId = getUser();
+					add.hash = lastNotification;
 					pm.updateOwnedSession(add);
 					modified.add(session.getId());
 				}
@@ -198,8 +199,9 @@ public class NotificationService extends Service {
 			Trackable[] ids = pm.getMarkedSessions(getUser());
 			for (int i = 0; i < ids.length; i++) {
 				Session session = server.getSession(ids[i].sessionId);
-				if (session.getLastReschedule() != null && session.getLastReschedule().gt(ids[i].when)) {
-					ids[i].when = DateTime.now(XCS.TZ);
+				if ( ids[i].hash != session.getModificationHash()) {
+					ids[i].hash = session.getModificationHash();
+					ids[i].date = session.getStartTime();
 					pm.updateMarkedSession(ids[i]);
 					modified.add(session.getId());
 				}

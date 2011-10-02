@@ -5,7 +5,6 @@ import hirondelle.date4j.DateTime.DayOverflow;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,7 +47,6 @@ public class Conference implements Serializable {
 	private transient SortedSet<Session> sessions;
 
 	public Conference() {
-		resetSessions();
 		this.locations = new HashSet<Location>();
 	}
 
@@ -75,6 +73,9 @@ public class Conference implements Serializable {
 	}
 
 	public SortedSet<Session> getSessions() {
+		if (sessions == null) {
+			resetSessions();
+		}
 		if (sessions.isEmpty()) {
 			try {
 				List<Session> list = ConferenceServer.getInstance().getSessions(this);
@@ -92,7 +93,7 @@ public class Conference implements Serializable {
 		if (loc == null) {
 			return data;
 		}
-		
+
 		TreeSet<Session> set = new TreeSet<Session>(new SessionComparator());
 		for (Session session : data) {
 			// If the session has a location not assigned to the conference, it never shows ...
@@ -152,15 +153,6 @@ public class Conference implements Serializable {
 	}
 
 	public Set<Location> getLocations() {
-		if (locations.isEmpty()) {
-			try {
-				Location[] list = ConferenceServer.getInstance().getLocations(true);
-				locations.addAll(Arrays.asList(list));
-			}
-			catch (CommException e) {
-				BaseActivity.handleException(null, "retrieving locations", e);
-			}
-		}
 		return locations;
 	}
 
@@ -193,7 +185,7 @@ public class Conference implements Serializable {
 	}
 
 	public Session getUpcomingSession() {
-		for (Session session : sessions) {
+		for (Session session : getSessions()) {
 			if (!session.isExpired()) {
 				return session;
 			}
@@ -209,7 +201,7 @@ public class Conference implements Serializable {
 	 */
 	public boolean addSession(Session session) {
 		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + getTitle());
-		session.setDate(date);
+		session.setStartTime(date);
 		try {
 			int id = ConferenceServer.getInstance().storeSession(session, getId(), false);
 			resetSessions();
@@ -222,7 +214,9 @@ public class Conference implements Serializable {
 	}
 
 	public void deleteSession(Session session) {
-		sessions.remove(session);
+		if (sessions != null) {
+			sessions.remove(session);
+		}
 		try {
 			ConferenceServer.getInstance().deleteSession(session, getId());
 		}
@@ -265,7 +259,7 @@ public class Conference implements Serializable {
 
 		int prefstart = Math.max(getTime(start), getTime(startTime));
 
-		for (Session session : sessions) {
+		for (Session session : getSessions()) {
 			if (!location.equals(session.getLocation())) {
 				continue;
 			}

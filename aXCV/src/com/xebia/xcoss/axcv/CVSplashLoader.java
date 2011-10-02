@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
+import com.xebia.xcoss.axcv.logic.PersistentConferenceCache;
+import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.service.NotificationServiceManager;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -50,7 +52,9 @@ public class CVSplashLoader extends BaseActivity {
 
 	@Override
 	protected void onDestroy() {
-		getProfileManager().closeConnection();
+		if (isFinishing()) {
+			closeProfileManager();
+		}
 		super.onDestroy();
 	}
 

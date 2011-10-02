@@ -5,6 +5,8 @@ import hirondelle.date4j.DateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
+
 import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
@@ -17,8 +19,8 @@ public class ConferenceServerProxy extends ConferenceServer {
 
 	private BaseActivity activity;
 
-	protected ConferenceServerProxy(String base) {
-		super(base);
+	protected ConferenceServerProxy(String base, Context ctx) {
+		super(base, ctx);
 	}
 
 	public static ConferenceServerProxy getInstance(BaseActivity act) {
@@ -149,9 +151,9 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public Location[] getLocations(boolean defaultOnly) {
+	public Location[] getLocations() {
 		try {
-			return super.getLocations(defaultOnly);
+			return super.getLocations();
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "get locations", e);

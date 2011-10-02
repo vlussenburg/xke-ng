@@ -49,7 +49,7 @@ public class CVTrack extends BaseActivity {
 				Session session = server.getSession(id);
 				if (session != null) {
 					// session.isExpired() works also on the day itself
-					if (today.gt(session.getDate())) {
+					if (today.gt(session.getStartTime())) {
 						hasExpiredSession = true;
 					} else {
 						selectedSessions.add(session);

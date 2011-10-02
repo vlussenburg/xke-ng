@@ -3,18 +3,19 @@ package com.xebia.xcoss.axcv.logic;
 import hirondelle.date4j.DateTime;
 import hirondelle.date4j.DateTime.Unit;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
-import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
-import com.xebia.xcoss.axcv.model.Credential;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Search;
@@ -43,23 +44,28 @@ public class ConferenceServer {
 		return instance;
 	}
 
-	public static ConferenceServer createInstance(String user, String password, String url) {
-		ConferenceServer server = new ConferenceServerProxy(url);
+	public static ConferenceServer createInstance(String user, String password, String url, Context ctx) {
+		close();
+		ConferenceServer server = new ConferenceServerProxy(url, ctx);
 		instance = server;
 		instance.login(user, password);
 		return instance;
 	}
 
-	protected ConferenceServer(String base) {
+	protected ConferenceServer(String base, Context ctx) {
 		this.baseUrl = base;
-		this.conferenceCache = new ConferenceCache();
+		this.conferenceCache = new PersistentConferenceCache(ctx);
+		this.conferenceCache.init();
 	}
 
 	public void login(String user, String password) {
-		StringBuilder requestUrl = new StringBuilder();
-		requestUrl.append(baseUrl);
-		requestUrl.append("/login");
-		this.token = RestClient.postObject(requestUrl.toString(), new Credential(user, password), String.class, null);
+		// TODO : Not yet implemented on EC2
+		this.token = "NoAuthenticationYet";
+		// StringBuilder requestUrl = new StringBuilder();
+		// requestUrl.append(baseUrl);
+		// requestUrl.append("/login");
+		// this.token = RestClient.postObject(requestUrl.toString(), new Credential(user, password), String.class,
+		// null);
 	}
 
 	public boolean isLoggedIn() {
@@ -68,29 +74,43 @@ public class ConferenceServer {
 
 	public Conference getConference(DateTime date) {
 		List<Conference> conferences = getConferences(date);
-		if ( conferences == null || conferences.isEmpty() ) {
+		if (conferences == null || conferences.isEmpty()) {
 			return null;
 		}
 		return conferences.get(0);
 	}
 
 	public Conference getConference(String id) {
-		Conference result = conferenceCache.getConference(id);
-		if (result == null) {
-			StringBuilder requestUrl = new StringBuilder();
-			requestUrl.append(baseUrl);
-			requestUrl.append("/conference/");
-			requestUrl.append(id);
-
-			result = RestClient.loadObject(requestUrl.toString(), Conference.class, token);
-			conferenceCache.add(result);
+		// TODO Temporary workaround
+		Integer year = DateTime.today(XCS.TZ).getYear();
+		List<Conference> result = getConferences(year);
+		for (int i = 1; i < 3; i++) {
+			for (Conference conf : result) {
+				if (conf.getId().equals(id)) {
+					return conf;
+				}
+			}
+			result = getConferences(year + i);
+			result.addAll(getConferences(year - i));
 		}
-		return result;
+		return null;
+
+		// Conference result = conferenceCache.getConference(id);
+		// if (result == null) {
+		// StringBuilder requestUrl = new StringBuilder();
+		// requestUrl.append(baseUrl);
+		// requestUrl.append("/conference/");
+		// requestUrl.append(id);
+		//
+		// result = RestClient.loadObject(requestUrl.toString(), Conference.class, token);
+		// conferenceCache.add(result);
+		// }
+		// return result;
 	}
 
 	public List<Conference> getConferences(Integer year) {
 		List<Conference> result = conferenceCache.getConferences(year);
-		if (result == null) {
+		if (result == null || result.isEmpty()) {
 			StringBuilder requestUrl = new StringBuilder();
 			requestUrl.append(baseUrl);
 			requestUrl.append("/conferences/");
@@ -100,7 +120,9 @@ public class ConferenceServer {
 			if (result == null) {
 				return new ArrayList<Conference>();
 			}
-			conferenceCache.add(result);
+			for (Conference conference : result) {
+				conferenceCache.add(conference);
+			}
 		}
 		Collections.sort(result, new ConferenceComparator());
 		for (Conference conference : result) {
@@ -111,7 +133,7 @@ public class ConferenceServer {
 
 	public List<Conference> getConferences(DateTime date) {
 		List<Conference> result = conferenceCache.getConferences(date);
-		if (result == null) {
+		if (result == null || result.isEmpty()) {
 			StringBuilder requestUrl = new StringBuilder();
 			requestUrl.append(baseUrl);
 			requestUrl.append("/conferences/");
@@ -128,7 +150,9 @@ public class ConferenceServer {
 			if (result == null) {
 				return new ArrayList<Conference>();
 			}
-			conferenceCache.add(result);
+			for (Conference conference : result) {
+				conferenceCache.add(conference);
+			}
 		}
 		Collections.sort(result, new ConferenceComparator());
 		return result;
@@ -158,7 +182,12 @@ public class ConferenceServer {
 	}
 
 	public List<Session> getSessions(Conference conference) {
-		// Conference is cached, so no need to do it for the sessions
+		Class<?> type = Array.newInstance(Session.class, 0).getClass();
+		Session[] sessions = (Session[]) conferenceCache.getObject(conference.getId(), type);
+		if (sessions != null) {
+			return Arrays.asList(sessions);
+		}
+		
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/conference/");
@@ -170,7 +199,11 @@ public class ConferenceServer {
 			return new ArrayList<Session>();
 		}
 
-		conferenceCache.addSessions(result);
+		conferenceCache.addObject(conference.getId(), result.toArray(new Session[result.size()]));
+		for (Session session : result) {
+			conferenceCache.add(session);
+		}
+		
 		Collections.sort(result, new SessionComparator());
 		return result;
 	}
@@ -217,8 +250,8 @@ public class ConferenceServer {
 	}
 
 	public Author[] getAllAuthors() {
-		List<Author> result = (List<Author>) conferenceCache.getObject(AUTHOR_CACHE_KEY);
-		if (result == null) {
+		List<Author> result = conferenceCache.getObject(AUTHOR_CACHE_KEY, new ArrayList<Author>().getClass());
+		if (result == null || result.isEmpty()) {
 			StringBuilder requestUrl = new StringBuilder();
 			requestUrl.append(baseUrl);
 			requestUrl.append("/authors");
@@ -233,7 +266,7 @@ public class ConferenceServer {
 	}
 
 	public int createLocation(String location) {
-		conferenceCache.removeObject(LOCATION_CACHE_KEY);
+		conferenceCache.removeObject(LOCATION_CACHE_KEY, new ArrayList<Location>().getClass());
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/location");
@@ -241,9 +274,9 @@ public class ConferenceServer {
 		return RestClient.createObject(requestUrl.toString(), location, int.class, token);
 	}
 
-	public Location[] getLocations(boolean defaultOnly) {
-		List<Location> result = (List<Location>) conferenceCache.getObject(LOCATION_CACHE_KEY);
-		if (result == null) {
+	public Location[] getLocations() {
+		List<Location> result = conferenceCache.getObject(LOCATION_CACHE_KEY, new ArrayList<Location>().getClass());
+		if (result == null || result.isEmpty()) {
 			StringBuilder requestUrl = new StringBuilder();
 			requestUrl.append(baseUrl);
 			requestUrl.append("/locations");
@@ -254,31 +287,22 @@ public class ConferenceServer {
 			}
 			conferenceCache.addObject(LOCATION_CACHE_KEY, result);
 		}
-		if (defaultOnly) {
-			List<Location> base = new ArrayList<Location>();
-			for (Location location : result) {
-				if (location.isStandard()) {
-					base.add(location);
-				}
-			}
-			result = base;
-		}
 		return result.toArray(new Location[result.size()]);
 	}
 
 	public void createLabel(String name) {
-		conferenceCache.removeObject(LABEL_CACHE_KEY);
+		conferenceCache.removeObject(LABEL_CACHE_KEY, new ArrayList<String>().getClass());
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/label");
-//		requestUrl.append(URLEncoder.encode(name));
+		// requestUrl.append(URLEncoder.encode(name));
 
 		RestClient.createObject(requestUrl.toString(), name, void.class, token);
 	}
 
 	public String[] getLabels() {
-		List<String> result = (List<String>) conferenceCache.getObject(LABEL_CACHE_KEY);
-		if (result == null) {
+		List<String> result = conferenceCache.getObject(LABEL_CACHE_KEY, new ArrayList<String>().getClass());
+		if (result == null || result.isEmpty()) {
 			StringBuilder requestUrl = new StringBuilder();
 			requestUrl.append(baseUrl);
 			requestUrl.append("/labels");
@@ -294,8 +318,8 @@ public class ConferenceServer {
 	}
 
 	public List<String> getLabels(Author author) {
-		List<String> result = (List<String>) conferenceCache.getObject(AUTHOR_LABEL_CACHE_KEY);
-		if (result == null) {
+		List<String> result = conferenceCache.getObject(AUTHOR_LABEL_CACHE_KEY, new ArrayList<String>().getClass());
+		if (result == null || result.isEmpty()) {
 			StringBuilder requestUrl = new StringBuilder();
 			requestUrl.append(baseUrl);
 			requestUrl.append("/labels/author/");
@@ -337,6 +361,9 @@ public class ConferenceServer {
 	}
 
 	public void registerRate(Session session, int rate) {
+		// TODO Not server implemented.
+		if (true) return;
+		
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/feedback/");
@@ -347,6 +374,9 @@ public class ConferenceServer {
 	}
 
 	public double getRate(Session session) {
+		// TODO Not server implemented.
+		if (true) return 0;
+		
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/feedback/");
@@ -357,8 +387,11 @@ public class ConferenceServer {
 	}
 
 	public Remark[] getRemarks(Session session) {
+		// TODO Not server implemented.
+		if (true) return new Remark[0];
+
 		String key = REMARK_CACHE_KEY + session.getId();
-		List<Remark> result = (List<Remark>) conferenceCache.getObject(key);
+		List<Remark> result = (List<Remark>) conferenceCache.getObject(key, new ArrayList<Remark>().getClass());
 		if (result == null) {
 			StringBuilder requestUrl = new StringBuilder();
 			requestUrl.append(baseUrl);
@@ -376,8 +409,11 @@ public class ConferenceServer {
 	}
 
 	public void registerRemark(Session session, Remark remark) {
+		// TODO Not server implemented.
+		if (true) return;
+		
 		String key = REMARK_CACHE_KEY + session.getId();
-		conferenceCache.removeObject(key);
+		conferenceCache.removeObject(key, new ArrayList<Remark>().getClass());
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/feedback/");
@@ -407,7 +443,7 @@ public class ConferenceServer {
 		// No conference in this year.
 		return getNextConference(DateTime.forDateOnly(dt.getYear() + 1, 1, 1));
 	}
-	
+
 	public Conference getPreviousConference(DateTime dt) {
 		List<Conference> list = getConferences(dt.getYear());
 		if (list.isEmpty()) {
@@ -426,7 +462,7 @@ public class ConferenceServer {
 		// No conference in this year.
 		return getPreviousConference(DateTime.forDateOnly(dt.getYear() - 1, 1, 1));
 	}
-	
+
 	public List<Conference> getUpcomingConferences(int size) {
 		DateTime now = DateTime.today(XCS.TZ);
 		Integer yearValue = now.getYear();
@@ -479,6 +515,7 @@ public class ConferenceServer {
 	public static void close() {
 		if (instance != null) {
 			instance.token = null;
+			instance.conferenceCache.destroy();
 		}
 	}
 }

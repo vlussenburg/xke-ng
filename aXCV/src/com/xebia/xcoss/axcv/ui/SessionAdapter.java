@@ -129,7 +129,7 @@ public class SessionAdapter extends BaseAdapter {
 
 		StringBuilder sb = new StringBuilder();
 		if ( includeDate ) {
-			sb.append(timeUtil.getAbsoluteDate(session.getDate()));
+			sb.append(timeUtil.getAbsoluteDate(session.getStartTime()));
 			sb.append(" | ");
 		}
 		sb.append(session.getLocation().getDescription());

@@ -1,24 +1,37 @@
-{
-  "locations":[
-  {
-    "id":"701",
-    "name":"Maupertuus",
-    "standard":"true"
-  },
-  {
-    "id":"702",
-    "name":"Library",
-    "standard":"true"
-  },
-  {
-    "id":"703",
-    "name":"Laap",
-    "standard":"true"
-  },
-  {
-    "id":"704",
-    "name":"Attic",
-    "standard":"false"
-  }
-  ]
-}
+[{
+  "id":1960148201,
+  "description":"Maup",
+  "capacity":20
+},{
+  "id":1960148177,
+  "description":"Laap",
+  "capacity":30
+},{
+  "id":1960148007,
+  "description":"Maup",
+  "capacity":20
+},{
+  "id":1960148203,
+  "description":"Library",
+  "capacity":10
+},{
+  "id":1960148176,
+  "description":"Maup",
+  "capacity":20
+},{
+  "id":1960148178,
+  "description":"Library",
+  "capacity":10
+},{
+  "id":1960148010,
+  "description":"Library",
+  "capacity":10
+},{
+  "id":1960148009,
+  "description":"Laap",
+  "capacity":30
+},{
+  "id":1960148202,
+  "description":"Laap",
+  "capacity":30
+}]

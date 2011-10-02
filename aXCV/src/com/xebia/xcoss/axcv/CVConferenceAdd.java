@@ -175,7 +175,7 @@ public class CVConferenceAdd extends AdditionActivity {
 						return;
 					}
 					// Add the location
-					Location[] locations = getConferenceServer().getLocations(false);
+					Location[] locations = getConferenceServer().getLocations();
 					Location selected = null;
 					for (int i = 0; i < locations.length; i++) {
 						if (locations[i].getDescription().equals(value)) {
@@ -225,7 +225,7 @@ public class CVConferenceAdd extends AdditionActivity {
 				dialog = new TextInputDialog(this, R.id.conferenceLocText);
 			break;
 			case XCS.DIALOG.INPUT_LOCATION:
-				Location[] locations = getConferenceServer().getLocations(false);
+				Location[] locations = getConferenceServer().getLocations();
 				int size = locations.length + 1;
 
 				items = new String[size];

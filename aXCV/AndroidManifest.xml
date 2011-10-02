@@ -109,10 +109,10 @@
 		-->
 		<meta-data
 			android:name="com.xebia.xcoss.serverUrl"
-			android:value="http://10.0.2.2:9000" />
+			android:value="http://ec2-46-137-184-99.eu-west-1.compute.amazonaws.com:8080/xkeng" />
 		<meta-data
 			android:name="de.quist.app.errorreporter.targetUrl"
-			android:value="http://10.0.2.2:9000/error" />
+			android:value="http://ec2-46-137-184-99.eu-west-1.compute.amazonaws.com:8080/xkeng/error" />
 		<meta-data
 			android:name="de.quist.app.errorreporter.reportOnFroyo"
 			android:value="true" />
