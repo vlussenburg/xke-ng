@@ -177,7 +177,7 @@ public class Conference implements Serializable {
 
 	public Session getSessionById(String id) {
 		for (Session session : getSessions()) {
-			if (id == session.getId()) {
+			if (id.equals(session.getId())) {
 				return session;
 			}
 		}

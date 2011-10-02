@@ -85,7 +85,7 @@ public class CVAuthor extends BaseActivity {
 				}
 			}
 		}
-		return null;
+		return new Author("noauthor", "Author not found", "", "");
 	}
 
 	private void showSession(int index) {

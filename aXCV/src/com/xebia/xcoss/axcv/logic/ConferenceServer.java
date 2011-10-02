@@ -81,31 +81,17 @@ public class ConferenceServer {
 	}
 
 	public Conference getConference(String id) {
-		// TODO Temporary workaround
-		Integer year = DateTime.today(XCS.TZ).getYear();
-		List<Conference> result = getConferences(year);
-		for (int i = 1; i < 3; i++) {
-			for (Conference conf : result) {
-				if (conf.getId().equals(id)) {
-					return conf;
-				}
-			}
-			result = getConferences(year + i);
-			result.addAll(getConferences(year - i));
-		}
-		return null;
+		Conference result = conferenceCache.getConference(id);
+		if (result == null) {
+			StringBuilder requestUrl = new StringBuilder();
+			requestUrl.append(baseUrl);
+			requestUrl.append("/conference/");
+			requestUrl.append(id);
 
-		// Conference result = conferenceCache.getConference(id);
-		// if (result == null) {
-		// StringBuilder requestUrl = new StringBuilder();
-		// requestUrl.append(baseUrl);
-		// requestUrl.append("/conference/");
-		// requestUrl.append(id);
-		//
-		// result = RestClient.loadObject(requestUrl.toString(), Conference.class, token);
-		// conferenceCache.add(result);
-		// }
-		// return result;
+			result = RestClient.loadObject(requestUrl.toString(), Conference.class, token);
+			conferenceCache.add(result);
+		}
+		return result;
 	}
 
 	public List<Conference> getConferences(Integer year) {
@@ -187,7 +173,7 @@ public class ConferenceServer {
 		if (sessions != null) {
 			return Arrays.asList(sessions);
 		}
-		
+
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/conference/");
@@ -203,7 +189,7 @@ public class ConferenceServer {
 		for (Session session : result) {
 			conferenceCache.add(session);
 		}
-		
+
 		Collections.sort(result, new SessionComparator());
 		return result;
 	}
@@ -363,7 +349,7 @@ public class ConferenceServer {
 	public void registerRate(Session session, int rate) {
 		// TODO Not server implemented.
 		if (true) return;
-		
+
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/feedback/");
@@ -376,7 +362,7 @@ public class ConferenceServer {
 	public double getRate(Session session) {
 		// TODO Not server implemented.
 		if (true) return 0;
-		
+
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/feedback/");
@@ -411,7 +397,7 @@ public class ConferenceServer {
 	public void registerRemark(Session session, Remark remark) {
 		// TODO Not server implemented.
 		if (true) return;
-		
+
 		String key = REMARK_CACHE_KEY + session.getId();
 		conferenceCache.removeObject(key, new ArrayList<Remark>().getClass());
 		StringBuilder requestUrl = new StringBuilder();

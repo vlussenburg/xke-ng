@@ -257,7 +257,7 @@ public abstract class BaseActivity extends Activity {
 		@Override
 		protected Boolean doInBackground(String... arg0) {
 			try {
-				List<Conference> conferences = getConferenceServer().getUpcomingConferences(4);
+				List<Conference> conferences = getConferenceServer().getUpcomingConferences(1);
 				for (Conference conference : conferences) {
 					conference.getSessions();
 				}

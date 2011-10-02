@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -17,6 +18,7 @@ import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.SessionAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
 
+
 public class CVSessionList extends SwipeActivity {
 
 	private Conference currentConference;
@@ -27,6 +29,7 @@ public class CVSessionList extends SwipeActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.schedule);
+		super.onCreate(savedInstanceState);
 		addGestureDetection(R.id.scheduleSwipeBase);
 
 		currentConference = getConference();
@@ -47,7 +50,6 @@ public class CVSessionList extends SwipeActivity {
 				switchTo(currentConference, paramInt);
 			}
 		});
-		super.onCreate(savedInstanceState);
 	}
 
 	@Override
@@ -57,6 +59,13 @@ public class CVSessionList extends SwipeActivity {
 		sessions = currentConference.getSessions(loc).toArray(new Session[0]);
 		TextView location = (TextView) findViewById(R.id.rightText);
 		location.setText(loc.getDescription());
+		location.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				onSwipeRightToLeft();
+			}
+		});
 
 		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, sessions);
 		ListView sessionList = (ListView) findViewById(R.id.sessionList);
