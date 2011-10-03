@@ -248,25 +248,25 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public int storeConference(Conference conference, boolean update) {
+	public String storeConference(Conference conference, boolean create) {
 		try {
-			return super.storeConference(conference, update);
+			return super.storeConference(conference, create);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "store conference", e);
 		}
-		return -1;
+		return null;
 	}
 
 	@Override
-	public int storeSession(Session session, String conferenceId, boolean update) {
+	public String storeSession(Session session, String conferenceId, boolean update) {
 		try {
 			return super.storeSession(session, conferenceId, update);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "store session", e);
 		}
-		return -1;
+		return null;
 	}
 
 	@Override

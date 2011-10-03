@@ -204,7 +204,7 @@ public class RestClient {
 			request.addHeader("Authorization", "Token " + token);
 			HttpResponse response = getHttpClient().execute(request);
 
-			handleResponse(request.getURI(), response.getStatusLine().getStatusCode());
+			handleResponse(request, response);
 
 			StringBuilder result = new StringBuilder();
 			HttpEntity entity = response.getEntity();
@@ -234,24 +234,25 @@ public class RestClient {
 		return new DefaultHttpClient(httpParams);
 	}
 
-	private static void handleResponse(URI uri, int code) {
-		switch (code) {
+	private static void handleResponse(HttpRequestBase request, HttpResponse response) {
+		int responseCode = response.getStatusLine().getStatusCode();
+		switch (responseCode) {
 			case 200:
 				// This is an ok status
 			break;
 			case 403:
-				Log.w(XCS.LOG.COMMUNICATE, "Not authenticated for URL '"+uri.toString()+"'.");
-				throw new DataException(DataException.Code.NOT_ALLOWED, uri);
+				Log.w(XCS.LOG.COMMUNICATE, "Not authenticated for URL '"+request.getURI().toString()+"'.");
+				throw new DataException(DataException.Code.NOT_ALLOWED, request.getURI());
 			case 404:
-				Log.w(XCS.LOG.COMMUNICATE, "The URL '"+uri.toString()+"' was not found!");
-				throw new DataException(DataException.Code.NOT_FOUND, uri);
+				Log.w(XCS.LOG.COMMUNICATE, "The URL '"+request.toString()+"' was not found!");
+				throw new DataException(DataException.Code.NOT_FOUND, request.getURI());
 			case 500:
-				Log.e(XCS.LOG.COMMUNICATE, "Server error on '"+uri.toString()+"'.");
-				throw new ServerException(uri.getPath());
+				Log.e(XCS.LOG.COMMUNICATE, "Server error on '"+request.getURI().toString()+"'.");
+				throw new ServerException(request.getURI().getPath());
 			default:
-				if (code >= 400) {
-					Log.e(XCS.LOG.COMMUNICATE, "Error "+code+" on '"+uri.toString()+"'.");
-					throw new CommException(uri, code);
+				if (responseCode >= 400) {
+					Log.e(XCS.LOG.COMMUNICATE, "Error "+responseCode+" on '"+request.getURI().toString()+"'.");
+					throw new CommException(request.getURI(), responseCode);
 				}
 			break;
 		}

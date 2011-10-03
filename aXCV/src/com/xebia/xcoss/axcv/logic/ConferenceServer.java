@@ -144,17 +144,17 @@ public class ConferenceServer {
 		return result;
 	}
 
-	public int storeConference(Conference conference, boolean update) {
+	public String storeConference(Conference conference, boolean create) {
 		conferenceCache.remove(conference);
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/conference");
 
-		if (update) {
-			RestClient.updateObject(requestUrl.toString(), conference, token);
-			return -1;
+		if (create) {
+			return RestClient.createObject(requestUrl.toString(), conference, String.class, token);
 		}
-		return RestClient.createObject(requestUrl.toString(), conference, int.class, token);
+		RestClient.updateObject(requestUrl.toString(), conference, token);
+		return conference.getId();
 	}
 
 	public void deleteConference(Conference conference) {
@@ -208,7 +208,7 @@ public class ConferenceServer {
 		return result;
 	}
 
-	public int storeSession(Session session, String conferenceId, boolean update) {
+	public String storeSession(Session session, String conferenceId, boolean create) {
 		conferenceCache.remove(session);
 		conferenceCache.remove(conferenceCache.getConference(conferenceId));
 		StringBuilder requestUrl = new StringBuilder();
@@ -217,11 +217,11 @@ public class ConferenceServer {
 		requestUrl.append(conferenceId);
 		requestUrl.append("/session");
 
-		if (update) {
-			RestClient.updateObject(requestUrl.toString(), session, token);
-			return -1;
+		if (create) {
+			return RestClient.createObject(requestUrl.toString(), session, String.class, token);
 		}
-		return RestClient.createObject(requestUrl.toString(), session, int.class, token);
+		RestClient.updateObject(requestUrl.toString(), session, token);
+		return session.getId();
 	}
 
 	public void deleteSession(Session session, String conferenceId) {

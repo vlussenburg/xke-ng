@@ -199,13 +199,13 @@ public class Conference implements Serializable {
 	 * @param session
 	 * @return
 	 */
-	public boolean addSession(Session session) {
+	public boolean addSession(Session session, boolean create) {
 		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + getTitle());
 		session.setStartTime(date);
 		try {
-			int id = ConferenceServer.getInstance().storeSession(session, getId(), false);
+			String id = ConferenceServer.getInstance().storeSession(session, getId(), create);
 			resetSessions();
-			return id > 0;
+			return !StringUtil.isEmpty(id);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(null, "adding session", e);
@@ -225,19 +225,19 @@ public class Conference implements Serializable {
 		}
 	}
 
-	public static int create(Conference conference) {
+	public static String create(Conference conference) {
 		try {
-			return ConferenceServer.getInstance().storeConference(conference, false);
+			return ConferenceServer.getInstance().storeConference(conference, true);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(null, "creating conference", e);
 		}
-		return 0;
+		return null;
 	}
 
 	public boolean update() {
 		try {
-			ConferenceServer.getInstance().storeConference(this, true);
+			ConferenceServer.getInstance().storeConference(this, false);
 			return true;
 		}
 		catch (CommException e) {
