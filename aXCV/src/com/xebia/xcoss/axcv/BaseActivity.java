@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -244,6 +245,7 @@ public abstract class BaseActivity extends Activity {
 		private ProgressDialog dialog;
 		private BaseActivity ctx;
 		private Exception resultingException;
+		private boolean cancelled = false;
 
 		public DataRetriever(BaseActivity ctx) {
 			this.ctx = ctx;
@@ -251,7 +253,13 @@ public abstract class BaseActivity extends Activity {
 
 		@Override
 		protected void onPreExecute() {
-			this.dialog = ProgressDialog.show(ctx, null, "Loading. Please wait...", true);
+			this.dialog = ProgressDialog.show(ctx, null, "Loading. Please wait...", true, true);
+			this.dialog.setOnCancelListener(new OnCancelListener() {
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					cancelled = true;
+				}
+			});
 		}
 
 		@Override
@@ -276,14 +284,19 @@ public abstract class BaseActivity extends Activity {
 
 		@Override
 		protected void onPostExecute(Boolean result) {
+			if (cancelled) {
+				// TODO Does not close app...
+				ctx.onFailure();
+				return;
+			}
+
 			dialog.cancel();
 
 			if (result) {
 				// Note, authentication may still be invalid.
 				ctx.onSuccess();
 			} else {
-				Dialog errorDialog = createDialog("Error",
-						"Connection to server failed (" + StringUtil.getExceptionMessage(resultingException) + ").");
+				Dialog errorDialog = createDialog("Error", "Connection to server failed.");
 				errorDialog.setOnDismissListener(new Dialog.OnDismissListener() {
 					@Override
 					public void onDismiss(DialogInterface di) {

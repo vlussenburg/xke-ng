@@ -45,7 +45,6 @@ public class ConferenceServer {
 	}
 
 	public static ConferenceServer createInstance(String user, String password, String url, Context ctx) {
-		close();
 		ConferenceServer server = new ConferenceServerProxy(url, ctx);
 		instance = server;
 		instance.login(user, password);

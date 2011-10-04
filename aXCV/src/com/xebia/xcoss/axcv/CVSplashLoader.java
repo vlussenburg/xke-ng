@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -53,7 +54,9 @@ public class CVSplashLoader extends BaseActivity {
 	@Override
 	protected void onDestroy() {
 		if (isFinishing()) {
+			Log.i(XCS.LOG.NAVIGATE, "Closing application.");
 			closeProfileManager();
+			ConferenceServer.close();
 		}
 		super.onDestroy();
 	}

@@ -27,11 +27,14 @@ public class PersistentConferenceCache extends ConferenceCache {
 	@Override
 	public void init() {
 		profileManager.openConnection();
+		super.init();
 	}
 	
 	@Override
 	public void destroy() {
+		profileManager.purgeCache();
 		profileManager.closeConnection();
+		super.destroy();
 	}
 	
 	@Override

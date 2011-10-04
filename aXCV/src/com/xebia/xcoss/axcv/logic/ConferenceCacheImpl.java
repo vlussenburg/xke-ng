@@ -11,6 +11,12 @@ public class ConferenceCacheImpl extends ConferenceCache {
 	protected ConferenceCacheImpl() {
 		this.cachedObjects = new HashMap<String, CachedObject<?>>();
 	}
+	
+	@Override
+	public void destroy() {
+		this.cachedObjects = new HashMap<String, CachedObject<?>>();
+		super.destroy();
+	}
 
 	@Override
 	public <T> CachedObject<T> doGetCachedObject(String key, Class<T> type) {

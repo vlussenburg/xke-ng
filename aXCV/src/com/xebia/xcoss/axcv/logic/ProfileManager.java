@@ -15,6 +15,8 @@ import com.xebia.xcoss.axcv.util.XCS;
 
 public class ProfileManager extends SQLiteOpenHelper {
 
+	private static final int DAYS_TO_KEEP_IN_CACHE = 1;
+
 	private static final int DATABASE_VERSION = 1;
 
 	private static final String DATABASE_NAME = "xkeng.db";
@@ -28,12 +30,14 @@ public class ProfileManager extends SQLiteOpenHelper {
 	private static final String SES_COL_DATE = "timestamp";
 	private static final String CACHE_COL_KEY = "key";
 	private static final String CACHE_COL_OBJ = "value";
+	private static final String CACHE_COL_DATE = "timestamp";
 
 	private static final String SES_QUERY_TRACKABLE = SES_COL_USER + " = ? AND " + SES_COL_SESSION + " = ?";
 	private static final String SES_QUERY_NAME = SES_COL_USER + " = ?";
 	private static final String SES_QUERY_PRUNE = SES_COL_DATE + " < ?";
 	private static final String CACHE_QUERY = CACHE_COL_KEY + " = ?";
 	private static final String CACHE_QUERY_TYPE = CACHE_COL_KEY + " like ? || '%'";
+	private static final String CACHE_QUERY_PRUNE = CACHE_COL_DATE + " < ?";
 
 	public class Trackable {
 		public long hash;
@@ -121,7 +125,9 @@ public class ProfileManager extends SQLiteOpenHelper {
 		create.append(CACHE_COL_KEY);
 		create.append(" text primary key not null, ");
 		create.append(CACHE_COL_OBJ);
-		create.append(" text not null);");
+		create.append(" text not null,");
+		create.append(CACHE_COL_DATE);
+		create.append(" datetime);");
 		db.execSQL(create.toString());
 	}
 
@@ -322,12 +328,13 @@ public class ProfileManager extends SQLiteOpenHelper {
 	public void updateCachedObject(String key, String value) {
 		int update = -1;
 		ContentValues values = new ContentValues();
-
+		long now = System.currentTimeMillis();
 		try {
 			checkConnection();
 			String[] whereArgs = new String[] { key };
 			values.put(CACHE_COL_KEY, key);
 			values.put(CACHE_COL_OBJ, value);
+			values.put(CACHE_COL_DATE, now);
 			update = database.update(CACHE_TABLE, values, CACHE_QUERY, whereArgs);
 		}
 		catch (Exception e) {
@@ -337,6 +344,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 			try {
 				values.put(CACHE_COL_KEY, key);
 				values.put(CACHE_COL_OBJ, value);
+				values.put(CACHE_COL_DATE, now);
 				database.insert(CACHE_TABLE, null, values);
 			}
 			catch (Exception e) {
@@ -355,10 +363,22 @@ public class ProfileManager extends SQLiteOpenHelper {
 			Log.w(XCS.LOG.COMMUNICATE, "Delete failed: " + StringUtil.getExceptionMessage(e));
 		}
 	}
+	
+	public void purgeCache() {
+		try {
+			checkConnection();
+			String[] whereArgs = new String[1];
+			DateTime moment = DateTime.now(XCS.TZ).minusDays(DAYS_TO_KEEP_IN_CACHE);
+			whereArgs[0] = String.valueOf(moment.getMilliseconds(XCS.TZ));
+			database.delete(CACHE_TABLE, CACHE_QUERY_PRUNE, whereArgs);
+		}
+		catch (Exception e) {
+			Log.w(XCS.LOG.COMMUNICATE, "Delete failed: " + StringUtil.getExceptionMessage(e));
+		}
+	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase paramSQLiteDatabase, int paramInt1, int paramInt2) {
 		// TODO Auto-generated method stub
 	}
-
 }

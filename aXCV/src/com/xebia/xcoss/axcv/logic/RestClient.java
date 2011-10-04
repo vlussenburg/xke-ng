@@ -127,6 +127,9 @@ public class RestClient {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
 			reader = getReader(new HttpPost(url), postData, token);
+			// Retrieves the full object !
+			// TODO : Id changes....
+			System.out.println("Update = " + gson.fromJson(reader, object.getClass()));
 		}
 		finally {
 			StreamUtil.close(reader);
