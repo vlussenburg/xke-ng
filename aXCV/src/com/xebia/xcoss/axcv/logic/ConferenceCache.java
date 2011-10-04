@@ -85,7 +85,11 @@ public abstract class ConferenceCache {
 	}
 
 	public void remove(Conference conference) {
-		doRemoveCachedObject(conference.getId(), Session.class);
+		doRemoveCachedObject(conference.getId(), Conference.class);
+	}
+
+	public void removeConference(String id) {
+		doRemoveCachedObject(id, Conference.class);
 	}
 
 	public void removeObject(String key, Class<?> type) {

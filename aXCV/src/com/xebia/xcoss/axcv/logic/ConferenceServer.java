@@ -210,7 +210,7 @@ public class ConferenceServer {
 
 	public String storeSession(Session session, String conferenceId, boolean create) {
 		conferenceCache.remove(session);
-		conferenceCache.remove(conferenceCache.getConference(conferenceId));
+		conferenceCache.removeConference(conferenceId);
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/conference/");
