@@ -10,8 +10,6 @@ import de.quist.app.errorreporter.ExceptionReporter;
 
 public class ProxyExceptionReporter implements UncaughtExceptionHandler {
 
-//	public static final String TOKEN = "com.xebia.Exception";
-
 	private static ProxyExceptionReporter instance = new ProxyExceptionReporter();
 	
 	private ExceptionReporter exceptionReporter;
@@ -26,7 +24,7 @@ public class ProxyExceptionReporter implements UncaughtExceptionHandler {
 
 	@Override
 	public void uncaughtException(Thread t, Throwable throwable) {
-		Log.e(XCS.LOG.ALL, "[FATAL] Fault in application: ", throwable);
+		Log.e(XCS.LOG.ALL, "[FATAL] Fault in application ("+t+"): ", throwable);
 		exceptionReporter.reportException(t, throwable);
 
         // System.exit causes an undesired restart of only the current activity.
@@ -35,5 +33,4 @@ public class ProxyExceptionReporter implements UncaughtExceptionHandler {
         // Since other mechanisms cause hangs, still using this, but correcting it...
 		System.exit(-1);
 	}
-
 }
