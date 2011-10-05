@@ -19,7 +19,6 @@ public class ProxyExceptionReporter implements UncaughtExceptionHandler {
 	public static void register(BaseActivity ctx) {
 		UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
 		if ( !(handler instanceof ProxyExceptionReporter) ) {
-			Log.v(XCS.LOG.ALL, "Current uncaugt handler = " + handler);
 			instance.exceptionReporter = ExceptionReporter.register(ctx);
 			Thread.setDefaultUncaughtExceptionHandler(instance);
 		}

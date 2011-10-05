@@ -270,6 +270,7 @@ public class ConferenceServer {
 			if (result == null) {
 				return new Location[0];
 			}
+			// TODO Server returns no unique list
 			conferenceCache.addObject(LOCATION_CACHE_KEY, result);
 		}
 		return result.toArray(new Location[result.size()]);

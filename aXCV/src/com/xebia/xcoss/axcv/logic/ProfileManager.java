@@ -379,6 +379,6 @@ public class ProfileManager extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase paramSQLiteDatabase, int paramInt1, int paramInt2) {
-		// TODO Auto-generated method stub
+		// Not supported for the first release.
 	}
 }

@@ -139,7 +139,7 @@ public class Session implements Serializable {
 	}
 
 	public void setStartTime(DateTime time) {
-		updateTime(startTime, time);
+		startTime = updateTime(startTime, time);
 	}
 
 	public DateTime getEndTime() {
@@ -147,20 +147,21 @@ public class Session implements Serializable {
 	}
 
 	public void setEndTime(DateTime time) {
-		updateTime(endTime, time);
+		endTime = updateTime(endTime, time);
 	}
 
-	private void updateTime(DateTime baseTime, DateTime time) {
-		if (baseTime == null || (time.hasHourMinuteSecond() && time.hasYearMonthDay())) {
-			baseTime = time;
-		} else {
-			if (time.hasYearMonthDay()) {
-				baseTime = new DateTime(time.getYear(), time.getMonth(), time.getDay(), baseTime.getHour(), baseTime.getMinute(), 0, 0);
-			}
-			if (time.hasHourMinuteSecond()) {
-				baseTime = new DateTime(baseTime.getYear(), baseTime.getMonth(), baseTime.getDay(), time.getHour(), time.getMinute(), 0, 0);
-			}
+	private DateTime updateTime(final DateTime baseTime, final DateTime time) {
+		DateTime result = baseTime;
+		if ( result == null ) {
+			result = DateTime.now(XCS.TZ);
 		}
+		if (time.hasYearMonthDay()) {
+			result = new DateTime(time.getYear(), time.getMonth(), time.getDay(), result.getHour(), result.getMinute(), 0, 0);
+		}
+		if (time.hasHourMinuteSecond()) {
+			result = new DateTime(result.getYear(), result.getMonth(), result.getDay(), time.getHour(), time.getMinute(), 0, 0);
+		}
+		return result;
 	}
 
 	public String getDescription() {

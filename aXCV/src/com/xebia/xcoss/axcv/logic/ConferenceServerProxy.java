@@ -81,7 +81,10 @@ public class ConferenceServerProxy extends ConferenceServer {
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "get authors", e);
 		}
-		return new Author[0];
+		// TODO : Need implementation on server
+		Author[] authors = new Author[1];
+		authors[0] = new Author("1", "Empty author", "info@xebia.com", "+3130723884");
+		return authors;
 	}
 
 	@Override
