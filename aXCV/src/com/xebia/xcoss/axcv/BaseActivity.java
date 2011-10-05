@@ -1,18 +1,13 @@
 package com.xebia.xcoss.axcv;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -200,7 +195,8 @@ public abstract class BaseActivity extends Activity {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			String user = sp.getString(XCS.PREF.USERNAME, null);
 			String password = SecurityUtils.decrypt(sp.getString(XCS.PREF.PASSWORD, ""));
-			server = ConferenceServer.createInstance(user, password, getServerUrl(), rootActivity.getApplicationContext());
+			server = ConferenceServer.createInstance(user, password, getServerUrl(),
+					rootActivity.getApplicationContext());
 		}
 		return server;
 	}
@@ -212,9 +208,9 @@ public abstract class BaseActivity extends Activity {
 		profileManager.openConnection();
 		return profileManager;
 	}
-	
+
 	protected void closeProfileManager() {
-		if ( profileManager != null) {
+		if (profileManager != null) {
 			profileManager.closeConnection();
 		}
 	}
@@ -237,78 +233,6 @@ public abstract class BaseActivity extends Activity {
 	protected void onSuccess() {}
 
 	protected void onFailure() {}
-
-	class DataRetriever extends AsyncTask<String, Void, Boolean> {
-
-		// http://appfulcrum.com/?p=126
-
-		private ProgressDialog dialog;
-		private BaseActivity ctx;
-		private Exception resultingException;
-
-		public DataRetriever(BaseActivity ctx) {
-			this.ctx = ctx;
-		}
-
-		@Override
-		protected void onPreExecute() {
-			this.dialog = ProgressDialog.show(ctx, null, "Loading. Please wait...", true, true);
-			this.dialog.setOnCancelListener(new OnCancelListener() {
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					Dialog errorDialog = createDialog("Cancelled", "The initial loading was cancelled. The application will be closed.");
-					errorDialog.setOnDismissListener(new Dialog.OnDismissListener() {
-						@Override
-						public void onDismiss(DialogInterface di) {
-							ctx.onFailure();
-						}
-					});
-					errorDialog.show();
-				}
-			});
-		}
-
-		@Override
-		protected Boolean doInBackground(String... arg0) {
-			try {
-				List<Conference> conferences = getConferenceServer().getUpcomingConferences(1);
-				for (Conference conference : conferences) {
-					conference.getSessions();
-				}
-			}
-			catch (DataException e) {
-				resultingException = e;
-			}
-			catch (Exception e) {
-				resultingException = e;
-				Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Failure: " + StringUtil.getExceptionMessage(e));
-				e.printStackTrace();
-				return false;
-			}
-			return true;
-		}
-
-		@Override
-		protected void onPostExecute(Boolean result) {
-
-			dialog.cancel();
-
-			if (result) {
-				// Note, authentication may still be invalid.
-				ctx.onSuccess();
-			} else {
-				Dialog errorDialog = createDialog("Error", "Connection to server failed.");
-				errorDialog.setOnDismissListener(new Dialog.OnDismissListener() {
-					@Override
-					public void onDismiss(DialogInterface di) {
-						ctx.onFailure();
-						di.dismiss();
-					}
-				});
-				errorDialog.show();
-			}
-		}
-	}
 
 	private String getServerUrl() {
 		try {
