@@ -245,7 +245,6 @@ public abstract class BaseActivity extends Activity {
 		private ProgressDialog dialog;
 		private BaseActivity ctx;
 		private Exception resultingException;
-		private boolean cancelled = false;
 
 		public DataRetriever(BaseActivity ctx) {
 			this.ctx = ctx;
@@ -257,7 +256,14 @@ public abstract class BaseActivity extends Activity {
 			this.dialog.setOnCancelListener(new OnCancelListener() {
 				@Override
 				public void onCancel(DialogInterface dialog) {
-					cancelled = true;
+					Dialog errorDialog = createDialog("Cancelled", "The initial loading was cancelled. The application will be closed.");
+					errorDialog.setOnDismissListener(new Dialog.OnDismissListener() {
+						@Override
+						public void onDismiss(DialogInterface di) {
+							ctx.onFailure();
+						}
+					});
+					errorDialog.show();
 				}
 			});
 		}
@@ -284,11 +290,6 @@ public abstract class BaseActivity extends Activity {
 
 		@Override
 		protected void onPostExecute(Boolean result) {
-			if (cancelled) {
-				// TODO Does not close app...
-				ctx.onFailure();
-				return;
-			}
 
 			dialog.cancel();
 
