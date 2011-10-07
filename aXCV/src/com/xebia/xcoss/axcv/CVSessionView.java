@@ -5,6 +5,7 @@ import java.util.Set;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -175,11 +177,14 @@ public class CVSessionView extends SessionSwipeActivity {
 		}
 
 		Session session = getNextSession();
-		TextView sessionText = (TextView) findViewById(R.id.textNextSession);
+		View viewById = findViewById(R.id.textNextSession);
+		LinearLayout layout = (LinearLayout) viewById.getParent();
 		if ( session == null ) {
-			sessionText.setText("< no next session >");
+			layout.setVisibility(View.GONE);
 		} else {
-			sessionText.setText("Next: " + session.getTitle());
+			layout.setVisibility(View.VISIBLE);
+			TextView sessionText = (TextView) viewById;
+			sessionText.setText(session.getTitle());
 			sessionText.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -189,11 +194,14 @@ public class CVSessionView extends SessionSwipeActivity {
 		}
 
 		session = getPreviousSession();
-		sessionText = (TextView) findViewById(R.id.textPreviousSession);
+		viewById = findViewById(R.id.textPreviousSession);
+		layout = (LinearLayout) viewById.getParent();
 		if ( session == null ) {
-			sessionText.setText("< no previous session >");
+			layout.setVisibility(View.GONE);
 		} else {
-			sessionText.setText("Prev: " + session.getTitle());
+			layout.setVisibility(View.VISIBLE);
+			TextView sessionText = (TextView) viewById;
+			sessionText.setText(session.getTitle());
 			sessionText.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
