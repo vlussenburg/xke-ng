@@ -126,36 +126,6 @@ public class CVSessionView extends SessionSwipeActivity {
 				}
 			});
 		}
-		// Slide buttons
-		ImageView im;
-//		im = (ImageView) findViewById(R.id.slideLocationMin);
-//		im.setOnClickListener(new OnClickListener() {
-//			@Override
-//			public void onClick(View paramView) {
-//				onSwipeLeftToRight();
-//			}
-//		});
-//		im = (ImageView) findViewById(R.id.slideLocationPlus);
-//		im.setOnClickListener(new OnClickListener() {
-//			@Override
-//			public void onClick(View paramView) {
-//				onSwipeRightToLeft();
-//			}
-//		});
-		im = (ImageView) findViewById(R.id.slideTimeMin);
-		im.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View paramView) {
-				onSwipeTopToBottom();
-			}
-		});
-		im = (ImageView) findViewById(R.id.slideTimePlus);
-		im.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View paramView) {
-				onSwipeBottomToTop();
-			}
-		});
 	}
 
 	@Override
@@ -182,7 +152,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		if ( loc == null ) {
 			location.setText("");
 		} else {
-			location.setText(loc.getDescription());
+			location.setText(loc.getDescription() + " >");
 			location.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -195,7 +165,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		if ( loc == null ) {
 			location.setText("");
 		} else {
-			location.setText(loc.getDescription());
+			location.setText("< " + loc.getDescription());
 			location.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -203,7 +173,35 @@ public class CVSessionView extends SessionSwipeActivity {
 				}
 			});
 		}
-	}
+
+		Session session = getNextSession();
+		TextView sessionText = (TextView) findViewById(R.id.textNextSession);
+		if ( session == null ) {
+			sessionText.setText("< no next session >");
+		} else {
+			sessionText.setText("Next: " + session.getTitle());
+			sessionText.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					onSwipeRightToLeft();
+				}
+			});
+		}
+
+		session = getPreviousSession();
+		sessionText = (TextView) findViewById(R.id.textPreviousSession);
+		if ( session == null ) {
+			sessionText.setText("< no previous session >");
+		} else {
+			sessionText.setText("Prev: " + session.getTitle());
+			sessionText.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					onSwipeLeftToRight();
+				}
+			});
+		}
+}
 	
 	@Override
 	protected Dialog onCreateDialog(int id) {
@@ -306,29 +304,45 @@ public class CVSessionView extends SessionSwipeActivity {
 	}
 
 	public void onSwipeBottomToTop() {
-		Set<Session> sessionsSet = this.getConference().getSessions();
-		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
-		int index = sessions.indexOf(currentSession);
-		if (index < sessions.size() - 1) {
-			currentSession = sessions.get(++index);
+		Session nextSession = getNextSession();
+		if ( nextSession != null ) {
+			currentSession = nextSession;
 			startActivityCurrentSession();
 			overridePendingTransition(R.anim.slide_bottom_to_top, 0);
 		} else {
 			Toast.makeText(this, "No later session", Toast.LENGTH_LONG).show();
 		}
 	}
-
+	
 	public void onSwipeTopToBottom() {
-		Set<Session> sessionsSet = this.getConference().getSessions();
-		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
-		int index = sessions.indexOf(currentSession);
-		if (index > 0) {
-			currentSession = sessions.get(--index);
+		Session previousSession = getPreviousSession();
+		if ( previousSession != null ) {
+			currentSession = previousSession;
 			startActivityCurrentSession();
 			overridePendingTransition(R.anim.slide_top_to_bottom, 0);
 		} else {
 			Toast.makeText(this, "No earlier session", Toast.LENGTH_LONG).show();
 		}
+	}
+	
+	private Session getNextSession() {
+		Set<Session> sessionsSet = this.getConference().getSessions();
+		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
+		int index = sessions.indexOf(currentSession);
+		if (index < sessions.size() - 1) {
+			return sessions.get(++index);
+		}
+		return null;
+	}
+
+	private Session getPreviousSession() {
+		Set<Session> sessionsSet = this.getConference().getSessions();
+		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
+		int index = sessions.indexOf(currentSession);
+		if (index > 0) {
+			return sessions.get(--index);
+		}
+		return null;
 	}
 
 	private void startActivityCurrentSession() {
