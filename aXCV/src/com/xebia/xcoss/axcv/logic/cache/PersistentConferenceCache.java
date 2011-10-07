@@ -1,4 +1,4 @@
-package com.xebia.xcoss.axcv.logic;
+package com.xebia.xcoss.axcv.logic.cache;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.util.XCS;
 
 import android.content.Context;
@@ -20,7 +21,7 @@ public class PersistentConferenceCache extends ConferenceCache {
 	private ProfileManager profileManager;
 
 	protected PersistentConferenceCache(Context ctx) {
-		super();
+		super(ctx);
 		this.profileManager = new ProfileManager(ctx);
 	}
 

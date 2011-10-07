@@ -1,7 +1,7 @@
 package com.xebia.xcoss.axcv;
 
 import java.util.ArrayList;
-import java.util.SortedSet;
+import java.util.Set;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.RatingValue;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Session;
@@ -31,7 +32,7 @@ import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
-public class CVSessionView extends SwipeActivity {
+public class CVSessionView extends SessionSwipeActivity {
 
 	private Session currentSession;
 
@@ -43,9 +44,15 @@ public class CVSessionView extends SwipeActivity {
 
 		addGestureDetection(R.id.relativeLayoutLowest);
 
-		Conference conference = getConference();
-		currentSession = getSession(conference);
-
+		Conference conference = getCurrentConference();
+		Location location = getCurrentLocation();
+		// TODO What if no sessions at this location ?
+		for (Session s : conference.getSessions()) {
+			if ( !s.isExpired() && s.getLocation().equals(location)) {
+				currentSession = s;
+				break;
+			}
+		}
 		fill(conference);
 	}
 
@@ -121,20 +128,20 @@ public class CVSessionView extends SwipeActivity {
 		}
 		// Slide buttons
 		ImageView im;
-		im = (ImageView) findViewById(R.id.slideLocationMin);
-		im.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View paramView) {
-				onSwipeLeftToRight();
-			}
-		});
-		im = (ImageView) findViewById(R.id.slideLocationPlus);
-		im.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View paramView) {
-				onSwipeRightToLeft();
-			}
-		});
+//		im = (ImageView) findViewById(R.id.slideLocationMin);
+//		im.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View paramView) {
+//				onSwipeLeftToRight();
+//			}
+//		});
+//		im = (ImageView) findViewById(R.id.slideLocationPlus);
+//		im.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View paramView) {
+//				onSwipeRightToLeft();
+//			}
+//		});
 		im = (ImageView) findViewById(R.id.slideTimeMin);
 		im.setOnClickListener(new OnClickListener() {
 			@Override
@@ -149,7 +156,6 @@ public class CVSessionView extends SwipeActivity {
 				onSwipeBottomToTop();
 			}
 		});
-
 	}
 
 	@Override
@@ -170,6 +176,33 @@ public class CVSessionView extends SwipeActivity {
 
 		ImageView button = (ImageView) findViewById(R.id.sessionMarkButton);
 		markSession(currentSession, button, false);
+		
+		Location loc = getNextLocation();
+		TextView location = (TextView) findViewById(R.id.rightText);
+		if ( loc == null ) {
+			location.setText("");
+		} else {
+			location.setText(loc.getDescription());
+			location.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					onSwipeRightToLeft();
+				}
+			});
+		}
+		loc = getPreviousLocation();
+		location = (TextView) findViewById(R.id.leftText);
+		if ( loc == null ) {
+			location.setText("");
+		} else {
+			location.setText(loc.getDescription());
+			location.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					onSwipeLeftToRight();
+				}
+			});
+		}
 	}
 	
 	@Override
@@ -273,26 +306,26 @@ public class CVSessionView extends SwipeActivity {
 	}
 
 	public void onSwipeBottomToTop() {
-		SortedSet<Session> sessionsSet = this.getConference().getSessions();
+		Set<Session> sessionsSet = this.getConference().getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
 		int index = sessions.indexOf(currentSession);
 		if (index < sessions.size() - 1) {
 			currentSession = sessions.get(++index);
 			startActivityCurrentSession();
-			overridePendingTransition(R.anim.slide_bottom_to_top, R.anim.slide_bottom_to_top_exit);
+			overridePendingTransition(R.anim.slide_bottom_to_top, 0);
 		} else {
 			Toast.makeText(this, "No later session", Toast.LENGTH_LONG).show();
 		}
 	}
 
 	public void onSwipeTopToBottom() {
-		SortedSet<Session> sessionsSet = this.getConference().getSessions();
+		Set<Session> sessionsSet = this.getConference().getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
 		int index = sessions.indexOf(currentSession);
 		if (index > 0) {
 			currentSession = sessions.get(--index);
 			startActivityCurrentSession();
-			overridePendingTransition(R.anim.slide_top_to_bottom, R.anim.slide_top_to_bottom_exit);
+			overridePendingTransition(R.anim.slide_top_to_bottom, 0);
 		} else {
 			Toast.makeText(this, "No earlier session", Toast.LENGTH_LONG).show();
 		}
@@ -305,14 +338,5 @@ public class CVSessionView extends SwipeActivity {
 		startActivity(intent);
 		// Finish this activity to let the back button go directly to the overview page
 		finish();
-	}
-
-	public void onSwipeLeftToRight() {
-		Toast.makeText(this, "Swipe Right", Toast.LENGTH_SHORT).show();
-	}
-	
-	@Override
-	public void onSwipeRightToLeft() {
-		Toast.makeText(this, "Swipe Left", Toast.LENGTH_SHORT).show();
 	}
 }

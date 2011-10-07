@@ -1,14 +1,18 @@
-package com.xebia.xcoss.axcv.logic;
+package com.xebia.xcoss.axcv.logic.cache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.content.Context;
+
+
 public class ConferenceCacheImpl extends ConferenceCache {
 
 	private HashMap<String, CachedObject<?>> cachedObjects;
 
-	protected ConferenceCacheImpl() {
+	protected ConferenceCacheImpl(Context ctx) {
+		super(ctx);
 		this.cachedObjects = new HashMap<String, CachedObject<?>>();
 	}
 	

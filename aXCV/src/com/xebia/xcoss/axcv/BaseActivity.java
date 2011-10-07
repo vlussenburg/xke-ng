@@ -22,6 +22,7 @@ import com.xebia.xcoss.axcv.logic.ConferenceServerProxy;
 import com.xebia.xcoss.axcv.logic.DataException;
 import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.ProxyExceptionReporter;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
@@ -167,11 +168,7 @@ public abstract class BaseActivity extends Activity {
 		return conference;
 	}
 
-	protected Session getSession(Conference conference) {
-		return getSession(conference, true);
-	}
-
-	protected Session getSession(Conference conference, boolean useDefault) {
+	protected Session getSelectedSession(Conference conference) {
 		Session session = null;
 		String identifier = null;
 		try {
@@ -181,9 +178,14 @@ public abstract class BaseActivity extends Activity {
 		catch (Exception e) {
 			Log.w(LOG.ALL, "No session with ID " + identifier + " or conference not found.");
 		}
-		if (session == null && useDefault) {
+		if (session == null) {
 			Log.w(LOG.ALL, "Conference default : " + (conference == null ? "NULL" : conference.getTitle()));
-			session = conference.getUpcomingSession();
+			for (Session s : conference.getSessions()) {
+				if ( !s.isExpired() ) {
+					session = s;
+					break;
+				}
+			}
 			Log.w(LOG.ALL, "Session default " + (session == null ? "NULL" : session.getTitle()));
 		}
 		return session;

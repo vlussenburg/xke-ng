@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
-import com.xebia.xcoss.axcv.logic.PersistentConferenceCache;
+import com.xebia.xcoss.axcv.logic.cache.PersistentConferenceCache;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.service.NotificationServiceManager;
 import com.xebia.xcoss.axcv.util.XCS;

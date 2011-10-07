@@ -61,7 +61,7 @@ public class DataRetriever extends AsyncTask<String, Void, Boolean> {
 			}
 		}
 		catch (Exception e) {
-			Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Failure: " + StringUtil.getExceptionMessage(e));
+			Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Failure: " + StringUtil.getExceptionMessage(e), e);
 			return false;
 		}
 		return true;
@@ -70,7 +70,7 @@ public class DataRetriever extends AsyncTask<String, Void, Boolean> {
 	@Override
 	protected void onPostExecute(Boolean result) {
 
-		dialog.cancel();
+		dialog.dismiss();
 
 		if (result) {
 			// Note, authentication may still be invalid.

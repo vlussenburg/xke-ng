@@ -57,7 +57,7 @@ public class CVSessionAdd extends AdditionActivity {
 		this.timeFormatter = new ScreenTimeUtil(this);
 
 		conference = getConference();
-		originalSession = getSession(conference, false);
+		originalSession = getSelectedSession(conference);
 		if (originalSession == null) {
 			create = true;
 			session = new Session();
@@ -85,7 +85,7 @@ public class CVSessionAdd extends AdditionActivity {
 
 	private void showSession() {
 		if (session == null) {
-			session = getSession(conference, false);
+			session = getSelectedSession(conference);
 		}
 		if (session != null) {
 			DateTime startTime = session.getStartTime();

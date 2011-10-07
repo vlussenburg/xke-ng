@@ -1,4 +1,4 @@
-package com.xebia.xcoss.axcv.logic;
+package com.xebia.xcoss.axcv.logic.cache;
 
 import hirondelle.date4j.DateTime;
 import hirondelle.date4j.DateTime.Unit;
@@ -6,6 +6,7 @@ import hirondelle.date4j.DateTime.Unit;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.xebia.xcoss.axcv.model.Conference;
@@ -14,6 +15,9 @@ import com.xebia.xcoss.axcv.util.XCS;
 
 public abstract class ConferenceCache {
 	protected static final long CACHETIME = 30 * 60 * 1000;
+
+	public ConferenceCache(Context ctx) {
+	}
 
 	public <T> T getObject(String key, Class<T> type) {
 		return checkValid(doGetCachedObject(key, type));

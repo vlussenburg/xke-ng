@@ -8,6 +8,7 @@ import com.xebia.xcoss.axcv.util.StringUtil;
 
 public class FormatUtil {
 
+	public static final String NONE_FOUND = "<None>";
 	private static final String LINE = System.getProperty("line.separator");
 	
 	public static String getText(double rate) {
@@ -47,7 +48,7 @@ public class FormatUtil {
 		if ( sb.length() > 0 ) {
 			return sb.substring(0, sb.length()-2);
 		}
-		return emptyIndication ? "<None>" : "";
+		return emptyIndication ? NONE_FOUND : "";
 	}
 
 	public static CharSequence getText(String value) {

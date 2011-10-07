@@ -1,4 +1,4 @@
-package com.xebia.xcoss.axcv.logic;
+package com.xebia.xcoss.axcv.logic.cache;
 
 import java.io.Serializable;
 

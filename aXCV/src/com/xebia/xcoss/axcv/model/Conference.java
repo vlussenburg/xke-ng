@@ -44,7 +44,7 @@ public class Conference implements Serializable {
 	@SerializedName("end")
 	private DateTime endTime = DateTime.forTimeOnly(21, 0, 0, 0);
 	private Set<Location> locations;
-	private transient SortedSet<Session> sessions;
+	private Set<Session> sessions;
 
 	public Conference() {
 		this.locations = new HashSet<Location>();
@@ -72,7 +72,7 @@ public class Conference implements Serializable {
 		return id;
 	}
 
-	public SortedSet<Session> getSessions() {
+	public Set<Session> getSessions() {
 		if (sessions == null) {
 			resetSessions();
 		}
@@ -88,8 +88,8 @@ public class Conference implements Serializable {
 		return sessions;
 	}
 
-	public SortedSet<Session> getSessions(Location loc) {
-		SortedSet<Session> data = getSessions();
+	public Set<Session> getSessions(Location loc) {
+		Set<Session> data = getSessions();
 		if (loc == null) {
 			return data;
 		}
@@ -184,15 +184,15 @@ public class Conference implements Serializable {
 		return null;
 	}
 
-	public Session getUpcomingSession() {
-		for (Session session : getSessions()) {
-			if (!session.isExpired()) {
-				return session;
-			}
-		}
-		return null;
-	}
-
+//	public Session getUpcomingSession(Location loc) {
+//		for (Session session : getSessions()) {
+//			if (!session.isExpired()) {
+//				return session;
+//			}
+//		}
+//		return null;
+//	}
+//
 	/**
 	 * Adds a session on the server and resets the local stored sessions.
 	 * 

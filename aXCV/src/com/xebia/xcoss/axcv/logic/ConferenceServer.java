@@ -14,6 +14,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
+import com.xebia.xcoss.axcv.logic.cache.ConferenceCache;
+import com.xebia.xcoss.axcv.logic.cache.NoCache;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Location;
@@ -53,7 +55,8 @@ public class ConferenceServer {
 
 	protected ConferenceServer(String base, Context ctx) {
 		this.baseUrl = base;
-		this.conferenceCache = new PersistentConferenceCache(ctx);
+		// TODO Make configurable
+		this.conferenceCache = new NoCache(ctx); // new PersistentConferenceCache(ctx);
 		this.conferenceCache.init();
 	}
 
