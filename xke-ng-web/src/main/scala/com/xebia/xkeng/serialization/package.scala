@@ -50,6 +50,14 @@ package object util {
       case _ => Nil
     }
   }
+  
+  def deserializeList[T](value: JValue, convert:JValue => T)(implicit m: Manifest[T]): List[T] = {
+    value match {
+      case JArray(locs) => locs.map((v: JValue) => convert(v))
+      case _ => Nil
+    }
+  }
+  
   def deserializeToStr(value: JValue):String = { 
 	  Printer.pretty(JsonAST.render(value))
   }

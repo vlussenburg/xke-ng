@@ -41,14 +41,17 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     end should be(fmt.parseDateTime("2011-11-07T21:00:00.000Z"))
   }
   it should "deserialize a conference with locations with json correctly" in {
-    val jsonString = """{"title":"TED-style XKE","begin":"2011-11-07T16:00:00.000Z", "end":"2011-11-07T21:00:00.000Z", "locations" : [{"id" : -1706815601, "description" : "Maup", "capacity" : 20 }]}"""
+    //val jsonString = """{"title":"TED-style XKE","begin":"2011-11-07T16:00:00.000Z", "end":"2011-11-07T21:00:00.000Z", "locations" : [{"id" : -1706815601, "description" : "Maup", "capacity" : 20 }]}"""
+    val jsonString = """{"title":"XKE", "begin":"2011-10-12T18:32:00.354+02:00","end":"2011-10-12T22:32:00.354+02:00","sessions":[{"id":1318177920605,"title":"Mongo rocks","description":"Mongo is a nosql db","startTime":"2011-10-12T18:32:00.354+02:00","endTime":"2011-10-12T19:32:00.354+02:00","limit":"10 people","type":"STRATEGIC","authors":[],"location":{"id":-377039271,"description":"Maup","capacity":20}},{"id":1318177920606,"title":"Scala rocks even more","description":"Scala is a scalable programming language","startTime":"2011-10-12T18:32:00.354+02:00","endTime":"2011-10-12T19:32:00.354+02:00","limit":"20 people","type":"STRATEGIC","authors":[{"userId":"peteru","mail":"upeter@xebia.com","name":"Urs Peter"},{"userId":"amooy","mail":"amooy@xebia.com","name":"Age Mooy"}],"location":{"id":-377039270,"description":"Laap","capacity":30}}],"locations":[{"id":-377039271,"description":"Maup","capacity":20},{"id":-377039270,"description":"Laap","capacity":30}]}"""
+    
     val result = fromConferenceJson(jsonString)
-    val Conference(_, title, begin, end, _, locations) = result
-    title should be("TED-style XKE")
-    begin should be(fmt.parseDateTime("2011-11-07T16:00:00.000Z"))
-    end should be(fmt.parseDateTime("2011-11-07T21:00:00.000Z"))
-    locations.size should not be (0)
-    locations.head should be(Location(-1706815601, "Maup", 20))
+    val Conference(_, title, begin, end, sessions, locations) = result
+    title should be("XKE")
+    begin should be(fmt.parseDateTime("2011-10-12T18:32:00.354+02:00"))
+    end should be(fmt.parseDateTime("2011-10-12T22:32:00.354+02:00"))
+    locations.size should be (2)
+    sessions.size should be(2)
+    locations.head should be(Location(-377039271, "Maup", 20))
   }
   it should "serialize a location correctly" in {
     val expected: JValue = ("id" -> l1.id) ~

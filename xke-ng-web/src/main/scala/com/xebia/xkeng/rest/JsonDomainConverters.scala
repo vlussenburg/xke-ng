@@ -154,15 +154,19 @@ object JsonDomainConverters extends Logger {
   def fromConferenceJson(jsonString: String): Conference = {
     val JObject(confJson) = JsonParser.parse(jsonString)
 
-    val id: Option[String] = (confJson \\ "id") match {
+    val id: Option[String] = (confJson \ "id") match {
       case JString(id) => Some(id)
       case _ => None
     } //why parse Id if u don't use it?
-    val JString(title) = confJson \\! "title"
+    val JString(title) = confJson \! "title"
     val JString(AsDateTime(begin)) = confJson \\! "begin"
     val JString(AsDateTime(end)) = confJson \\! "end"
     val locations: List[Location] = deserializeList[Location](confJson \\ "locations")
-    val conference = Conference(title, begin, end, Nil, locations)
+    val sessionSerializer = (json:JValue) => fromSessionJson(false)(serializeToJsonStr(json))
+    val sessions:List[Session] = deserializeList[Session](confJson \\ "sessions", sessionSerializer)
+    
+    
+    val conference = Conference(title, begin, end, sessions, locations)
     conference
 
   }

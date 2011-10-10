@@ -33,7 +33,7 @@ javacOptions ++= Seq("-source", "1.5", "-target", "1.5")
 // append -deprecation to the options passed to the Scala compiler
 scalacOptions += "-deprecation"
 
-seq(webSettings :_*)
+//seq(webSettings :_*)
 
 libraryDependencies ++= {
   val liftVersion = "2.4-M2"
@@ -44,6 +44,7 @@ libraryDependencies ++= {
     "junit" % "junit" % "4.5" % "test->default",
     "ch.qos.logback" % "logback-classic" % "0.9.26",
     "org.scala-tools.testing" %% "specs" % "1.6.8" % "test->default",
+    "net.databinder" %% "dispatch-http" % "0.8.5", 
     "com.h2database" % "h2" % "1.2.138",
     "com.amazonaws" % "aws-java-sdk" % "1.2.0" % "test->default"
   )
