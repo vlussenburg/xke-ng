@@ -7,7 +7,7 @@ import org.joda.time._
 import net.liftweb.json._
 import scala.Predef._
 import scala.Long
-import net.liftweb.mongodb.{MongoDocument, ObjectIdSerializer, MongoDocumentMeta}
+import net.liftweb.mongodb.{ MongoDocument, ObjectIdSerializer, MongoDocumentMeta }
 import net.liftweb.json.JsonDSL._
 import java.lang.IllegalArgumentException
 import com.xebia.xkeng.serialization._
@@ -23,9 +23,8 @@ import helper._
 trait EmbeddedDocumentOps[T] {
   self: MongoDocumentMeta[T] =>
 
-  type EmbeddedElem = {def id: Long; def serializeToJson: JValue}
+  type EmbeddedElem = { def id: Long; def serializeToJson: JValue }
 
-    
   /**
    * Mongo qry:
    *  db.confs.update({"_id":ObjectId("<id>")},{$push:{"<arrayname>":<json>}})
@@ -49,7 +48,7 @@ trait EmbeddedDocumentOps[T] {
   def removeFromArray(_id: ObjectId, arrayName: String, elemInArrayQry: JValue) = {
     self.update(("_id" -> _id.toString), ("$pull" -> (arrayName -> elemInArrayQry)))
   }
-  
+
   protected[model] def doSaveOrUpdate(_id: ObjectId, nameMongoArray: String, mongoArray: List[EmbeddedElem], elem: EmbeddedElem) = {
     if (!mongoArray.exists(_.id == elem.id)) {
       pushToArray(_id, nameMongoArray, elem.serializeToJson)
@@ -62,15 +61,12 @@ trait EmbeddedDocumentOps[T] {
     removeFromArray(_id, nameMongoArray, ("id" -> elem.id))
   }
 
-  
 }
-
-
 
 /**
  * Defines the structure of a Conference.
  */
-object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps[Conference]  {
+object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps[Conference] {
   override def collectionName = "confs"
 
   override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
@@ -78,8 +74,8 @@ object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps
   def apply(title: String, begin: DateTime, end: DateTime, sessions: List[Session], locations: List[Location]): Conference = {
     Conference(ObjectId.get, title, begin, end, sessions, locations)
   }
-  
-    def apply(id:String, title: String, begin: DateTime, end: DateTime, sessions: List[Session], locations: List[Location]): Conference = {
+
+  def apply(id: String, title: String, begin: DateTime, end: DateTime, sessions: List[Session], locations: List[Location]): Conference = {
     Conference(new ObjectId(id), title, begin, end, sessions, locations)
   }
 }
@@ -89,9 +85,9 @@ object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps
  * This class is a case class, due to net.liftweb.mongodb requirements.
  */
 case class Conference(val _id: ObjectId, title: String, begin: DateTime, end: DateTime, var sessions: List[Session], var locations: List[Location]) extends MongoDocument[Conference] {
-  
+
   def meta = Conference
-  
+
   def saveOrUpdate(session: Session) = {
     meta.doSaveOrUpdate(_id, "sessions", sessions, session)
     sessions = session :: (sessions - session)
@@ -104,33 +100,31 @@ case class Conference(val _id: ObjectId, title: String, begin: DateTime, end: Da
     sessions
   }
 
-  def saveOrUpdate(location: Location) = { 
+  def saveOrUpdate(location: Location) = {
     meta.doSaveOrUpdate(_id, "locations", locations, location)
     locations = location :: (locations - location)
     locations
   }
- 
+
   def remove(location: Location) = {
-    if(sessions.exists(_.location.id == location.id)) {
-      throw new IllegalArgumentException("The following sessions: %s still depend on the location: %s you want to remove. A location can only be removed if it has no references to sessions." format(sessions, location))
+    if (sessions.exists(_.location.id == location.id)) {
+      throw new IllegalArgumentException("The following sessions: %s still depend on the location: %s you want to remove. A location can only be removed if it has no references to sessions." format (sessions, location))
     }
     meta.doRemove(_id, "locations", location)
     locations = locations.filter(_.id != location.id)
     locations
   }
 
-  def getLocationById(id:Long):Option[Location] = locations.find(_.id == id)
-  
-  def getSessionById(id:Long):Option[Session] = sessions.find(_.id == id)
-  
-    
+  def getLocationById(id: Long): Option[Location] = locations.find(_.id == id)
+
+  def getSessionById(id: Long): Option[Session] = sessions.find(_.id == id)
 
 }
 
 /**
  * Represents a Session at a location. A Session contains time, space and session properties.
  */
-case class Session(val id: Long, val start: DateTime, val end: DateTime, val location:Location, val title: String, val description:String, sessionType:String, val limit: String, authors:List[Author]) extends ToJsonSerializer[Session] {
+case class Session(val id: Long, val start: DateTime, val end: DateTime, val location: Location, val title: String, val description: String, sessionType: String, val limit: String, authors: List[Author], ratings: List[Int], comments: List[Comment]) extends ToJsonSerializer[Session] {
   def period = new Period(start.getMillis, end.getMillis)
 }
 
@@ -139,31 +133,40 @@ case class Session(val id: Long, val start: DateTime, val end: DateTime, val loc
  */
 object Session extends FromJsonDeserializer[Session] {
 
- def apply(start: DateTime, end: DateTime, location: Location, title: String, description:String, sessionType:String, limit: String, authors:List[Author]) = {
-    new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors)
+  def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String) = {
+    new Session(nextSeq, start, end, location, title, description, sessionType, limit, Nil, Nil, Nil)
   }
-  def apply(start: DateTime, end: DateTime, location: Location, title: String, description:String, sessionType:String, limit: String) = {
-    new Session(nextSeq, start, end, location, title, description, sessionType, limit, Nil)
+  def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String, authors: List[Author]) = {
+    new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors, Nil, Nil)
   }
+  def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String, authors: List[Author], ratings: List[Int]) = {
+    new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors, ratings, Nil)
+  }
+  def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String, authors: List[Author], ratings: List[Int], comments: List[Comment]) = {
+    new Session(nextSeq, start, end, location, title, description, sessionType, limit, Nil, ratings, comments)
+  }
+
 }
+
+case class Comment(comment: String, author: Author)
 
 /**
  * Represents an author
  */
-case class Author(userId:String, mail:String, name:String) extends ToJsonSerializer[Author]
+case class Author(userId: String, mail: String, name: String) extends ToJsonSerializer[Author]
 
 /**
  * Represents an author document wrapper.
  * This class is a case class, due to net.liftweb.mongodb requirements.
  */
 case class AuthorDoc(_id: ObjectId, author: Author) extends MongoDocument[AuthorDoc] {
-    def meta = AuthorDoc
+  def meta = AuthorDoc
 }
-  
- /**
+
+/**
  * Defines the structure of a Facility.
  */
-object AuthorDoc extends MongoDocumentMeta[AuthorDoc]   {
+object AuthorDoc extends MongoDocumentMeta[AuthorDoc] {
   override def collectionName = "author"
 
   override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
@@ -171,9 +174,8 @@ object AuthorDoc extends MongoDocumentMeta[AuthorDoc]   {
   def apply(author: Author): AuthorDoc = {
     AuthorDoc(ObjectId.get, author)
   }
-  
-}
 
+}
 
 /**
  * Represents credentials used for authentication
@@ -183,39 +185,38 @@ case class Credential(val user: String, val cryptedPassword: String) extends ToJ
 /**
  * Represents a location, a physical space.
  */
-case class Location(id: Long, description: String, capacity: Int) extends ToJsonSerializer[Location] 
+case class Location(id: Long, description: String, capacity: Int) extends ToJsonSerializer[Location]
 
 object Location extends FromJsonDeserializer[Location] {
   def apply(name: String, capacity: Int): Location = {
     Location(nextSeq.toInt, name, capacity)
   }
-} 
+}
 
 /**
  * Represents a collection of Locations belonging to a facility.
  * This class is a case class, due to net.liftweb.mongodb requirements.
  */
 case class Facility(val _id: ObjectId, name: String, var locations: List[Location]) extends MongoDocument[Facility] {
-    def meta = Facility
- 
-  def saveOrUpdate(location: Location) = { 
+  def meta = Facility
+
+  def saveOrUpdate(location: Location) = {
     meta.doSaveOrUpdate(_id, "locations", locations, location)
     locations = location :: (locations - location)
     locations
   }
- 
+
   def remove(location: Location) = {
     meta.doRemove(_id, "locations", location)
     locations = locations.filter(_.id != location.id)
     locations
   }
 }
-  
-  
- /**
+
+/**
  * Defines the structure of a Facility.
  */
-object Facility extends MongoDocumentMeta[Facility] with EmbeddedDocumentOps[Facility]  {
+object Facility extends MongoDocumentMeta[Facility] with EmbeddedDocumentOps[Facility] {
   override def collectionName = "facility"
 
   override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
@@ -223,5 +224,5 @@ object Facility extends MongoDocumentMeta[Facility] with EmbeddedDocumentOps[Fac
   def apply(name: String, locations: List[Location]): Facility = {
     Facility(ObjectId.get, name, locations)
   }
-  
+
 }

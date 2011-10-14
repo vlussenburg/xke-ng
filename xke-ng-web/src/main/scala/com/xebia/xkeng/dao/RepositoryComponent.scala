@@ -3,7 +3,7 @@ package com.xebia.xkeng.dao
 import net.liftweb.json.JsonDSL._
 import org.joda.time.format._
 import org.joda.time.DateTime
-import com.xebia.xkeng.model.{ Location, Session, Conference, Facility, Author, AuthorDoc }
+import com.xebia.xkeng.model.{ Location, Session, Conference, Facility, Author, AuthorDoc, Comment }
 
 trait ConferenceRepository {
   def findConferences(year: Int): List[Conference]
@@ -21,6 +21,8 @@ trait ConferenceRepository {
 trait SessionRepository {
   def findSessionById(id: Long): Option[(Conference, Session)]
   def deleteSessionById(id: Long): Unit
+  def rateSessionById(id: Long, rate: Int): List[Int]
+  def commentSessionById(id: Long, rate: Int): List[Comment]
 }
 
 trait FacilityRepository {
@@ -41,8 +43,8 @@ trait AuthorRepository {
   def updateAuthor(author: Author): Unit
 
   def removeAuthor(author: Author): Unit
-  
-  def findAuthorByName(name:String):Option[Author]
+
+  def findAuthorByName(name: String): Option[Author]
 
 }
 
@@ -51,7 +53,7 @@ trait RepositoryComponent {
   val conferenceRepository: ConferenceRepository
   val sessionRepository: SessionRepository
   val facilityRepository: FacilityRepository
-  val authorRepository:AuthorRepository
+  val authorRepository: AuthorRepository
 
   class ConferenceRepositoryImpl extends ConferenceRepository {
 
@@ -95,6 +97,15 @@ trait RepositoryComponent {
       val conf = Conference.find(("sessions.id" -> id))
       conf.map(c => c.remove(c.getSessionById(id).get))
     }
+    def rateSessionById(id: Long, rate: Int): List[Int] = {
+      List(1, 2, 3)
+    }
+    def commentSessionById(id: Long, rate: Int): List[Comment] = {
+      val a1 = Author("peteru", "upeter@xebia.com", "Urs Peter")
+      val a2 = Author("amooy", "amooy@xebia.com", "Age Mooy")
+      List(Comment("This stuf is cool", a1), Comment("This stuff is not cool", a2))
+    }
+
   }
 
   class FacilityRepositoryImpl extends FacilityRepository {
@@ -134,40 +145,40 @@ trait RepositoryComponent {
   }
 
   class AuthorRepositoryImpl extends AuthorRepository {
-	  def findAllAuthors: List[Author] = {
-	  AuthorDoc.findAll.map(_.author)
-  }
-  
-  def addAuthor(author: Author): Unit = {
-	  findAuthorById(author.userId) match {
-	  case Some(foundAuthor) => throw new IllegalArgumentException("Cannot create author %s because an author (%s) with the same userId exists does already exist".format(author, foundAuthor))
-	  case None => AuthorDoc(author).save
-	  }
-  }
-  
-  def updateAuthor(author: Author): Unit = {
-	  findAuthorById(author.userId) match {
-	  case Some(currentAuthor) => currentAuthor.delete; AuthorDoc(author).save
-	  case None => throw new IllegalArgumentException("Cannot update author %s because author with userId %s does not exist".format(author, author.userId))
-	  }
-	  
-  }
-  
-  def findAuthorByName(name:String):Option[Author] = {
+    def findAllAuthors: List[Author] = {
+      AuthorDoc.findAll.map(_.author)
+    }
+
+    def addAuthor(author: Author): Unit = {
+      findAuthorById(author.userId) match {
+        case Some(foundAuthor) => throw new IllegalArgumentException("Cannot create author %s because an author (%s) with the same userId exists does already exist".format(author, foundAuthor))
+        case None => AuthorDoc(author).save
+      }
+    }
+
+    def updateAuthor(author: Author): Unit = {
+      findAuthorById(author.userId) match {
+        case Some(currentAuthor) => currentAuthor.delete; AuthorDoc(author).save
+        case None => throw new IllegalArgumentException("Cannot update author %s because author with userId %s does not exist".format(author, author.userId))
+      }
+
+    }
+
+    def findAuthorByName(name: String): Option[Author] = {
       AuthorDoc.find(("author.name" -> name)) match {
         case Some(aDoc) => Some(aDoc.author)
         case _ => None
       }
-  }
-  
-  def removeAuthor(author: Author): Unit = {
-	  findAuthorById(author.userId).map(_.delete)
-  }
-  
-  private def findAuthorById(userId: String): Option[AuthorDoc] = {
-	  AuthorDoc.find(("author.userId" -> userId))
-  }
-  
+    }
+
+    def removeAuthor(author: Author): Unit = {
+      findAuthorById(author.userId).map(_.delete)
+    }
+
+    private def findAuthorById(userId: String): Option[AuthorDoc] = {
+      AuthorDoc.find(("author.userId" -> userId))
+    }
+
   }
 }
 
