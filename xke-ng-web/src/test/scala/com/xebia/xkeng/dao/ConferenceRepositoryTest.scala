@@ -4,7 +4,7 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 import org.bson.types.ObjectId
-import org.scalatest.{BeforeAndAfterEach, FlatSpec}
+import org.scalatest.{ BeforeAndAfterEach, FlatSpec }
 import org.joda.time.DateTime
 import com.xebia.xkeng.model._
 import org.joda.time.format._
@@ -25,7 +25,6 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
 
   var conferences: List[Conference] = Nil
 
-
   override def beforeEach() {
     init()
     Conference.drop
@@ -35,8 +34,8 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
 
   private def createTestConference(startDate: DateTime) = {
     val s1 = Session(startDate, startDate.plusMinutes(60), l1, "Mongo rocks", "Mongo rocks like a stone", "STRATEGIC", "10 people")
-    val s2 = Session(startDate, startDate.plusMinutes(60), l2, "Scala rocks even more", "Scala is great and consice" , "STRATEGIC", "20 people")
-    val c = Conference(ObjectId.get, "XKE", startDate, startDate.plusHours(4), List(s1, s2), List(l1, l2, l3))
+    val s2 = Session(startDate, startDate.plusMinutes(60), l2, "Scala rocks even more", "Scala is great and consice", "STRATEGIC", "20 people")
+    val c = Conference("XKE", startDate, startDate.plusHours(4), List(s1, s2), List(l1, l2, l3))
     c.save
     c
   }
@@ -57,19 +56,15 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
     val confs = conferenceRepository.findConferences(xke2011_05_03.getYear, xke2011_05_03.getMonthOfYear, xke2011_05_03.getDayOfMonth)
     confs should not be (Nil)
     confs.size should be(1)
-     confs.head.sessions.size should be(2)
+    confs.head.sessions.size should be(2)
   }
   it should "find conference by id" in {
     val conf = conferenceRepository.findConference(conferences.head._id.toString)
     conf should not be (None)
   }
-  it should  "find session of a conference by id" in {
+  it should "find session of a conference by id" in {
     val session = conferenceRepository.findSessionsOfConference(conferences.head._id.toString)
     session should not be (None)
-  }
-  it should "find two locations" in {
-    val locations = conferenceRepository.findAllLocations
-    locations.size should be(3)
   }
   type ? = this.type
 }

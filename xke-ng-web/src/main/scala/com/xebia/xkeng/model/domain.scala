@@ -23,6 +23,9 @@ import helper._
 trait EmbeddedDocumentOps[T] {
   self: MongoDocumentMeta[T] =>
 
+  type EmbeddedElem = {def id: Long; def serializeToJson: JValue}
+
+    
   /**
    * Mongo qry:
    *  db.confs.update({"_id":ObjectId("<id>")},{$push:{"<arrayname>":<json>}})
@@ -46,8 +49,23 @@ trait EmbeddedDocumentOps[T] {
   def removeFromArray(_id: ObjectId, arrayName: String, elemInArrayQry: JValue) = {
     self.update(("_id" -> _id.toString), ("$pull" -> (arrayName -> elemInArrayQry)))
   }
+  
+  protected[model] def doSaveOrUpdate(_id: ObjectId, nameMongoArray: String, mongoArray: List[EmbeddedElem], elem: EmbeddedElem) = {
+    if (!mongoArray.exists(_.id == elem.id)) {
+      pushToArray(_id, nameMongoArray, elem.serializeToJson)
+    } else {
+      updateInArray(_id, nameMongoArray, ("id" -> elem.id), elem.serializeToJson)
+    }
+  }
 
+  protected[model] def doRemove(_id: ObjectId, nameMongoArray: String, elem: EmbeddedElem) = {
+    removeFromArray(_id, nameMongoArray, ("id" -> elem.id))
+  }
+
+  
 }
+
+
 
 /**
  * Defines the structure of a Conference.
@@ -61,35 +79,33 @@ object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps
     Conference(ObjectId.get, title, begin, end, sessions, locations)
   }
   
+    def apply(id:String, title: String, begin: DateTime, end: DateTime, sessions: List[Session], locations: List[Location]): Conference = {
+    Conference(new ObjectId(id), title, begin, end, sessions, locations)
+  }
 }
 
 /**
  * Represents a Conference, a conference has a number of locations, where sessions are available.
  * This class is a case class, due to net.liftweb.mongodb requirements.
  */
-case class Conference(_id: ObjectId, title: String, begin: DateTime, end: DateTime, var sessions: List[Session], var locations: List[Location]) extends MongoDocument[Conference] {
+case class Conference(val _id: ObjectId, title: String, begin: DateTime, end: DateTime, var sessions: List[Session], var locations: List[Location]) extends MongoDocument[Conference] {
+  
   def meta = Conference
-
-  type EmbeddedElem = {def id: Long; def serializeToJson: JValue}
-//  sessions = sessions.map(s => {
-//    s.location = Some(locations.find(_.id == s.locationRefId).get); s
-//  })
-//
   
   def saveOrUpdate(session: Session) = {
-    doSaveOrUpdate("sessions", sessions, session)
+    meta.doSaveOrUpdate(_id, "sessions", sessions, session)
     sessions = session :: (sessions - session)
     sessions
   }
 
   def remove(session: Session) = {
-    doRemove("sessions", session)
+    meta.doRemove(_id, "sessions", session)
     sessions = sessions.filter(_.id != session.id)
     sessions
   }
 
   def saveOrUpdate(location: Location) = { 
-    doSaveOrUpdate("locations", locations, location)
+    meta.doSaveOrUpdate(_id, "locations", locations, location)
     locations = location :: (locations - location)
     locations
   }
@@ -98,7 +114,7 @@ case class Conference(_id: ObjectId, title: String, begin: DateTime, end: DateTi
     if(sessions.exists(_.location.id == location.id)) {
       throw new IllegalArgumentException("The following sessions: %s still depend on the location: %s you want to remove. A location can only be removed if it has no references to sessions." format(sessions, location))
     }
-    doRemove("locations", location)
+    meta.doRemove(_id, "locations", location)
     locations = locations.filter(_.id != location.id)
     locations
   }
@@ -106,19 +122,8 @@ case class Conference(_id: ObjectId, title: String, begin: DateTime, end: DateTi
   def getLocationById(id:Long):Option[Location] = locations.find(_.id == id)
   
   def getSessionById(id:Long):Option[Session] = sessions.find(_.id == id)
-
-
-  private def doSaveOrUpdate(nameMongoArray: String, mongoArray: List[EmbeddedElem], elem: EmbeddedElem) = {
-    if (!mongoArray.exists(_.id == elem.id)) {
-      meta.pushToArray(_id, nameMongoArray, elem.serializeToJson)
-    } else {
-      meta.updateInArray(_id, nameMongoArray, ("id" -> elem.id), elem.serializeToJson)
-    }
-  }
-
-  private def doRemove(nameMongoArray: String, elem: EmbeddedElem) = {
-    meta.removeFromArray(_id, nameMongoArray, ("id" -> elem.id))
-  }
+  
+    
 
 }
 
@@ -148,19 +153,75 @@ object Session extends FromJsonDeserializer[Session] {
 case class Author(userId:String, mail:String, name:String) extends ToJsonSerializer[Author]
 
 /**
+ * Represents an author document wrapper.
+ * This class is a case class, due to net.liftweb.mongodb requirements.
+ */
+case class AuthorDoc(_id: ObjectId, author: Author) extends MongoDocument[AuthorDoc] {
+    def meta = AuthorDoc
+}
+  
+ /**
+ * Defines the structure of a Facility.
+ */
+object AuthorDoc extends MongoDocumentMeta[AuthorDoc]   {
+  override def collectionName = "author"
+
+  override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
+
+  def apply(author: Author): AuthorDoc = {
+    AuthorDoc(ObjectId.get, author)
+  }
+  
+}
+
+
+/**
  * Represents credentials used for authentication
  */
-case class Credential(val user: String, val cryptedPassword: String) extends ToJsonSerializer[Credential] {
-}
+case class Credential(val user: String, val cryptedPassword: String) extends ToJsonSerializer[Credential]
 
 /**
  * Represents a location, a physical space.
  */
-case class Location(id: Long, description: String, capacity: Int) extends ToJsonSerializer[Location]
+case class Location(id: Long, description: String, capacity: Int) extends ToJsonSerializer[Location] 
 
-object Location extends FromJsonDeserializer[Location]{
+object Location extends FromJsonDeserializer[Location] {
   def apply(name: String, capacity: Int): Location = {
     Location(nextSeq.toInt, name, capacity)
   }
 } 
 
+/**
+ * Represents a collection of Locations belonging to a facility.
+ * This class is a case class, due to net.liftweb.mongodb requirements.
+ */
+case class Facility(val _id: ObjectId, name: String, var locations: List[Location]) extends MongoDocument[Facility] {
+    def meta = Facility
+ 
+  def saveOrUpdate(location: Location) = { 
+    meta.doSaveOrUpdate(_id, "locations", locations, location)
+    locations = location :: (locations - location)
+    locations
+  }
+ 
+  def remove(location: Location) = {
+    meta.doRemove(_id, "locations", location)
+    locations = locations.filter(_.id != location.id)
+    locations
+  }
+}
+  
+  
+ /**
+ * Defines the structure of a Facility.
+ */
+object Facility extends MongoDocumentMeta[Facility] with EmbeddedDocumentOps[Facility]  {
+  override def collectionName = "facility"
+
+  override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
+
+  def apply(name: String, locations: List[Location]): Facility = {
+    Facility(ObjectId.get, name, locations)
+  }
+  
+}

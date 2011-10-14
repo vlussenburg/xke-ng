@@ -145,32 +145,41 @@ object JsonDomainConverters extends Logger {
     val session = Session(start, end, location, title, description, sessionType, limit, authors)
     if (!isNew) {
       val JInt(id) = (sessJson \! "id")
-      session.copy(id = id.toLong)
-    } else {
-      session
-    }
+      return session.copy(id = id.toLong)
+    } 
+    session
   }
 
   def fromConferenceJson(jsonString: String): Conference = {
     val JObject(confJson) = JsonParser.parse(jsonString)
 
-    val id: Option[String] = (confJson \ "id") match {
-      case JString(id) => Some(id)
-      case _ => None
-    } //why parse Id if u don't use it?
     val JString(title) = confJson \! "title"
     val JString(AsDateTime(begin)) = confJson \\! "begin"
     val JString(AsDateTime(end)) = confJson \\! "end"
     val locations: List[Location] = deserializeList[Location](confJson \\ "locations")
     val sessionSerializer = (json:JValue) => fromSessionJson(false)(serializeToJsonStr(json))
     val sessions:List[Session] = deserializeList[Session](confJson \\ "sessions", sessionSerializer)
-    
-    
-    val conference = Conference(title, begin, end, sessions, locations)
+     val conference = (confJson \ "id") match {
+      case JString(id) => Conference(id, title, begin, end, sessions, locations)
+      case _ => Conference(title, begin, end, sessions, locations)
+    } 
     conference
 
   }
 
+    def fromLocationJson(isNew: Boolean)(jsonString: String): Location = {
+    val JObject(locJson) = JsonParser.parse(jsonString)
+    val JString(desc) = locJson \! "description"
+    val JInt(capacity) = locJson \! "capacity"
+    val location = Location(desc, capacity.toInt)
+    if (!isNew) {
+      val JInt(id) = (locJson \! "id")
+      return location.copy(id = id.toLong)
+    } 
+    location
+  }
+
+  
   def fromCredentialJson(jsonString: String): Credential = {
     val JObject(jsonValue) = JsonParser.parse(jsonString)
     val JString(name) = jsonValue \\! "name"

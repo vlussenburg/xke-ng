@@ -75,11 +75,11 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
 
     // GET /locations
     case Req("locations" :: Nil, _, GetRequest) =>
-      handleLocations
+      asJsonResp(facilityRepository.findAllLocations)
 
-    // PUT /location
-    case req @ Req("location" :: Nil, _, PutRequest) =>
-      handleLocationUpdate(req.body.toOption)
+    // POST /location
+    case req @ Req("location" :: Nil, _, PostRequest) =>
+      handleLocationCreate(req.body.toOption)
 
     /**
      * *******************
@@ -89,7 +89,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
 
     // GET /authors
     case Req("authors" :: Nil, _, GetRequest) =>
-      handleAuthors
+      asJsonResp(authorRepository.findAllAuthors)
 
     /**
      * *******************
@@ -146,18 +146,18 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
       handleRatingCreate(sessionId.toInt, req.body.toOption)
   }
 
-  private def asJsonResp(json: Option[JValue]):Box[LiftResponse] = json match {
+  private def asJsonResp(json: Option[JValue]): Box[LiftResponse] = json match {
     case Some(v) => asJsonResp(v)
     case _ => Full(NotFoundResponse())
   }
 
-    private def asJsonResp(json: JValue):Box[LiftResponse] =  Full(JsonResponse(json))
-  
+  private def asJsonResp(json: JValue): Box[LiftResponse] = Full(JsonResponse(json))
+
   private def handleConferenceUpdate(id: String, jsonBody: Option[Array[Byte]]) = {
     conferenceRepository.findConference(id) match {
       case Some(confToUpdate) => {
         val confFromJson = fromConferenceJson(new String(jsonBody.get))
-        val updatedConf = confFromJson.copy(_id = confToUpdate._id)
+        val updatedConf = confFromJson.copy(_id = confToUpdate._id).copy(sessions = confToUpdate.sessions)
         updatedConf.save
         asJsonResp(updatedConf)
       }
@@ -168,7 +168,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
 
   private def handleConferenceCreate(jsonBody: Option[Array[Byte]]) = {
     val conference = fromConferenceJson(new String(jsonBody.get))
-    conference.save
+    conference.copy(sessions = Nil).save
     asJsonResp(conference)
   }
 
@@ -194,7 +194,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     }
   }
 
-  private def handleSessionUpdate(confId:String , jsonBody: Option[Array[Byte]]) = {
+  private def handleSessionUpdate(confId: String, jsonBody: Option[Array[Byte]]) = {
     conferenceRepository.findConference(confId) match {
       case Some(conf) => {
         val updatedSession = fromSessionJson(false)(new String(jsonBody.get))
@@ -211,14 +211,6 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     Full(OkResponse()) //don't we need to handle errors?
   }
 
-  private def handleLocations = {
-    val a = conferenceRepository.findAllLocations
-    asJsonResp(a)
-  }
-
-  private def handleAuthors = {
-    Full(NotFoundResponse())
-  }
 
   private def handleLabels = {
     Full(NotFoundResponse())
@@ -232,8 +224,11 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     Full(NotFoundResponse())
   }
 
-  private def handleLocationUpdate(jsonBody: Option[Array[Byte]]) = {
-    Full(NotFoundResponse())
+  private def handleLocationCreate(jsonBody: Option[Array[Byte]]) = {
+    val location = fromLocationJson(true)(new String(jsonBody.get))
+    facilityRepository.addLocation(location)
+    asJsonResp(location)
+
   }
 
   private def handleSearchAuthors(jsonBody: Option[Array[Byte]]) = {

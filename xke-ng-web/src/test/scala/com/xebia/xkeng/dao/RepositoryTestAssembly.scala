@@ -12,4 +12,6 @@ object RepositoryTestAssembly extends RepositoryComponent {
 
   val conferenceRepository = new ConferenceRepositoryImpl
   val sessionRepository = new SessionRepositoryImpl
+  val facilityRepository = new FacilityRepositoryImpl
+  val authorRepository = new AuthorRepositoryImpl
 }
