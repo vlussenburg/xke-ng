@@ -10,7 +10,7 @@ import JsonDomainConverters._
 import net.liftweb.http._
 import org.joda.time._
 import net.liftweb.util.BasicTypesHelpers._
-import com.xebia.xkeng.model.Session
+import com.xebia.xkeng.model._
 
 trait XKENGDispatchAPI extends RestHelper with Logger {
   this: RepositoryComponent =>
@@ -133,17 +133,17 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
      * *******************
      */
     // GET /feedback/<id>/comment
-    case Req("feedback" :: sessionId :: "comment" :: Nil, _, GetRequest) =>
-      handleComments(sessionId.toInt)
+    case Req("feedback" :: AsLong(sessionId) :: "comment" :: Nil, _, GetRequest) =>
+      readComments(sessionId)
     // PUT /feedback/<id>/comment
-    case req @ Req("feedback" :: sessionId :: "comment" :: Nil, _, PutRequest) =>
-      handleCommentCreate(sessionId.toInt, req.body.toOption)
+    case req @ Req("feedback" :: AsLong(sessionId) :: "comment" :: Nil, _, PutRequest) =>
+      handleCommentCreate(sessionId, req.body.toOption)
     // GET /feedback/<id>/rating
-    case Req("feedback" :: sessionId :: "rating" :: Nil, _, GetRequest) =>
-      handleRating(sessionId.toInt)
+    case Req("feedback" :: AsLong(sessionId) :: "rating" :: Nil, _, GetRequest) =>
+      readRatings(sessionId)
     // PUT /feedback/<id>/rating
-    case req @ Req("feedback" :: sessionId :: "rating" :: Nil, _, PutRequest) =>
-      handleRatingCreate(sessionId.toInt, req.body.toOption)
+    case req @ Req("feedback" :: AsLong(sessionId) :: "rating" :: Nil, _, PutRequest) =>
+      handleRatingCreate(sessionId, req.body.toOption)
   }
 
   private def asJsonResp(json: Option[JValue]): Box[LiftResponse] = json match {
@@ -211,7 +211,6 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     Full(OkResponse()) //don't we need to handle errors?
   }
 
-
   private def handleLabels = {
     Full(NotFoundResponse())
   }
@@ -249,19 +248,28 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     Full(NotFoundResponse())
   }
 
-  private def handleComments(sessionId: Int) = {
-    Full(NotFoundResponse())
+  private def readComments(sessionId: Long) = {
+    sessionRepository.findSessionById(sessionId) match {
+      case Some((conference, session)) => asJsonResp(session.comments)
+      case None => Full(NotFoundResponse())
+    }
+
   }
 
-  private def handleCommentCreate(sessionId: Int, jsonBody: Option[Array[Byte]]) = {
-    Full(NotFoundResponse())
+  private def handleCommentCreate(sessionId: Long, jsonBody: Option[Array[Byte]]) = {
+    val comment = fromCommentJson(new String(jsonBody.get))
+    asJsonResp(sessionRepository.commentSessionById(sessionId, comment))
   }
 
-  private def handleRating(sessionId: Int) = {
-    Full(NotFoundResponse())
+  private def readRatings(sessionId: Long) = {
+    sessionRepository.findSessionById(sessionId) match {
+      case Some((conference, session)) => asJsonResp(session.ratings)
+      case None => Full(NotFoundResponse())
+    }
   }
 
-  private def handleRatingCreate(sessionId: Int, jsonBody: Option[Array[Byte]]) = {
-    Full(NotFoundResponse())
+  private def handleRatingCreate(sessionId: Long, jsonBody: Option[Array[Byte]]) = {
+    val rating = fromRatingJson(new String(jsonBody.get))
+    asJsonResp(sessionRepository.rateSessionById(sessionId, rating))
   }
 }

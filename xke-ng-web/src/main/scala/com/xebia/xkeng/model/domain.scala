@@ -124,8 +124,18 @@ case class Conference(val _id: ObjectId, title: String, begin: DateTime, end: Da
 /**
  * Represents a Session at a location. A Session contains time, space and session properties.
  */
-case class Session(val id: Long, val start: DateTime, val end: DateTime, val location: Location, val title: String, val description: String, sessionType: String, val limit: String, authors: List[Author], ratings: List[Int], comments: List[Comment]) extends ToJsonSerializer[Session] {
+case class Session(val id: Long, val start: DateTime, val end: DateTime, val location: Location, val title: String, val description: String, sessionType: String, val limit: String, authors: List[Author], ratings: List[Rating], comments: List[Comment]) extends ToJsonSerializer[Session] {
   def period = new Period(start.getMillis, end.getMillis)
+  
+  def addComment(comment:Comment):Session = copy(comments = comment :: comments)
+
+  def addRating(rating:Rating):Session = {
+    ratings.find(_.userId == rating.userId) match {
+      case Some(_) => copy(ratings = (rating :: ratings.filterNot(_.userId == rating.userId)))
+      case None => copy(ratings = rating :: ratings)
+    }
+  }
+
 }
 
 /**
@@ -139,16 +149,23 @@ object Session extends FromJsonDeserializer[Session] {
   def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String, authors: List[Author]) = {
     new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors, Nil, Nil)
   }
-  def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String, authors: List[Author], ratings: List[Int]) = {
+  def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String, authors: List[Author], ratings: List[Rating]) = {
     new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors, ratings, Nil)
   }
-  def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String, authors: List[Author], ratings: List[Int], comments: List[Comment]) = {
-    new Session(nextSeq, start, end, location, title, description, sessionType, limit, Nil, ratings, comments)
+  def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String, authors: List[Author], ratings: List[Rating], comments: List[Comment]) = {
+    new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors, ratings, comments)
   }
 
 }
+/**
+ * Represents a comment for a session
+ */
+case class Comment(comment: String, userId: String)
 
-case class Comment(comment: String, author: Author)
+/**
+ * Represents a rating for a session
+ */
+case class Rating(rate:Int, userId:String)
 
 /**
  * Represents an author

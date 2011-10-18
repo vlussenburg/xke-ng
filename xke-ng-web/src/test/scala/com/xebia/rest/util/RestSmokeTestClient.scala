@@ -15,7 +15,7 @@ import org.joda.time.DateTime
 import net.liftweb.json.JsonAST.{ JValue, JArray }
 import net.liftweb.json.ext.JodaTimeSerializers
 import javax.security.auth.login.LoginContext
-import com.xebia.xkeng.model.{ Credential, Session, Location, Conference, Author }
+import com.xebia.xkeng.model.{ Credential, Session, Location, Conference, Author, Rating, Comment }
 import net.liftweb.common.Logger
 import com.xebia.xkeng.serialization.util._
 import com.xebia.xkeng.rest.JsonDomainConverters._
@@ -29,6 +29,8 @@ object RestSmokeTestClient {
   val xkeStartDate = new DateTime().plusDays(3)
   val l1 = Location("Maup", 20)
   val l2 = Location("Laap", 30)
+  val c1 = Comment("bla bla comment", "peteru")
+  val r1 = Rating(10, "peteru" )
   val a1 = Author("peteru", "upeter@xebia.com", "Urs Peter")
   val a2 = Author("amooy", "amooy@xebia.com", "Age Mooy")
   val s1 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "Mongo is a nosql db", "STRATEGIC", "10 people")
@@ -58,6 +60,15 @@ object RestSmokeTestClient {
     }
   }
 
+  def rateSession(sessionId: Long, rate: Rating): List[Int] = {
+    update("feedback/" + sessionId + "/rating", ("rate" -> rate.rate),fromRatingListJson(_))
+  }
+
+   def commentSession(sessionId: Long, comment: Comment): List[Comment] = {
+    update("feedback/" + sessionId + "/comment", ("comment" -> comment.comment), fromCommentListJson(_))
+  }
+
+  
   def query[T](target: String)(callback: String => T) = {
     val req = new Request(:/(host, port))
     http x ((req / target >:> identity) {
@@ -74,6 +85,13 @@ object RestSmokeTestClient {
 
   }
 
+   //Low level http methods
+  private def update[T](target: String, json: JValue, callback: String => T): T = {
+    http(:/(host, port).PUT / target <<< serializeToJsonStr(json) >~ { resp => callback(resp.getLines.mkString) })
+
+  }
+
+  
   private def update(target: String, json: JValue) = {
     val req = new Request(:/(host, port).PUT)
     val (status, headers) = http x ((req / target <<< serializeToJsonStr(json) >:> identity) {
@@ -110,6 +128,15 @@ object RestSmokeTestClient {
     val newSession = addSession(c._id.toString, s1)
     println("new session %s" format newSession)
 
+    println("Add rating to session...")
+    val ratings = rateSession(newSession.id, r1)
+    println("rated session %s %s" format (newSession, ratings))
+
+    println("Add comment to session...")
+    val comments = commentSession(newSession.id, c1)
+    println("commented session %s %s" format (newSession, comments))
+    
+    
   }
 
 }

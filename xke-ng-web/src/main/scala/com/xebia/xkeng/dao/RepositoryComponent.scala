@@ -3,7 +3,7 @@ package com.xebia.xkeng.dao
 import net.liftweb.json.JsonDSL._
 import org.joda.time.format._
 import org.joda.time.DateTime
-import com.xebia.xkeng.model.{ Location, Session, Conference, Facility, Author, AuthorDoc, Comment }
+import com.xebia.xkeng.model.{ Location, Session, Conference, Facility, Author, AuthorDoc, Comment, Rating }
 
 trait ConferenceRepository {
   def findConferences(year: Int): List[Conference]
@@ -21,8 +21,8 @@ trait ConferenceRepository {
 trait SessionRepository {
   def findSessionById(id: Long): Option[(Conference, Session)]
   def deleteSessionById(id: Long): Unit
-  def rateSessionById(id: Long, rate: Int): List[Int]
-  def commentSessionById(id: Long, rate: Int): List[Comment]
+  def rateSessionById(id: Long, rate: Rating): List[Rating]
+  def commentSessionById(id: Long, rate: Comment): List[Comment]
 }
 
 trait FacilityRepository {
@@ -97,15 +97,26 @@ trait RepositoryComponent {
       val conf = Conference.find(("sessions.id" -> id))
       conf.map(c => c.remove(c.getSessionById(id).get))
     }
-    def rateSessionById(id: Long, rate: Int): List[Int] = {
-      List(1, 2, 3)
-    }
-    def commentSessionById(id: Long, rate: Int): List[Comment] = {
-      val a1 = Author("peteru", "upeter@xebia.com", "Urs Peter")
-      val a2 = Author("amooy", "amooy@xebia.com", "Age Mooy")
-      List(Comment("This stuf is cool", a1), Comment("This stuff is not cool", a2))
+    
+    def rateSessionById(id: Long, rating: Rating): List[Rating] = {
+      val (conference, session) = getSessionById(id)
+      val ratedSession = session.addRating(rating)
+      conference.saveOrUpdate(ratedSession)
+      ratedSession.ratings
     }
 
+    def commentSessionById(id: Long, comment: Comment): List[Comment] = {
+      val (conference, session) = getSessionById(id)
+      val commentedSession = session.addComment(comment)
+      conference.saveOrUpdate(commentedSession)
+      commentedSession.comments
+    }
+
+    private def getSessionById(id: Long): (Conference, Session) = {
+      findSessionById(id).map(t => t).getOrElse {
+        throw new IllegalArgumentException("Cannot comment session with id %s because it does not exist".format(id))
+      }
+    }
   }
 
   class FacilityRepositoryImpl extends FacilityRepository {

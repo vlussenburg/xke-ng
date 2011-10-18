@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 import net.liftweb.json.JsonAST.{ JValue, JArray }
 import net.liftweb.json.ext.JodaTimeSerializers
 import javax.security.auth.login.LoginContext
-import com.xebia.xkeng.model.{ Credential, Session, Location, Conference, Author }
+import com.xebia.xkeng.model.{ Credential, Session, Location, Conference, Author, Comment, Rating }
 import net.liftweb.common.Logger
 import com.xebia.xkeng.serialization.util._
 
@@ -76,6 +76,8 @@ object JsonDomainConverters extends Logger {
       ("limit" -> session.limit) ~
       ("type" -> session.sessionType) ~
       ("authors" -> authorsToJArray(session.authors)) ~
+      ("comments" -> commentsToJArray(session.comments)) ~
+      ("ratings" -> ratingsFullToJArray(session.ratings)) ~
       ("location" -> locationToJValue(session.location))
   }
 
@@ -122,9 +124,22 @@ object JsonDomainConverters extends Logger {
       ("capacity" -> location.capacity)
   }
 
+  implicit def commentToJValue(comment: Comment): JValue = {
+    ("user" -> comment.userId) ~
+      ("comment" -> comment.comment)
+  }
+
+  implicit def ratingFullToJValue(rating: Rating): JValue = {
+    ("user" -> rating.userId) ~
+      ("rate" -> rating.rate)
+  }
+
   implicit def conferencesToJArray(conferences: List[Conference]): JValue = new JArray(conferences.map(conferenceToJValue))
   implicit def locationsToJArray(locations: List[Location]): JValue = new JArray(locations.map(locationToJValue))
+  implicit def commentsToJArray(comments: List[Comment]): JValue = new JArray(comments.map(commentToJValue))
+  implicit def ratingsToJArray(ratings: List[Rating]): JValue = new JArray(ratings.map(rating => JInt(rating.rate)))
   implicit def authorsToJArray(authors: List[Author]): JValue = new JArray(authors.map(_.serializeToJson))
+  def ratingsFullToJArray(ratings: List[Rating]): JValue = new JArray(ratings.map(ratingFullToJValue))
 
   /**
    * =====================================================
@@ -142,11 +157,15 @@ object JsonDomainConverters extends Logger {
     val JString(sessionType) = sessJson \! "type"
     val location = deserialize[Location](sessJson \\ "location")
     val authors: List[Author] = deserializeList[Author](sessJson \\ "authors")
-    val session = Session(start, end, location, title, description, sessionType, limit, authors)
+    val commentSerializer = (json: JValue) => fromCommentJson(serializeToJsonStr(json))
+    val comments = deserializeList[Comment](sessJson \\ "comments", commentSerializer)
+    val ratingsSerializer = (json: JValue) => fromRatingFullJson(serializeToJsonStr(json))
+    val ratings = deserializeList[Rating](sessJson \\ "ratings", ratingsSerializer)
+    val session = Session(start, end, location, title, description, sessionType, limit, authors, ratings, comments)
     if (!isNew) {
       val JInt(id) = (sessJson \! "id")
       return session.copy(id = id.toLong)
-    } 
+    }
     session
   }
 
@@ -157,17 +176,17 @@ object JsonDomainConverters extends Logger {
     val JString(AsDateTime(begin)) = confJson \\! "begin"
     val JString(AsDateTime(end)) = confJson \\! "end"
     val locations: List[Location] = deserializeList[Location](confJson \\ "locations")
-    val sessionSerializer = (json:JValue) => fromSessionJson(false)(serializeToJsonStr(json))
-    val sessions:List[Session] = deserializeList[Session](confJson \\ "sessions", sessionSerializer)
-     val conference = (confJson \ "id") match {
+    val sessionSerializer = (json: JValue) => fromSessionJson(false)(serializeToJsonStr(json))
+    val sessions: List[Session] = deserializeList[Session](confJson \\ "sessions", sessionSerializer)
+    val conference = (confJson \ "id") match {
       case JString(id) => Conference(id, title, begin, end, sessions, locations)
       case _ => Conference(title, begin, end, sessions, locations)
-    } 
+    }
     conference
 
   }
 
-    def fromLocationJson(isNew: Boolean)(jsonString: String): Location = {
+  def fromLocationJson(isNew: Boolean)(jsonString: String): Location = {
     val JObject(locJson) = JsonParser.parse(jsonString)
     val JString(desc) = locJson \! "description"
     val JInt(capacity) = locJson \! "capacity"
@@ -175,11 +194,50 @@ object JsonDomainConverters extends Logger {
     if (!isNew) {
       val JInt(id) = (locJson \! "id")
       return location.copy(id = id.toLong)
-    } 
+    }
     location
   }
+ 
+  def fromCommentJson(jsonString: String): Comment = {
+    val JObject(jsonValue) = JsonParser.parse(jsonString)
+    val JString(comment) = jsonValue \! "comment"
+    //TODO dynamically get current logged in user
+    Comment(comment, "guest")
+  }
 
-  
+  def fromCommentListJson(jsonString: String): List[Comment] = {
+    def fromCommentFullJson(jsonValue: JValue): Comment = {
+      val JString(comment) = jsonValue \ "comment"
+      val JString(user) = jsonValue \ "user"
+      Comment(comment, user)
+    }
+
+    val JArray(jsonValue) = JsonParser.parse(jsonString)
+    deserializeList[Comment](jsonValue, fromCommentFullJson(_))
+  }
+
+  def fromRatingJson(jsonString: String): Rating = {
+    val JObject(jsonValue) = JsonParser.parse(jsonString)
+    val JInt(rate) = jsonValue \! "rate"
+    //TODO dynamically get current logged in user
+    Rating(rate.toInt, "guest")
+  }
+
+  def fromRatingFullJson(jsonString: String): Rating = {
+    val JObject(jsonValue) = JsonParser.parse(jsonString)
+    val JInt(rate) = jsonValue \! "rate"
+    val JString(user) = jsonValue \! "user"
+    Rating(rate.toInt, user)
+  }
+
+  def fromRatingListJson(jsonString: String): List[Int] = {
+    val JArray(ratings) = JsonParser.parse(jsonString)
+    ratings.map((v: JValue) => {
+      val JInt(rate) = v
+      rate.toInt
+    })
+  }
+
   def fromCredentialJson(jsonString: String): Credential = {
     val JObject(jsonValue) = JsonParser.parse(jsonString)
     val JString(name) = jsonValue \\! "name"
