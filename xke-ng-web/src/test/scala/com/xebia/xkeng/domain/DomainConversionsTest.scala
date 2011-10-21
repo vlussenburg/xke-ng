@@ -76,10 +76,10 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
       ("authors" -> List(a1)) ~
       ("comments" -> List(c1)) ~
       ("ratings" -> ratingsFullToJArray(List(r1))) ~
-       ("labels" -> serializeStringsToJArray(lb1)) ~
-     ("location" -> l1.serializeToJson)
+      ("labels" -> serializeStringsToJArray(lb1)) ~
+      ("location" -> l1.serializeToJson)
     val json: JValue = s1 //use implicits to convert to JSON
-     json should be(expected)
+    json should be(expected)
   }
   it should "serialize a session without authors, comments, labels and ratings" in {
 
@@ -94,11 +94,11 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
       ("type" -> s1.sessionType) ~
       ("comments" -> List[Comment]()) ~
       ("ratings" -> List[Rating]()) ~
-     ("labels" -> List[String]()) ~ 
-     ("location" -> l1.serializeToJson)
+      ("labels" -> List[String]()) ~
+      ("location" -> l1.serializeToJson)
 
     val json: JValue = s1 //use implicits to convert to JSON
- //   println(deserializeToStr(expected))
+    //   println(deserializeToStr(expected))
 
     json should be(expected)
   }
