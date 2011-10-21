@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -66,11 +64,15 @@ public class CVSessionAdd extends AdditionActivity {
 			session = new Session(originalSession);
 			((TextView) findViewById(R.id.addModifyTitle)).setText("Edit session");
 		}
-
-		showConference();
-		showSession();
 		registerActions();
 		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	protected void onResume() {
+		showConference();
+		showSession();
+		super.onResume();
 	}
 
 	private void showConference() {
@@ -264,8 +266,15 @@ public class CVSessionAdd extends AdditionActivity {
 				showConference();
 			break;
 			case R.id.sessionStart:
-				session.setStartTime(timeFormatter.getAbsoluteTime(value.toString()));
-			break;
+				TimeSlot t = (TimeSlot) selection;
+				session.setStartTime(t.start);
+				if (session.getEndTime() == null) {
+					session.setEndTime(session.getStartTime().plus(0, 0, 0, 0, session.getDuration(), 0,
+							DayOverflow.Spillover));
+				}
+				if ( session.getLocation() == null ) {
+					session.setLocation(t.location);
+				}
 			case R.id.sessionDuration:
 				int duration = StringUtil.getFirstInteger(value);
 				if (session.getStartTime() == null) {
@@ -338,21 +347,21 @@ public class CVSessionAdd extends AdditionActivity {
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.INPUT_TIME_START:
-				List<TimeSlot> tslist = session.getLocation() == null ? conference.getAvailableTimeSlots() : conference
+				Set<TimeSlot> tslist = session.getLocation() == null ? conference.getAvailableTimeSlots() : conference
 						.getAvailableTimeSlots(session.getLocation());
-				SortedSet<String> set = new TreeSet<String>();
-				idx = 0;
-				for (TimeSlot timeSlot : tslist) {
-					set.add(timeFormatter.getAbsoluteTime(timeSlot.start));
-				}
+				
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Pick a start time");
-				items = set.toArray(new String[set.size()]);
-				if (items.length == 0) {
+				if (tslist.size() == 0) {
 					builder.setMessage("This conference is fully booked!");
 					builder.setIcon(android.R.drawable.ic_dialog_alert);
 				} else {
-					builder.setItems(items, new DialogHandler(this, items, R.id.sessionStart));
+					TimeSlot[] slots = tslist.toArray(new TimeSlot[0]);
+					items = new String[slots.length];
+					for (int i = 0; i < slots.length; i++) {
+						items[i] = timeFormatter.getAbsoluteTime(slots[i].start) + " @ " + slots[i].location;
+					}
+					builder.setItems(items, new DialogHandler(this, slots, R.id.sessionStart));
 				}
 				dialog = builder.create();
 				dialog.setOnCancelListener(this);

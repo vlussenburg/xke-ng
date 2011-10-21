@@ -195,10 +195,8 @@ public abstract class BaseActivity extends Activity {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			String user = sp.getString(XCS.PREF.USERNAME, null);
 			String password = SecurityUtils.decrypt(sp.getString(XCS.PREF.PASSWORD, ""));
-			if (rootActivity != null) {
-				server = ConferenceServer.createInstance(user, password, getServerUrl(),
-						rootActivity.getApplicationContext());
-			}
+			server = ConferenceServer.createInstance(user, password, getServerUrl(),
+					rootActivity == null ? null : rootActivity.getApplicationContext());
 		}
 		return server;
 	}

@@ -112,7 +112,11 @@ public class RestClient {
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
-			Log.d(LOG.COMMUNICATE, "POST (create) to '" + url + "':\n" + postData);
+			Log.d(LOG.COMMUNICATE, "POST (create) to '" + url + "': ");
+			String[] split = postData.split(",");
+			for (int i = 0; i < split.length; i++) {
+				Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
+			}
 			reader = getReader(new HttpPost(url), postData, token);
 			return gson.fromJson(reader, rvClass);
 		}

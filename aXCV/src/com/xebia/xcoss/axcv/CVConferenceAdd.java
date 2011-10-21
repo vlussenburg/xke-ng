@@ -148,13 +148,14 @@ public class CVConferenceAdd extends AdditionActivity {
 				conference.setTitle(value);
 			break;
 			case R.id.conferenceDate:
-				conference.setDate((DateTime) selection);
+				conference.updateStartTime((DateTime) selection);
+				conference.updateEndTime((DateTime) selection);
 			break;
 			case R.id.conferenceStart:
-				conference.setStartTime((DateTime) selection);
+				conference.updateStartTime((DateTime) selection);
 			break;
 			case R.id.conferenceEnd:
-				conference.setEndTime((DateTime) selection);
+				conference.updateEndTime((DateTime) selection);
 			break;
 			case R.id.conferenceDescription:
 				conference.setDescription(value);

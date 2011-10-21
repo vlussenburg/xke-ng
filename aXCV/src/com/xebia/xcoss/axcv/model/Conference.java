@@ -4,10 +4,10 @@ import hirondelle.date4j.DateTime;
 import hirondelle.date4j.DateTime.DayOverflow;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import android.util.Log;
@@ -17,6 +17,7 @@ import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
+import com.xebia.xcoss.axcv.model.util.TimeSlotComparator;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -37,8 +38,6 @@ public class Conference implements Serializable {
 	private String description;
 	private Author organiser;
 	@SerializedName("begin")
-	private DateTime date;
-	@SerializedName("begin")
 	private DateTime startTime = DateTime.forTimeOnly(16, 0, 0, 0);
 	@SerializedName("end")
 	private DateTime endTime = DateTime.forTimeOnly(21, 0, 0, 0);
@@ -56,7 +55,6 @@ public class Conference implements Serializable {
 		this.title = original.title;
 		this.description = original.description;
 		// DateTime is immutable
-		this.date = original.date;
 		this.startTime = original.startTime;
 		this.endTime = original.endTime;
 		// Author is immutable
@@ -69,6 +67,13 @@ public class Conference implements Serializable {
 
 	public String getId() {
 		return id;
+	}
+
+	public DateTime getDate() {
+		if (startTime.hasYearMonthDay()) {
+			return startTime;
+		}
+		return null;
 	}
 
 	public Set<Session> getSessions() {
@@ -111,28 +116,37 @@ public class Conference implements Serializable {
 		this.title = title;
 	}
 
-	public DateTime getDate() {
-		return date;
-	}
-
-	public void setDate(DateTime date) {
-		this.date = date;
-	}
-
 	public DateTime getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(DateTime startTime) {
-		this.startTime = startTime;
+	public void updateStartTime(final DateTime updated) {
+		if (startTime == null || (updated.hasHourMinuteSecond() && updated.hasYearMonthDay())) {
+			startTime = updated;
+		} else {
+			startTime = addToTime(startTime, updated);
+		}
 	}
 
 	public DateTime getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(DateTime endTime) {
-		this.endTime = endTime;
+	public void updateEndTime(final DateTime updated) {
+		if (endTime == null || (updated.hasHourMinuteSecond() && updated.hasYearMonthDay())) {
+			endTime = updated;
+		} else {
+			endTime = addToTime(endTime, updated);
+		}
+	}
+
+	private DateTime addToTime(DateTime time, DateTime updated) {
+		if (updated.hasHourMinuteSecond()) {
+			return new DateTime(time.getYear(), time.getMonth(), time.getDay(), updated.getHour(), updated.getMinute(),
+					updated.getSecond(), 0);
+		}
+		return new DateTime(updated.getYear(), updated.getMonth(), updated.getDay(), time.getHour(), time.getMinute(),
+				time.getSecond(), 0);
 	}
 
 	public String getDescription() {
@@ -158,8 +172,8 @@ public class Conference implements Serializable {
 	// Utilities
 
 	public boolean check(List<String> messages) {
-		if (date == null) {
-			messages.add("Date");
+		if (startTime == null || endTime == null || !startTime.hasHourMinuteSecond()) {
+			messages.add("Date, start/end time");
 		}
 		if (StringUtil.isEmpty(title)) {
 			messages.add("Title");
@@ -183,15 +197,6 @@ public class Conference implements Serializable {
 		return null;
 	}
 
-//	public Session getUpcomingSession(Location loc) {
-//		for (Session session : getSessions()) {
-//			if (!session.isExpired()) {
-//				return session;
-//			}
-//		}
-//		return null;
-//	}
-//
 	/**
 	 * Adds a session on the server and resets the local stored sessions.
 	 * 
@@ -200,7 +205,7 @@ public class Conference implements Serializable {
 	 */
 	public boolean addSession(Session session, boolean create) {
 		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + getTitle());
-		session.setStartTime(date);
+		session.setStartTime(startTime);
 		try {
 			String id = ConferenceServer.getInstance().storeSession(session, getId(), create);
 			resetSessions();
@@ -266,7 +271,7 @@ public class Conference implements Serializable {
 
 			// Preferred start time is later than session time.
 			if (prefstart >= sesstart) {
-				Log.d(XCS.LOG.ALL, "On " + session.getTitle() + ": session starting earlier.");
+				// Log.d(XCS.LOG.ALL, "On " + session.getTitle() + ": session starting earlier.");
 				// If the session ends after the preferred start time, move start time.
 				prefstart = Math.max(getTime(session.getEndTime()), prefstart);
 			} else {
@@ -288,17 +293,16 @@ public class Conference implements Serializable {
 		return null;
 	}
 
-	public List<TimeSlot> getAvailableTimeSlots() {
-		ArrayList<TimeSlot> list = new ArrayList<TimeSlot>();
+	public SortedSet<TimeSlot> getAvailableTimeSlots() {
+		TreeSet<TimeSlot> list = new TreeSet<TimeSlot>(new TimeSlotComparator());
 		for (Location loc : locations) {
 			list.addAll(getAvailableTimeSlots(loc));
 		}
 		return list;
 	}
 
-	public List<TimeSlot> getAvailableTimeSlots(Location loc) {
-		ArrayList<TimeSlot> list = new ArrayList<TimeSlot>();
-
+	public SortedSet<TimeSlot> getAvailableTimeSlots(Location loc) {
+		TreeSet<TimeSlot> list = new TreeSet<TimeSlot>(new TimeSlotComparator());
 		TimeSlot t;
 		DateTime start = startTime;
 		while ((t = getNextAvailableTimeSlot(start, TimeSlot.LENGTH, loc)) != null) {
@@ -327,7 +331,7 @@ public class Conference implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((date == null) ? 0 : date.hashCode());
+		result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
@@ -338,9 +342,9 @@ public class Conference implements Serializable {
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
 		Conference other = (Conference) obj;
-		if (date == null) {
-			if (other.date != null) return false;
-		} else if (!date.equals(other.date)) return false;
+		if (startTime == null) {
+			if (other.startTime != null) return false;
+		} else if (!startTime.equals(other.startTime)) return false;
 		if (title == null) {
 			if (other.title != null) return false;
 		} else if (!title.equals(other.title)) return false;
@@ -350,7 +354,7 @@ public class Conference implements Serializable {
 	@Override
 	public String toString() {
 		return "Conference [id=" + id + ", title=" + title + ", description=" + description + ", organiser="
-				+ organiser + ", date=" + date + ", startTime=" + startTime + ", endTime=" + endTime + ", locations="
+				+ organiser + ", startTime=" + startTime + ", endTime=" + endTime + ", locations="
 				+ FormatUtil.getList(locations) + ", sessions=" + FormatUtil.getList(sessions) + "]";
 	}
 

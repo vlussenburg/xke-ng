@@ -157,7 +157,8 @@ public class ConferenceServer {
 		requestUrl.append("/conference");
 
 		if (create) {
-			return RestClient.createObject(requestUrl.toString(), conference, String.class, token);
+			Conference created = RestClient.createObject(requestUrl.toString(), conference, Conference.class, token);
+			return created.getId();
 		}
 		RestClient.updateObject(requestUrl.toString(), conference, token);
 		return conference.getId();

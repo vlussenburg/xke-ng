@@ -246,6 +246,9 @@ public class Session implements Serializable {
 		if (location == null) {
 			messages.add("Location");
 		}
+		if (limit == null) {
+			messages.add("Limit");
+		}
 		return (messages.size() == 0);
 	}
 
