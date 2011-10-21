@@ -118,6 +118,7 @@ case class Conference(val _id: ObjectId, title: String, begin: DateTime, end: Da
   def getLocationById(id: Long): Option[Location] = locations.find(_.id == id)
 
   def getSessionById(id: Long): Option[Session] = sessions.find(_.id == id)
+  
 
 }
 

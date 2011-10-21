@@ -34,8 +34,9 @@ object RestSmokeTestClient {
   val r1 = Rating(10, "peteru" )
   val a1 = Author("peteru", "upeter@xebia.com", "Urs Peter")
   val a2 = Author("amooy", "amooy@xebia.com", "Age Mooy")
+  val lbl = Set("Scala", "DSL")
   val s1 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "Mongo is a nosql db", "STRATEGIC", "10 people")
-  val s2 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l2, "Scala rocks even more", "Scala is a scalable programming language", "STRATEGIC", "20 people", List(a1, a2))
+  val s2 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l2, "Scala rocks even more", "Scala is a scalable programming language", "STRATEGIC", "20 people", List(a1, a2), Nil, Nil, lbl)
   val c = Conference("XKE", xkeStartDate, xkeStartDate.plusHours(4), Nil, List(l1, l2))
 
   def searchConference(id: String): Conference = {
@@ -62,7 +63,7 @@ object RestSmokeTestClient {
   }
 
   def rateSession(sessionId: Long, rate: Rating): List[Int] = {
-    add("feedback/" + sessionId + "/rating", ("rate" -> rate.rate))(fromRatingListJson(_))
+    add("feedback/" + sessionId + "/rating", ("rate" -> rate.rate))(r => deserializeIntList(serializeToJson(r)))
   }
 
    def commentSession(sessionId: Long, comment: Comment): List[Comment] = {
@@ -126,7 +127,7 @@ object RestSmokeTestClient {
     println("found conference %s" format found)
 
     println("Add session to conference...")
-    val newSession = addSession(c._id.toString, s1)
+    val newSession = addSession(c._id.toString, s2)
     println("new session %s" format newSession)
 
     println("Add rating to session...")

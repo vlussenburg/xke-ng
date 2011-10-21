@@ -63,7 +63,8 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
   it should "serialize a session with authors, comments and ratings" in {
     val r1 = Rating(10, "peteru")
     val c1 = Comment("blabla", "peteru")
-    val s1 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "Mongo for world domination", "STRATEGIC", "10 people", List(a1), List(r1), List(c1))
+    val lb1 = "Scala"
+    val s1 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "Mongo for world domination", "STRATEGIC", "10 people", List(a1), List(r1), List(c1), Set(lb1))
 
     val expected: JValue = ("id" -> s1.id) ~
       ("title" -> s1.title) ~
@@ -75,11 +76,12 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
       ("authors" -> List(a1)) ~
       ("comments" -> List(c1)) ~
       ("ratings" -> ratingsFullToJArray(List(r1))) ~
-      ("location" -> l1.serializeToJson)
+       ("labels" -> serializeStringsToJArray(lb1)) ~
+     ("location" -> l1.serializeToJson)
     val json: JValue = s1 //use implicits to convert to JSON
-    json should be(expected)
+     json should be(expected)
   }
-  it should "serialize a session without authors, comments and ratings" in {
+  it should "serialize a session without authors, comments, labels and ratings" in {
 
     val s1 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "Mongo for world domination", "STRATEGIC", "10 people")
     val expected: JValue = ("id" -> s1.id) ~
@@ -92,12 +94,15 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
       ("type" -> s1.sessionType) ~
       ("comments" -> List[Comment]()) ~
       ("ratings" -> List[Rating]()) ~
-      ("location" -> l1.serializeToJson)
+     ("labels" -> List[String]()) ~ 
+     ("location" -> l1.serializeToJson)
 
     val json: JValue = s1 //use implicits to convert to JSON
+ //   println(deserializeToStr(expected))
+
     json should be(expected)
   }
-  it should "deserialize a session without authors correctly" in {
+  it should "deserialize a session without authors, comments, labels and ratings correctly" in {
 
     val jsonString = """{    
     "title":"The power of Android",
@@ -118,7 +123,7 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     title should be("The power of Android")
     descr should be("Android descr")
   }
-  it should "deserialize a session with authors correctly" in {
+  it should "deserialize a session with authors, comments, ratings and labels correctly" in {
 
     val jsonString = """{    
     "title":"The power of Android",
@@ -148,7 +153,8 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     	"comment":"bla"
       }
     ],
-     "ratings" :[ { 
+	"labels":["Scala", "DSL" ], 
+    "ratings" :[ { 
     	"user": "guest",
     	"rate": 1
     	},
@@ -158,8 +164,11 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     	}
     ] }"""
     val result = fromSessionJson(true)(jsonString)
-    val Session(id, start, end, location, title, descr, sessionType, limit, authors, ratings, comments, _) = result //use pattern-matching to bind the values
+    val Session(id, start, end, location, title, descr, sessionType, limit, authors, ratings, comments, labels) = result //use pattern-matching to bind the values
     authors.size should be(2)
+    ratings.size should be(2)
+    comments.size should be(1)
+    labels.size should be(2)
     title should be("The power of Android")
     descr should be("Android descr")
 
@@ -173,6 +182,20 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     userId should be("guest")
   }
 
+  it should "deserialize a list of Strings correctly" in {
+
+    val jsonString = """["first", "second"]"""
+    val l = deserializeStringList(serializeToJson(jsonString))
+    l should be(List("first", "second"))
+
+  }
+  it should "deserialize a list of ints correctly" in {
+
+    val jsonString = """[1, 2]"""
+    val l = deserializeIntList(serializeToJson(jsonString))
+    l should be(List(1, 2))
+
+  }
   it should "deserialize a comment correctly" in {
     val jsonString = """{"comment":"This is awesome"}"""
     val Comment(comment, userId) = fromCommentJson(jsonString)

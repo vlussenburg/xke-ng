@@ -11,6 +11,7 @@ import com.xebia.xkeng.model.{ Credential, Session, Location, Conference, Author
 import net.liftweb.common.Logger
 import com.xebia.xkeng.serialization.util._
 
+
 /**
  * {
  * "conferences":[
@@ -78,6 +79,7 @@ object JsonDomainConverters extends Logger {
       ("authors" -> authorsToJArray(session.authors)) ~
       ("comments" -> commentsToJArray(session.comments)) ~
       ("ratings" -> ratingsFullToJArray(session.ratings)) ~
+      ("labels" -> serializeStringsToJArray(session.labels.toSeq : _*)) ~
       ("location" -> locationToJValue(session.location))
   }
 
@@ -161,7 +163,10 @@ object JsonDomainConverters extends Logger {
     val comments = deserializeList[Comment](sessJson \\ "comments", commentSerializer)
     val ratingsSerializer = (json: JValue) => fromRatingFullJson(serializeToJsonStr(json))
     val ratings = deserializeList[Rating](sessJson \\ "ratings", ratingsSerializer)
-    val session = Session(start, end, location, title, description, sessionType, limit, authors, ratings, comments)
+    val labels = deserializeStringList(sessJson \\ "labels").toSet
+
+    val session = Session(start, end, location, title, description, sessionType, limit, authors, ratings, comments, labels)
+
     if (!isNew) {
       val JInt(id) = (sessJson \! "id")
       return session.copy(id = id.toLong)
@@ -197,7 +202,7 @@ object JsonDomainConverters extends Logger {
     }
     location
   }
- 
+
   def fromCommentJson(jsonString: String): Comment = {
     val JObject(jsonValue) = JsonParser.parse(jsonString)
     val JString(comment) = jsonValue \! "comment"
@@ -228,14 +233,6 @@ object JsonDomainConverters extends Logger {
     val JInt(rate) = jsonValue \! "rate"
     val JString(user) = jsonValue \! "user"
     Rating(rate.toInt, user)
-  }
-
-  def fromRatingListJson(jsonString: String): List[Int] = {
-    val JArray(ratings) = JsonParser.parse(jsonString)
-    ratings.map((v: JValue) => {
-      val JInt(rate) = v
-      rate.toInt
-    })
   }
 
   def fromCredentialJson(jsonString: String): Credential = {

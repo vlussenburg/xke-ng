@@ -63,10 +63,10 @@ object Assembly extends Logger {
   private def createTestConferences(startDate: DateTime, locations: List[Location], authors: List[Author]) = {
     val a1 = authors(0)
     val a2 = authors(1)
-
-    val s1 = Session(startDate, startDate.plusMinutes(60), locations(0), "Mongo rocks", "Mongo is a paperless document database", "STRATEGIC", "10 people", List(a1))
-    val s2 = Session(startDate, startDate.plusMinutes(60), locations(1), "Scala rocks even more", "Scala is a codeless programming language", "STRATEGIC", "10 people", List(a2))
-    val s3 = Session(startDate, startDate.plusMinutes(120), locations(2), "Scala quirks", "No such thing as a free ride when doing scala", "STRATEGIC", "10 people", List(a1, a2))
+    
+    val s1 = Session(startDate, startDate.plusMinutes(60), locations(0), "Mongo rocks", "Mongo is a paperless document database", "STRATEGIC", "10 people", List(a1), Nil, Nil, Set("Database", "Mongo", "Javascript"))
+    val s2 = Session(startDate, startDate.plusMinutes(60), locations(1), "Scala rocks even more", "Scala is a codeless programming language", "STRATEGIC", "10 people", List(a2), Nil, Nil, Set("Scala", "Functions", "DSL"))
+    val s3 = Session(startDate, startDate.plusMinutes(120), locations(2), "Scala quirks", "No such thing as a free ride when doing scala", "STRATEGIC", "10 people", List(a1, a2), Nil, Nil, Set("Scala", "Functional Programming", "Beauty"))
     val c = Conference(ObjectId.get, "XKE", startDate, startDate.plusHours(4), List(s1, s2, s3), locations)
     c.save
   }

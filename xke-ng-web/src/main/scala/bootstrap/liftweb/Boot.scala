@@ -32,7 +32,7 @@ class Boot {
 
 
     Assembly.initMongoDB()
-    val purge = Props.get("mongo.purge.data").map(_.toBoolean).getOrElse(false)
+    val purge = Props.get("mongo.purge.data").map(_.trim.toBoolean).getOrElse(false)
     Assembly.purgeAndPushTestdata(purge)
     LiftRules.dispatch.append(Assembly.XKENGDispatchAPIAssembly)
     /*
