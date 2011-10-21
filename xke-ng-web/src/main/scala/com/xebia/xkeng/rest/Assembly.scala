@@ -7,7 +7,7 @@ import com.mongodb.{ Mongo, MongoOptions, ServerAddress }
 import org.joda.time.DateTime
 import org.bson.types.ObjectId
 import net.liftweb.common._
-import com.xebia.xkeng.model.{ Session, Location, Conference, Author, Facility, AuthorDoc }
+import com.xebia.xkeng.model.{ Session, Location, Conference, Author, Facility, AuthorDoc, Labels }
 
 object Assembly extends Logger {
 
@@ -16,9 +16,19 @@ object Assembly extends Logger {
     val sessionRepository = new SessionRepositoryImpl
     val facilityRepository = new FacilityRepositoryImpl
     val authorRepository = new AuthorRepositoryImpl
+    val labelRepository = new LabelRepositoryImpl
   }
 
-  def initMongoDB() = {
+  def init() = {
+    initMongoDB()
+    initListeners()
+  }
+
+  private def initListeners() = {
+    Conference.addSessionListener(XKENGDispatchAPIAssembly.labelRepository)
+  }
+
+  private def initMongoDB() = {
     val srvr = new ServerAddress(Props.get("mongo.host").getOrElse("127.0.0.1"), Props.get("mongo.port").map(_.toInt).getOrElse(27017))
     val mo = new MongoOptions
     mo.socketTimeout = Props.get("mongo.socket.timeout").map(_.toInt).getOrElse(30000)
@@ -28,10 +38,11 @@ object Assembly extends Logger {
   }
 
   def purgeAndPushTestdata(forcePurge: Boolean = false) = {
-    if (Conference.count == 0 || Facility.count == 0 || AuthorDoc.count == 0 || forcePurge) {
+    if (Conference.count == 0 || Facility.count == 0 || AuthorDoc.count == 0 || Labels.count == 0 || forcePurge) {
       Conference.drop
       Facility.drop
       AuthorDoc.drop
+      Labels.drop
       val today = new DateTime().hourOfDay.setCopy(16).minuteOfHour.setCopy(0)
       val prevWeek = today.minusWeeks(1)
       val nextWeek = today.plusWeeks(1)
@@ -63,11 +74,12 @@ object Assembly extends Logger {
   private def createTestConferences(startDate: DateTime, locations: List[Location], authors: List[Author]) = {
     val a1 = authors(0)
     val a2 = authors(1)
-    
+
     val s1 = Session(startDate, startDate.plusMinutes(60), locations(0), "Mongo rocks", "Mongo is a paperless document database", "STRATEGIC", "10 people", List(a1), Nil, Nil, Set("Database", "Mongo", "Javascript"))
     val s2 = Session(startDate, startDate.plusMinutes(60), locations(1), "Scala rocks even more", "Scala is a codeless programming language", "STRATEGIC", "10 people", List(a2), Nil, Nil, Set("Scala", "Functions", "DSL"))
     val s3 = Session(startDate, startDate.plusMinutes(120), locations(2), "Scala quirks", "No such thing as a free ride when doing scala", "STRATEGIC", "10 people", List(a1, a2), Nil, Nil, Set("Scala", "Functional Programming", "Beauty"))
-    val c = Conference(ObjectId.get, "XKE", startDate, startDate.plusHours(4), List(s1, s2, s3), locations)
+    val c = Conference(ObjectId.get, "XKE", startDate, startDate.plusHours(4), Nil, locations)
     c.save
+    List(s1, s2, s3).foreach(c.saveOrUpdate(_))
   }
 }

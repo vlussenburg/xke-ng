@@ -1,9 +1,11 @@
 package com.xebia.xkeng.dao
 
 import net.liftweb.json.JsonDSL._
+import net.liftweb.mongodb._
+import com.mongodb._
 import org.joda.time.format._
 import org.joda.time.DateTime
-import com.xebia.xkeng.model.{ Location, Session, Conference, Facility, Author, AuthorDoc, Comment, Rating }
+import com.xebia.xkeng.model.{ Location, Session, Conference, Facility, Author, AuthorDoc, Comment, Rating, Labels, SessionListener }
 
 trait ConferenceRepository {
   def findConferences(year: Int): List[Conference]
@@ -48,12 +50,19 @@ trait AuthorRepository {
 
 }
 
+trait LabelRepository {
+
+  def findAllLabels(): Set[String]
+  def addLabels(label: String *):Unit
+}
+
 trait RepositoryComponent {
 
   val conferenceRepository: ConferenceRepository
   val sessionRepository: SessionRepository
   val facilityRepository: FacilityRepository
   val authorRepository: AuthorRepository
+  val labelRepository: LabelRepository
 
   class ConferenceRepositoryImpl extends ConferenceRepository {
 
@@ -87,6 +96,14 @@ trait RepositoryComponent {
      */
     def findConference(id: String) = Conference.find(id)
 
+    /**
+     * db.confs.find({}, {'sessions.labels':1})
+     */
+    def findAllLabels(): List[String] = {
+      val confererencesWithLabels = Conference.findAll(new BasicDBObject(), Some(new BasicDBObjectBuilder().add("sessions.label", 1).get()))
+      Nil
+    }
+
   }
 
   class SessionRepositoryImpl extends SessionRepository {
@@ -97,7 +114,7 @@ trait RepositoryComponent {
       val conf = Conference.find(("sessions.id" -> id))
       conf.map(c => c.remove(c.getSessionById(id).get))
     }
-    
+
     def rateSessionById(id: Long, rating: Rating): List[Rating] = {
       val (conference, session) = getSessionById(id)
       val ratedSession = session.addRating(rating)
@@ -190,6 +207,33 @@ trait RepositoryComponent {
       AuthorDoc.find(("author.userId" -> userId))
     }
 
+  }
+
+  class LabelRepositoryImpl extends LabelRepository with SessionListener {
+
+    def findAllLabels(): Set[String] = {
+      getLabelsDoc.labels
+    }
+    def addLabels(labels: String *):Unit = {
+      val labelsDoc = getLabelsDoc
+      labels.foreach(labelsDoc.add(_))
+    }
+
+    override def sessionUpdated(session:Session) = addLabels(session.labels.toSeq : _*)
+    
+    /**
+     * Make sure there is only one Labels document
+     */
+    private def getLabelsDoc: Labels = {
+      Labels.findAll match {
+        case Nil => {
+          val f = Labels("NL", Set.empty)
+          f.save
+          f
+        }
+        case f :: xs => f
+      }
+    }
   }
 }
 

@@ -136,11 +136,13 @@ object JsonDomainConverters extends Logger {
       ("rate" -> rating.rate)
   }
 
+  
   implicit def conferencesToJArray(conferences: List[Conference]): JValue = new JArray(conferences.map(conferenceToJValue))
   implicit def locationsToJArray(locations: List[Location]): JValue = new JArray(locations.map(locationToJValue))
   implicit def commentsToJArray(comments: List[Comment]): JValue = new JArray(comments.map(commentToJValue))
   implicit def ratingsToJArray(ratings: List[Rating]): JValue = new JArray(ratings.map(rating => JInt(rating.rate)))
   implicit def authorsToJArray(authors: List[Author]): JValue = new JArray(authors.map(_.serializeToJson))
+  implicit def labelsToJArray(labels: Set[String]): JValue = serializeStringsToJArray(labels.toSeq : _*)
   def ratingsFullToJArray(ratings: List[Rating]): JValue = new JArray(ratings.map(ratingFullToJValue))
 
   /**

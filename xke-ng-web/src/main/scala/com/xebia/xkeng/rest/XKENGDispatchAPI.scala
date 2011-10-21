@@ -98,7 +98,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
      */
     // GET /labels
     case Req("labels" :: Nil, _, GetRequest) =>
-      handleLabels
+      asJsonResp(labelRepository.findAllLabels())
     // GET /labels/author/<id>
     case Req("labels" :: "author" :: authorId :: Nil, _, GetRequest) =>
       handleLabels(authorId)

@@ -68,9 +68,13 @@ trait EmbeddedDocumentOps[T] {
  */
 object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps[Conference] {
   override def collectionName = "confs"
-
+	
   override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
 
+  var listeners:List[SessionListener] = Nil;
+  def addSessionListener(listener:SessionListener *) = listeners =  listeners ::: listener.toList
+  
+  
   def apply(title: String, begin: DateTime, end: DateTime, sessions: List[Session], locations: List[Location]): Conference = {
     Conference(ObjectId.get, title, begin, end, sessions, locations)
   }
@@ -91,6 +95,7 @@ case class Conference(val _id: ObjectId, title: String, begin: DateTime, end: Da
   def saveOrUpdate(session: Session) = {
     meta.doSaveOrUpdate(_id, "sessions", sessions, session)
     sessions = session :: (sessions - session)
+    meta.listeners.foreach(_.sessionUpdated(session))
     sessions
   }
 
@@ -246,4 +251,45 @@ object Facility extends MongoDocumentMeta[Facility] with EmbeddedDocumentOps[Fac
     Facility(ObjectId.get, name, locations)
   }
 
+}
+
+
+/**
+ * Represents a collection of Labels.
+ * This class is a case class, due to net.liftweb.mongodb requirements.
+ */
+case class Labels(val _id: ObjectId, name: String, var labels: Set[String]) extends MongoDocument[Labels] {
+  def meta = Labels
+
+  def add(label: String) = {
+    if(!labels.contains(label)) {
+    meta.pushToArray(_id, "labels", new JString(label))
+    labels = labels + label
+    }
+    labels
+  }
+
+}
+
+/**
+ * Defines the structure of a Label.
+ */
+object Labels extends MongoDocumentMeta[Labels] with EmbeddedDocumentOps[Labels] {
+  override def collectionName = "labels"
+
+  override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
+
+  def apply(name: String, labels: Set[String]): Labels = {
+    Labels(ObjectId.get, name, labels)
+  }
+
+}
+
+
+/**
+ * Listener for Session events
+ */
+trait SessionListener {
+  
+  def sessionUpdated(session:Session):Unit
 }

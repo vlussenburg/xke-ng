@@ -31,7 +31,7 @@ class Boot {
     //    LiftRules.setSiteMapFunc(() => User.sitemapMutator(sitemap()))
 
 
-    Assembly.initMongoDB()
+    Assembly.init()
     val purge = Props.get("mongo.purge.data").map(_.trim.toBoolean).getOrElse(false)
     Assembly.purgeAndPushTestdata(purge)
     LiftRules.dispatch.append(Assembly.XKENGDispatchAPIAssembly)

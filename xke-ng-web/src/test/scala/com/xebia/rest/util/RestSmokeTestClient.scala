@@ -44,6 +44,12 @@ object RestSmokeTestClient {
       fromConferenceJson(_)
     }
   }
+  
+  def queryLabels():Set[String] = {
+    query("labels") {
+      r => deserializeStringList(serializeStringsToJArray(r)).toSet
+    }
+  }
 
   def addConference(c: Conference): Conference = {
     add("conference", conferenceToJValue(c)) {
@@ -137,6 +143,10 @@ object RestSmokeTestClient {
     println("Add comment to session...")
     val comments = commentSession(newSession.id, c1)
     println("commented session %s %s" format (newSession, comments))
+
+    println("Query labels...")
+    val labels = queryLabels()
+    println("labels %s" format (labels))
     
     
   }
