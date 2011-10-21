@@ -152,6 +152,8 @@ object JsonDomainConverters extends Logger {
    */
 
   def fromSessionJson(isNew: Boolean)(jsonString: String): Session = {
+    
+    println(jsonString)
     val JObject(sessJson) = JsonParser.parse(jsonString)
     val JString(AsDateTime(start)) = sessJson \\! "startTime"
     val JString(AsDateTime(end)) = sessJson \\! "endTime"

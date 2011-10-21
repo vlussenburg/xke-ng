@@ -53,7 +53,8 @@ trait AuthorRepository {
 trait LabelRepository {
 
   def findAllLabels(): Set[String]
-  def addLabels(label: String *):Unit
+  def findLabelsByAuthorId(userId: String): Set[String]
+  def addLabels(label: String*): Unit
 }
 
 trait RepositoryComponent {
@@ -211,16 +212,27 @@ trait RepositoryComponent {
 
   class LabelRepositoryImpl extends LabelRepository with SessionListener {
 
+    /**
+     * The labels are updated when a session is updated, which can contain
+     * a new label
+     */
+    override def sessionUpdated(session: Session) = addLabels(session.labels.toSeq: _*)
+
     def findAllLabels(): Set[String] = {
       getLabelsDoc.labels
     }
-    def addLabels(labels: String *):Unit = {
+    def addLabels(labels: String*): Unit = {
       val labelsDoc = getLabelsDoc
       labels.foreach(labelsDoc.add(_))
     }
 
-    override def sessionUpdated(session:Session) = addLabels(session.labels.toSeq : _*)
-    
+    def findLabelsByAuthorId(userId: String): Set[String] = {
+      val sessionsGivenByAuthor: List[Session] = Conference.findAll(("sessions.authors.userId" -> userId)).flatMap {
+        _.sessions.filter(_.authors.exists(_.userId == userId))
+      }
+      sessionsGivenByAuthor.flatMap(_.labels).toSet
+    }
+
     /**
      * Make sure there is only one Labels document
      */

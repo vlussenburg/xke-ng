@@ -101,11 +101,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
       asJsonResp(labelRepository.findAllLabels())
     // GET /labels/author/<id>
     case Req("labels" :: "author" :: authorId :: Nil, _, GetRequest) =>
-      handleLabels(authorId)
-
-    // PUT /label/<name>
-    case req @ Req("label" :: name :: Nil, _, PutRequest) =>
-      handleLabelUpdate(name, req.body.toOption)
+      asJsonResp(labelRepository.findLabelsByAuthorId(authorId))
 
     /**
      * *******************
@@ -209,14 +205,6 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
   private def handleSessionDelete(sessionId: Long) = {
     sessionRepository.deleteSessionById(sessionId)
     Full(OkResponse()) //don't we need to handle errors?
-  }
-
-  private def handleLabels = {
-    Full(NotFoundResponse())
-  }
-
-  private def handleLabels(authorId: String) = {
-    Full(NotFoundResponse())
   }
 
   private def handleLabelUpdate(name: String, jsonBody: Option[Array[Byte]]) = {

@@ -94,11 +94,11 @@ package object util {
     parse(s)
   }
 
-   def serializeStringsToJArray(strings: String *): JArray = {
+  def serializeStringsToJArray(strings: String*): JArray = {
     JArray(strings.toList.map(JString(_)))
   }
- 
-     def serializeIntsToJArray(ints: Int *): JArray = {
+
+  def serializeIntsToJArray(ints: Int*): JArray = {
     JArray(ints.toList.map(JInt(_)))
   }
   def serializeToJsonStr(t: AnyRef): String = {
@@ -106,22 +106,29 @@ package object util {
   }
 
   implicit def pimpJValueWithInformativeFailingSelector[T <: JValue](values: List[T]): { def \\!(query: String): JValue; def \!(query: String): JValue } = new {
-    def noMatchPartial(query: String): PartialFunction[JValue, JValue] = {
-      case JObject(Nil) => {
-        val message = "mandatory json field=[%s] of json=[%s] was not present." format (query, serializeToJsonStr(values))
-        error(message)
-        throw new IllegalArgumentException(message)
-      }
+
+    def handleNotFound(query: String, values: List[T]) = {
+      val message = "mandatory json field=[%s] of json=[%s] was not present." format (query, serializeToJsonStr(values).replace("\"" ,"" ))
+      error(message)
+      throw new IllegalArgumentException(message)
+
     }
+    def emptyObjectPartial(query: String): PartialFunction[JValue, JValue] = {
+      case JObject(Nil) => handleNotFound(query, values)
+    }
+    def jNothingPartial(query: String): PartialFunction[JValue, JValue] = {
+      case JNothing => handleNotFound(query, values)
+    }
+
     val default: PartialFunction[JValue, JValue] = { case a: JValue => a }
 
     def \\!(query: String): JValue = {
       val selected: JValue = (values \\ query)
-      noMatchPartial(query).orElse(default)(selected)
+      emptyObjectPartial(query).orElse(jNothingPartial(query)).orElse(default)(selected)
     }
     def \!(query: String): JValue = {
       val selected: JValue = (values \ query)
-      noMatchPartial(query).orElse(default)(selected)
+      emptyObjectPartial(query).orElse(jNothingPartial(query)).orElse(default)(selected)
     }
   }
 

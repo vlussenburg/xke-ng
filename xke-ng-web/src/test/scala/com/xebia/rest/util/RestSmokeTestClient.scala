@@ -51,6 +51,16 @@ object RestSmokeTestClient {
     }
   }
 
+   def querySession(id:Long):Session = {
+    query("session/" + id) {
+      r => fromSessionJson(false)(r)
+    }
+  }
+    def queryLabelsByAuthor(userId:String):Set[String] = {
+    query("labels/author/" + userId) {
+      r => deserializeStringList(serializeStringsToJArray(r)).toSet
+    }
+  }
   def addConference(c: Conference): Conference = {
     add("conference", conferenceToJValue(c)) {
       fromConferenceJson(_)
@@ -62,6 +72,10 @@ object RestSmokeTestClient {
     status
   }
 
+   def updateSession(c: Conference, s:Session): Int = {
+    val (status, _) = update("conference/" + c._id.toString + "/session", sessionToJValue(s))
+    status
+  }
   def addSession(confId: String, session: Session): Session = {
     add("conference/" + confId + "/session", sessionToJValue(session)) {
       fromSessionJson(false)(_)
@@ -125,7 +139,7 @@ object RestSmokeTestClient {
     println("found conference %s" format found)
 
     println("Update conference...")
-    val status = updateConference(c.copy(title = "XKENG"))
+    var status = updateConference(c.copy(title = "XKENG"))
     assert(status == 200)
 
     println("Search updated conference...")
@@ -136,6 +150,14 @@ object RestSmokeTestClient {
     val newSession = addSession(c._id.toString, s2)
     println("new session %s" format newSession)
 
+     println("Update session ...")
+    status = updateSession(c, newSession.copy(title = s2.title + " title changed!"))
+    assert(status == 200)
+
+    println("Query session ...")
+    val queriedSession = querySession(newSession.id)
+    println("queried session %s" format queriedSession)
+    
     println("Add rating to session...")
     val ratings = rateSession(newSession.id, r1)
     println("rated session %s %s" format (newSession, ratings))
@@ -145,9 +167,12 @@ object RestSmokeTestClient {
     println("commented session %s %s" format (newSession, comments))
 
     println("Query labels...")
-    val labels = queryLabels()
+    var labels = queryLabels()
     println("labels %s" format (labels))
     
+     println("Query labels by author...")
+    labels = queryLabelsByAuthor(a2.userId)
+    println("labels %s" format (labels))
     
   }
 
