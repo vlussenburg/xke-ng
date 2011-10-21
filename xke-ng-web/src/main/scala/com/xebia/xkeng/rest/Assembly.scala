@@ -21,11 +21,6 @@ object Assembly extends Logger {
 
   def init() = {
     initMongoDB()
-    initListeners()
-  }
-
-  private def initListeners() = {
-    Conference.addSessionListener(XKENGDispatchAPIAssembly.labelRepository)
   }
 
   private def initMongoDB() = {

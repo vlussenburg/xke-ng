@@ -213,6 +213,10 @@ trait RepositoryComponent {
   class LabelRepositoryImpl extends LabelRepository with SessionListener {
 
     /**
+     * Register listener
+     */
+    Conference.addSessionListener(this)
+    /**
      * The labels are updated when a session is updated, which can contain
      * a new label
      */
