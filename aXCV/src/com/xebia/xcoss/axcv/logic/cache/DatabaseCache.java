@@ -9,18 +9,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.xebia.xcoss.axcv.logic.ProfileManager;
-import com.xebia.xcoss.axcv.util.XCS;
-
 import android.content.Context;
 import android.util.Log;
 import biz.source_code.base64Coder.Base64Coder;
 
-public class PersistentConferenceCache extends ConferenceCache {
+import com.xebia.xcoss.axcv.logic.ProfileManager;
+import com.xebia.xcoss.axcv.util.XCS;
+
+public class DatabaseCache extends DataCache {
 
 	private ProfileManager profileManager;
 
-	protected PersistentConferenceCache(Context ctx) {
+	public DatabaseCache(Context ctx) {
 		super(ctx);
 		this.profileManager = new ProfileManager(ctx);
 	}

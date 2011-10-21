@@ -14,6 +14,7 @@ import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Author;
+import com.xebia.xcoss.axcv.model.Rate;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -80,8 +81,8 @@ public class SearchResultAdapter extends BaseAdapter {
 		}
 
 		try {
-			double rate = ConferenceServer.getInstance().getRate(session);
-			ratingView.setText(FormatUtil.getText(rate));
+			Rate rate = ConferenceServer.getInstance().getRate(session);
+			ratingView.setText(rate.toString());
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(ctx, "retrieving rate", e);

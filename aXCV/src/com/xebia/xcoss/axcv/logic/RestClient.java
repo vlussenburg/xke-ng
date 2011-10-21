@@ -112,8 +112,8 @@ public class RestClient {
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
-			Log.d(LOG.COMMUNICATE, "PUT (create) to '" + url + "':\n" + postData);
-			reader = getReader(new HttpPut(url), postData, token);
+			Log.d(LOG.COMMUNICATE, "POST (create) to '" + url + "':\n" + postData);
+			reader = getReader(new HttpPost(url), postData, token);
 			return gson.fromJson(reader, rvClass);
 		}
 		finally {
@@ -127,12 +127,10 @@ public class RestClient {
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
-			Log.d(LOG.COMMUNICATE, "POST (update) to '" + url + "':\n" + postData);
-			reader = getReader(new HttpPost(url), postData, token);
+			Log.d(LOG.COMMUNICATE, "PUT (update) to '" + url + "':\n" + postData);
+			reader = getReader(new HttpPut(url), postData, token);
 			T result = getGson().fromJson(reader, (Class<T>) object.getClass());
-			// Retrieves the full object !
 			// TODO : Id changes....
-			System.out.println("Update = " + gson.fromJson(reader, object.getClass()));
 			return result;
 		}
 		finally {

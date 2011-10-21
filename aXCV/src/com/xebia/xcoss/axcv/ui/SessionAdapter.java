@@ -38,9 +38,9 @@ public class SessionAdapter extends BaseAdapter {
 
 		Session session = (Session) getItem(paramInt);
 		int colorId = ctx.getResources().getColor(R.color.tc_itemdefault);
-		if ( session.isExpired() ) {
+		if (session.isExpired()) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemgone);
-		} else if ( session.isRunning() ) {
+		} else if (session.isRunning()) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemactive);
 		}
 		if (session.isMandatory()) {
@@ -84,13 +84,18 @@ public class SessionAdapter extends BaseAdapter {
 
 		ImageView button;
 		button = (ImageView) row.findViewById(R.id.markButton);
-		ctx.markSession(session, button, false);
-		button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				ctx.markSession(session, view, true);
-			}
-		});
+		if (StringUtil.isEmpty(ctx.getUser())) {
+			button.setVisibility(View.GONE);
+		} else {
+			button.setVisibility(View.VISIBLE);
+			ctx.markSession(session, button, false);
+			button.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					ctx.markSession(session, view, true);
+				}
+			});
+		}
 		button = (ImageView) row.findViewById(R.id.editButton);
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -128,7 +133,7 @@ public class SessionAdapter extends BaseAdapter {
 	private CharSequence getLocationAndDate(Session session) {
 
 		StringBuilder sb = new StringBuilder();
-		if ( includeDate ) {
+		if (includeDate) {
 			sb.append(timeUtil.getAbsoluteDate(session.getStartTime()));
 			sb.append(" | ");
 		}

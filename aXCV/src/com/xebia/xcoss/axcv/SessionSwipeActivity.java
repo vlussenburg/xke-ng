@@ -1,10 +1,15 @@
 package com.xebia.xcoss.axcv;
 
-import com.xebia.xcoss.axcv.model.Conference;
-import com.xebia.xcoss.axcv.model.Location;
-
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.View.OnClickListener;
+import android.widget.TextView;
+
+import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Location;
+import com.xebia.xcoss.axcv.model.Session;
 
 public abstract class SessionSwipeActivity extends SwipeActivity {
 
@@ -24,7 +29,18 @@ public abstract class SessionSwipeActivity extends SwipeActivity {
 	}
 
 	protected Location getCurrentLocation() {
-		return locations[currentLocation];
+		return locations.length > 0 ? locations[currentLocation] : null;
+	}
+
+	protected void updateLocation(Session session) {
+		if (session != null) {
+			for (int i = 0; i < locations.length; i++) {
+				if (locations[i].equals(session.getLocation())) {
+					currentLocation = i;
+					break;
+				}
+			}
+		}
 	}
 
 	protected Location getNextLocation() {
@@ -43,34 +59,32 @@ public abstract class SessionSwipeActivity extends SwipeActivity {
 
 	@Override
 	public void onSwipeLeftToRight() {
-		int maxIndex = currentConference.getLocations().size() - 1;
-		if (currentLocation == 0) {
-			currentLocation = maxIndex;
-		} else {
+		Location location = getPreviousLocation();
+		if (location != null) {
 			currentLocation--;
+			Intent intent = getIntent();
+			// intent.putExtra(IA_CONFERENCE, currentConference.getId());
+			intent.putExtra(IA_LOCATION_ID, currentLocation);
+			intent.removeExtra(IA_SESSION);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			overridePendingTransition(R.anim.slide_right, 0);
 		}
-		Intent intent = getIntent();
-		intent.putExtra(IA_CONFERENCE, currentConference.getId());
-		intent.putExtra(IA_LOCATION_ID, currentLocation);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		startActivity(intent);
-		overridePendingTransition(R.anim.slide_right, 0);
 	}
 
 	@Override
 	public void onSwipeRightToLeft() {
-		int maxIndex = currentConference.getLocations().size() - 1;
-		if (currentLocation == maxIndex) {
-			currentLocation = 0;
-		} else {
+		Location location = getNextLocation();
+		if (location != null) {
 			currentLocation++;
+			Intent intent = getIntent();
+			// intent.putExtra(IA_CONFERENCE, currentConference.getId());
+			intent.putExtra(IA_LOCATION_ID, currentLocation);
+			intent.removeExtra(IA_SESSION);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			overridePendingTransition(R.anim.slide_left, 0);
 		}
-		Intent intent = getIntent();
-		intent.putExtra(IA_CONFERENCE, currentConference.getId());
-		intent.putExtra(IA_LOCATION_ID, currentLocation);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		startActivity(intent);
-		overridePendingTransition(R.anim.slide_left, 0);
 	}
 
 	@Override
@@ -78,4 +92,38 @@ public abstract class SessionSwipeActivity extends SwipeActivity {
 
 	@Override
 	public void onSwipeBottomToTop() {}
+
+	protected void updateLocations() {
+		Location loc = getNextLocation();
+		TextView location = (TextView) findViewById(R.id.rightText);
+		ViewGroup group = ((ViewGroup) findViewById(R.id.nextLocationLayout));
+		if (loc == null) {
+			group.setVisibility(View.INVISIBLE);
+		} else {
+			group.setVisibility(View.VISIBLE);
+			location.setText(loc.getDescription());
+			location.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					onSwipeRightToLeft();
+				}
+			});
+		}
+		loc = getPreviousLocation();
+		location = (TextView) findViewById(R.id.leftText);
+		group = ((ViewGroup) findViewById(R.id.prevLocationLayout));
+		if (loc == null) {
+			group.setVisibility(View.INVISIBLE);
+		} else {
+			group.setVisibility(View.VISIBLE);
+			location.setText(loc.getDescription());
+			location.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					onSwipeLeftToRight();
+				}
+			});
+		}
+	}
+
 }

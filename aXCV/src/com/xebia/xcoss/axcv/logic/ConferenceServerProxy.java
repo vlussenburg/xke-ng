@@ -11,6 +11,7 @@ import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Location;
+import com.xebia.xcoss.axcv.model.Rate;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Search;
 import com.xebia.xcoss.axcv.model.Session;
@@ -165,14 +166,14 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public double getRate(Session session) {
+	public Rate getRate(Session session) {
 		try {
 			return super.getRate(session);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "get rate", e);
 		}
-		return -1;
+		return new Rate(null);
 	}
 
 	@Override
@@ -209,7 +210,7 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public void registerRate(Session session, int rate) {
+	public void registerRate(Session session, Rate rate) {
 		try {
 			super.registerRate(session, rate);
 		}

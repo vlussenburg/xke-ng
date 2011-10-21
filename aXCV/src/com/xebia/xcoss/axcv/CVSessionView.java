@@ -5,15 +5,16 @@ import java.util.Set;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Location;
+import com.xebia.xcoss.axcv.model.Rate;
 import com.xebia.xcoss.axcv.model.RatingValue;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Session;
@@ -43,19 +45,31 @@ public class CVSessionView extends SessionSwipeActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.session);
-
 		addGestureDetection(R.id.relativeLayoutLowest);
+	}
 
+	@Override
+	protected void onResume() {
 		Conference conference = getCurrentConference();
-		Location location = getCurrentLocation();
-		// TODO What if no sessions at this location ?
-		for (Session s : conference.getSessions()) {
-			if ( !s.isExpired() && s.getLocation().equals(location)) {
-				currentSession = s;
-				break;
+		currentSession = getSelectedSession(conference);
+		if ( currentSession == null ) {
+			Location location = getCurrentLocation();
+			for (Session s : conference.getSessions()) {
+				if (s.getLocation().equals(location)) {
+					currentSession = s;
+					break;
+				}
 			}
 		}
+		if ( currentSession == null ) {
+			currentSession = getDefaultSession(conference);
+		}
+		updateLocation(currentSession);
 		fill(conference);
+		updateLocations();
+		updateSessions();
+		updateRateAndReview();
+		super.onResume();
 	}
 
 	private void fill(Conference conference) {
@@ -114,13 +128,15 @@ public class CVSessionView extends SessionSwipeActivity {
 		view.setOnClickListener(lRate);
 		findViewById(R.id.scRatingLayout).setOnClickListener(lRate);
 
-		TextView view2 = (TextView) findViewById(R.id.scComments);
-		view2.setOnClickListener(lReview);
+		view = (TextView) findViewById(R.id.scComments);
+		view.setOnClickListener(lReview);
 
 		ImageView button = (ImageView) findViewById(R.id.sessionMarkButton);
-		if ( currentSession.getType() == Session.Type.BREAK ) {
-			button.setVisibility(View.INVISIBLE);
+		if (currentSession.getType() == Session.Type.BREAK || StringUtil.isEmpty(getUser())) {
+			button.setVisibility(View.GONE);
 		} else {
+			markSession(currentSession, button, false);
+			button.setVisibility(View.VISIBLE);
 			button.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
@@ -129,57 +145,24 @@ public class CVSessionView extends SessionSwipeActivity {
 			});
 		}
 	}
-
-	@Override
-	protected void onResume() {
-		refresh();
-		super.onResume();
-	}
-
-	private void refresh() {
+	
+	private void updateRateAndReview() {
 		ConferenceServer server = getConferenceServer();
 
 		TextView view = (TextView) findViewById(R.id.scRating);
 		view.setText(FormatUtil.getText(server.getRate(currentSession)));
 
-		TextView view2 = (TextView) findViewById(R.id.scComments);
+		view = (TextView) findViewById(R.id.scComments);
 		Spanned spannedContent = Html.fromHtml(FormatUtil.getHtml(server.getRemarks(currentSession)));
-		view2.setText(spannedContent, BufferType.SPANNABLE);
+		view.setText(spannedContent, BufferType.SPANNABLE);
 
-		ImageView button = (ImageView) findViewById(R.id.sessionMarkButton);
-		markSession(currentSession, button, false);
-		
-		Location loc = getNextLocation();
-		TextView location = (TextView) findViewById(R.id.rightText);
-		if ( loc == null ) {
-			location.setText("");
-		} else {
-			location.setText(loc.getDescription() + " >");
-			location.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					onSwipeRightToLeft();
-				}
-			});
-		}
-		loc = getPreviousLocation();
-		location = (TextView) findViewById(R.id.leftText);
-		if ( loc == null ) {
-			location.setText("");
-		} else {
-			location.setText("< " + loc.getDescription());
-			location.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					onSwipeLeftToRight();
-				}
-			});
-		}
+	}
 
-		Session session = getNextSession();
+	private void updateSessions() {
+		Session session = getNextSession(getCurrentLocation());
 		View viewById = findViewById(R.id.textNextSession);
 		LinearLayout layout = (LinearLayout) viewById.getParent();
-		if ( session == null ) {
+		if (session == null) {
 			layout.setVisibility(View.GONE);
 		} else {
 			layout.setVisibility(View.VISIBLE);
@@ -193,10 +176,10 @@ public class CVSessionView extends SessionSwipeActivity {
 			});
 		}
 
-		session = getPreviousSession();
+		session = getPreviousSession(getCurrentLocation());
 		viewById = findViewById(R.id.textPreviousSession);
 		layout = (LinearLayout) viewById.getParent();
-		if ( session == null ) {
+		if (session == null) {
 			layout.setVisibility(View.GONE);
 		} else {
 			layout.setVisibility(View.VISIBLE);
@@ -209,8 +192,8 @@ public class CVSessionView extends SessionSwipeActivity {
 				}
 			});
 		}
-}
-	
+	}
+
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog = null;
@@ -231,21 +214,19 @@ public class CVSessionView extends SessionSwipeActivity {
 				submit.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View paramView) {
-						int rate = 1 + seekbar.getProgress();
+						Rate rate = new Rate(1 + seekbar.getProgress());
 						getConferenceServer().registerRate(currentSession, rate);
 						dismissDialog(XCS.DIALOG.ADD_RATING);
-						refresh();
+						updateRateAndReview();
 					}
 				});
 
 				seekbar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 					@Override
-					public void onStopTrackingTouch(SeekBar paramSeekBar) {
-					}
+					public void onStopTrackingTouch(SeekBar paramSeekBar) {}
 
 					@Override
-					public void onStartTrackingTouch(SeekBar paramSeekBar) {
-					}
+					public void onStartTrackingTouch(SeekBar paramSeekBar) {}
 
 					@Override
 					public void onProgressChanged(SeekBar paramSeekBar, int paramInt, boolean paramBoolean) {
@@ -270,7 +251,7 @@ public class CVSessionView extends SessionSwipeActivity {
 						String remark = edit.getText().toString();
 						getConferenceServer().registerRemark(currentSession, new Remark(getUser(), remark));
 						dismissDialog(XCS.DIALOG.CREATE_REVIEW);
-						refresh();
+						updateRateAndReview();
 					}
 				});
 				return dialog;
@@ -312,8 +293,8 @@ public class CVSessionView extends SessionSwipeActivity {
 	}
 
 	public void onSwipeBottomToTop() {
-		Session nextSession = getNextSession();
-		if ( nextSession != null ) {
+		Session nextSession = getNextSession(getCurrentLocation());
+		if (nextSession != null) {
 			currentSession = nextSession;
 			startActivityCurrentSession();
 			overridePendingTransition(R.anim.slide_bottom_to_top, 0);
@@ -321,10 +302,10 @@ public class CVSessionView extends SessionSwipeActivity {
 			Toast.makeText(this, "No later session", Toast.LENGTH_LONG).show();
 		}
 	}
-	
+
 	public void onSwipeTopToBottom() {
-		Session previousSession = getPreviousSession();
-		if ( previousSession != null ) {
+		Session previousSession = getPreviousSession(getCurrentLocation());
+		if (previousSession != null) {
 			currentSession = previousSession;
 			startActivityCurrentSession();
 			overridePendingTransition(R.anim.slide_top_to_bottom, 0);
@@ -332,23 +313,30 @@ public class CVSessionView extends SessionSwipeActivity {
 			Toast.makeText(this, "No earlier session", Toast.LENGTH_LONG).show();
 		}
 	}
-	
-	private Session getNextSession() {
+
+	private Session getNextSession(Location location) {
 		Set<Session> sessionsSet = this.getConference().getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
 		int index = sessions.indexOf(currentSession);
-		if (index < sessions.size() - 1) {
-			return sessions.get(++index);
+		int max = sessions.size() - 1;
+		while (index < max) {
+			Session session = sessions.get(++index);
+			if ( session.getLocation().equals(location) ) {
+				return session;
+			}
 		}
 		return null;
 	}
 
-	private Session getPreviousSession() {
+	private Session getPreviousSession(Location location) {
 		Set<Session> sessionsSet = this.getConference().getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
 		int index = sessions.indexOf(currentSession);
-		if (index > 0) {
-			return sessions.get(--index);
+		while (index > 0) {
+			Session session = sessions.get(--index);
+			if ( session.getLocation().equals(location) ) {
+				return session;
+			}
 		}
 		return null;
 	}

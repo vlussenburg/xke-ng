@@ -22,7 +22,6 @@ import com.xebia.xcoss.axcv.logic.ConferenceServerProxy;
 import com.xebia.xcoss.axcv.logic.DataException;
 import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.model.Conference;
-import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.ProxyExceptionReporter;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
@@ -178,17 +177,16 @@ public abstract class BaseActivity extends Activity {
 		catch (Exception e) {
 			Log.w(LOG.ALL, "No session with ID " + identifier + " or conference not found.");
 		}
-		if (session == null) {
-			Log.w(LOG.ALL, "Conference default : " + (conference == null ? "NULL" : conference.getTitle()));
-			for (Session s : conference.getSessions()) {
-				if ( !s.isExpired() ) {
-					session = s;
-					break;
-				}
-			}
-			Log.w(LOG.ALL, "Session default " + (session == null ? "NULL" : session.getTitle()));
-		}
 		return session;
+	}
+
+	protected Session getDefaultSession(Conference conference) {
+		for (Session s : conference.getSessions()) {
+			if (!s.isExpired()) {
+				return s;
+			}
+		}
+		return conference.getSessions().iterator().next();
 	}
 
 	protected ConferenceServer getConferenceServer() {
@@ -197,8 +195,10 @@ public abstract class BaseActivity extends Activity {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			String user = sp.getString(XCS.PREF.USERNAME, null);
 			String password = SecurityUtils.decrypt(sp.getString(XCS.PREF.PASSWORD, ""));
-			server = ConferenceServer.createInstance(user, password, getServerUrl(),
-					rootActivity.getApplicationContext());
+			if (rootActivity != null) {
+				server = ConferenceServer.createInstance(user, password, getServerUrl(),
+						rootActivity.getApplicationContext());
+			}
 		}
 		return server;
 	}
@@ -302,7 +302,7 @@ public abstract class BaseActivity extends Activity {
 		throw new CommException("Failure on activity '" + activity + "': " + StringUtil.getExceptionMessage(e), e);
 	}
 
-	protected String getUser() {
+	public String getUser() {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 		String user = sp.getString(XCS.PREF.USERNAME, null);
 		return user;

@@ -132,6 +132,9 @@ public class ProfileManager extends SQLiteOpenHelper {
 	}
 
 	public boolean markSession(String user, Session session) {
+		if ( StringUtil.isEmpty(user)) {
+			return false;
+		}
 		Log.v(XCS.LOG.COMMUNICATE, "Marking session " + session.getId() + " for user " + user);
 		try {
 			checkConnection();
@@ -150,6 +153,9 @@ public class ProfileManager extends SQLiteOpenHelper {
 	}
 
 	public boolean unmarkSession(String user, Session session) {
+		if ( StringUtil.isEmpty(user)) {
+			return false;
+		}
 		Log.v(XCS.LOG.COMMUNICATE, "Unmarking session " + session.getId() + " for user " + user);
 		try {
 			checkConnection();
@@ -180,6 +186,9 @@ public class ProfileManager extends SQLiteOpenHelper {
 	}
 
 	public boolean isMarked(String user, String sessionId) {
+		if ( StringUtil.isEmpty(user)) {
+			return false;
+		}
 		Log.v(XCS.LOG.COMMUNICATE, "Check if marked " + sessionId + " for user " + user);
 		try {
 			checkConnection();
@@ -194,6 +203,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 		}
 		catch (Exception e) {
 			Log.w(XCS.LOG.COMMUNICATE, "Unmarking session failed: " + StringUtil.getExceptionMessage(e));
+			e.printStackTrace();
 			return false;
 		}
 	}

@@ -7,11 +7,11 @@ import java.util.List;
 import android.content.Context;
 
 
-public class ConferenceCacheImpl extends ConferenceCache {
+public class MemoryCache extends DataCache {
 
 	private HashMap<String, CachedObject<?>> cachedObjects;
 
-	protected ConferenceCacheImpl(Context ctx) {
+	public MemoryCache(Context ctx) {
 		super(ctx);
 		this.cachedObjects = new HashMap<String, CachedObject<?>>();
 	}

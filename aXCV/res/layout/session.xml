@@ -75,9 +75,8 @@
 				<TextView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:id="@+id/textView1"
 					android:text="Right"
-					android:paddingRight="3dp"></TextView>
+					android:paddingRight="3dp" android:id="@+id/rightText"></TextView>
 				<ImageView
 					android:id="@+id/ImageView04"
 					android:layout_width="wrap_content"
@@ -95,12 +94,11 @@
 					android:src="@drawable/arrow_left_float"
 					android:layout_height="fill_parent"></ImageView>
 				<TextView
-					android:id="@+id/textView2"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="Left"
 					android:layout_gravity="left"
-					android:paddingLeft="3dp"></TextView>
+					android:paddingLeft="3dp" android:id="@+id/leftText"></TextView>
 			</LinearLayout>
 		</FrameLayout>
 		<View

@@ -5,7 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 
-public class NoCache extends ConferenceCache {
+public class NoCache extends DataCache {
 
 	public NoCache(Context ctx) {
 		super(ctx);

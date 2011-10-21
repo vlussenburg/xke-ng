@@ -14,11 +14,13 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
-import com.xebia.xcoss.axcv.logic.cache.ConferenceCache;
-import com.xebia.xcoss.axcv.logic.cache.NoCache;
+import com.xebia.xcoss.axcv.logic.cache.DataCache;
+import com.xebia.xcoss.axcv.logic.cache.DatabaseCache;
+import com.xebia.xcoss.axcv.logic.cache.MemoryCache;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Location;
+import com.xebia.xcoss.axcv.model.Rate;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Search;
 import com.xebia.xcoss.axcv.model.Session;
@@ -40,7 +42,7 @@ public class ConferenceServer {
 
 	private static ConferenceServer instance;
 
-	private ConferenceCache conferenceCache;
+	private DataCache conferenceCache;
 
 	public static ConferenceServer getInstance() {
 		return instance;
@@ -56,7 +58,9 @@ public class ConferenceServer {
 	protected ConferenceServer(String base, Context ctx) {
 		this.baseUrl = base;
 		// TODO Make configurable
-		this.conferenceCache = new NoCache(ctx); // new PersistentConferenceCache(ctx);
+		this.conferenceCache = new DatabaseCache(ctx);
+//		this.conferenceCache = new NoCache(ctx);
+		this.conferenceCache = new MemoryCache(ctx);
 		this.conferenceCache.init();
 	}
 
@@ -349,10 +353,7 @@ public class ConferenceServer {
 		return result;
 	}
 
-	public void registerRate(Session session, int rate) {
-		// TODO Not server implemented.
-		if (true) return;
-
+	public void registerRate(Session session, Rate rate) {
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/feedback/");
@@ -362,23 +363,18 @@ public class ConferenceServer {
 		RestClient.createObject(requestUrl.toString(), rate, void.class, token);
 	}
 
-	public double getRate(Session session) {
-		// TODO Not server implemented.
-		if (true) return 0;
-
+	public Rate getRate(Session session) {
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/feedback/");
 		requestUrl.append(session.getId());
 		requestUrl.append("/rating");
 
-		return RestClient.loadObject(requestUrl.toString(), double.class, token);
+		List<Integer> list = RestClient.loadObjects(requestUrl.toString(), int.class, token);
+		return new Rate(list);
 	}
 
 	public Remark[] getRemarks(Session session) {
-		// TODO Not server implemented.
-		if (true) return new Remark[0];
-
 		String key = REMARK_CACHE_KEY + session.getId();
 		List<Remark> result = (List<Remark>) conferenceCache.getObject(key, new ArrayList<Remark>().getClass());
 		if (result == null) {
@@ -398,9 +394,6 @@ public class ConferenceServer {
 	}
 
 	public void registerRemark(Session session, Remark remark) {
-		// TODO Not server implemented.
-		if (true) return;
-
 		String key = REMARK_CACHE_KEY + session.getId();
 		conferenceCache.removeObject(key, new ArrayList<Remark>().getClass());
 		StringBuilder requestUrl = new StringBuilder();
@@ -409,7 +402,7 @@ public class ConferenceServer {
 		requestUrl.append(session.getId());
 		requestUrl.append("/comment");
 
-		RestClient.createObject(requestUrl.toString(), remark, void.class, token);
+		RestClient.createObject(requestUrl.toString(), remark, Remark.class, token);
 	}
 
 	/* Utility functions */

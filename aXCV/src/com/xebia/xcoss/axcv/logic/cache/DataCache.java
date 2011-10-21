@@ -13,10 +13,10 @@ import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.XCS;
 
-public abstract class ConferenceCache {
+public abstract class DataCache {
 	protected static final long CACHETIME = 30 * 60 * 1000;
 
-	public ConferenceCache(Context ctx) {
+	public DataCache(Context ctx) {
 	}
 
 	public <T> T getObject(String key, Class<T> type) {
