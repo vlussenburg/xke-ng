@@ -124,7 +124,7 @@ case class Conference(val _id: ObjectId, title: String, begin: DateTime, end: Da
 /**
  * Represents a Session at a location. A Session contains time, space and session properties.
  */
-case class Session(val id: Long, val start: DateTime, val end: DateTime, val location: Location, val title: String, val description: String, sessionType: String, val limit: String, authors: List[Author], ratings: List[Rating], comments: List[Comment]) extends ToJsonSerializer[Session] {
+case class Session(val id: Long, val start: DateTime, val end: DateTime, val location: Location, val title: String, val description: String, sessionType: String, val limit: String, authors: List[Author], ratings: List[Rating], comments: List[Comment], labels:Set[String]) extends ToJsonSerializer[Session] {
   def period = new Period(start.getMillis, end.getMillis)
   
   def addComment(comment:Comment):Session = copy(comments = comment :: comments)
@@ -144,16 +144,19 @@ case class Session(val id: Long, val start: DateTime, val end: DateTime, val loc
 object Session extends FromJsonDeserializer[Session] {
 
   def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String) = {
-    new Session(nextSeq, start, end, location, title, description, sessionType, limit, Nil, Nil, Nil)
+    new Session(nextSeq, start, end, location, title, description, sessionType, limit, Nil, Nil, Nil, Set.empty)
   }
   def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String, authors: List[Author]) = {
-    new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors, Nil, Nil)
+    new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors, Nil, Nil, Set.empty)
   }
   def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String, authors: List[Author], ratings: List[Rating]) = {
-    new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors, ratings, Nil)
+    new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors, ratings, Nil, Set.empty)
   }
   def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String, authors: List[Author], ratings: List[Rating], comments: List[Comment]) = {
-    new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors, ratings, comments)
+    new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors, ratings, comments, Set.empty)
+  }
+  def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String, authors: List[Author], ratings: List[Rating], comments: List[Comment], labels:Set[String]) = {
+    new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors, ratings, comments, labels)
   }
 
 }

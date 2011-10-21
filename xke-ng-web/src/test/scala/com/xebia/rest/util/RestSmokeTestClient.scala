@@ -23,6 +23,7 @@ import com.xebia.xkeng.rest.JsonDomainConverters._
 object RestSmokeTestClient {
 
   val host = "localhost"
+  //val host = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com"
   val port = 8080
   val http = new Http
 
@@ -61,11 +62,11 @@ object RestSmokeTestClient {
   }
 
   def rateSession(sessionId: Long, rate: Rating): List[Int] = {
-    update("feedback/" + sessionId + "/rating", ("rate" -> rate.rate),fromRatingListJson(_))
+    add("feedback/" + sessionId + "/rating", ("rate" -> rate.rate))(fromRatingListJson(_))
   }
 
    def commentSession(sessionId: Long, comment: Comment): List[Comment] = {
-    update("feedback/" + sessionId + "/comment", ("comment" -> comment.comment), fromCommentListJson(_))
+    add("feedback/" + sessionId + "/comment", ("comment" -> comment.comment))(fromCommentListJson(_))
   }
 
   

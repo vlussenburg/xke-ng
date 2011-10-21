@@ -135,14 +135,14 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     // GET /feedback/<id>/comment
     case Req("feedback" :: AsLong(sessionId) :: "comment" :: Nil, _, GetRequest) =>
       readComments(sessionId)
-    // PUT /feedback/<id>/comment
-    case req @ Req("feedback" :: AsLong(sessionId) :: "comment" :: Nil, _, PutRequest) =>
+    // POST /feedback/<id>/comment
+    case req @ Req("feedback" :: AsLong(sessionId) :: "comment" :: Nil, _, PostRequest) =>
       handleCommentCreate(sessionId, req.body.toOption)
     // GET /feedback/<id>/rating
     case Req("feedback" :: AsLong(sessionId) :: "rating" :: Nil, _, GetRequest) =>
       readRatings(sessionId)
-    // PUT /feedback/<id>/rating
-    case req @ Req("feedback" :: AsLong(sessionId) :: "rating" :: Nil, _, PutRequest) =>
+    // POST /feedback/<id>/rating
+    case req @ Req("feedback" :: AsLong(sessionId) :: "rating" :: Nil, _, PostRequest) =>
       handleRatingCreate(sessionId, req.body.toOption)
   }
 

@@ -113,7 +113,7 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
         }
     }"""
     val result = fromSessionJson(true)(jsonString)
-    val Session(id, start, end, location, title, descr, sessionType, limit, authors, _, _) = result //use pattern-matching to bind the values
+    val Session(id, start, end, location, title, descr, sessionType, limit, authors, _, _, _) = result //use pattern-matching to bind the values
     authors.isEmpty should be(true)
     title should be("The power of Android")
     descr should be("Android descr")
@@ -158,7 +158,7 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     	}
     ] }"""
     val result = fromSessionJson(true)(jsonString)
-    val Session(id, start, end, location, title, descr, sessionType, limit, authors, ratings, comments) = result //use pattern-matching to bind the values
+    val Session(id, start, end, location, title, descr, sessionType, limit, authors, ratings, comments, _) = result //use pattern-matching to bind the values
     authors.size should be(2)
     title should be("The power of Android")
     descr should be("Android descr")

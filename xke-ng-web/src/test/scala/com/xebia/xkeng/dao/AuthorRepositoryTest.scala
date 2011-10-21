@@ -11,7 +11,7 @@ import org.joda.time.format._
 import com.xebia.xkeng.dao.RepositoryTestAssembly._
 
 @RunWith(classOf[JUnitRunner])
-class authorRepositoryTest extends FlatSpec with ShouldMatchers with BeforeAndAfterEach with MongoTestConnection {
+class AuthorRepositoryTest extends FlatSpec with ShouldMatchers with BeforeAndAfterEach with MongoTestConnection {
 
   val a1 = Author("peteru", "upeter@xebia.com", "Urs Peter")
   val a2 = Author("amooy", "amooy@xebia.com", "Age Mooy")
