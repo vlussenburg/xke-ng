@@ -71,13 +71,30 @@ public abstract class DataCache {
 		return checkValid(doGetCachedObject(id, Session.class));
 	}
 
-	public void add(Session result) {
+	public List<Session> getSessions(String id) {
+		ArrayList<Session> sessions = new ArrayList<Session>();
+		for (CachedObject<Session> co : doGetCachedObjects(Session.class)) {
+			if (co.object.getConferenceId().equals(id)) {
+				sessions.add(checkValid(co, false));
+			}
+		}
+		return sessions;
+	}
+
+	public void add(String conferenceId, Session result) {
+		result.setConferenceId(conferenceId);
 		doPutCachedObject(result.getId(), new CachedObject<Session>(result));
 	}
 
+	public void add(String conferenceId, Iterable<Session> result) {
+		for (Session session : result) {
+			add(conferenceId, session);
+		}
+	}
 	public void add(Conference result) {
 		CachedObject<Conference> cachedObject = new CachedObject<Conference>(result);
 		doPutCachedObject(result.getId(), cachedObject);
+		add(result.getId(), result.getSessions());
 	}
 
 	public <T> void addObject(String key, T o) {
@@ -90,10 +107,9 @@ public abstract class DataCache {
 
 	public void remove(Conference conference) {
 		doRemoveCachedObject(conference.getId(), Conference.class);
-	}
-
-	public void removeConference(String id) {
-		doRemoveCachedObject(id, Conference.class);
+		for (Session session : conference.getSessions()) {
+			remove(session);
+		}
 	}
 
 	public void removeObject(String key, Class<?> type) {
@@ -124,6 +140,10 @@ public abstract class DataCache {
 	}
 
 	protected <T> T checkValid(CachedObject<T> co) {
+		return checkValid(co, true);
+	}
+	
+	protected <T> T checkValid(CachedObject<T> co, boolean discard) {
 		if (co == null) {
 			return null;
 		}
@@ -131,7 +151,7 @@ public abstract class DataCache {
 		if (co.dirty || (co.moment + CACHETIME) < now) {
 			Log.d(XCS.LOG.CACHE, "Cache hit, but dirty: " + co.object);
 			co.dirty = true;
-			return null;
+			return discard ? null : co.object;
 		}
 		Log.d(XCS.LOG.CACHE, "Cache hit: " + co.object);
 		return co.object;

@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
@@ -50,6 +51,7 @@ public abstract class BaseActivity extends Activity {
 
 	private static Activity rootActivity;
 	private static ProfileManager profileManager;
+	private static String lastError;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +99,9 @@ public abstract class BaseActivity extends Activity {
 		// miList = menu.add(0, XCS.MENU.OVERVIEW, Menu.NONE, R.string.menu_overview);
 		miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
 		miSearch = menu.add(0, XCS.MENU.SEARCH, Menu.NONE, R.string.menu_search);
-		miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
+		if (!StringUtil.isEmpty(getUser())) {
+			miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
+		}
 		miExit = menu.add(0, XCS.MENU.EXIT, Menu.NONE, R.string.menu_exit);
 
 		miAdd.setIcon(android.R.drawable.ic_menu_add);
@@ -195,8 +199,8 @@ public abstract class BaseActivity extends Activity {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			String user = sp.getString(XCS.PREF.USERNAME, null);
 			String password = SecurityUtils.decrypt(sp.getString(XCS.PREF.PASSWORD, ""));
-			server = ConferenceServer.createInstance(user, password, getServerUrl(),
-					rootActivity == null ? null : rootActivity.getApplicationContext());
+			server = ConferenceServer.createInstance(user, password, getServerUrl(), rootActivity == null ? null
+					: rootActivity.getApplicationContext());
 		}
 		return server;
 	}
@@ -270,6 +274,7 @@ public abstract class BaseActivity extends Activity {
 		if (e instanceof DataException) {
 			if (((DataException) e).missing()) {
 				Log.w(XCS.LOG.COMMUNICATE, "No result for '" + activity + "'.");
+				lastError = "Not found: " + activity;
 			} else {
 				// Authentication failure
 				if (context != null) {
@@ -292,6 +297,7 @@ public abstract class BaseActivity extends Activity {
 					builder.create().show();
 				} else {
 					Log.e(XCS.LOG.COMMUNICATE, "Resource not found while " + activity + ".");
+					lastError = "Not allowed: " + activity;
 				}
 			}
 			return;

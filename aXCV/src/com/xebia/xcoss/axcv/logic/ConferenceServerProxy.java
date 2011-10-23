@@ -65,9 +65,9 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public void deleteSession(Session session, String conferenceId) {
+	public void deleteSession(Session session) {
 		try {
-			super.deleteSession(session, conferenceId);
+			super.deleteSession(session);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "delete session", e);
@@ -82,10 +82,7 @@ public class ConferenceServerProxy extends ConferenceServer {
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "get authors", e);
 		}
-		// TODO : Need implementation on server
-		Author[] authors = new Author[1];
-		authors[0] = new Author("1", "Empty author", "info@xebia.com", "+3130723884");
-		return authors;
+		return new Author[0];
 	}
 
 	@Override

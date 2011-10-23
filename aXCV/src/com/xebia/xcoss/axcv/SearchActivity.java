@@ -75,7 +75,7 @@ public abstract class SearchActivity extends SwipeActivity {
 			@Override
 			public void onClick(View paramView) {
 				String text = input.getText().toString();
-
+				input.setText("");
 				authorResults.clear();
 				authorResults.addAll(searchAuthors(text));
 				authorAdapter.notifyDataSetChanged();

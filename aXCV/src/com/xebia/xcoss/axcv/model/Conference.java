@@ -25,7 +25,8 @@ import com.xebia.xcoss.axcv.util.XCS;
 public class Conference implements Serializable {
 
 	public class TimeSlot {
-		public static final int LENGTH = 30;
+		public static final int LENGTH = 60;
+		public static final int MIN_LENGTH = 5;
 		public DateTime start;
 		public DateTime end;
 		public Location location;
@@ -222,7 +223,7 @@ public class Conference implements Serializable {
 			sessions.remove(session);
 		}
 		try {
-			ConferenceServer.getInstance().deleteSession(session, getId());
+			ConferenceServer.getInstance().deleteSession(session);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(null, "deleting session", e);
@@ -293,21 +294,22 @@ public class Conference implements Serializable {
 		return null;
 	}
 
-	public SortedSet<TimeSlot> getAvailableTimeSlots() {
+	public SortedSet<TimeSlot> getAvailableTimeSlots(int duration) {
 		TreeSet<TimeSlot> list = new TreeSet<TimeSlot>(new TimeSlotComparator());
 		for (Location loc : locations) {
-			list.addAll(getAvailableTimeSlots(loc));
+			list.addAll(getAvailableTimeSlots(duration, loc));
 		}
 		return list;
 	}
 
-	public SortedSet<TimeSlot> getAvailableTimeSlots(Location loc) {
+	public SortedSet<TimeSlot> getAvailableTimeSlots(int duration, Location loc) {
 		TreeSet<TimeSlot> list = new TreeSet<TimeSlot>(new TimeSlotComparator());
 		TimeSlot t;
+		int length = duration < TimeSlot.MIN_LENGTH ? TimeSlot.LENGTH : duration;
 		DateTime start = startTime;
-		while ((t = getNextAvailableTimeSlot(start, TimeSlot.LENGTH, loc)) != null) {
+		while ((t = getNextAvailableTimeSlot(start, length, loc)) != null) {
 			list.add(t);
-			start = start.plus(0, 0, 0, 0, TimeSlot.LENGTH, 0, DayOverflow.Spillover);
+			start = start.plus(0, 0, 0, 0, length, 0, DayOverflow.Spillover);
 		}
 		return list;
 	}

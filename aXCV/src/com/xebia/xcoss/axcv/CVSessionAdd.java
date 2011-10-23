@@ -272,7 +272,7 @@ public class CVSessionAdd extends AdditionActivity {
 					session.setEndTime(session.getStartTime().plus(0, 0, 0, 0, session.getDuration(), 0,
 							DayOverflow.Spillover));
 				}
-				if ( session.getLocation() == null ) {
+				if (session.getLocation() == null) {
 					session.setLocation(t.location);
 				}
 			case R.id.sessionDuration:
@@ -347,9 +347,13 @@ public class CVSessionAdd extends AdditionActivity {
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.INPUT_TIME_START:
-				Set<TimeSlot> tslist = session.getLocation() == null ? conference.getAvailableTimeSlots() : conference
-						.getAvailableTimeSlots(session.getLocation());
-				
+				Set<TimeSlot> tslist = null;
+				if (session.getLocation() == null) {
+					tslist = conference.getAvailableTimeSlots(session.getDuration());
+				} else {
+					tslist = conference.getAvailableTimeSlots(session.getDuration(), session.getLocation());
+				}
+
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Pick a start time");
 				if (tslist.size() == 0) {
@@ -434,7 +438,7 @@ public class CVSessionAdd extends AdditionActivity {
 			break;
 			case XCS.DIALOG.INPUT_LIMIT:
 				tid = (TextInputDialog) dialog;
-				tid.setDescription("Audience limit");
+				tid.setDescription("Number of people");
 				tid.setValue(session.getLimit());
 			break;
 			case XCS.DIALOG.INPUT_DESCRIPTION:

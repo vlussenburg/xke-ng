@@ -58,8 +58,8 @@ public class ConferenceServer {
 	protected ConferenceServer(String base, Context ctx) {
 		this.baseUrl = base;
 		// TODO Make configurable
-		this.conferenceCache = new DatabaseCache(ctx);
-//		this.conferenceCache = new NoCache(ctx);
+		// this.conferenceCache = new DatabaseCache(ctx);
+		// this.conferenceCache = new NoCache(ctx);
 		this.conferenceCache = new MemoryCache(ctx);
 		this.conferenceCache.init();
 	}
@@ -117,9 +117,6 @@ public class ConferenceServer {
 			}
 		}
 		Collections.sort(result, new ConferenceComparator());
-		for (Conference conference : result) {
-			Log.w(LOG.ALL, "[result] " + conference);
-		}
 		return result;
 	}
 
@@ -151,53 +148,47 @@ public class ConferenceServer {
 	}
 
 	public String storeConference(Conference conference, boolean create) {
-		conferenceCache.remove(conference);
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/conference");
 
+		conferenceCache.remove(conference);
 		if (create) {
-			Conference created = RestClient.createObject(requestUrl.toString(), conference, Conference.class, token);
-			return created.getId();
+			conference = RestClient.createObject(requestUrl.toString(), conference, Conference.class, token);
+		} else {
+			conference = RestClient.updateObject(requestUrl.toString(), conference, token);
 		}
-		RestClient.updateObject(requestUrl.toString(), conference, token);
+		conferenceCache.add(conference);
 		return conference.getId();
 	}
 
 	public void deleteConference(Conference conference) {
-		conferenceCache.remove(conference);
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/conference/");
 		requestUrl.append(conference.getId());
 
+		conferenceCache.remove(conference);
 		RestClient.deleteObject(requestUrl.toString(), token);
 	}
 
 	public List<Session> getSessions(Conference conference) {
-		Class<?> type = Array.newInstance(Session.class, 0).getClass();
-		Session[] sessions = (Session[]) conferenceCache.getObject(conference.getId(), type);
-		if (sessions != null) {
-			return Arrays.asList(sessions);
-		}
-
-		StringBuilder requestUrl = new StringBuilder();
-		requestUrl.append(baseUrl);
-		requestUrl.append("/conference/");
-		requestUrl.append(conference.getId());
-		requestUrl.append("/sessions");
-
-		List<Session> result = RestClient.loadObjects(requestUrl.toString(), Session.class, token);
+		List<Session> result = conferenceCache.getSessions(conference.getId());
 		if (result == null) {
-			return new ArrayList<Session>();
-		}
+			StringBuilder requestUrl = new StringBuilder();
+			requestUrl.append(baseUrl);
+			requestUrl.append("/conference/");
+			requestUrl.append(conference.getId());
+			requestUrl.append("/sessions");
 
-		conferenceCache.addObject(conference.getId(), result.toArray(new Session[result.size()]));
-		for (Session session : result) {
-			conferenceCache.add(session);
-		}
+			result = RestClient.loadObjects(requestUrl.toString(), Session.class, token);
+			if (result == null) {
+				return new ArrayList<Session>();
+			}
 
-		Collections.sort(result, new SessionComparator());
+			conferenceCache.add(conference.getId(), result);
+			Collections.sort(result, new SessionComparator());
+		}
 		return result;
 	}
 
@@ -210,14 +201,12 @@ public class ConferenceServer {
 			requestUrl.append(id);
 
 			result = RestClient.loadObject(requestUrl.toString(), Session.class, token);
-			conferenceCache.add(result);
+			// Not added to the cache, since we do not know the conference ID
 		}
 		return result;
 	}
 
 	public String storeSession(Session session, String conferenceId, boolean create) {
-		conferenceCache.remove(session);
-		conferenceCache.removeConference(conferenceId);
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/conference/");
@@ -225,15 +214,16 @@ public class ConferenceServer {
 		requestUrl.append("/session");
 
 		if (create) {
-			return RestClient.createObject(requestUrl.toString(), session, String.class, token);
+			session = RestClient.createObject(requestUrl.toString(), session, Session.class, token);
+		} else {
+			session = RestClient.updateObject(requestUrl.toString(), session, token);
 		}
-		RestClient.updateObject(requestUrl.toString(), session, token);
+		conferenceCache.add(conferenceId, session);
 		return session.getId();
 	}
 
-	public void deleteSession(Session session, String conferenceId) {
+	public void deleteSession(Session session) {
 		conferenceCache.remove(session);
-		conferenceCache.remove(conferenceCache.getConference(conferenceId));
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/session/");

@@ -44,7 +44,7 @@ public class Session implements Serializable {
 	private String description;
 	private DateTime startTime;
 	private DateTime endTime;
-	private String limit;
+	private String limit = "Unlimited";
 	private Type type = Type.STANDARD;
 	private Set<Author> authors;
 	private Location location;
@@ -52,10 +52,12 @@ public class Session implements Serializable {
 	// private DateTime lastUpdate;
 	// private DateTime lastReschedule;
 
+	private Set<String> labels;
+	private transient String conferenceId;
+	
 	// TODO : Not mapped at all at the moment...
 	private String intendedAudience;
 	private String preparation;
-	private Set<String> labels;
 	private Set<String> languages;
 
 	public Session() {
@@ -246,8 +248,11 @@ public class Session implements Serializable {
 		if (location == null) {
 			messages.add("Location");
 		}
-		if (limit == null) {
-			messages.add("Limit");
+		if (StringUtil.isEmpty(limit)) {
+			messages.add("Number of people");
+		}
+		if (StringUtil.isEmpty(description)) {
+			messages.add("Description");
 		}
 		return (messages.size() == 0);
 	}
@@ -337,5 +342,13 @@ public class Session implements Serializable {
 	public long getModificationHash() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	public void setConferenceId(String conferenceId) {
+		this.conferenceId = conferenceId;
+	}
+	
+	public String getConferenceId() {
+		return conferenceId;
 	}
 }

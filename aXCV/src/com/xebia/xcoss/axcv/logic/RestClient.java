@@ -131,7 +131,11 @@ public class RestClient {
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
-			Log.d(LOG.COMMUNICATE, "PUT (update) to '" + url + "':\n" + postData);
+			Log.d(LOG.COMMUNICATE, "PUT (update) to '" + url + "':");
+			String[] split = postData.split(",");
+			for (int i = 0; i < split.length; i++) {
+				Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
+			}
 			reader = getReader(new HttpPut(url), postData, token);
 			T result = getGson().fromJson(reader, (Class<T>) object.getClass());
 			// TODO : Id changes....

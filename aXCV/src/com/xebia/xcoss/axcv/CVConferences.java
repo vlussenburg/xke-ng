@@ -46,22 +46,8 @@ public class CVConferences extends SwipeActivity {
 		setContentView(R.layout.conferences);
 		addGestureDetection(R.id.conferencesSwipeBase);
 		super.onCreate(savedInstanceState);
-
+		
 		shownYear = getIntent().getIntExtra(IA_CONF_YEAR, DateTime.today(XCS.TZ).getYear());
-
-		List<Conference> list = getConferenceServer().getConferences(shownYear);
-		final Conference[] conferences = list.toArray(new Conference[list.size()]);
-		ConferenceAdapter adapter = new ConferenceAdapter(this, R.layout.conference_item, conferences);
-		ListView conferencesList = (ListView) findViewById(R.id.conferencesList);
-		conferencesList.setAdapter(adapter);
-		conferencesList.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
-				// Adapter = listview, view = tablelayout.
-				switchTo(conferences[paramInt]);
-			}
-		});
 
 		// Check for redirection. Not the case if menu option is used.
 		if (getIntent().getBooleanExtra(IA_REDIRECT, true)) {
@@ -74,6 +60,23 @@ public class CVConferences extends SwipeActivity {
 
 		TextView title = (TextView) findViewById(R.id.conferencesTitle);
 		title.setText(title.getText() + " " + shownYear);
+	}
+
+	@Override
+	protected void onResume() {
+		List<Conference> list = getConferenceServer().getConferences(shownYear);
+		final Conference[] conferences = list.toArray(new Conference[list.size()]);
+		ConferenceAdapter adapter = new ConferenceAdapter(this, R.layout.conference_item, conferences);
+		ListView conferencesList = (ListView) findViewById(R.id.conferencesList);
+		conferencesList.setAdapter(adapter);
+		conferencesList.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
+				// Adapter = listview, view = tablelayout.
+				switchTo(conferences[paramInt]);
+			}
+		});
+		super.onResume();
 	}
 
 	private void switchTo(Conference conference) {
