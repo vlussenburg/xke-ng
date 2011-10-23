@@ -6,6 +6,6 @@ conferenceID=4ea26b84e4b0777b9acd36c4
 curl $applicationURL/conference/$conferenceID > updateConference.json
 cat updateConference.json | sed 's/XKE/TED/' > updatedConference.json
 
-curl -X PUT -d @updatedConference.json $applicationURL/conference
+curl -X PUT -d @updatedConference.json $applicationURL/conference/$conferenceID
 
 rm *.json

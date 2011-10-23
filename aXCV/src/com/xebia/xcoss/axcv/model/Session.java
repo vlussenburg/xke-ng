@@ -38,6 +38,8 @@ public class Session implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	public static final int DEFAULT_DURATION = 60;
+
 	// Auto mapped
 	private String id;
 	private String title;
@@ -218,7 +220,7 @@ public class Session implements Serializable {
 	}
 
 	public int getDuration() {
-		int duration = 60;
+		int duration = DEFAULT_DURATION;
 		if (startTime != null && endTime != null) {
 			int start = startTime.getHour() * 60 + startTime.getMinute();
 			int end = endTime.getHour() * 60 + endTime.getMinute();

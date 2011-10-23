@@ -156,6 +156,8 @@ public class ConferenceServer {
 		if (create) {
 			conference = RestClient.createObject(requestUrl.toString(), conference, Conference.class, token);
 		} else {
+			requestUrl.append('/');
+			requestUrl.append(conference.getId());
 			conference = RestClient.updateObject(requestUrl.toString(), conference, token);
 		}
 		conferenceCache.add(conference);
@@ -216,6 +218,9 @@ public class ConferenceServer {
 		if (create) {
 			session = RestClient.createObject(requestUrl.toString(), session, Session.class, token);
 		} else {
+			// TODO should be conforming to other functions
+//			requestUrl.append('/');
+//			requestUrl.append(session.getId());
 			session = RestClient.updateObject(requestUrl.toString(), session, token);
 		}
 		conferenceCache.add(conferenceId, session);

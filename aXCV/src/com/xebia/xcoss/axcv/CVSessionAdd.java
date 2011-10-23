@@ -167,6 +167,8 @@ public class CVSessionAdd extends AdditionActivity {
 							.show();
 					return;
 				}
+				Log.w(XCS.LOG.ALL, "* Start = " + session.getStartTime());
+				Log.w(XCS.LOG.ALL, "* Eind  = " + session.getEndTime());
 				if (!conference.addSession(session, create)) {
 					Log.e(LOG.ALL, "Adding session failed.");
 					createDialog("No session added", "Session could not be added.").show();
@@ -220,7 +222,7 @@ public class CVSessionAdd extends AdditionActivity {
 		Iterator<Location> iterator = locations.iterator();
 		while (slot == null && iterator.hasNext()) {
 			Location next = iterator.next();
-			slot = conference.getNextAvailableTimeSlot(session.getStartTime(), duration, next);
+			slot = conference.getNextAvailableTimeSlot(session, session.getStartTime(), duration, next);
 			Log.v("XCS", "Reschedule ["
 					+ session.getStartTime()
 					+ ", "
@@ -239,6 +241,7 @@ public class CVSessionAdd extends AdditionActivity {
 
 		if (slot != null) {
 			session.setStartTime(conference.getDate());
+			session.setEndTime(conference.getDate());
 			session.setStartTime(slot.start);
 			session.setEndTime(slot.end);
 			session.setLocation(slot.location);
@@ -268,19 +271,22 @@ public class CVSessionAdd extends AdditionActivity {
 			case R.id.sessionStart:
 				TimeSlot t = (TimeSlot) selection;
 				session.setStartTime(t.start);
-				if (session.getEndTime() == null) {
-					session.setEndTime(session.getStartTime().plus(0, 0, 0, 0, session.getDuration(), 0,
-							DayOverflow.Spillover));
-				}
-				if (session.getLocation() == null) {
-					session.setLocation(t.location);
-				}
+				rescheduleSession(0);
+//				if (session.getEndTime() == null) {
+//					int duration = session.getDuration();
+//					if ( duration == 0 ) { duration = Session.DEFAULT_DURATION; }
+//					session.setEndTime(session.getStartTime().plus(0, 0, 0, 0, duration, 0,
+//							DayOverflow.Spillover));
+//				}
+//				if (session.getLocation() == null) {
+//					session.setLocation(t.location);
+//				}
 			case R.id.sessionDuration:
 				int duration = StringUtil.getFirstInteger(value);
-				if (session.getStartTime() == null) {
+//				if (session.getStartTime() == null) {
 					rescheduleSession(duration);
-				}
-				session.setEndTime(session.getStartTime().plus(0, 0, 0, 0, duration, 0, DayOverflow.Spillover));
+//				}
+//				session.setEndTime(session.getStartTime().plus(0, 0, 0, 0, duration, 0, DayOverflow.Spillover));
 			break;
 			case R.id.sessionLanguage:
 				Set<String> languages = session.getLanguages();
@@ -315,6 +321,8 @@ public class CVSessionAdd extends AdditionActivity {
 			default:
 				Log.w(LOG.NAVIGATE, "Don't know how to process: " + field);
 		}
+		Log.w(XCS.LOG.ALL, "Start = " + session.getStartTime());
+		Log.w(XCS.LOG.ALL, "Eind  = " + session.getEndTime());
 		showSession();
 	}
 

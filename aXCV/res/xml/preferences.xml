@@ -10,8 +10,7 @@
 			android:dialogMessage="Specify your account name"
 			android:key="Username"
 			android:title="Username"
-			android:summary="(not specified)"
-			android:defaultValue="account" />
+			android:summary="(not specified)" />
 		<com.xebia.xcoss.axcv.preference.EditPasswordPreference
 			android:dialogTitle="Enter password"
 			android:dialogMessage="This password is stored encrypted"
@@ -19,14 +18,6 @@
 			android:password="true"
 			android:title="Password"
 			android:summary="None set" />
-<!-- 
-		<CheckBoxPreference
-			android:dependency="Username"
-			android:key="StorePassword"
-			android:title="Store Password"
-			android:defaultValue="true"
-			android:summary="Save the password encrypted on the device" />
- -->
    	</PreferenceCategory>
 	<PreferenceCategory
 		android:title="Preferences">

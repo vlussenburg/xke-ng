@@ -206,7 +206,6 @@ public class Conference implements Serializable {
 	 */
 	public boolean addSession(Session session, boolean create) {
 		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + getTitle());
-		session.setStartTime(startTime);
 		try {
 			String id = ConferenceServer.getInstance().storeSession(session, getId(), create);
 			resetSessions();
@@ -260,12 +259,13 @@ public class Conference implements Serializable {
 		}
 	}
 
-	public TimeSlot getNextAvailableTimeSlot(DateTime start, int duration, Location location) {
+	// TODO : Allow current session to be overwritten
+	public TimeSlot getNextAvailableTimeSlot(Session rescheduleSession, DateTime start, int duration, Location location) {
 
 		int prefstart = Math.max(getTime(start), getTime(startTime));
 
 		for (Session session : getSessions()) {
-			if (!location.equals(session.getLocation())) {
+			if (!location.equals(session.getLocation()) || session.equals(rescheduleSession)) {
 				continue;
 			}
 			int sesstart = getTime(session.getStartTime());
@@ -307,7 +307,7 @@ public class Conference implements Serializable {
 		TimeSlot t;
 		int length = duration < TimeSlot.MIN_LENGTH ? TimeSlot.LENGTH : duration;
 		DateTime start = startTime;
-		while ((t = getNextAvailableTimeSlot(start, length, loc)) != null) {
+		while ((t = getNextAvailableTimeSlot(null, start, length, loc)) != null) {
 			list.add(t);
 			start = start.plus(0, 0, 0, 0, length, 0, DayOverflow.Spillover);
 		}

@@ -43,7 +43,6 @@ public abstract class BaseActivity extends Activity {
 
 	private MenuItem miSettings;
 	private MenuItem miSearch;
-	private MenuItem miList;
 	private MenuItem miAdd;
 	private MenuItem miEdit;
 	private MenuItem miTrack;
@@ -96,11 +95,11 @@ public abstract class BaseActivity extends Activity {
 
 		miAdd = menu.add(0, XCS.MENU.ADD, Menu.NONE, R.string.menu_add);
 		miEdit = menu.add(0, XCS.MENU.EDIT, Menu.NONE, R.string.menu_edit);
-		// miList = menu.add(0, XCS.MENU.OVERVIEW, Menu.NONE, R.string.menu_overview);
 		miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
 		miSearch = menu.add(0, XCS.MENU.SEARCH, Menu.NONE, R.string.menu_search);
 		if (!StringUtil.isEmpty(getUser())) {
 			miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
+			miTrack.setIcon(android.R.drawable.ic_menu_agenda);
 		}
 		miExit = menu.add(0, XCS.MENU.EXIT, Menu.NONE, R.string.menu_exit);
 
@@ -108,8 +107,6 @@ public abstract class BaseActivity extends Activity {
 		miEdit.setIcon(android.R.drawable.ic_menu_edit);
 		miSettings.setIcon(android.R.drawable.ic_menu_preferences);
 		miSearch.setIcon(android.R.drawable.ic_menu_search);
-		// miList.setIcon(R.drawable.ic_menu_list);
-		miTrack.setIcon(android.R.drawable.ic_menu_agenda);
 		miExit.setIcon(R.drawable.ic_menu_exit);
 
 		return true;
@@ -310,5 +307,11 @@ public abstract class BaseActivity extends Activity {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 		String user = sp.getString(XCS.PREF.USERNAME, null);
 		return user;
+	}
+	
+	public static String getLastError() {
+		String error = lastError;
+		lastError = null;
+		return error;
 	}
 }
