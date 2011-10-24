@@ -14,21 +14,22 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.xebia.xcoss.axcv.model.Author;
+import com.xebia.xcoss.axcv.ui.LabelAdapter;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class CVSearchLabel extends BaseActivity {
 
 	private List<String> selectedLabels;
-	private ArrayAdapter<String> listAdapter;
+	private LabelAdapter labelAdapter;
 	private AutoCompleteTextView view;
 	private Set<String> allLabels;
 
@@ -37,7 +38,6 @@ public class CVSearchLabel extends BaseActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.search_items);
 		view = (AutoCompleteTextView) findViewById(R.id.ssa_text);
-		ListView labelList = (ListView) findViewById(R.id.ssa_list);
 		final String startText = getResources().getString(R.string.default_input_text);
 		view.setSelection(0, startText.length());
 		initSelectedLabels();
@@ -79,15 +79,6 @@ public class CVSearchLabel extends BaseActivity {
 
 		});
 
-		listAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, selectedLabels);
-		labelList.setAdapter(listAdapter);
-		labelList.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> adapter, View view, int i, long l) {
-				listAdapter.remove(listAdapter.getItem(i));
-				Toast.makeText(getApplicationContext(), "Label removed", Toast.LENGTH_SHORT).show();
-			}
-		});
 		super.onCreate(savedInstanceState);
 	}
 
@@ -105,7 +96,7 @@ public class CVSearchLabel extends BaseActivity {
 			selectedLabels.add(name);
 			Collections.sort(selectedLabels);
 		}
-		listAdapter.notifyDataSetChanged();
+		labelAdapter.notifyDataSetChanged();
 		return allLabels.contains(name);
 	}
 
@@ -121,7 +112,7 @@ public class CVSearchLabel extends BaseActivity {
 				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						selectedLabels.remove(name);
-						listAdapter.notifyDataSetChanged();
+						labelAdapter.notifyDataSetChanged();
 						dialog.dismiss();
 					}
 				});
@@ -141,6 +132,15 @@ public class CVSearchLabel extends BaseActivity {
 	}
 
 	@Override
+	protected void onResume() {
+		initSelectedLabels();
+		labelAdapter = new LabelAdapter(this, R.layout.author_item_small, selectedLabels);
+		ListView labelList = (ListView) findViewById(R.id.ssa_list);
+		labelList.setAdapter(labelAdapter);
+		super.onResume();
+	}
+	
+	@Override
 	public void onBackPressed() {
 		addLabel(view.getText().toString());
 		Intent result = new Intent();
@@ -150,7 +150,17 @@ public class CVSearchLabel extends BaseActivity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		return true;
+	public boolean onContextItemSelected(MenuItem menuItem) {
+		int position = menuItem.getGroupId();
+		
+		switch (menuItem.getItemId()) {
+			case R.id.remove:
+				selectedLabels.remove(position);
+				labelAdapter.notifyDataSetChanged();
+				Toast.makeText(getApplicationContext(), "Label removed", Toast.LENGTH_SHORT).show();
+				return true;
+			default:
+				return super.onContextItemSelected(menuItem);
+		}		
 	}
 }
