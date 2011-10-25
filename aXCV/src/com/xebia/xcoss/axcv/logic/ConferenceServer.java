@@ -189,7 +189,6 @@ public class ConferenceServer {
 			}
 
 			conferenceCache.add(conference.getId(), result);
-			Collections.sort(result, new SessionComparator());
 		}
 		return result;
 	}

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +34,7 @@ import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
+import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class CVSessionView extends SessionSwipeActivity {
 
@@ -158,6 +160,9 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	private void updateSessions() {
 		Session session = getNextSession(getCurrentLocation());
+//		Log.i(XCS.LOG.NAVIGATE, "Find sessions at " + getCurrentLocation());
+//		Log.i(XCS.LOG.NAVIGATE, "Current session = " + currentSession);
+//		Log.i(XCS.LOG.NAVIGATE, "Next session = " + session);
 		View viewById = findViewById(R.id.textNextSession);
 		LinearLayout layout = (LinearLayout) viewById.getParent();
 		if (session == null) {
@@ -169,12 +174,13 @@ public class CVSessionView extends SessionSwipeActivity {
 			sessionText.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					onSwipeRightToLeft();
+					onSwipeBottomToTop();
 				}
 			});
 		}
 
 		session = getPreviousSession(getCurrentLocation());
+//		Log.i(XCS.LOG.NAVIGATE, "Previous session = " + session);
 		viewById = findViewById(R.id.textPreviousSession);
 		layout = (LinearLayout) viewById.getParent();
 		if (session == null) {
@@ -186,7 +192,7 @@ public class CVSessionView extends SessionSwipeActivity {
 			sessionText.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					onSwipeLeftToRight();
+					onSwipeTopToBottom();
 				}
 			});
 		}

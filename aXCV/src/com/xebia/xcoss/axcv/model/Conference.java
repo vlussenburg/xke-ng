@@ -4,6 +4,7 @@ import hirondelle.date4j.DateTime;
 import hirondelle.date4j.DateTime.DayOverflow;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -90,6 +91,21 @@ public class Conference implements Serializable {
 				BaseActivity.handleException(null, "retrieving sessions", e);
 			}
 		}
+		// Json mapping does not put it in a sorted set...
+		return sort(sessions);
+	}
+
+	private Set<Session> sort(Set<Session> org) {
+		try {
+			if ( ((TreeSet<Session>) org).comparator() instanceof SessionComparator ) {
+				return org;
+			}
+		} catch (Exception e) {
+			// Ignore
+		}
+		
+		resetSessions();
+		sessions.addAll(org);
 		return sessions;
 	}
 
