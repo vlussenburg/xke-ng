@@ -1,7 +1,6 @@
 package com.xebia.xcoss.axcv.model;
 
 import hirondelle.date4j.DateTime;
-import hirondelle.date4j.DateTime.DayOverflow;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -11,57 +10,56 @@ import java.util.TreeSet;
 
 import android.util.Log;
 
-import com.google.gson.annotations.SerializedName;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class Session implements Serializable {
 
 	public enum Type {
-		STANDARD ("Presentation"), 
-		WORKSHOP ("Workshop"),
-		BRAINSTORM ("Brainstorm"),
-		BOOK ("Book review"),
-		SUMMARY ("Report"),
-		STRATEGIC ("Strategy"),
-		INCUBATOR ("Incubator"),
-		
-		MANDATORY ("Corporate (mandatory)"), 
-		BREAK ("Break"); // This is also Mandatory
-		
+		STANDARD("Presentation"), WORKSHOP("Workshop"), BRAINSTORM("Brainstorm"), BOOK("Book review"), SUMMARY("Report"), STRATEGIC(
+				"Strategy"), INCUBATOR("Incubator"),
+
+		MANDATORY("Corporate (mandatory)"), BREAK("Break"); // This is also Mandatory
+
 		private String text;
-		private Type(String txt) { this.text = txt; }
-		public String toString() { return text; }
-		
+
+		private Type(String txt) {
+			this.text = txt;
+		}
+
+		public String toString() {
+			return text;
+		}
+
 		public boolean hasDetails() {
 			return (this != MANDATORY && this != BREAK);
-		} 
+		}
 	}
 
 	private static final long serialVersionUID = 1L;
 
+	public static final int DEFAULT_DURATION = 60;
+
 	// Auto mapped
-	private String title;
 	private String id;
-	private Type type = Type.STANDARD;
-
-	@SerializedName("descr")
+	private String title;
 	private String description;
-
-	private Location location;
-	private DateTime date;
 	private DateTime startTime;
 	private DateTime endTime;
-	private DateTime lastUpdate;
-	private DateTime lastReschedule;
-
-	@SerializedName("audience")
-	private String intendedAudience;
-	private String limit;
-	private String preparation;
-
+	private String limit = "Unlimited";
+	private Type type = Type.STANDARD;
 	private Set<Author> authors;
+	private Location location;
+	// private DateTime date;
+	// private DateTime lastUpdate;
+	// private DateTime lastReschedule;
+
 	private Set<String> labels;
+	private transient String conferenceId;
+	
+	// TODO : Not mapped at all at the moment...
+	private String intendedAudience;
+	private String preparation;
 	private Set<String> languages;
 
 	public Session() {
@@ -78,7 +76,6 @@ public class Session implements Serializable {
 
 		title = original.title;
 		location = original.location;
-		date = original.date;
 		startTime = original.startTime;
 		endTime = original.endTime;
 		description = original.description;
@@ -141,28 +138,34 @@ public class Session implements Serializable {
 		}
 	}
 
-	public DateTime getDate() {
-		return date;
-	}
-
-	public void setDate(DateTime date) {
-		this.date = date;
-	}
-
 	public DateTime getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(DateTime startTime) {
-		this.startTime = startTime;
+	public void setStartTime(DateTime time) {
+		startTime = updateTime(startTime, time);
 	}
 
 	public DateTime getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(DateTime endTime) {
-		this.endTime = endTime;
+	public void setEndTime(DateTime time) {
+		endTime = updateTime(endTime, time);
+	}
+
+	private DateTime updateTime(final DateTime baseTime, final DateTime time) {
+		DateTime result = baseTime;
+		if ( result == null ) {
+			result = DateTime.now(XCS.TZ);
+		}
+		if (time.hasYearMonthDay()) {
+			result = new DateTime(time.getYear(), time.getMonth(), time.getDay(), result.getHour(), result.getMinute(), 0, 0);
+		}
+		if (time.hasHourMinuteSecond()) {
+			result = new DateTime(result.getYear(), result.getMonth(), result.getDay(), time.getHour(), time.getMinute(), 0, 0);
+		}
+		return result;
 	}
 
 	public String getDescription() {
@@ -208,7 +211,7 @@ public class Session implements Serializable {
 		if (StringUtil.isEmpty(id)) {
 			this.type = type;
 		} else {
-			Log.w(XCS.LOG.PROPERTIES, "Could not set type to "+type+", id = " + id);
+			Log.w(XCS.LOG.PROPERTIES, "Could not set type to " + type + ", id = " + id);
 		}
 	}
 
@@ -217,7 +220,7 @@ public class Session implements Serializable {
 	}
 
 	public int getDuration() {
-		int duration = 60;
+		int duration = DEFAULT_DURATION;
 		if (startTime != null && endTime != null) {
 			int start = startTime.getHour() * 60 + startTime.getMinute();
 			int end = endTime.getHour() * 60 + endTime.getMinute();
@@ -225,15 +228,15 @@ public class Session implements Serializable {
 		}
 		return duration;
 	}
-	
-	public DateTime getLastUpdate() {
-		return lastUpdate;
-	}
-	
-	public DateTime getLastReschedule() {
-		return lastReschedule;
-	}
 
+	// public DateTime getLastUpdate() {
+	// return lastUpdate;
+	// }
+	//
+	// public DateTime getLastReschedule() {
+	// return lastReschedule;
+	// }
+	//
 	public boolean check(List<String> messages) {
 		if (startTime == null) {
 			messages.add("Start time");
@@ -247,67 +250,73 @@ public class Session implements Serializable {
 		if (location == null) {
 			messages.add("Location");
 		}
+		if (StringUtil.isEmpty(limit)) {
+			messages.add("Number of people");
+		}
+		if (StringUtil.isEmpty(description)) {
+			messages.add("Description");
+		}
 		return (messages.size() == 0);
 	}
 
 	public int calculateCompleteness(int maxInclusive) {
 		int value = 0;
 		// Title: Max 10
-		if ( !StringUtil.isEmpty(title) ) {
-			value += Math.min(10, title.length()/2);
+		if (!StringUtil.isEmpty(title)) {
+			value += Math.min(10, title.length() / 2);
 			Log.v(XCS.LOG.ALL, "Title boosted value to " + value);
 		}
 		// Description: Max 35
-		if ( !StringUtil.isEmpty(description) ) {
-			value += Math.min(35, description.replaceAll("\\w", "").length()*1.4);
+		if (!StringUtil.isEmpty(description)) {
+			value += Math.min(35, description.replaceAll("\\w", "").length() * 1.4);
 			Log.v(XCS.LOG.ALL, "Description boosted value to " + value);
 		}
 		// startTime: Max 5
-		if ( startTime != null ) {
+		if (startTime != null) {
 			value += 5;
 			Log.v(XCS.LOG.ALL, "Start time boosted value to " + value);
 		}
 		// Location: Max 5
-		if ( location != null ) {
+		if (location != null) {
 			value += 5;
 			Log.v(XCS.LOG.ALL, "Location boosted value to " + value);
 		}
 		// Author: Max 5
-		if ( authors != null && authors.size() > 0) {
+		if (authors != null && authors.size() > 0) {
 			value += 5;
 			Log.v(XCS.LOG.ALL, "Authors boosted value to " + value);
 		}
 		// Labels: Max 10
-		if ( labels != null ) {
-			value += Math.min(10, labels.size()*3);
+		if (labels != null) {
+			value += Math.min(10, labels.size() * 3);
 			Log.v(XCS.LOG.ALL, "Labels boosted value to " + value);
 		}
 		// Languages: Max 5
-		if ( languages != null && languages.size() > 0) {
+		if (languages != null && languages.size() > 0) {
 			value += 5;
 			Log.v(XCS.LOG.ALL, "Languages boosted value to " + value);
 		}
 		// Preparation: Max 5
-		if ( !StringUtil.isEmpty(preparation) ) {
-			value += Math.min(5, preparation.length()/3);
+		if (!StringUtil.isEmpty(preparation)) {
+			value += Math.min(5, preparation.length() / 3);
 			Log.v(XCS.LOG.ALL, "Preparation boosted value to " + value);
 		}
 		// intendedAudience: Max 20
-		if ( !StringUtil.isEmpty(intendedAudience) ) {
+		if (!StringUtil.isEmpty(intendedAudience)) {
 			value += Math.min(20, intendedAudience.length());
 			Log.v(XCS.LOG.ALL, "Audience boosted value to " + value);
 		}
 		Log.i(XCS.LOG.ALL, "Completeness (100) = " + value);
 
-		return value == 0 ? 0 : Math.max(1, (value*maxInclusive)/100);
+		return value == 0 ? 0 : Math.max(1, (value * maxInclusive) / 100);
 	}
 
 	@Override
 	public String toString() {
 		return "Session [title=" + title + ", id=" + id + ", description=" + description + ", location=" + location
-				+ ", date=" + date + ", startTime=" + startTime + ", endTime=" + endTime + ", intendedAudience="
-				+ intendedAudience + ", limit=" + limit + ", preparation=" + preparation + ", authors=" + authors
-				+ ", labels=" + labels + ", languages=" + languages + "]";
+				+ ", startTime=" + startTime + ", endTime=" + endTime + ", intendedAudience=" + intendedAudience
+				+ ", limit=" + limit + ", preparation=" + preparation + ", authors=" + authors + ", labels=" + labels
+				+ ", languages=" + languages + "]";
 	}
 
 	public boolean isMandatory() {
@@ -319,18 +328,29 @@ public class Session implements Serializable {
 	}
 
 	public boolean isExpired() {
-		if ( getDate() == null ) {
+		if (getEndTime() == null) {
 			return false;
 		}
-		DateTime expired = getDate().plus(0, 0, 0, getEndTime().getHour(), getEndTime().getMinute(), 0, DayOverflow.Spillover);
-		return expired.isInThePast(XCS.TZ);
+		return getEndTime().isInThePast(XCS.TZ);
 	}
 
 	public boolean isRunning() {
-		if ( getDate() == null ) {
+		if (getStartTime() == null) {
 			return false;
 		}
-		DateTime started = getDate().plus(0, 0, 0, getStartTime().getHour(), getStartTime().getMinute(), 0, DayOverflow.Spillover);
-		return DateTime.now(XCS.TZ).gteq(started) && !isExpired(); 
+		return DateTime.now(XCS.TZ).gteq(getStartTime()) && !isExpired();
+	}
+
+	public long getModificationHash() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	public void setConferenceId(String conferenceId) {
+		this.conferenceId = conferenceId;
+	}
+	
+	public String getConferenceId() {
+		return conferenceId;
 	}
 }

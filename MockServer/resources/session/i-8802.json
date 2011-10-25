@@ -10,7 +10,7 @@
     "limit":"10 people",
     "type":"STRATEGIC",
 	"location": {
-           "description": "Library",
+           "name": "Library",
            "id": "714",
            "standard": "true"
 	}

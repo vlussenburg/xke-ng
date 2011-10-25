@@ -67,20 +67,39 @@
 				android:text="23 mei 1999"
 				android:layout_height="wrap_content"
 				android:id="@+id/conferenceDate"></TextView>
-			<TextView
+			<LinearLayout
+				android:id="@+id/nextLocationLayout"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:id="@+id/textView1"
-				android:layout_gravity="right"
-				android:text="Right"
-				android:paddingRight="3dp"></TextView>
-			<TextView
-				android:id="@+id/textView2"
+				android:layout_gravity="right">
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Right"
+					android:paddingRight="3dp" android:id="@+id/rightText"></TextView>
+				<ImageView
+					android:id="@+id/ImageView04"
+					android:layout_width="wrap_content"
+					android:src="@drawable/arrow_right_float"
+					android:layout_height="fill_parent"></ImageView>
+			</LinearLayout>
+			<LinearLayout
+				android:id="@+id/prevLocationLayout"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="Left"
-				android:layout_gravity="left"
-				android:paddingLeft="3dp"></TextView>
+				android:layout_gravity="left">
+				<ImageView
+					android:id="@+id/ImageView04"
+					android:layout_width="wrap_content"
+					android:src="@drawable/arrow_left_float"
+					android:layout_height="fill_parent"></ImageView>
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Left"
+					android:layout_gravity="left"
+					android:paddingLeft="3dp" android:id="@+id/leftText"></TextView>
+			</LinearLayout>
 		</FrameLayout>
 		<View
 			android:id="@+id/secondDivider"
@@ -104,36 +123,97 @@
 			android:layout_height="wrap_content"
 			android:id="@+id/linearLayout3"
 			android:layout_width="fill_parent"
+			android:gravity="center"
+			android:orientation="vertical"
+			android:padding="2sp">
+			<LinearLayout
+				android:id="@+id/prevSessionLayout"
+				android:layout_width="fill_parent"
+				android:gravity="center"
+				android:background="@drawable/touchtext"
+				android:layout_height="wrap_content">
+				<ImageView
+					android:id="@+id/imageView1"
+					android:layout_width="wrap_content"
+					android:src="@android:drawable/arrow_up_float"
+					android:layout_height="fill_parent"></ImageView>
+				<TextView
+					android:id="@+id/textPreviousSession"
+					android:layout_height="wrap_content"
+					android:text="Previous Session"
+					android:padding="2sp"
+					android:gravity="center"
+					android:layout_width="wrap_content"></TextView>
+				<ImageView
+					android:id="@+id/ImageView01"
+					android:layout_width="wrap_content"
+					android:src="@android:drawable/arrow_up_float"
+					android:layout_height="fill_parent"></ImageView>
+			</LinearLayout>
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="1sp"
+				android:id="@+id/linearLayout7"></LinearLayout>
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:gravity="center"
+				android:layout_height="wrap_content"
+				android:background="@drawable/touchtext" android:id="@+id/nextSessionLayout">
+				<ImageView
+					android:id="@+id/ImageView03"
+					android:layout_width="wrap_content"
+					android:src="@android:drawable/arrow_down_float"
+					android:layout_height="fill_parent"></ImageView>
+				<TextView
+					android:text="Next Session"
+					android:padding="2sp"
+					android:gravity="center"
+					android:layout_height="wrap_content"
+					android:id="@+id/textNextSession"
+					android:layout_width="wrap_content"></TextView>
+				<ImageView
+					android:id="@+id/ImageView02"
+					android:layout_width="wrap_content"
+					android:src="@android:drawable/arrow_down_float"
+					android:layout_height="fill_parent"></ImageView>
+			</LinearLayout>
+		</LinearLayout>
+		<!--
+			<LinearLayout
+			android:layout_height="wrap_content"
+			android:id="@+id/linearLayout3"
+			android:layout_width="fill_parent"
 			android:gravity="center">
 			<ImageView
-				android:layout_height="wrap_content"
-				android:layout_width="wrap_content"
-				android:src="@drawable/location_previous"
-				android:id="@+id/slideLocationMin"
-				android:padding="1sp"
-				android:layout_weight="1"></ImageView>
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:src="@drawable/location_previous"
+			android:id="@+id/slideLocationMin"
+			android:padding="1sp"
+			android:layout_weight="1"></ImageView>
 			<ImageView
-				android:layout_height="wrap_content"
-				android:src="@drawable/time_previous"
-				android:layout_width="wrap_content"
-				android:id="@+id/slideTimeMin"
-				android:padding="1sp"
-				android:layout_weight="1"></ImageView>
+			android:layout_height="wrap_content"
+			android:src="@drawable/time_previous"
+			android:layout_width="wrap_content"
+			android:id="@+id/slideTimeMin"
+			android:padding="1sp"
+			android:layout_weight="1"></ImageView>
 			<ImageView
-				android:layout_height="wrap_content"
-				android:layout_width="wrap_content"
-				android:src="@drawable/time_next"
-				android:id="@+id/slideTimePlus"
-				android:padding="1sp"
-				android:layout_weight="1"></ImageView>
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:src="@drawable/time_next"
+			android:id="@+id/slideTimePlus"
+			android:padding="1sp"
+			android:layout_weight="1"></ImageView>
 			<ImageView
-				android:layout_height="wrap_content"
-				android:layout_width="wrap_content"
-				android:src="@drawable/location_next"
-				android:id="@+id/slideLocationPlus"
-				android:padding="1sp"
-				android:layout_weight="1"></ImageView>
-		</LinearLayout>
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:src="@drawable/location_next"
+			android:id="@+id/slideLocationPlus"
+			android:padding="1sp"
+			android:layout_weight="1"></ImageView>
+			</LinearLayout>
+		-->
 	</LinearLayout>
 	<!-- Content part of the session -->
 	<ScrollView
@@ -332,7 +412,9 @@
 				android:scrollbars="vertical"
 				android:background="@drawable/textbox"
 				android:scrollbarFadeDuration="0"
-				android:layout_margin="1sp" android:layout_height="100sp" android:scrollbarStyle="insideOverlay">
+				android:layout_margin="1sp"
+				android:layout_height="100sp"
+				android:scrollbarStyle="insideOverlay">
 				<TextView
 					android:id="@+id/scComments"
 					android:layout_width="fill_parent"

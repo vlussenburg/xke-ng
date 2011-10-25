@@ -1,17 +1,13 @@
 package com.xebia.xcoss.axcv;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -19,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
@@ -46,7 +43,6 @@ public abstract class BaseActivity extends Activity {
 
 	private MenuItem miSettings;
 	private MenuItem miSearch;
-	private MenuItem miList;
 	private MenuItem miAdd;
 	private MenuItem miEdit;
 	private MenuItem miTrack;
@@ -54,6 +50,7 @@ public abstract class BaseActivity extends Activity {
 
 	private static Activity rootActivity;
 	private static ProfileManager profileManager;
+	private static String lastError;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,13 +75,6 @@ public abstract class BaseActivity extends Activity {
 					showConferencesList();
 				}
 			});
-//			conferenceButton.setOnLongClickListener(new View.OnLongClickListener() {
-//				@Override
-//				public boolean onLongClick(View v) {
-//					resetApplication(true);
-//					return true;
-//				}
-//			});
 		}
 	}
 
@@ -105,18 +95,18 @@ public abstract class BaseActivity extends Activity {
 
 		miAdd = menu.add(0, XCS.MENU.ADD, Menu.NONE, R.string.menu_add);
 		miEdit = menu.add(0, XCS.MENU.EDIT, Menu.NONE, R.string.menu_edit);
-//		miList = menu.add(0, XCS.MENU.OVERVIEW, Menu.NONE, R.string.menu_overview);
 		miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
 		miSearch = menu.add(0, XCS.MENU.SEARCH, Menu.NONE, R.string.menu_search);
-		miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
+		if (!StringUtil.isEmpty(getUser())) {
+			miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
+			miTrack.setIcon(android.R.drawable.ic_menu_agenda);
+		}
 		miExit = menu.add(0, XCS.MENU.EXIT, Menu.NONE, R.string.menu_exit);
-		
+
 		miAdd.setIcon(android.R.drawable.ic_menu_add);
 		miEdit.setIcon(android.R.drawable.ic_menu_edit);
 		miSettings.setIcon(android.R.drawable.ic_menu_preferences);
 		miSearch.setIcon(android.R.drawable.ic_menu_search);
-//		miList.setIcon(R.drawable.ic_menu_list);
-		miTrack.setIcon(android.R.drawable.ic_menu_agenda);
 		miExit.setIcon(R.drawable.ic_menu_exit);
 
 		return true;
@@ -178,11 +168,7 @@ public abstract class BaseActivity extends Activity {
 		return conference;
 	}
 
-	protected Session getSession(Conference conference) {
-		return getSession(conference, true);
-	}
-
-	protected Session getSession(Conference conference, boolean useDefault) {
+	protected Session getSelectedSession(Conference conference) {
 		Session session = null;
 		String identifier = null;
 		try {
@@ -192,12 +178,16 @@ public abstract class BaseActivity extends Activity {
 		catch (Exception e) {
 			Log.w(LOG.ALL, "No session with ID " + identifier + " or conference not found.");
 		}
-		if (session == null && useDefault) {
-			Log.w(LOG.ALL, "Conference default : " + (conference == null ? "NULL" : conference.getTitle()));
-			session = conference.getUpcomingSession();
-			Log.w(LOG.ALL, "Session default " + (session == null ? "NULL" : session.getTitle()));
-		}
 		return session;
+	}
+
+	protected Session getDefaultSession(Conference conference) {
+		for (Session s : conference.getSessions()) {
+			if (!s.isExpired()) {
+				return s;
+			}
+		}
+		return conference.getSessions().iterator().next();
 	}
 
 	protected ConferenceServer getConferenceServer() {
@@ -206,7 +196,8 @@ public abstract class BaseActivity extends Activity {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			String user = sp.getString(XCS.PREF.USERNAME, null);
 			String password = SecurityUtils.decrypt(sp.getString(XCS.PREF.PASSWORD, ""));
-			server = ConferenceServer.createInstance(user, password, getServerUrl());
+			server = ConferenceServer.createInstance(user, password, getServerUrl(), rootActivity == null ? null
+					: rootActivity.getApplicationContext());
 		}
 		return server;
 	}
@@ -217,6 +208,12 @@ public abstract class BaseActivity extends Activity {
 		}
 		profileManager.openConnection();
 		return profileManager;
+	}
+
+	protected void closeProfileManager() {
+		if (profileManager != null) {
+			profileManager.closeConnection();
+		}
 	}
 
 	protected Dialog createDialog(String title, String message) {
@@ -237,65 +234,6 @@ public abstract class BaseActivity extends Activity {
 	protected void onSuccess() {}
 
 	protected void onFailure() {}
-
-	class DataRetriever extends AsyncTask<String, Void, Boolean> {
-
-		// http://appfulcrum.com/?p=126
-
-		private ProgressDialog dialog;
-		private BaseActivity ctx;
-		private Exception resultingException;
-
-		public DataRetriever(BaseActivity ctx) {
-			this.ctx = ctx;
-		}
-
-		@Override
-		protected void onPreExecute() {
-			this.dialog = ProgressDialog.show(ctx, null, "Loading. Please wait...", true);
-		}
-
-		@Override
-		protected Boolean doInBackground(String... arg0) {
-			try {
-				List<Conference> conferences = getConferenceServer().getUpcomingConferences(4);
-				for (Conference conference : conferences) {
-					conference.getSessions();
-				}
-			}
-			catch (DataException e) {
-				resultingException = e;
-			}
-			catch (Exception e) {
-				resultingException = e;
-				Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Failure: " + StringUtil.getExceptionMessage(e));
-				e.printStackTrace();
-				return false;
-			}
-			return true;
-		}
-
-		@Override
-		protected void onPostExecute(Boolean result) {
-			dialog.cancel();
-
-			if (result) {
-				// Note, authentication may still be invalid.
-				ctx.onSuccess();
-			} else {
-				Dialog errorDialog = createDialog("Error",
-						"Connection to server failed (" + StringUtil.getExceptionMessage(resultingException) + ").");
-				errorDialog.setOnDismissListener(new Dialog.OnDismissListener() {
-					@Override
-					public void onDismiss(DialogInterface di) {
-						ctx.onFailure();
-						di.dismiss();
-					}
-				});
-				errorDialog.show();
-			}
-		}
-	}
 
 	private String getServerUrl() {
 		try {
@@ -333,6 +271,7 @@ public abstract class BaseActivity extends Activity {
 		if (e instanceof DataException) {
 			if (((DataException) e).missing()) {
 				Log.w(XCS.LOG.COMMUNICATE, "No result for '" + activity + "'.");
+				lastError = "Not found: " + activity;
 			} else {
 				// Authentication failure
 				if (context != null) {
@@ -355,6 +294,7 @@ public abstract class BaseActivity extends Activity {
 					builder.create().show();
 				} else {
 					Log.e(XCS.LOG.COMMUNICATE, "Resource not found while " + activity + ".");
+					lastError = "Not allowed: " + activity;
 				}
 			}
 			return;
@@ -363,9 +303,15 @@ public abstract class BaseActivity extends Activity {
 		throw new CommException("Failure on activity '" + activity + "': " + StringUtil.getExceptionMessage(e), e);
 	}
 
-	protected String getUser() {
+	public String getUser() {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 		String user = sp.getString(XCS.PREF.USERNAME, null);
 		return user;
+	}
+	
+	public static String getLastError() {
+		String error = lastError;
+		lastError = null;
+		return error;
 	}
 }

@@ -148,13 +148,14 @@ public class CVConferenceAdd extends AdditionActivity {
 				conference.setTitle(value);
 			break;
 			case R.id.conferenceDate:
-				conference.setDate((DateTime) selection);
+				conference.updateStartTime((DateTime) selection);
+				conference.updateEndTime((DateTime) selection);
 			break;
 			case R.id.conferenceStart:
-				conference.setStartTime((DateTime) selection);
+				conference.updateStartTime((DateTime) selection);
 			break;
 			case R.id.conferenceEnd:
-				conference.setEndTime((DateTime) selection);
+				conference.updateEndTime((DateTime) selection);
 			break;
 			case R.id.conferenceDescription:
 				conference.setDescription(value);
@@ -175,7 +176,7 @@ public class CVConferenceAdd extends AdditionActivity {
 						return;
 					}
 					// Add the location
-					Location[] locations = getConferenceServer().getLocations(false);
+					Location[] locations = getConferenceServer().getLocations();
 					Location selected = null;
 					for (int i = 0; i < locations.length; i++) {
 						if (locations[i].getDescription().equals(value)) {
@@ -225,7 +226,7 @@ public class CVConferenceAdd extends AdditionActivity {
 				dialog = new TextInputDialog(this, R.id.conferenceLocText);
 			break;
 			case XCS.DIALOG.INPUT_LOCATION:
-				Location[] locations = getConferenceServer().getLocations(false);
+				Location[] locations = getConferenceServer().getLocations();
 				int size = locations.length + 1;
 
 				items = new String[size];

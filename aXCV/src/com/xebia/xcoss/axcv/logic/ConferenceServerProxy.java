@@ -5,10 +5,13 @@ import hirondelle.date4j.DateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
+
 import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Location;
+import com.xebia.xcoss.axcv.model.Rate;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Search;
 import com.xebia.xcoss.axcv.model.Session;
@@ -17,8 +20,8 @@ public class ConferenceServerProxy extends ConferenceServer {
 
 	private BaseActivity activity;
 
-	protected ConferenceServerProxy(String base) {
-		super(base);
+	protected ConferenceServerProxy(String base, Context ctx) {
+		super(base, ctx);
 	}
 
 	public static ConferenceServerProxy getInstance(BaseActivity act) {
@@ -62,9 +65,9 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public void deleteSession(Session session, String conferenceId) {
+	public void deleteSession(Session session) {
 		try {
-			super.deleteSession(session, conferenceId);
+			super.deleteSession(session);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "delete session", e);
@@ -149,9 +152,9 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public Location[] getLocations(boolean defaultOnly) {
+	public Location[] getLocations() {
 		try {
-			return super.getLocations(defaultOnly);
+			return super.getLocations();
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "get locations", e);
@@ -160,14 +163,14 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public double getRate(Session session) {
+	public Rate getRate(Session session) {
 		try {
 			return super.getRate(session);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "get rate", e);
 		}
-		return -1;
+		return new Rate(null);
 	}
 
 	@Override
@@ -204,7 +207,7 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public void registerRate(Session session, int rate) {
+	public void registerRate(Session session, Rate rate) {
 		try {
 			super.registerRate(session, rate);
 		}
@@ -246,25 +249,25 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public int storeConference(Conference conference, boolean update) {
+	public String storeConference(Conference conference, boolean create) {
 		try {
-			return super.storeConference(conference, update);
+			return super.storeConference(conference, create);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "store conference", e);
 		}
-		return -1;
+		return null;
 	}
 
 	@Override
-	public int storeSession(Session session, String conferenceId, boolean update) {
+	public String storeSession(Session session, String conferenceId, boolean update) {
 		try {
 			return super.storeSession(session, conferenceId, update);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "store session", e);
 		}
-		return -1;
+		return null;
 	}
 
 	@Override

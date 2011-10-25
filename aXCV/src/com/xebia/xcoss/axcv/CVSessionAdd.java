@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -57,7 +55,7 @@ public class CVSessionAdd extends AdditionActivity {
 		this.timeFormatter = new ScreenTimeUtil(this);
 
 		conference = getConference();
-		originalSession = getSession(conference, false);
+		originalSession = getSelectedSession(conference);
 		if (originalSession == null) {
 			create = true;
 			session = new Session();
@@ -66,11 +64,15 @@ public class CVSessionAdd extends AdditionActivity {
 			session = new Session(originalSession);
 			((TextView) findViewById(R.id.addModifyTitle)).setText("Edit session");
 		}
-
-		showConference();
-		showSession();
 		registerActions();
 		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	protected void onResume() {
+		showConference();
+		showSession();
+		super.onResume();
 	}
 
 	private void showConference() {
@@ -85,7 +87,7 @@ public class CVSessionAdd extends AdditionActivity {
 
 	private void showSession() {
 		if (session == null) {
-			session = getSession(conference, false);
+			session = getSelectedSession(conference);
 		}
 		if (session != null) {
 			DateTime startTime = session.getStartTime();
@@ -165,7 +167,9 @@ public class CVSessionAdd extends AdditionActivity {
 							.show();
 					return;
 				}
-				if (!conference.addSession(session)) {
+				Log.w(XCS.LOG.ALL, "* Start = " + session.getStartTime());
+				Log.w(XCS.LOG.ALL, "* Eind  = " + session.getEndTime());
+				if (!conference.addSession(session, create)) {
 					Log.e(LOG.ALL, "Adding session failed.");
 					createDialog("No session added", "Session could not be added.").show();
 				}
@@ -218,7 +222,7 @@ public class CVSessionAdd extends AdditionActivity {
 		Iterator<Location> iterator = locations.iterator();
 		while (slot == null && iterator.hasNext()) {
 			Location next = iterator.next();
-			slot = conference.getNextAvailableTimeSlot(session.getStartTime(), duration, next);
+			slot = conference.getNextAvailableTimeSlot(session, session.getStartTime(), duration, next);
 			Log.v("XCS", "Reschedule ["
 					+ session.getStartTime()
 					+ ", "
@@ -236,10 +240,11 @@ public class CVSessionAdd extends AdditionActivity {
 		}
 
 		if (slot != null) {
+			session.setStartTime(conference.getDate());
+			session.setEndTime(conference.getDate());
 			session.setStartTime(slot.start);
 			session.setEndTime(slot.end);
 			session.setLocation(slot.location);
-			session.setDate(conference.getDate());
 		}
 		return slot;
 	}
@@ -260,19 +265,28 @@ public class CVSessionAdd extends AdditionActivity {
 			case R.id.conferenceName:
 				Identifiable ident = (Identifiable) selection;
 				conference = getConferenceServer().getConference(ident.getIdentifier());
-				session.setDate(conference.getDate());
-				// session.setConference(conference);
+				session.setStartTime(conference.getDate());
 				showConference();
 			break;
 			case R.id.sessionStart:
-				session.setStartTime(timeFormatter.getAbsoluteTime(value.toString()));
-			break;
+				TimeSlot t = (TimeSlot) selection;
+				session.setStartTime(t.start);
+				rescheduleSession(0);
+//				if (session.getEndTime() == null) {
+//					int duration = session.getDuration();
+//					if ( duration == 0 ) { duration = Session.DEFAULT_DURATION; }
+//					session.setEndTime(session.getStartTime().plus(0, 0, 0, 0, duration, 0,
+//							DayOverflow.Spillover));
+//				}
+//				if (session.getLocation() == null) {
+//					session.setLocation(t.location);
+//				}
 			case R.id.sessionDuration:
 				int duration = StringUtil.getFirstInteger(value);
-				if (session.getStartTime() == null) {
+//				if (session.getStartTime() == null) {
 					rescheduleSession(duration);
-				}
-				session.setEndTime(session.getStartTime().plus(0, 0, 0, 0, duration, 0, DayOverflow.Spillover));
+//				}
+//				session.setEndTime(session.getStartTime().plus(0, 0, 0, 0, duration, 0, DayOverflow.Spillover));
 			break;
 			case R.id.sessionLanguage:
 				Set<String> languages = session.getLanguages();
@@ -307,6 +321,8 @@ public class CVSessionAdd extends AdditionActivity {
 			default:
 				Log.w(LOG.NAVIGATE, "Don't know how to process: " + field);
 		}
+		Log.w(XCS.LOG.ALL, "Start = " + session.getStartTime());
+		Log.w(XCS.LOG.ALL, "Eind  = " + session.getEndTime());
 		showSession();
 	}
 
@@ -339,21 +355,25 @@ public class CVSessionAdd extends AdditionActivity {
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.INPUT_TIME_START:
-				List<TimeSlot> tslist = session.getLocation() == null ? conference.getAvailableTimeSlots() : conference
-						.getAvailableTimeSlots(session.getLocation());
-				SortedSet<String> set = new TreeSet<String>();
-				idx = 0;
-				for (TimeSlot timeSlot : tslist) {
-					set.add(timeFormatter.getAbsoluteTime(timeSlot.start));
+				Set<TimeSlot> tslist = null;
+				if (session.getLocation() == null) {
+					tslist = conference.getAvailableTimeSlots(session.getDuration());
+				} else {
+					tslist = conference.getAvailableTimeSlots(session.getDuration(), session.getLocation());
 				}
+
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Pick a start time");
-				items = set.toArray(new String[set.size()]);
-				if (items.length == 0) {
+				if (tslist.size() == 0) {
 					builder.setMessage("This conference is fully booked!");
 					builder.setIcon(android.R.drawable.ic_dialog_alert);
 				} else {
-					builder.setItems(items, new DialogHandler(this, items, R.id.sessionStart));
+					TimeSlot[] slots = tslist.toArray(new TimeSlot[0]);
+					items = new String[slots.length];
+					for (int i = 0; i < slots.length; i++) {
+						items[i] = timeFormatter.getAbsoluteTime(slots[i].start) + " @ " + slots[i].location;
+					}
+					builder.setItems(items, new DialogHandler(this, slots, R.id.sessionStart));
 				}
 				dialog = builder.create();
 				dialog.setOnCancelListener(this);
@@ -426,7 +446,7 @@ public class CVSessionAdd extends AdditionActivity {
 			break;
 			case XCS.DIALOG.INPUT_LIMIT:
 				tid = (TextInputDialog) dialog;
-				tid.setDescription("Audience limit");
+				tid.setDescription("Number of people");
 				tid.setValue(session.getLimit());
 			break;
 			case XCS.DIALOG.INPUT_DESCRIPTION:

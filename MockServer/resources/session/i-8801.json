@@ -9,7 +9,7 @@
     "audience":"Everybody",
     "type":"WORKSHOP",
 	"location": {
-           "description": "Maupertuus",
+           "name": "Maupertuus",
            "id": "711",
            "standard": "true"
 	}

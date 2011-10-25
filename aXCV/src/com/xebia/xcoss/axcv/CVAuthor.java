@@ -54,8 +54,13 @@ public class CVAuthor extends BaseActivity {
 		TextView view = (TextView) findViewById(R.id.av_labels);
 		HashSet<String> labels = new HashSet<String>();
 		labels.addAll(getConferenceServer().getLabels(author));
-		view.setText(FormatUtil.getList(labels));
-		Linkify.addLinks(view, XCS.TAG.PATTERN, XCS.TAG.LINK);
+		String list = FormatUtil.getList(labels, false);
+		if (StringUtil.isEmpty(list)) {
+			list = FormatUtil.NONE_FOUND;
+		} else {
+			Linkify.addLinks(view, XCS.TAG.PATTERN, XCS.TAG.LINK);
+		}
+		view.setText(list);
 		view.setFocusable(false);
 
 		LayoutInflater inflater = getLayoutInflater();
@@ -85,14 +90,14 @@ public class CVAuthor extends BaseActivity {
 				}
 			}
 		}
-		return null;
+		return new Author("noauthor", "Author not found", "", "");
 	}
 
 	private void showSession(int index) {
 		Session session = searchResults.get(index);
-		if (session.getDate() != null) {
+		if (session.getStartTime() != null) {
 			Intent intent = new Intent(this, CVSessionView.class);
-			Conference conference = getConferenceServer().getConference(session.getDate());
+			Conference conference = getConferenceServer().getConference(session.getStartTime());
 			intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
 			intent.putExtra(BaseActivity.IA_SESSION, session.getId());
 			startActivity(intent);

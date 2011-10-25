@@ -75,7 +75,7 @@ public abstract class SearchActivity extends SwipeActivity {
 			@Override
 			public void onClick(View paramView) {
 				String text = input.getText().toString();
-
+				input.setText("");
 				authorResults.clear();
 				authorResults.addAll(searchAuthors(text));
 				authorAdapter.notifyDataSetChanged();
@@ -103,9 +103,9 @@ public abstract class SearchActivity extends SwipeActivity {
 	private void showSession(int index) {
 		if (index < sessionResults.size()) {
 			Session session = sessionResults.get(index);
-			if (session.getDate() != null) {
+			if (session.getStartTime() != null) {
 				Intent intent = new Intent(this, CVSessionView.class);
-				Conference conference = getConferenceServer().getConference(session.getDate());
+				Conference conference = getConferenceServer().getConference(session.getStartTime());
 				intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
 				intent.putExtra(BaseActivity.IA_SESSION, session.getId());
 				startActivity(intent);

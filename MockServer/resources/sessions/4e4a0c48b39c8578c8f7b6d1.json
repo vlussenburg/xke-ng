@@ -9,7 +9,7 @@
     "id":"8801",
     "audience":"Everybody",
 	"location": {
-           "description": "Maupertuus",
+           "name": "Maupertuus",
            "id": "711",
            "standard": "true"
 	},
@@ -33,7 +33,7 @@
     "date":"2011-11-07T00:00:00.000Z",
     "id":"8803",
 	"location": {
-           "description": "Maupertuus",
+           "name": "Maupertuus",
            "id": "711",
            "standard": "true"
 	},
@@ -52,7 +52,7 @@
     "limit":"10 people",
 	"type":"STRATEGIC",
 	"location": {
-           "description": "Laap",
+           "name": "Laap",
            "id": "712",
            "standard": "true"
 	},

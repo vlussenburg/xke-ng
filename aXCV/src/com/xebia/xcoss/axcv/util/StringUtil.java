@@ -19,7 +19,7 @@ public class StringUtil {
 		return ( sb.length() == 0 ? 0 : Integer.parseInt(sb.toString()));
 	}
 
-	public static String getExceptionMessage(Exception e) {
+	public static String getExceptionMessage(Throwable e) {
 		String message = e.getMessage();
 		if ( StringUtil.isEmpty(message)) {
 			message = e.getClass().getSimpleName().replaceFirst("Exception", "");

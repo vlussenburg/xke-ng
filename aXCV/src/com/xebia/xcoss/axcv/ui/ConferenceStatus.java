@@ -45,7 +45,7 @@ public class ConferenceStatus {
 			return "" + openSlots + " slots available";
 		}
 		catch (Exception e) {
-			Log.e(LOG.ALL, "Status fail: " + e.getMessage());
+			Log.e(LOG.ALL, "Status fail: " + e.getMessage(), e);
 		}
 		return "";
 	}

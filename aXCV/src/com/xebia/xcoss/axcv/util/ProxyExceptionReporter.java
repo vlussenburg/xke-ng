@@ -10,8 +10,6 @@ import de.quist.app.errorreporter.ExceptionReporter;
 
 public class ProxyExceptionReporter implements UncaughtExceptionHandler {
 
-//	public static final String TOKEN = "com.xebia.Exception";
-
 	private static ProxyExceptionReporter instance = new ProxyExceptionReporter();
 	
 	private ExceptionReporter exceptionReporter;
@@ -19,7 +17,6 @@ public class ProxyExceptionReporter implements UncaughtExceptionHandler {
 	public static void register(BaseActivity ctx) {
 		UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
 		if ( !(handler instanceof ProxyExceptionReporter) ) {
-			Log.v(XCS.LOG.ALL, "Current uncaugt handler = " + handler);
 			instance.exceptionReporter = ExceptionReporter.register(ctx);
 			Thread.setDefaultUncaughtExceptionHandler(instance);
 		}
@@ -27,8 +24,12 @@ public class ProxyExceptionReporter implements UncaughtExceptionHandler {
 
 	@Override
 	public void uncaughtException(Thread t, Throwable throwable) {
-		Log.e(XCS.LOG.ALL, "[FATAL] Fault in application: " + throwable);
-		exceptionReporter.reportException(t, throwable);
+		Log.e(XCS.LOG.ALL, "[FATAL] Fault in application ("+t+"): ", throwable);
+		try {
+			exceptionReporter.reportException(t, throwable);
+		} catch (Throwable ignored) {
+			Log.w(XCS.LOG.ALL, "[FATAL] Fault not reported: " + StringUtil.getExceptionMessage(throwable));
+		}
 
         // System.exit causes an undesired restart of only the current activity.
 		// This causes the exit strategy not to work (there is no CVSplashLoader)
@@ -36,5 +37,4 @@ public class ProxyExceptionReporter implements UncaughtExceptionHandler {
         // Since other mechanisms cause hangs, still using this, but correcting it...
 		System.exit(-1);
 	}
-
 }
