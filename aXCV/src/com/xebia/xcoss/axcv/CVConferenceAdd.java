@@ -29,6 +29,7 @@ import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
+import com.xebia.xcoss.axcv.ui.LocationInputDialog;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.TextInputDialog;
 import com.xebia.xcoss.axcv.util.StringUtil;
@@ -47,9 +48,11 @@ public class CVConferenceAdd extends AdditionActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.add_conference);
-		this.timeFormatter = new ScreenTimeUtil(this);
+		super.onCreate(savedInstanceState);
 
-		originalConference = getConference(false);
+		this.timeFormatter = new ScreenTimeUtil(this);
+		this.originalConference = getConference(false);
+
 		if (originalConference == null) {
 			create = true;
 			conference = new Conference();
@@ -61,7 +64,6 @@ public class CVConferenceAdd extends AdditionActivity {
 
 		showConference();
 		registerActions();
-		super.onCreate(savedInstanceState);
 	}
 
 	private void showConference() {
@@ -165,16 +167,19 @@ public class CVConferenceAdd extends AdditionActivity {
 			break;
 			case R.id.conferenceLocText:
 				if (!StringUtil.isEmpty(value)) {
-					getConferenceServer().createLocation(value);
-				}
-			// fallThrough
-			case R.id.conferenceLocations:
-				if (checked) {
-					if (ADD_NEW_LOCATION.equals(value)) {
-						showDialog(XCS.DIALOG.CREATE_LOCATION);
-						removeDialog(XCS.DIALOG.INPUT_LOCATION);
-						return;
+					if (selection instanceof Location) {
+						getConferenceServer().createLocation((Location) selection);
 					}
+				}
+				// fallThrough
+			case R.id.conferenceLocations:
+				if (ADD_NEW_LOCATION.equals(value)) {
+					showDialog(XCS.DIALOG.CREATE_LOCATION);
+					removeDialog(XCS.DIALOG.INPUT_LOCATION);
+					return;
+				}
+
+				if (checked) {
 					// Add the location
 					Location[] locations = getConferenceServer().getLocations();
 					Location selected = null;
@@ -187,7 +192,7 @@ public class CVConferenceAdd extends AdditionActivity {
 					if (selected != null) {
 						conference.getLocations().add(selected);
 					}
-				} else if (!ADD_NEW_LOCATION.equals(value)) {
+				} else {
 					Location contained = null;
 					Set<Location> locations = conference.getLocations();
 					for (Location location : locations) {
@@ -223,7 +228,7 @@ public class CVConferenceAdd extends AdditionActivity {
 				dialog = new TextInputDialog(this, R.id.conferenceDescription);
 			break;
 			case XCS.DIALOG.CREATE_LOCATION:
-				dialog = new TextInputDialog(this, R.id.conferenceLocText);
+				dialog = new LocationInputDialog(this, R.id.conferenceLocText);
 			break;
 			case XCS.DIALOG.INPUT_LOCATION:
 				Location[] locations = getConferenceServer().getLocations();
@@ -231,12 +236,12 @@ public class CVConferenceAdd extends AdditionActivity {
 
 				items = new String[size];
 				boolean[] check = new boolean[size];
-				
-				for (int i = 0; i < size-1; i++) {
+
+				for (int i = 0; i < size - 1; i++) {
 					items[i] = locations[i].getDescription();
 					check[i] = false;
 				}
-				items[size-1] = ADD_NEW_LOCATION;
+				items[size - 1] = ADD_NEW_LOCATION;
 
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Select locations");
@@ -304,11 +309,6 @@ public class CVConferenceAdd extends AdditionActivity {
 				tid.setDescription("Description");
 				tid.setValue(conference.getDescription());
 			break;
-			case XCS.DIALOG.CREATE_LOCATION:
-				tid = (TextInputDialog) dialog;
-				tid.setDescription("Location name");
-				tid.setValue("");
-				break;
 			case XCS.DIALOG.INPUT_LOCATION:
 				AlertDialog ad = (AlertDialog) dialog;
 				Set<Location> locations = conference.getLocations();
@@ -383,10 +383,8 @@ public class CVConferenceAdd extends AdditionActivity {
 	}
 
 	@Override
-	public void onDismiss(DialogInterface di) {
-	}
+	public void onDismiss(DialogInterface di) {}
 
 	@Override
-	public void onCancel(DialogInterface di) {
-	}
+	public void onCancel(DialogInterface di) {}
 }

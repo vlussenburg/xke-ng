@@ -246,13 +246,13 @@ public class ConferenceServer {
 		return result.toArray(new Author[result.size()]);
 	}
 
-	public int createLocation(String location) {
+	public Location createLocation(Location location) {
 		conferenceCache.removeObject(LOCATION_CACHE_KEY, new ArrayList<Location>().getClass());
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/location");
 
-		return RestClient.createObject(requestUrl.toString(), location, int.class, token);
+		return RestClient.createObject(requestUrl.toString(), location, Location.class, token);
 	}
 
 	public Location[] getLocations() {

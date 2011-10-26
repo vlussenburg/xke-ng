@@ -271,13 +271,13 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public int createLocation(String location) {
+	public Location createLocation(Location location) {
 		try {
 			return super.createLocation(location);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "create location", e);
 		}
-		return -1;
+		return null;
 	}
 }

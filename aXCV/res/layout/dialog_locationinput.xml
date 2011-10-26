@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:id="@+id/linearLayout1"
+	android:layout_height="fill_parent"
+	android:layout_width="fill_parent">
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textSize="18sp"
+		android:gravity="center"
+		android:layout_gravity="center_horizontal"
+		android:paddingLeft="5sp"
+		android:paddingRight="5sp"
+		android:id="@+id/seDescription"
+		android:layout_marginBottom="10sp"
+		android:layout_marginTop="10sp" android:text="@string/newLocationLabel"></TextView>
+	<EditText
+		android:layout_width="fill_parent"
+		android:layout_marginLeft="5sp"
+		android:layout_marginRight="5sp"
+		android:layout_gravity="center_horizontal"
+		android:cursorVisible="true"
+		android:gravity="top|left"
+		android:id="@+id/seValue"
+		android:layout_height="42dp"
+		android:inputType="text|textAutoCorrect|textAutoComplete|textShortMessage" android:maxLength="25"></EditText>
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:id="@+id/linearLayout3"
+		android:layout_width="wrap_content" android:gravity="right" android:layout_gravity="right" android:padding="4sp">
+		<TextView
+			android:layout_weight="1"
+			android:layout_height="wrap_content"
+			android:text="@string/sizeLabel"
+			android:layout_width="wrap_content"
+			android:padding="3sp" android:id="@+id/seRoomSizeLabel"></TextView>
+		<EditText
+			android:layout_width="wrap_content"
+			android:layout_weight="1"
+			android:layout_height="wrap_content"
+			android:inputType="number" android:width="60dp" android:id="@+id/seRoomSize" android:layout_marginLeft="5sp" android:layout_marginRight="5sp" android:maxLength="3">
+			<requestFocus></requestFocus>
+		</EditText>
+	</LinearLayout>
+	<LinearLayout
+		android:id="@+id/linearLayout2"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_horizontal"
+		android:gravity="center_horizontal">
+		<Button
+			android:text="Submit"
+			android:layout_width="wrap_content"
+			android:layout_gravity="center_horizontal"
+			android:id="@+id/seCommit"
+			android:layout_height="wrap_content"></Button>
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_gravity="center_horizontal"
+			android:layout_height="wrap_content"
+			android:id="@+id/seCancel"
+			android:text="Cancel"></Button>
+	</LinearLayout>
+</LinearLayout>

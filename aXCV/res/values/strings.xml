@@ -28,5 +28,7 @@
     <string name="my_track_title">My track list</string>   
     <string name="context_menu_author_view">View author</string>    
     <string name="context_menu_author_remove">Remove author</string>
-    <string name="context_menu_label_remove">Remove label</string>     
+    <string name="context_menu_label_remove">Remove label</string>
+    <string name="sizeLabel">Room size</string>     
+    <string name="newLocationLabel">Location name</string>     
 </resources>
