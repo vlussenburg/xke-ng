@@ -41,7 +41,7 @@ public class Session implements Serializable {
 	public static final int DEFAULT_DURATION = 60;
 
 	// Auto mapped
-	private String id;
+	private Integer id;
 	private String title;
 	private String description;
 	private DateTime startTime;
@@ -88,7 +88,7 @@ public class Session implements Serializable {
 		languages.addAll(original.languages);
 	}
 
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
 
@@ -208,7 +208,7 @@ public class Session implements Serializable {
 	 * Only allow the type to be set if it has no id yet.
 	 */
 	public void setType(Type type) {
-		if (StringUtil.isEmpty(id)) {
+		if (id == null) {
 			this.type = type;
 		} else {
 			Log.w(XCS.LOG.PROPERTIES, "Could not set type to " + type + ", id = " + id);

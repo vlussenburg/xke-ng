@@ -205,7 +205,7 @@ public class Conference implements Serializable {
 		sessions = new TreeSet<Session>(new SessionComparator());
 	}
 
-	public Session getSessionById(String id) {
+	public Session getSessionById(Integer id) {
 		for (Session session : getSessions()) {
 			if (id.equals(session.getId())) {
 				return session;
@@ -223,9 +223,9 @@ public class Conference implements Serializable {
 	public boolean addSession(Session session, boolean create) {
 		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + getTitle());
 		try {
-			String id = ConferenceServer.getInstance().storeSession(session, getId(), create);
+			Integer id = ConferenceServer.getInstance().storeSession(session, getId(), create);
 			resetSessions();
-			return !StringUtil.isEmpty(id);
+			return id != null;
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(null, "adding session", e);

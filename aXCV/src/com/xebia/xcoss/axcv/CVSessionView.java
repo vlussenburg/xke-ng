@@ -43,8 +43,8 @@ public class CVSessionView extends SessionSwipeActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		setContentView(R.layout.sessionview);
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.session);
 		addGestureDetection(R.id.relativeLayoutLowest);
 	}
 

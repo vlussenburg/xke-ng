@@ -15,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
@@ -75,6 +74,8 @@ public abstract class BaseActivity extends Activity {
 					showConferencesList();
 				}
 			});
+		} else {
+			Log.e("XCS", "Conference button not found on view " + this.getClass().getSimpleName());
 		}
 	}
 
@@ -97,10 +98,6 @@ public abstract class BaseActivity extends Activity {
 		miEdit = menu.add(0, XCS.MENU.EDIT, Menu.NONE, R.string.menu_edit);
 		miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
 		miSearch = menu.add(0, XCS.MENU.SEARCH, Menu.NONE, R.string.menu_search);
-		if (!StringUtil.isEmpty(getUser())) {
-			miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
-			miTrack.setIcon(android.R.drawable.ic_menu_agenda);
-		}
 		miExit = menu.add(0, XCS.MENU.EXIT, Menu.NONE, R.string.menu_exit);
 
 		miAdd.setIcon(android.R.drawable.ic_menu_add);
@@ -109,6 +106,10 @@ public abstract class BaseActivity extends Activity {
 		miSearch.setIcon(android.R.drawable.ic_menu_search);
 		miExit.setIcon(R.drawable.ic_menu_exit);
 
+		if (!StringUtil.isEmpty(getUser())) {
+			miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
+			miTrack.setIcon(android.R.drawable.ic_menu_agenda);
+		}
 		return true;
 	}
 
@@ -170,9 +171,9 @@ public abstract class BaseActivity extends Activity {
 
 	protected Session getSelectedSession(Conference conference) {
 		Session session = null;
-		String identifier = null;
+		Integer identifier = null;
 		try {
-			identifier = getIntent().getExtras().getString(IA_SESSION);
+			identifier = getIntent().getExtras().getInt(IA_SESSION);
 			session = conference.getSessionById(identifier);
 		}
 		catch (Exception e) {

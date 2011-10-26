@@ -20,7 +20,7 @@ public class CVSplashLoader extends BaseActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		setContentView(R.layout.loader);
+		setContentView(R.layout.splashloader);
 		super.onCreate(savedInstanceState);
 		// Ignore terminated; this is the main screen
 

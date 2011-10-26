@@ -3,19 +3,15 @@ package com.xebia.xcoss.axcv.logic;
 import hirondelle.date4j.DateTime;
 import hirondelle.date4j.DateTime.Unit;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
 import com.xebia.xcoss.axcv.logic.cache.DataCache;
-import com.xebia.xcoss.axcv.logic.cache.DatabaseCache;
 import com.xebia.xcoss.axcv.logic.cache.MemoryCache;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
@@ -27,7 +23,6 @@ import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.util.ConferenceComparator;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.util.XCS;
-import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class ConferenceServer {
 
@@ -193,8 +188,8 @@ public class ConferenceServer {
 		return result;
 	}
 
-	public Session getSession(String id) {
-		Session result = conferenceCache.getSession(id);
+	public Session getSession(Integer id) {
+		Session result = conferenceCache.getSession(id.toString());
 		if (result == null) {
 			StringBuilder requestUrl = new StringBuilder();
 			requestUrl.append(baseUrl);
@@ -207,23 +202,22 @@ public class ConferenceServer {
 		return result;
 	}
 
-	public String storeSession(Session session, String conferenceId, boolean create) {
+	public Integer storeSession(Session session, String conferenceId, boolean create) {
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/conference/");
 		requestUrl.append(conferenceId);
 		requestUrl.append("/session");
 
+		Integer sessionId = session.getId();
 		if (create) {
 			session = RestClient.createObject(requestUrl.toString(), session, Session.class, token);
+			conferenceCache.add(conferenceId, session);
+			sessionId = session.getId();
 		} else {
-			// TODO should be conforming to other functions
-//			requestUrl.append('/');
-//			requestUrl.append(session.getId());
-			session = RestClient.updateObject(requestUrl.toString(), session, token);
+			RestClient.updateObject(requestUrl.toString(), session, token);
 		}
-		conferenceCache.add(conferenceId, session);
-		return session.getId();
+		return sessionId;
 	}
 
 	public void deleteSession(Session session) {
@@ -272,7 +266,6 @@ public class ConferenceServer {
 			if (result == null) {
 				return new Location[0];
 			}
-			// TODO Server returns no unique list
 			conferenceCache.addObject(LOCATION_CACHE_KEY, result);
 		}
 		return result.toArray(new Location[result.size()]);
@@ -355,7 +348,7 @@ public class ConferenceServer {
 		requestUrl.append(session.getId());
 		requestUrl.append("/rating");
 
-		RestClient.createObject(requestUrl.toString(), rate, void.class, token);
+		RestClient.createObject(requestUrl.toString(), rate, Rate.class, token);
 	}
 
 	public Rate getRate(Session session) {

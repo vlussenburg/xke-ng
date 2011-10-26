@@ -7,11 +7,10 @@
 	android:layout_height="fill_parent">
 	<ImageView
 		android:layout_width="wrap_content"
-		android:id="@+id/imgConference"
 		android:layout_height="wrap_content"
 		android:src="@drawable/x_conference"
 		android:layout_gravity="center"
-		android:layout_marginTop="10dp"></ImageView>
+		android:layout_marginTop="10dp" android:id="@+id/conferenceButton"></ImageView>
 	<TextView
 		android:id="@+id/txtConference"
 		android:layout_width="wrap_content"
