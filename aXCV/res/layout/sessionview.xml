@@ -113,11 +113,6 @@
 		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
 		android:id="@+id/sc_navigate">
-		<View
-			android:layout_height="2dp"
-			android:layout_width="fill_parent"
-			android:background="@color/linebreak"
-			android:id="@+id/thirdDivider" />
 		<LinearLayout
 			android:layout_height="wrap_content"
 			android:id="@+id/linearLayout3"
@@ -129,8 +124,7 @@
 				android:id="@+id/prevSessionLayout"
 				android:layout_width="fill_parent"
 				android:gravity="center"
-				android:background="@drawable/touchtext"
-				android:layout_height="wrap_content">
+				android:background="@drawable/touchtext" android:layout_height="fill_parent">
 				<ImageView
 					android:id="@+id/imageView1"
 					android:layout_width="wrap_content"
@@ -140,9 +134,8 @@
 					android:id="@+id/textPreviousSession"
 					android:layout_height="wrap_content"
 					android:text="Previous Session"
-					android:padding="2sp"
 					android:gravity="center"
-					android:layout_width="wrap_content"></TextView>
+					android:layout_width="wrap_content" android:padding="4sp"></TextView>
 				<ImageView
 					android:id="@+id/ImageView01"
 					android:layout_width="wrap_content"
@@ -165,11 +158,10 @@
 					android:layout_height="fill_parent"></ImageView>
 				<TextView
 					android:text="Next Session"
-					android:padding="2sp"
 					android:gravity="center"
 					android:layout_height="wrap_content"
 					android:id="@+id/textNextSession"
-					android:layout_width="wrap_content"></TextView>
+					android:layout_width="wrap_content" android:padding="4sp"></TextView>
 				<ImageView
 					android:id="@+id/ImageView02"
 					android:layout_width="wrap_content"

@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,7 +33,6 @@ import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
-import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class CVSessionView extends SessionSwipeActivity {
 

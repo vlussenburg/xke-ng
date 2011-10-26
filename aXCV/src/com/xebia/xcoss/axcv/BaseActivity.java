@@ -59,12 +59,12 @@ public abstract class BaseActivity extends Activity {
 		if (rootActivity == null) {
 			rootActivity = this;
 		}
-		Log.e("XCS", "========== ROOT activity [" + rootActivity.getLocalClassName() + "] ========== ");
-		if ((rootActivity instanceof CVSplashLoader) == false) {
-			Log.e("XCS", "========== ROOT activity RESET ========== ");
-			resetApplication(true);
-			return;
-		}
+//		Log.e("XCS", "========== ROOT activity [" + rootActivity.getLocalClassName() + "] ========== ");
+//		if ((rootActivity instanceof CVSplashLoader) == false) {
+//			Log.e("XCS", "========== ROOT activity RESET ========== ");
+//			resetApplication(true);
+//			return;
+//		}
 
 		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);
 		if (conferenceButton != null) {
