@@ -10,7 +10,7 @@ import JsonDomainConverters._
 import net.liftweb.http._
 import org.joda.time._
 import net.liftweb.util.BasicTypesHelpers._
-import com.xebia.xkeng.model.Session
+import com.xebia.xkeng.model._
 
 trait XKENGDispatchAPI extends RestHelper with Logger {
   this: RepositoryComponent =>
@@ -35,7 +35,10 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
       handleConferenceCreate(req.body.toOption)
     // GET /conference/<id>
     case Req("conference" :: id :: Nil, _, GetRequest) =>
-      asJsonResp(conferenceRepository.findConference(id))
+      conferenceRepository.findConference(id) match {
+        case Some(c) => asJsonResp(c)
+        case _ => Full(NotFoundResponse())
+      }
     // PUT /conference
     case req @ Req("conference" :: id :: Nil, _, PutRequest) =>
       handleConferenceUpdate(id, req.body.toOption)
@@ -59,7 +62,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
       handleSessionUpdate(id, req.body.toOption)
     // GET /session/<id>
     case Req("session" :: AsLong(id) :: Nil, _, GetRequest) =>
-      asJsonResp(sessionRepository.findSessionById(id).map(_._2))
+      asJsonResp(Some(sessionRepository.findSessionById(id).map(_._2)))
     // DELETE /session/<sid>
     case Req("session" :: AsLong(id) :: Nil, _, DeleteRequest) =>
       handleSessionDelete(id)
@@ -72,11 +75,11 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
 
     // GET /locations
     case Req("locations" :: Nil, _, GetRequest) =>
-      handleLocations
+      asJsonResp(facilityRepository.findAllLocations)
 
-    // PUT /location
-    case req @ Req("location" :: Nil, _, PutRequest) =>
-      handleLocationUpdate(req.body.toOption)
+    // POST /location
+    case req @ Req("location" :: Nil, _, PostRequest) =>
+      handleLocationCreate(req.body.toOption)
 
     /**
      * *******************
@@ -86,7 +89,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
 
     // GET /authors
     case Req("authors" :: Nil, _, GetRequest) =>
-      handleAuthors
+      asJsonResp(authorRepository.findAllAuthors)
 
     /**
      * *******************
@@ -95,14 +98,10 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
      */
     // GET /labels
     case Req("labels" :: Nil, _, GetRequest) =>
-      handleLabels
+      asJsonResp(labelRepository.findAllLabels())
     // GET /labels/author/<id>
     case Req("labels" :: "author" :: authorId :: Nil, _, GetRequest) =>
-      handleLabels(authorId)
-
-    // PUT /label/<name>
-    case req @ Req("label" :: name :: Nil, _, PutRequest) =>
-      handleLabelUpdate(name, req.body.toOption)
+      asJsonResp(labelRepository.findLabelsByAuthorId(authorId))
 
     /**
      * *******************
@@ -130,38 +129,42 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
      * *******************
      */
     // GET /feedback/<id>/comment
-    case Req("feedback" :: sessionId :: "comment" :: Nil, _, GetRequest) =>
-      handleComments(sessionId.toInt)
-    // PUT /feedback/<id>/comment
-    case req @ Req("feedback" :: sessionId :: "comment" :: Nil, _, PutRequest) =>
-      handleCommentCreate(sessionId.toInt, req.body.toOption)
+    case Req("feedback" :: AsLong(sessionId) :: "comment" :: Nil, _, GetRequest) =>
+      readComments(sessionId)
+    // POST /feedback/<id>/comment
+    case req @ Req("feedback" :: AsLong(sessionId) :: "comment" :: Nil, _, PostRequest) =>
+      handleCommentCreate(sessionId, req.body.toOption)
     // GET /feedback/<id>/rating
-    case Req("feedback" :: sessionId :: "rating" :: Nil, _, GetRequest) =>
-      handleRating(sessionId.toInt)
-    // PUT /feedback/<id>/rating
-    case req @ Req("feedback" :: sessionId :: "rating" :: Nil, _, PutRequest) =>
-      handleRatingCreate(sessionId.toInt, req.body.toOption)
+    case Req("feedback" :: AsLong(sessionId) :: "rating" :: Nil, _, GetRequest) =>
+      readRatings(sessionId)
+    // POST /feedback/<id>/rating
+    case req @ Req("feedback" :: AsLong(sessionId) :: "rating" :: Nil, _, PostRequest) =>
+      handleRatingCreate(sessionId, req.body.toOption)
   }
 
-  private def asJsonResp(json: JValue) = Full(JsonResponse(json))
+  private def asJsonResp(json: Option[JValue]): Box[LiftResponse] = json match {
+    case Some(v) => asJsonResp(v)
+    case _ => Full(NotFoundResponse())
+  }
+
+  private def asJsonResp(json: JValue): Box[LiftResponse] = Full(JsonResponse(json))
 
   private def handleConferenceUpdate(id: String, jsonBody: Option[Array[Byte]]) = {
     conferenceRepository.findConference(id) match {
       case Some(confToUpdate) => {
         val confFromJson = fromConferenceJson(new String(jsonBody.get))
-        val updatedConf = confFromJson.copy(_id = confToUpdate._id)
+        val updatedConf = confFromJson.copy(_id = confToUpdate._id).copy(sessions = confToUpdate.sessions)
         updatedConf.save
         asJsonResp(updatedConf)
-
       }
-      case None => Full(BadResponse())
+      case None => Full(NotFoundResponse())
     }
 
   }
 
   private def handleConferenceCreate(jsonBody: Option[Array[Byte]]) = {
     val conference = fromConferenceJson(new String(jsonBody.get))
-    conference.save
+    conference.copy(sessions = Nil).save
     asJsonResp(conference)
   }
 
@@ -170,7 +173,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     Full(OkResponse())
   }
 
-  private def handleSessionsList(conferenceId: String): Full[LiftResponse] = {
+  private def handleSessionsList(conferenceId: String): Box[LiftResponse] = {
     //should return the sessions of a single conference.
     asJsonResp(conferenceRepository.findSessionsOfConference(conferenceId))
 
@@ -183,18 +186,18 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
         conf.saveOrUpdate(session)
         asJsonResp(session)
       }
-      case _ => Full(BadResponse())
+      case _ => Full(NotFoundResponse())
     }
   }
 
-  private def handleSessionUpdate(confId:String , jsonBody: Option[Array[Byte]]) = {
+  private def handleSessionUpdate(confId: String, jsonBody: Option[Array[Byte]]) = {
     conferenceRepository.findConference(confId) match {
       case Some(conf) => {
         val updatedSession = fromSessionJson(false)(new String(jsonBody.get))
         conf.saveOrUpdate(updatedSession)
         Full(OkResponse())
       }
-      case _ => Full(BadResponse())
+      case _ => Full(NotFoundResponse())
 
     }
   }
@@ -204,29 +207,15 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     Full(OkResponse()) //don't we need to handle errors?
   }
 
-  private def handleLocations = {
-    val a = conferenceRepository.findAllLocations
-    asJsonResp(a)
-  }
-
-  private def handleAuthors = {
-    Full(NotFoundResponse())
-  }
-
-  private def handleLabels = {
-    Full(NotFoundResponse())
-  }
-
-  private def handleLabels(authorId: String) = {
-    Full(NotFoundResponse())
-  }
-
   private def handleLabelUpdate(name: String, jsonBody: Option[Array[Byte]]) = {
     Full(NotFoundResponse())
   }
 
-  private def handleLocationUpdate(jsonBody: Option[Array[Byte]]) = {
-    Full(NotFoundResponse())
+  private def handleLocationCreate(jsonBody: Option[Array[Byte]]) = {
+    val location = fromLocationJson(true)(new String(jsonBody.get))
+    facilityRepository.addLocation(location)
+    asJsonResp(location)
+
   }
 
   private def handleSearchAuthors(jsonBody: Option[Array[Byte]]) = {
@@ -247,19 +236,28 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     Full(NotFoundResponse())
   }
 
-  private def handleComments(sessionId: Int) = {
-    Full(NotFoundResponse())
+  private def readComments(sessionId: Long) = {
+    sessionRepository.findSessionById(sessionId) match {
+      case Some((conference, session)) => asJsonResp(session.comments)
+      case None => Full(NotFoundResponse())
+    }
+
   }
 
-  private def handleCommentCreate(sessionId: Int, jsonBody: Option[Array[Byte]]) = {
-    Full(NotFoundResponse())
+  private def handleCommentCreate(sessionId: Long, jsonBody: Option[Array[Byte]]) = {
+    val comment = fromCommentJson(new String(jsonBody.get))
+    asJsonResp(sessionRepository.commentSessionById(sessionId, comment))
   }
 
-  private def handleRating(sessionId: Int) = {
-    Full(NotFoundResponse())
+  private def readRatings(sessionId: Long) = {
+    sessionRepository.findSessionById(sessionId) match {
+      case Some((conference, session)) => asJsonResp(session.ratings)
+      case None => Full(NotFoundResponse())
+    }
   }
 
-  private def handleRatingCreate(sessionId: Int, jsonBody: Option[Array[Byte]]) = {
-    Full(NotFoundResponse())
+  private def handleRatingCreate(sessionId: Long, jsonBody: Option[Array[Byte]]) = {
+    val rating = fromRatingJson(new String(jsonBody.get))
+    asJsonResp(sessionRepository.rateSessionById(sessionId, rating))
   }
 }

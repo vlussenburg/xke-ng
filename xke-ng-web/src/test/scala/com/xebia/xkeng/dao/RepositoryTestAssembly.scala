@@ -9,7 +9,9 @@ import net.liftweb.mongodb.MongoDB
 
 object RepositoryTestAssembly extends RepositoryComponent {
 
-
   val conferenceRepository = new ConferenceRepositoryImpl
   val sessionRepository = new SessionRepositoryImpl
+  val facilityRepository = new FacilityRepositoryImpl
+  val authorRepository = new AuthorRepositoryImpl
+  val labelRepository = new LabelRepositoryImpl
 }

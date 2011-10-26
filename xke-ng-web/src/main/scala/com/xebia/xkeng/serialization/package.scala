@@ -5,8 +5,7 @@ import scala.io.Source
 import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.DateTime
 
-import net.liftweb.json.JsonAST.JArray
-import net.liftweb.json.JsonAST.JValue
+import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL.seq2jvalue
 import net.liftweb.json.ext.JodaTimeSerializers
 import net.liftweb.json.Formats
@@ -46,43 +45,90 @@ package object util {
 
   def deserializeList[T](value: JValue)(implicit m: Manifest[T]): List[T] = {
     value match {
-      case JArray(locs) => locs.map((v: JValue) => deserialize[T](v))
+      case JArray(items) => items.map((v: JValue) => deserialize[T](v))
       case _ => Nil
     }
   }
-  def deserializeToStr(value: JValue):String = { 
-	  Printer.pretty(JsonAST.render(value))
+
+  def deserializeStringList(value: JValue): List[String] = {
+    value match {
+      case JArray(items) => {
+        items match {
+          case l @ List(_: JString, _*) => l.asInstanceOf[List[JString]].map(_.values.toString())
+          case _ => Nil
+        }
+      }
+      case _ => Nil
+    }
   }
-  
+
+  def deserializeIntList(value: JValue): List[Int] = {
+    value match {
+      case JArray(items) => {
+        items match {
+          case l @ List(_: JInt, _*) => l.asInstanceOf[List[JInt]].map(_.values.toInt)
+          case _ => Nil
+        }
+      }
+      case _ => Nil
+    }
+  }
+
+  def deserializeList[T](value: JValue, convert: JValue => T)(implicit m: Manifest[T]): List[T] = {
+    value match {
+      case JArray(items) => items.map((v: JValue) => convert(v))
+      case _ => Nil
+    }
+  }
+
+  def deserializeToStr(value: JValue): String = {
+    Printer.pretty(JsonAST.render(value))
+  }
+
   /**
    * =====================================================
    * Generic serialization helpers
    * =====================================================
    */
   def serializeToJson(s: String): JValue = {
-    parse(serializeToJsonStr(s))
+    parse(s)
+  }
+
+  def serializeStringsToJArray(strings: String*): JArray = {
+    JArray(strings.toList.map(JString(_)))
+  }
+
+  def serializeIntsToJArray(ints: Int*): JArray = {
+    JArray(ints.toList.map(JInt(_)))
   }
   def serializeToJsonStr(t: AnyRef): String = {
     Serialization.write(t)
   }
 
   implicit def pimpJValueWithInformativeFailingSelector[T <: JValue](values: List[T]): { def \\!(query: String): JValue; def \!(query: String): JValue } = new {
-    def noMatchPartial(query: String): PartialFunction[JValue, JValue] = {
-      case JObject(Nil) => {
-        val message = "mandatory json field=[%s] of json=[%s] was not present." format (query, serializeToJsonStr(values))
-        error(message)
-        throw new IllegalArgumentException(message)
-      }
+
+    def handleNotFound(query: String, values: List[T]) = {
+      val message = "mandatory json field=[%s] of json=[%s] was not present." format (query, serializeToJsonStr(values).replace("\"" ,"" ))
+      error(message)
+      throw new IllegalArgumentException(message)
+
     }
+    def emptyObjectPartial(query: String): PartialFunction[JValue, JValue] = {
+      case JObject(Nil) => handleNotFound(query, values)
+    }
+    def jNothingPartial(query: String): PartialFunction[JValue, JValue] = {
+      case JNothing => handleNotFound(query, values)
+    }
+
     val default: PartialFunction[JValue, JValue] = { case a: JValue => a }
 
     def \\!(query: String): JValue = {
       val selected: JValue = (values \\ query)
-      noMatchPartial(query).orElse(default)(selected)
+      emptyObjectPartial(query).orElse(jNothingPartial(query)).orElse(default)(selected)
     }
     def \!(query: String): JValue = {
       val selected: JValue = (values \ query)
-      noMatchPartial(query).orElse(default)(selected)
+      emptyObjectPartial(query).orElse(jNothingPartial(query)).orElse(default)(selected)
     }
   }
 
@@ -100,7 +146,6 @@ package object util {
     getClass.getClassLoader.getResourceAsStream(fileName)
   }
 }
-
 
 import util._
 /**
