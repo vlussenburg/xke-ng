@@ -30,7 +30,7 @@
 		<CheckBoxPreference
 			android:key="ListView"
 			android:title="Show listing"
-			android:defaultValue="false"
+			android:defaultValue="true"
 			android:summaryOff="Use slide view"
 			android:summaryOn="Show sessions as schedule" />
 		<com.xebia.xcoss.axcv.preference.EditDateTimeFormatPreference

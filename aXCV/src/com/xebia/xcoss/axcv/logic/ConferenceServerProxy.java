@@ -185,7 +185,7 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public Session getSession(Integer id) {
+	public Session getSession(String id) {
 		try {
 			return super.getSession(id);
 		}
@@ -260,7 +260,7 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public Integer storeSession(Session session, String conferenceId, boolean update) {
+	public String storeSession(Session session, String conferenceId, boolean update) {
 		try {
 			return super.storeSession(session, conferenceId, update);
 		}

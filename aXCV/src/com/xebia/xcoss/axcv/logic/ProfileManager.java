@@ -41,7 +41,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 
 	public class Trackable {
 		public long hash;
-		public Integer sessionId;
+		public String sessionId;
 		public String userId;
 		public DateTime date;
 	};
@@ -95,7 +95,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 		create.append(SES_COL_USER);
 		create.append(" text not null, ");
 		create.append(SES_COL_SESSION);
-		create.append(" int, ");
+		create.append(" text not null, ");
 		create.append(SES_COL_HASH);
 		create.append(" text not null, ");
 		create.append(SES_COL_DATE);
@@ -185,7 +185,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 		}
 	}
 
-	public boolean isMarked(String user, Integer sessionId) {
+	public boolean isMarked(String user, String sessionId) {
 		if ( StringUtil.isEmpty(user)) {
 			return false;
 		}
@@ -208,7 +208,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 		}
 	}
 
-	public Integer[] getMarkedSessionIds(String user) {
+	public String[] getMarkedSessionIds(String user) {
 		Log.v(XCS.LOG.COMMUNICATE, "Get all marked sessions for user " + user);
 		try {
 			checkConnection();
@@ -216,17 +216,17 @@ public class ProfileManager extends SQLiteOpenHelper {
 			whereArgs[0] = user;
 			Cursor query = database.query(TRACK_TABLE, new String[] { SES_COL_SESSION }, SES_QUERY_NAME,
 					new String[] { user }, null, null, SES_COL_DATE + " ASC");
-			Integer[] result = new Integer[query.getCount()];
+			String[] result = new String[query.getCount()];
 			int i = 0;
 			for (query.moveToFirst(); !query.isAfterLast(); query.moveToNext()) {
-				result[i++] = query.getInt(query.getColumnIndex(SES_COL_SESSION));
+				result[i++] = query.getString(query.getColumnIndex(SES_COL_SESSION));
 			}
 			query.close();
 			return result;
 		}
 		catch (Exception e) {
 			Log.w(XCS.LOG.COMMUNICATE, "Retrieval failed: " + StringUtil.getExceptionMessage(e));
-			return new Integer[0];
+			return new String[0];
 		}
 	}
 
@@ -257,7 +257,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 			int i = 0;
 			for (query.moveToFirst(); !query.isAfterLast(); query.moveToNext()) {
 				Trackable trackable = new Trackable();
-				trackable.sessionId = query.getInt(query.getColumnIndex(SES_COL_SESSION));
+				trackable.sessionId = query.getString(query.getColumnIndex(SES_COL_SESSION));
 				trackable.hash = query.getLong(query.getColumnIndex(SES_COL_HASH));
 				trackable.userId = user;
 				trackable.date = DateTime.forInstant(query.getLong(query.getColumnIndex(SES_COL_DATE)), XCS.TZ);

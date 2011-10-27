@@ -41,7 +41,7 @@ public class Session implements Serializable {
 	public static final int DEFAULT_DURATION = 60;
 
 	// Auto mapped
-	private Integer id;
+	private Long id;
 	private String title;
 	private String description;
 	private DateTime startTime;
@@ -88,8 +88,8 @@ public class Session implements Serializable {
 		languages.addAll(original.languages);
 	}
 
-	public Integer getId() {
-		return id;
+	public String getId() {
+		return id.toString();
 	}
 
 	public String getTitle() {

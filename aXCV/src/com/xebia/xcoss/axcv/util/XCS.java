@@ -1,8 +1,12 @@
 package com.xebia.xcoss.axcv.util;
 
 import java.util.TimeZone;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.text.util.Linkify.MatchFilter;
+import android.text.util.Linkify.TransformFilter;
+import android.util.Log;
 import android.view.Menu;
 
 public class XCS {
@@ -13,12 +17,12 @@ public class XCS {
 
 	public static class TAG {
 		public static final String LINK = "tag://xebia/";
-		public static final Pattern PATTERN = Pattern.compile("[\\w\\s]+");
+		public static final Pattern PATTERN = Pattern.compile("[\\w]+([\\w\\s])*");
 	}
 
 	public static class AUTHOR {
 		public static final String LINK = "author://xebia/";
-		public static final Pattern PATTERN = Pattern.compile("[\\w\\s]+");
+		public static final Pattern PATTERN = Pattern.compile("[\\w]+([\\w\\s])*");
 	}
 
 	public static class DIALOG {

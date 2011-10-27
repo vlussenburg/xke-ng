@@ -189,8 +189,8 @@ public class ConferenceServer {
 		return result;
 	}
 
-	public Session getSession(Integer id) {
-		Session result = conferenceCache.getSession(id.toString());
+	public Session getSession(String id) {
+		Session result = conferenceCache.getSession(id);
 		if (result == null) {
 			StringBuilder requestUrl = new StringBuilder();
 			requestUrl.append(baseUrl);
@@ -203,14 +203,14 @@ public class ConferenceServer {
 		return result;
 	}
 
-	public Integer storeSession(Session session, String conferenceId, boolean create) {
+	public String storeSession(Session session, String conferenceId, boolean create) {
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/conference/");
 		requestUrl.append(conferenceId);
 		requestUrl.append("/session");
 
-		Integer sessionId = session.getId();
+		String sessionId = session.getId();
 		if (create) {
 			session = RestClient.createObject(requestUrl.toString(), session, Session.class, token);
 			conferenceCache.add(conferenceId, session);
@@ -354,7 +354,7 @@ public class ConferenceServer {
 		requestUrl.append(session.getId());
 		requestUrl.append("/rating");
 
-		RestClient.createObject(requestUrl.toString(), rate, Rate.class, token);
+		RestClient.createObject(requestUrl.toString(), rate, int[].class, token);
 	}
 
 	public Rate getRate(Session session) {
@@ -396,7 +396,7 @@ public class ConferenceServer {
 		requestUrl.append(session.getId());
 		requestUrl.append("/comment");
 
-		RestClient.createObject(requestUrl.toString(), remark, Remark.class, token);
+		RestClient.createObject(requestUrl.toString(), remark, Remark[].class, token);
 	}
 
 	/* Utility functions */

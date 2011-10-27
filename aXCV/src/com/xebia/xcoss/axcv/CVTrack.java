@@ -41,10 +41,10 @@ public class CVTrack extends BaseActivity {
 	protected void onResume() {
 		List<Session> selectedSessions = new ArrayList<Session>();
 		ConferenceServer server = getConferenceServer();
-		Integer[] markedSessions = getProfileManager().getMarkedSessionIds(getUser());
+		String[] markedSessions = getProfileManager().getMarkedSessionIds(getUser());
 		boolean hasExpiredSession = false;
 		DateTime today = DateTime.today(XCS.TZ);
-		for (Integer id : markedSessions) {
+		for (String id : markedSessions) {
 			try {
 				Session session = server.getSession(id);
 				if (session != null) {

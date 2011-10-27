@@ -1,5 +1,7 @@
 package com.xebia.xcoss.axcv;
 
+import java.util.Set;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -173,9 +175,9 @@ public abstract class BaseActivity extends Activity {
 
 	protected Session getSelectedSession(Conference conference) {
 		Session session = null;
-		Integer identifier = null;
+		String identifier = null;
 		try {
-			identifier = getIntent().getExtras().getInt(IA_SESSION);
+			identifier = getIntent().getExtras().getString(IA_SESSION);
 			session = conference.getSessionById(identifier);
 		}
 		catch (Exception e) {
@@ -185,12 +187,13 @@ public abstract class BaseActivity extends Activity {
 	}
 
 	protected Session getDefaultSession(Conference conference) {
-		for (Session s : conference.getSessions()) {
+		Set<Session> sessions = conference.getSessions();
+		for (Session s : sessions) {
 			if (!s.isExpired()) {
 				return s;
 			}
 		}
-		return conference.getSessions().iterator().next();
+		return sessions.isEmpty() ? null : sessions.iterator().next();
 	}
 
 	protected ConferenceServer getConferenceServer() {

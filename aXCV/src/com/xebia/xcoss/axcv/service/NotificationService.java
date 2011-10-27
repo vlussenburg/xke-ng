@@ -132,18 +132,18 @@ public class NotificationService extends Service {
 	}
 
 	protected void checkSessionsForChange(boolean owned) {
-		ArrayList<Integer> sessionIds = owned ? getChangesInOwnedSessions() : getChangesInTrackedSessions();
+		ArrayList<String> sessionIds = owned ? getChangesInOwnedSessions() : getChangesInTrackedSessions();
 		if (sessionIds.size() > 0) {
 			Message message = Message.obtain(handler);
 			Bundle data = new Bundle();
-			data.putIntegerArrayList(owned ? TAG_OWNED : TAG_TRACKED, sessionIds);
+			data.putStringArrayList(owned ? TAG_OWNED : TAG_TRACKED, sessionIds);
 			message.setData(data);
 			handler.sendMessage(message);
 		}
 	}
 
-	protected ArrayList<Integer> getChangesInOwnedSessions() {
-		ArrayList<Integer> modified = new ArrayList<Integer>();
+	protected ArrayList<String> getChangesInOwnedSessions() {
+		ArrayList<String> modified = new ArrayList<String>();
 		ProfileManager pm = new ProfileManager(this);
 		try {
 			pm.openConnection();
@@ -156,7 +156,7 @@ public class NotificationService extends Service {
 			for (Session session : sessions) {
 				boolean sessionFoundInMarkList = false;
 				long lastNotification = session.getModificationHash();
-				Integer id = session.getId();
+				String id = session.getId();
 				for (int i = 0; i < ids.length; i++) {
 					if (id.equals(ids[i].sessionId)) {
 						sessionFoundInMarkList = true;
@@ -187,8 +187,8 @@ public class NotificationService extends Service {
 		}
 	}
 
-	protected ArrayList<Integer> getChangesInTrackedSessions() {
-		ArrayList<Integer> modified = new ArrayList<Integer>();
+	protected ArrayList<String> getChangesInTrackedSessions() {
+		ArrayList<String> modified = new ArrayList<String>();
 		ConferenceServer server = ConferenceServer.getInstance();
 		ProfileManager pm = new ProfileManager(this);
 		try {
@@ -225,9 +225,9 @@ public class NotificationService extends Service {
 		boolean silent = (am.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) || (am.getMode() != AudioManager.MODE_NORMAL);
 		NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-		ArrayList<Integer> sessionIds = bundle.getIntegerArrayList(TAG_TRACKED);
+		ArrayList<String> sessionIds = bundle.getStringArrayList(TAG_TRACKED);
 		if (sessionIds != null) {
-			for (Integer sessionId : sessionIds) {
+			for (String sessionId : sessionIds) {
 				String title = "Track rescheduled";
 				String message = getSessionChange(sessionId);
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
@@ -239,13 +239,13 @@ public class NotificationService extends Service {
 					noty.sound = Uri.parse(soundUri);
 				}
 				// Use session id for notifyCount - This way there is one per session.
-				mgr.notify(sessionId, noty);
+				mgr.notify(sessionId.hashCode(), noty);
 			}
 		}
 
-		sessionIds = bundle.getIntegerArrayList(TAG_OWNED);
+		sessionIds = bundle.getStringArrayList(TAG_OWNED);
 		if (sessionIds != null) {
-			for (Integer sessionId : sessionIds) {
+			for (String sessionId : sessionIds) {
 				String title = "Session change!";
 				String message = getSessionChange(sessionId);
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
@@ -257,12 +257,12 @@ public class NotificationService extends Service {
 					noty.sound = Uri.parse(soundUri);
 				}
 				// Use session id for notifyCount - This way there is one per session.
-				mgr.notify(sessionId, noty);
+				mgr.notify(sessionId.hashCode(), noty);
 			}
 		}
 	}
 
-	private String getSessionChange(Integer id) {
+	private String getSessionChange(String id) {
 		try {
 			Session session = ConferenceServer.getInstance().getSession(id);
 			if (session == null) {
