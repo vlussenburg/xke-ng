@@ -210,13 +210,14 @@ public class ConferenceServer {
 		requestUrl.append(conferenceId);
 		requestUrl.append("/session");
 
-		String sessionId = session.getId();
+		String sessionId = null;
 		if (create) {
 			session = RestClient.createObject(requestUrl.toString(), session, Session.class, token);
 			conferenceCache.add(conferenceId, session);
 			sessionId = session.getId();
 		} else {
 			RestClient.updateObject(requestUrl.toString(), session, token);
+			sessionId = session.getId();
 		}
 		return sessionId;
 	}

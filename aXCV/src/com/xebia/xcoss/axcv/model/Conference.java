@@ -204,6 +204,17 @@ public class Conference implements Serializable {
 		locations.remove(location);
 	}
 
+	public boolean hasLocation(Location sessionLocation) {
+		if (sessionLocation != null) {
+			for (Location loc : locations) {
+				if (loc.getDescription().equals(sessionLocation.getDescription())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	// Utilities
 
 	public boolean check(List<String> messages) {
@@ -293,8 +304,8 @@ public class Conference implements Serializable {
 		}
 	}
 
-	// TODO : Allow current session to be overwritten
-	public TimeSlot getNextAvailableTimeSlot(Session rescheduleSession, DateTime start, int duration, Location location) {
+	public TimeSlot getNextAvailableTimeSlot(Session rescheduleSession, DateTime start, final int duration,
+			Location location) {
 
 		int prefstart = Math.max(getTime(start), getTime(startTime));
 

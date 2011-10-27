@@ -193,27 +193,25 @@ public class CVSessionAdd extends AdditionActivity {
 		button.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
-				if (rescheduleSession(0) == null) {
-					createDialog("Rescheduling failed",
-							"The session cannot be scheduled. Minimize duration or use another location.").show();
-				}
+				rescheduleSession(0);
 				showConference();
 				showSession();
 			}
 		});
 	}
 
-	private TimeSlot rescheduleSession(int duration) {
+	private void rescheduleSession(int duration) {
 		if (conference == null) {
-			return null;
+			return;
 		}
 		if (duration == 0) {
 			duration = session.getDuration();
 		}
 		List<Location> locations = null;
-		if (session.getLocation() != null) {
+		Location sessionLocation = session.getLocation();
+		if (sessionLocation != null && conference.hasLocation(sessionLocation)) {
 			locations = new ArrayList<Location>();
-			locations.add(session.getLocation());
+			locations.add(sessionLocation);
 		} else {
 			locations = conference.getLocations();
 		}
@@ -221,23 +219,23 @@ public class CVSessionAdd extends AdditionActivity {
 		TimeSlot slot = null;
 		Iterator<Location> iterator = locations.iterator();
 		while (slot == null && iterator.hasNext()) {
-			Location next = iterator.next();
-			slot = conference.getNextAvailableTimeSlot(session, session.getStartTime(), duration, next);
+			Location location = iterator.next();
 			Log.v("XCS", "Reschedule ["
 					+ session.getStartTime()
 					+ ", "
 					+ duration
 					+ ", "
-					+ next.getDescription()
-					+ "] => "
-					+ (slot == null ? "NONE" : slot.start.format("h:mm") + " till " + slot.end.format("h:mm") + " @ "
-							+ slot.location.getDescription()));
+					+ location.getDescription()
+					+ "] => ");
+			slot = conference.getNextAvailableTimeSlot(session, session.getStartTime(), duration, location);
+			Log.v("XCS", slot == null ? "NONE" : slot.start.format("h:mm") + " till " + slot.end.format("h:mm") + " @ "
+							+ slot.location.getDescription());
 		}
-		// Move up to the next conference and call this method recursively
-		if (slot == null) {
-			conference = getConferenceServer().getUpcomingConference(conference.getDate().plusDays(1));
-			slot = rescheduleSession(duration);
-		}
+//		// Move up to the next conference and call this method recursively
+//		if (slot == null) {
+//			conference = getConferenceServer().getUpcomingConference(conference.getDate().plusDays(1));
+//			slot = rescheduleSession(duration);
+//		}
 
 		if (slot != null) {
 			session.setStartTime(conference.getDate());
@@ -245,8 +243,11 @@ public class CVSessionAdd extends AdditionActivity {
 			session.setStartTime(slot.start);
 			session.setEndTime(slot.end);
 			session.setLocation(slot.location);
+			session.setConferenceId(conference.getId());
+		} else {
+			createDialog("Rescheduling failed",
+					"The session cannot be scheduled. Shorten session, use another location or choose another conference.").show();
 		}
-		return slot;
 	}
 
 	/**
@@ -266,27 +267,15 @@ public class CVSessionAdd extends AdditionActivity {
 				Identifiable ident = (Identifiable) selection;
 				conference = getConferenceServer().getConference(ident.getIdentifier());
 				session.setStartTime(conference.getDate());
-				showConference();
+				rescheduleSession(session.getDuration());
 			break;
 			case R.id.sessionStart:
 				TimeSlot t = (TimeSlot) selection;
 				session.setStartTime(t.start);
 				rescheduleSession(0);
-//				if (session.getEndTime() == null) {
-//					int duration = session.getDuration();
-//					if ( duration == 0 ) { duration = Session.DEFAULT_DURATION; }
-//					session.setEndTime(session.getStartTime().plus(0, 0, 0, 0, duration, 0,
-//							DayOverflow.Spillover));
-//				}
-//				if (session.getLocation() == null) {
-//					session.setLocation(t.location);
-//				}
 			case R.id.sessionDuration:
 				int duration = StringUtil.getFirstInteger(value);
-//				if (session.getStartTime() == null) {
-					rescheduleSession(duration);
-//				}
-//				session.setEndTime(session.getStartTime().plus(0, 0, 0, 0, duration, 0, DayOverflow.Spillover));
+				rescheduleSession(duration);
 			break;
 			case R.id.sessionLanguage:
 				Set<String> languages = session.getLanguages();
@@ -321,9 +310,8 @@ public class CVSessionAdd extends AdditionActivity {
 			default:
 				Log.w(LOG.NAVIGATE, "Don't know how to process: " + field);
 		}
-		Log.w(XCS.LOG.ALL, "Start = " + session.getStartTime());
-		Log.w(XCS.LOG.ALL, "Eind  = " + session.getEndTime());
 		showSession();
+		showConference();
 	}
 
 	private void activateDetails(boolean state) {

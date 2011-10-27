@@ -1,6 +1,7 @@
 package com.xebia.xcoss.axcv.model;
 
 import hirondelle.date4j.DateTime;
+import hirondelle.date4j.DateTime.DayOverflow;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -143,7 +144,9 @@ public class Session implements Serializable {
 	}
 
 	public void setStartTime(DateTime time) {
+		int duration = getDuration();
 		startTime = updateTime(startTime, time);
+		setEndTime(startTime.plus(0, 0, 0, 0, duration, 0, DayOverflow.Spillover));
 	}
 
 	public DateTime getEndTime() {
@@ -229,14 +232,6 @@ public class Session implements Serializable {
 		return duration;
 	}
 
-	// public DateTime getLastUpdate() {
-	// return lastUpdate;
-	// }
-	//
-	// public DateTime getLastReschedule() {
-	// return lastReschedule;
-	// }
-	//
 	public boolean check(List<String> messages) {
 		if (startTime == null) {
 			messages.add("Start time");
@@ -244,17 +239,19 @@ public class Session implements Serializable {
 		if (StringUtil.isEmpty(title)) {
 			messages.add("Title");
 		}
-		if (type != Type.BREAK && authors.isEmpty()) {
-			messages.add("Author");
+		if (StringUtil.isEmpty(description)) {
+			messages.add("Description");
+		}
+		if ( type != Type.BREAK ) {
+			if (authors.isEmpty()) {
+				messages.add("Author");
+			}
+			if (StringUtil.isEmpty(limit)) {
+				messages.add("Number of people");
+			}
 		}
 		if (location == null) {
 			messages.add("Location");
-		}
-		if (StringUtil.isEmpty(limit)) {
-			messages.add("Number of people");
-		}
-		if (StringUtil.isEmpty(description)) {
-			messages.add("Description");
 		}
 		return (messages.size() == 0);
 	}
