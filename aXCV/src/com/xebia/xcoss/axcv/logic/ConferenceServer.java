@@ -6,6 +6,7 @@ import hirondelle.date4j.DateTime.Unit;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import android.content.Context;
@@ -268,6 +269,11 @@ public class ConferenceServer {
 			}
 			conferenceCache.addObject(LOCATION_CACHE_KEY, result);
 		}
+		Collections.sort(result, new Comparator<Location>() {
+			public int compare(Location object1, Location object2) {
+				return object1.getDescription().compareTo(object2.getDescription());
+			}
+		});
 		return result.toArray(new Location[result.size()]);
 	}
 

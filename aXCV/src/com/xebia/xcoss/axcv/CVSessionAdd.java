@@ -210,9 +210,9 @@ public class CVSessionAdd extends AdditionActivity {
 		if (duration == 0) {
 			duration = session.getDuration();
 		}
-		Set<Location> locations = null;
+		List<Location> locations = null;
 		if (session.getLocation() != null) {
-			locations = new HashSet<Location>();
+			locations = new ArrayList<Location>();
 			locations.add(session.getLocation());
 		} else {
 			locations = conference.getLocations();

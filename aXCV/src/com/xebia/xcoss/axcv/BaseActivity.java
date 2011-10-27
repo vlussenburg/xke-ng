@@ -143,6 +143,8 @@ public abstract class BaseActivity extends Activity {
 		// Clears out the activity call stack
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
+		// Finish the current activity
+		finish();
 	}
 
 	public Conference getConference() {

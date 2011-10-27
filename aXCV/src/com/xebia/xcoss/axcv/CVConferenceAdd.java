@@ -182,27 +182,19 @@ public class CVConferenceAdd extends AdditionActivity {
 				if (checked) {
 					// Add the location
 					Location[] locations = getConferenceServer().getLocations();
-					Location selected = null;
 					for (int i = 0; i < locations.length; i++) {
 						if (locations[i].getDescription().equals(value)) {
-							selected = locations[i];
+							conference.addLocation(locations[i]);
 							break;
 						}
-					}
-					if (selected != null) {
-						conference.getLocations().add(selected);
 					}
 				} else {
-					Location contained = null;
-					Set<Location> locations = conference.getLocations();
+					Iterable<Location> locations = conference.getLocations();
 					for (Location location : locations) {
 						if (location.getDescription().equals(value)) {
-							contained = location;
+							conference.removeLocation(location);
 							break;
 						}
-					}
-					if (contained != null) {
-						locations.remove(contained);
 					}
 				}
 			break;
@@ -311,7 +303,7 @@ public class CVConferenceAdd extends AdditionActivity {
 			break;
 			case XCS.DIALOG.INPUT_LOCATION:
 				AlertDialog ad = (AlertDialog) dialog;
-				Set<Location> locations = conference.getLocations();
+				Iterable<Location> locations = conference.getLocations();
 				Set<String> locNames = new HashSet<String>();
 				for (Location location : locations) {
 					locNames.add(location.getDescription());

@@ -4,7 +4,9 @@ import hirondelle.date4j.DateTime;
 import hirondelle.date4j.DateTime.DayOverflow;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -97,13 +99,14 @@ public class Conference implements Serializable {
 
 	private Set<Session> sort(Set<Session> org) {
 		try {
-			if ( ((TreeSet<Session>) org).comparator() instanceof SessionComparator ) {
+			if (((TreeSet<Session>) org).comparator() instanceof SessionComparator) {
 				return org;
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			// Ignore
 		}
-		
+
 		resetSessions();
 		sessions.addAll(org);
 		return sessions;
@@ -182,8 +185,23 @@ public class Conference implements Serializable {
 		this.organiser = organiser;
 	}
 
-	public Set<Location> getLocations() {
-		return locations;
+	public List<Location> getLocations() {
+		List<Location> loc = new ArrayList<Location>();
+		loc.addAll(locations);
+		Collections.sort(loc, new Comparator<Location>() {
+			public int compare(Location object1, Location object2) {
+				return object1.getDescription().compareTo(object2.getDescription());
+			}
+		});
+		return loc;
+	}
+
+	public void addLocation(Location location) {
+		if (location != null) locations.add(location);
+	}
+
+	public void removeLocation(Location location) {
+		locations.remove(location);
 	}
 
 	// Utilities
