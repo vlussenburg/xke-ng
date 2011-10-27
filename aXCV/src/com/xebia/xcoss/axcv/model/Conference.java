@@ -368,8 +368,9 @@ public class Conference implements Serializable {
 
 	private TimeSlot getTimeSlot(int value, int duration, Location loc) {
 		TimeSlot ts = new TimeSlot();
+		int endValue = value + duration;
 		ts.start = DateTime.forTimeOnly(value / 60, value % 60, 0, 0);
-		ts.end = ts.start.plus(0, 0, 0, 0, duration, 0, DayOverflow.Spillover);
+		ts.end = DateTime.forTimeOnly(endValue / 60, endValue % 60, 0, 0);
 		ts.location = loc;
 		return ts;
 	}

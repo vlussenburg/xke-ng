@@ -51,11 +51,8 @@ public class Session implements Serializable {
 	private Type type = Type.STANDARD;
 	private Set<Author> authors;
 	private Location location;
-	// private DateTime date;
-	// private DateTime lastUpdate;
-	// private DateTime lastReschedule;
-
 	private Set<String> labels;
+	
 	private transient String conferenceId;
 	
 	// TODO : Not mapped at all at the moment...

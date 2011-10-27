@@ -1,11 +1,9 @@
 package com.xebia.xcoss.axcv;
 
 import hirondelle.date4j.DateTime;
-import hirondelle.date4j.DateTime.DayOverflow;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -239,7 +237,6 @@ public class CVSessionAdd extends AdditionActivity {
 
 		if (slot != null) {
 			session.setStartTime(conference.getDate());
-			session.setEndTime(conference.getDate());
 			session.setStartTime(slot.start);
 			session.setEndTime(slot.end);
 			session.setLocation(slot.location);
@@ -301,6 +298,7 @@ public class CVSessionAdd extends AdditionActivity {
 			break;
 			case R.id.sessionLocation:
 				session.setLocation((Location) selection);
+				rescheduleSession(0);
 			break;
 			case R.id.sessionType:
 				Type type = (Type) selection;
