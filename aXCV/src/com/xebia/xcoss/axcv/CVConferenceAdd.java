@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -24,10 +25,13 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.model.Location;
+import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.LocationInputDialog;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
@@ -119,15 +123,70 @@ public class CVConferenceAdd extends AdditionActivity {
 			}
 		});
 		button = (Button) findViewById(R.id.actionDelete);
-		if (create) {
+		if (create || conference.getDate().isInThePast(XCS.TZ)) {
 			button.setVisibility(View.GONE);
 		} else {
 			button.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View paramView) {
-					// TODO Confirmation dialog
-					conference.delete();
-					CVConferenceAdd.this.finish();
+					int size = conference.getSessions().size();
+					StringBuilder message = new StringBuilder();
+					String NEWLINE = System.getProperty("line.separator");
+					if (size > 0) {
+						message.append("Warning!");
+						message.append(NEWLINE);
+						message.append("This conference has ").append(size).append(" session(s).");
+						message.append(NEWLINE);
+					}
+					message.append("Are you sure to delete conference '").append(conference.getTitle()).append("'");
+					message.append(" on ");
+					message.append(timeFormatter.getAbsoluteDate(conference.getDate()));
+					message.append("?");
+
+					AlertDialog.Builder builder = new AlertDialog.Builder(CVConferenceAdd.this);
+					builder.setTitle("Delete conference");
+					builder.setMessage(message.toString());
+					builder.setIcon(android.R.drawable.ic_dialog_alert);
+					builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					});
+					builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							conference.delete();
+							CVConferenceAdd.this.finish();
+						}
+					});
+					if (size > 0) {
+						builder.setNeutralButton("Move & delete", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								Conference nextConference = getConferenceServer().getUpcomingConference(
+										conference.getDate().plusDays(1));
+								Set<Session> sessions = conference.getSessions();
+								for (Session s : sessions) {
+									SortedSet<TimeSlot> slots = nextConference.getAvailableTimeSlots(s.getDuration());
+									if (slots.isEmpty()) {
+										dialog.dismiss();
+										Toast.makeText(CVConferenceAdd.this, "Failed! Session cannot be moved.",
+												Toast.LENGTH_LONG);
+										return;
+									}
+									s.reschedule(nextConference, slots.first());
+									if ( !nextConference.addSession(s, false)) {
+										dialog.dismiss();
+										Toast.makeText(CVConferenceAdd.this, "Failed! Session cannot be moved.",
+												Toast.LENGTH_LONG);
+										return;
+									}
+								}
+								conference.delete();
+								CVConferenceAdd.this.finish();
+							}
+						});
+					}
+					AlertDialog alertDialog = builder.create();
+					alertDialog.show();
 				}
 			});
 		}

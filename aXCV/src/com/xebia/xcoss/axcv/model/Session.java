@@ -11,6 +11,7 @@ import java.util.TreeSet;
 
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -346,5 +347,13 @@ public class Session implements Serializable {
 	
 	public String getConferenceId() {
 		return conferenceId;
+	}
+
+	public void reschedule(Conference conference, TimeSlot slot) {
+		setStartTime(conference.getDate());
+		setStartTime(slot.start);
+		setEndTime(slot.end);
+		setLocation(slot.location);
+		setConferenceId(conference.getId());
 	}
 }

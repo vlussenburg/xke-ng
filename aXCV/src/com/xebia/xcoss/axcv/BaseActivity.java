@@ -76,8 +76,6 @@ public abstract class BaseActivity extends Activity {
 					showConferencesList();
 				}
 			});
-		} else {
-			Log.e("XCS", "Conference button not found on view " + this.getClass().getSimpleName());
 		}
 	}
 

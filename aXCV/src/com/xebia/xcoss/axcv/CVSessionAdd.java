@@ -165,8 +165,6 @@ public class CVSessionAdd extends AdditionActivity {
 							.show();
 					return;
 				}
-				Log.w(XCS.LOG.ALL, "* Start = " + session.getStartTime());
-				Log.w(XCS.LOG.ALL, "* Eind  = " + session.getEndTime());
 				if (!conference.addSession(session, create)) {
 					Log.e(LOG.ALL, "Adding session failed.");
 					createDialog("No session added", "Session could not be added.").show();
@@ -181,9 +179,27 @@ public class CVSessionAdd extends AdditionActivity {
 			button.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View paramView) {
-					// TODO Confirmation dialog
-					conference.deleteSession(originalSession);
-					CVSessionAdd.this.finish();
+					StringBuilder message = new StringBuilder();
+					message.append("Are you sure to delete session '").append(session.getTitle()).append("'");
+					message.append(" on ");
+					message.append(timeFormatter.getAbsoluteDate(session.getStartTime()));
+					message.append("?");
+
+					AlertDialog.Builder builder = new AlertDialog.Builder(CVSessionAdd.this);
+					builder.setTitle("Delete session");
+					builder.setMessage(message.toString());
+					builder.setIcon(android.R.drawable.ic_dialog_alert);
+					builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					});
+					builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							conference.deleteSession(originalSession);
+							CVSessionAdd.this.finish();
+						}
+					});
 				}
 			});
 		}
@@ -236,11 +252,7 @@ public class CVSessionAdd extends AdditionActivity {
 //		}
 
 		if (slot != null) {
-			session.setStartTime(conference.getDate());
-			session.setStartTime(slot.start);
-			session.setEndTime(slot.end);
-			session.setLocation(slot.location);
-			session.setConferenceId(conference.getId());
+			session.reschedule(conference, slot);
 		} else {
 			createDialog("Rescheduling failed",
 					"The session cannot be scheduled. Shorten session, use another location or choose another conference.").show();
