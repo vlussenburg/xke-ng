@@ -27,11 +27,13 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.ui.AddBreakDialog;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.LocationInputDialog;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
@@ -47,6 +49,7 @@ public class CVConferenceAdd extends AdditionActivity {
 	private Conference originalConference;
 	private Conference conference;
 	private boolean create = false;
+	private List<Session> breakSessions;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -56,7 +59,8 @@ public class CVConferenceAdd extends AdditionActivity {
 
 		this.timeFormatter = new ScreenTimeUtil(this);
 		this.originalConference = getConference(false);
-
+		this.breakSessions = new ArrayList<Session>();
+		
 		if (originalConference == null) {
 			create = true;
 			conference = new Conference();
@@ -94,12 +98,42 @@ public class CVConferenceAdd extends AdditionActivity {
 
 			view = (TextView) findViewById(R.id.conferenceLocations);
 			view.setText(FormatUtil.getList(conference.getLocations()));
+
+			List<Session> breakSessions = findBreakSessions();
+			StringBuilder sb = new StringBuilder();
+			String NL = System.getProperty("line.separator");
+			for (Session s : breakSessions) {
+				if (sb.length() > 0) {
+					sb.append(NL);
+				}
+				sb.append(s.getTitle());
+				sb.append(" [").append(s.getLocation());
+				sb.append(" @ ").append(timeFormatter.getAbsoluteTime(s.getStartTime()));
+				sb.append("]");
+			}
+			if (sb.length() == 0) {
+				sb.append(FormatUtil.NONE_FOUND);
+			}
+			view = (TextView) findViewById(R.id.breakTime);
+			view.setText(sb.toString());
 		}
+	}
+
+	private List<Session> findBreakSessions() {
+		ArrayList<Session> breaks = new ArrayList<Session>();
+		for (Session s : conference.getSessions()) {
+			if (s.isBreak()) {
+				breaks.add(s);
+			}
+		}
+		breaks.addAll(breakSessions);
+		return breaks;
 	}
 
 	private void registerActions() {
 		int[] identifiers = new int[] { R.id.conferenceName, R.id.conferenceDate, R.id.conferenceStart,
-				R.id.conferenceEnd, R.id.conferenceDescription, R.id.conferenceOrganiser, R.id.conferenceLocations };
+				R.id.conferenceEnd, R.id.conferenceDescription, R.id.conferenceOrganiser, R.id.conferenceLocations,
+				R.id.breakTime };
 
 		activateViews(identifiers);
 
@@ -115,9 +149,16 @@ public class CVConferenceAdd extends AdditionActivity {
 				}
 
 				if (create) {
-					Conference.create(conference);
+					conference = Conference.create(conference);
 				} else {
 					conference.update();
+				}
+				for (Session s : breakSessions) {
+					try {
+						conference.addSession(s, true);
+					} catch (CommException e) {
+						Log.e(XCS.LOG.COMMUNICATE, "Cannot add break session " + s);
+					}
 				}
 				CVConferenceAdd.this.finish();
 			}
@@ -173,7 +214,7 @@ public class CVConferenceAdd extends AdditionActivity {
 										return;
 									}
 									s.reschedule(nextConference, slots.first());
-									if ( !nextConference.addSession(s, false)) {
+									if (!nextConference.addSession(s, false)) {
 										dialog.dismiss();
 										Toast.makeText(CVConferenceAdd.this, "Failed! Session cannot be moved.",
 												Toast.LENGTH_LONG);
@@ -257,6 +298,11 @@ public class CVConferenceAdd extends AdditionActivity {
 					}
 				}
 			break;
+			case R.id.breakTime:
+				if ( selection instanceof Session ){
+					breakSessions.add((Session) selection);
+				}
+			break;
 			default:
 				Log.w(LOG.NAVIGATE, "Don't know how to process: " + field);
 		}
@@ -298,6 +344,13 @@ public class CVConferenceAdd extends AdditionActivity {
 				builder.setTitle("Select locations");
 				builder.setMultiChoiceItems(items, check, new DialogHandler(this, items, R.id.conferenceLocations));
 				dialog = builder.create();
+			break;
+			case XCS.DIALOG.CREATE_BREAK:
+				if (conference.getLocations().size() == 0 || conference.getDate() == null) {
+					createDialog("Conference detail", "No locations and/or date specified yet").show();
+				} else {
+					dialog = new AddBreakDialog(this, R.id.breakTime);
+				}
 			break;
 			case XCS.DIALOG.INPUT_TIME_START:
 				time = conference.getStartTime();
@@ -355,6 +408,10 @@ public class CVConferenceAdd extends AdditionActivity {
 				tid.setDescription("Conference title");
 				tid.setValue(conference.getTitle());
 			break;
+			case XCS.DIALOG.CREATE_BREAK:
+				AddBreakDialog abd = (AddBreakDialog) dialog;
+				abd.setConference(conference);
+			break;
 			case XCS.DIALOG.INPUT_DESCRIPTION:
 				tid = (TextInputDialog) dialog;
 				tid.setDescription("Description");
@@ -399,6 +456,9 @@ public class CVConferenceAdd extends AdditionActivity {
 			break;
 			case R.id.conferenceDate:
 				showDialog(XCS.DIALOG.INPUT_DATE);
+			break;
+			case R.id.breakTime:
+				showDialog(XCS.DIALOG.CREATE_BREAK);
 			break;
 			default:
 				Log.w(XCS.LOG.NAVIGATE, "Click on text not handled: " + id);

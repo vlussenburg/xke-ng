@@ -143,7 +143,7 @@ public class ConferenceServer {
 		return result;
 	}
 
-	public String storeConference(Conference conference, boolean create) {
+	public Conference storeConference(Conference conference, boolean create) {
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
 		requestUrl.append("/conference");
@@ -157,7 +157,7 @@ public class ConferenceServer {
 			conference = RestClient.updateObject(requestUrl.toString(), conference, token);
 		}
 		conferenceCache.add(conference);
-		return conference.getId();
+		return conference;
 	}
 
 	public void deleteConference(Conference conference) {

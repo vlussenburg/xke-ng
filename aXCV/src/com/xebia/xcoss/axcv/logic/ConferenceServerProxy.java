@@ -249,7 +249,7 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public String storeConference(Conference conference, boolean create) {
+	public Conference storeConference(Conference conference, boolean create) {
 		try {
 			return super.storeConference(conference, create);
 		}

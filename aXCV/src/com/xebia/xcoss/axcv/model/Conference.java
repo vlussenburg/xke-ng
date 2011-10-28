@@ -274,7 +274,7 @@ public class Conference implements Serializable {
 		}
 	}
 
-	public static String create(Conference conference) {
+	public static Conference create(Conference conference) {
 		try {
 			return ConferenceServer.getInstance().storeConference(conference, true);
 		}
