@@ -75,8 +75,9 @@ public class LocationInputDialog extends Dialog {
 					return;
 				}
 
-				int sizeAsInt = Integer.parseInt(size);
-				activity.updateField(identifier, new Location(sizeAsInt, name), true);
+				Location selection = new Location(0, name);
+				selection.setCapacity(Integer.parseInt(size));
+				activity.updateField(identifier, selection, true);
 				dismiss();
 			}
 		});

@@ -21,8 +21,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -42,8 +44,10 @@ import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class RestClient {
 
+	private static final String JSESSIONID = "JSESSIONID";
 	private static final int HTTP_TIMEOUT = 5 * 1000;
 	private static GsonBuilder gsonBuilder = null;
+	private static String sessionId = null;
 
 	private static Gson getGson() {
 		if (gsonBuilder == null) {
@@ -190,7 +194,6 @@ public class RestClient {
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
-			Log.d(LOG.COMMUNICATE, "Posting: " + postData);
 			reader = getReader(new HttpPost(url), postData, token);
 			return getGson().fromJson(reader, rvClass);
 		}
@@ -212,10 +215,17 @@ public class RestClient {
 	}
 
 	private static Reader getReader(HttpRequestBase request, String token) {
+		DefaultHttpClient httpClient = null;
 		try {
-			request.addHeader("Authorization", "Token " + token);
-			HttpResponse response = getHttpClient().execute(request);
-
+			httpClient = getHttpClient();
+			httpClient.getCookieStore().addCookie(new BasicClientCookie(JSESSIONID, sessionId));
+			HttpResponse response = httpClient.execute(request);
+	        List<Cookie> cookies = httpClient.getCookieStore().getCookies();
+	        for (Cookie cookie : cookies) {
+				if ( JSESSIONID.equals(cookie.getName()) ) {
+					sessionId = cookie.getValue();
+				}
+			}
 			handleResponse(request, response);
 
 			String result = readResponse(response);
@@ -224,6 +234,13 @@ public class RestClient {
 		}
 		catch (IOException e) {
 			throw new ServerException(request.getURI().toString(), e);
+		}
+		finally {
+			try {
+				httpClient.getConnectionManager().closeExpiredConnections();
+			} catch (Exception e) {
+				Log.i(XCS.LOG.COMMUNICATE, "Close expired failed: " + StringUtil.getExceptionMessage(e));
+			}
 		}
 	}
 
@@ -247,7 +264,7 @@ public class RestClient {
 		return result.toString();
 	}
 
-	private static HttpClient getHttpClient() {
+	private static DefaultHttpClient getHttpClient() {
 		HttpParams httpParams = new BasicHttpParams();
 		HttpConnectionParams.setConnectionTimeout(httpParams, HTTP_TIMEOUT);
 		HttpConnectionParams.setSoTimeout(httpParams, HTTP_TIMEOUT);

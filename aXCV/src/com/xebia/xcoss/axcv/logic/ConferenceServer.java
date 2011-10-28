@@ -16,6 +16,7 @@ import com.xebia.xcoss.axcv.logic.cache.DataCache;
 import com.xebia.xcoss.axcv.logic.cache.MemoryCache;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Credential;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Rate;
 import com.xebia.xcoss.axcv.model.Remark;
@@ -61,13 +62,11 @@ public class ConferenceServer {
 	}
 
 	public void login(String user, String password) {
-		// TODO : Not yet implemented on EC2
-		this.token = "NoAuthenticationYet";
-		// StringBuilder requestUrl = new StringBuilder();
-		// requestUrl.append(baseUrl);
-		// requestUrl.append("/login");
-		// this.token = RestClient.postObject(requestUrl.toString(), new Credential(user, password), String.class,
-		// null);
+		 StringBuilder requestUrl = new StringBuilder();
+		 requestUrl.append(baseUrl);
+		 requestUrl.append("/login");
+		 RestClient.postObject(requestUrl.toString(), new Credential(user, password), void.class, null);
+		 this.token = "fix";
 	}
 
 	public boolean isLoggedIn() {
