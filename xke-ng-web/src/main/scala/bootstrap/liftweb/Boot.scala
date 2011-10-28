@@ -4,10 +4,12 @@ import _root_.net.liftweb.common._
 import _root_.net.liftweb.http._
 import _root_.net.liftweb.http.provider._
 import _root_.net.liftweb.sitemap._
-import com.xebia.xkeng.rest.{Assembly, XKENGDispatchAPI}
+import com.xebia.xkeng.rest.Assembly._
+import com.xebia.xkeng.rest.SecurityInterceptor._
 import net.liftweb.util.Props
 import net.liftweb.mongodb.{DefaultMongoIdentifier, MongoDB}
 import com.mongodb.{Mongo, MongoOptions, ServerAddress}
+import net.liftweb.util.Helpers._ 
 
 /**
  * A class that's instantiated early and run.  It allows the application
@@ -31,11 +33,11 @@ class Boot {
     //    LiftRules.setSiteMapFunc(() => User.sitemapMutator(sitemap()))
 
 
-    Assembly.init()
+    init()
     val purge = Props.get("mongo.purge.data").map(_.trim.toBoolean).getOrElse(false)
-    Assembly.purgeAndPushTestdata(purge)
-    LiftRules.dispatch.append(Assembly.SecurityAPIAssembly)
-    LiftRules.dispatch.append(Assembly.XKENGDispatchAPIAssembly)
+    purgeAndPushTestdata(purge)
+    LiftRules.dispatch.append(SecurityAPIAssembly)
+    LiftRules.dispatch.append(authenticationInterceptor guard XKENGDispatchAPIAssembly)
     /*
      * Show the spinny image when an Ajax call starts
      */
