@@ -4,6 +4,9 @@ import hirondelle.date4j.DateTime;
 import hirondelle.date4j.DateTime.DayOverflow;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -90,6 +93,22 @@ public class Conference implements Serializable {
 				BaseActivity.handleException(null, "retrieving sessions", e);
 			}
 		}
+		// Json mapping does not put it in a sorted set...
+		return sort(sessions);
+	}
+
+	private Set<Session> sort(Set<Session> org) {
+		try {
+			if (((TreeSet<Session>) org).comparator() instanceof SessionComparator) {
+				return org;
+			}
+		}
+		catch (Exception e) {
+			// Ignore
+		}
+
+		resetSessions();
+		sessions.addAll(org);
 		return sessions;
 	}
 
@@ -166,8 +185,34 @@ public class Conference implements Serializable {
 		this.organiser = organiser;
 	}
 
-	public Set<Location> getLocations() {
-		return locations;
+	public List<Location> getLocations() {
+		List<Location> loc = new ArrayList<Location>();
+		loc.addAll(locations);
+		Collections.sort(loc, new Comparator<Location>() {
+			public int compare(Location object1, Location object2) {
+				return object1.getDescription().compareTo(object2.getDescription());
+			}
+		});
+		return loc;
+	}
+
+	public void addLocation(Location location) {
+		if (location != null) locations.add(location);
+	}
+
+	public void removeLocation(Location location) {
+		locations.remove(location);
+	}
+
+	public boolean hasLocation(Location sessionLocation) {
+		if (sessionLocation != null) {
+			for (Location loc : locations) {
+				if (loc.getDescription().equals(sessionLocation.getDescription())) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	// Utilities
@@ -189,9 +234,9 @@ public class Conference implements Serializable {
 		sessions = new TreeSet<Session>(new SessionComparator());
 	}
 
-	public Session getSessionById(String id) {
+	public Session getSessionById(String identifier) {
 		for (Session session : getSessions()) {
-			if (id.equals(session.getId())) {
+			if (identifier.equals(session.getId())) {
 				return session;
 			}
 		}
@@ -209,7 +254,7 @@ public class Conference implements Serializable {
 		try {
 			String id = ConferenceServer.getInstance().storeSession(session, getId(), create);
 			resetSessions();
-			return !StringUtil.isEmpty(id);
+			return id != null;
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(null, "adding session", e);
@@ -229,7 +274,7 @@ public class Conference implements Serializable {
 		}
 	}
 
-	public static String create(Conference conference) {
+	public static Conference create(Conference conference) {
 		try {
 			return ConferenceServer.getInstance().storeConference(conference, true);
 		}
@@ -259,8 +304,8 @@ public class Conference implements Serializable {
 		}
 	}
 
-	// TODO : Allow current session to be overwritten
-	public TimeSlot getNextAvailableTimeSlot(Session rescheduleSession, DateTime start, int duration, Location location) {
+	public TimeSlot getNextAvailableTimeSlot(Session rescheduleSession, DateTime start, final int duration,
+			Location location) {
 
 		int prefstart = Math.max(getTime(start), getTime(startTime));
 
@@ -323,8 +368,9 @@ public class Conference implements Serializable {
 
 	private TimeSlot getTimeSlot(int value, int duration, Location loc) {
 		TimeSlot ts = new TimeSlot();
+		int endValue = value + duration;
 		ts.start = DateTime.forTimeOnly(value / 60, value % 60, 0, 0);
-		ts.end = ts.start.plus(0, 0, 0, 0, duration, 0, DayOverflow.Spillover);
+		ts.end = DateTime.forTimeOnly(endValue / 60, endValue % 60, 0, 0);
 		ts.location = loc;
 		return ts;
 	}

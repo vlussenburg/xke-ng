@@ -32,6 +32,10 @@ public class Location implements Serializable {
 		return capacity;
 	}
 	
+	public void setCapacity(int capacity) {
+		this.capacity = capacity;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

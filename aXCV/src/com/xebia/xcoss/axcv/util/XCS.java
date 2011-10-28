@@ -1,8 +1,12 @@
 package com.xebia.xcoss.axcv.util;
 
 import java.util.TimeZone;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.text.util.Linkify.MatchFilter;
+import android.text.util.Linkify.TransformFilter;
+import android.util.Log;
 import android.view.Menu;
 
 public class XCS {
@@ -13,18 +17,18 @@ public class XCS {
 
 	public static class TAG {
 		public static final String LINK = "tag://xebia/";
-		public static final Pattern PATTERN = Pattern.compile("[\\w\\s]+");
+		public static final Pattern PATTERN = Pattern.compile("[\\w]+([\\w\\s])*");
 	}
 
 	public static class AUTHOR {
 		public static final String LINK = "author://xebia/";
-		public static final Pattern PATTERN = Pattern.compile("[\\w\\s]+");
+		public static final Pattern PATTERN = Pattern.compile("[\\w]+([\\w\\s])*");
 	}
 
 	public static class DIALOG {
 		public static final int ADD_RATING = DIALOGID;
 		public static final int CREATE_REVIEW = DIALOGID + 1;
-		public static final int ____NOT_USED__ = DIALOGID + 2;
+		public static final int CREATE_BREAK = DIALOGID + 2;
 		public static final int SELECT_CONFERENCE = DIALOGID + 3;
 		public static final int INPUT_TIME_START = DIALOGID + 4;
 		public static final int INPUT_DURATION = DIALOGID + 5;
@@ -50,6 +54,7 @@ public class XCS {
 		public static final String COMMUNICATE = "XCS";
 		public static final String CACHE = "XCS";
 		public static final String SWIPE = "XCS";
+		public static final String DATA = "XCS";
 	}
 
 	public static class MENU {

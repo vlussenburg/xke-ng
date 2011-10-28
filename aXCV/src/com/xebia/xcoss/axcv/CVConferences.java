@@ -44,8 +44,8 @@ public class CVConferences extends SwipeActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.conferences);
-		addGestureDetection(R.id.conferencesSwipeBase);
 		super.onCreate(savedInstanceState);
+		addGestureDetection(R.id.conferencesSwipeBase);
 		
 		shownYear = getIntent().getIntExtra(IA_CONF_YEAR, DateTime.today(XCS.TZ).getYear());
 

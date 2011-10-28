@@ -249,7 +249,7 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public String storeConference(Conference conference, boolean create) {
+	public Conference storeConference(Conference conference, boolean create) {
 		try {
 			return super.storeConference(conference, create);
 		}
@@ -271,13 +271,13 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public int createLocation(String location) {
+	public Location createLocation(Location location) {
 		try {
 			return super.createLocation(location);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "create location", e);
 		}
-		return -1;
+		return null;
 	}
 }

@@ -91,11 +91,12 @@
 		android:layout_below="@id/sc_header"
 		android:layout_above="@id/sc_navigate"
 		android:layout_width="fill_parent"
-		android:layout_height="fill_parent">
+		android:layout_height="fill_parent"
+		android:fillViewport="true">
 		<LinearLayout
 			android:orientation="vertical"
 			android:layout_width="fill_parent"
-			android:layout_height="wrap_content">
+			android:layout_height="fill_parent">
 			<TextView
 				android:background="@drawable/rateslider"
 				android:textSize="@dimen/ts_group"
@@ -130,7 +131,8 @@
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
 						android:id="@+id/conferenceDate"
-						android:background="@drawable/touchtext_disable" android:layout_weight="1"></TextView>
+						android:background="@drawable/touchtext_disable"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -149,7 +151,8 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/conferenceStart" android:layout_weight="1"></TextView>
+						android:id="@+id/conferenceStart"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -168,7 +171,8 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/conferenceEnd" android:layout_weight="1"></TextView>
+						android:id="@+id/conferenceEnd"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 			</TableLayout>
 			<TextView
@@ -188,9 +192,25 @@
 				android:layout_height="wrap_content"
 				android:id="@+id/TableLayout02"
 				android:padding="6sp">
-				<TableRow android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TableRow06">
-					<TextView android:textSize="@dimen/ts_attribute" android:text="Title" android:layout_height="wrap_content" android:id="@+id/TextView07" android:layout_width="wrap_content"></TextView>
-					<TextView android:textSize="@dimen/ts_attribute" android:padding="1sp" android:layout_marginLeft="5sp" android:text="@string/empty_value" android:layout_height="wrap_content" android:id="@+id/conferenceName" android:layout_width="wrap_content" android:layout_weight="1"></TextView>
+				<TableRow
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:id="@+id/TableRow06">
+					<TextView
+						android:textSize="@dimen/ts_attribute"
+						android:text="Title"
+						android:layout_height="wrap_content"
+						android:id="@+id/TextView07"
+						android:layout_width="wrap_content"></TextView>
+					<TextView
+						android:textSize="@dimen/ts_attribute"
+						android:padding="1sp"
+						android:layout_marginLeft="5sp"
+						android:text="@string/empty_value"
+						android:layout_height="wrap_content"
+						android:id="@+id/conferenceName"
+						android:layout_width="wrap_content"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -209,7 +229,8 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/conferenceDescription" android:layout_weight="1"></TextView>
+						android:id="@+id/conferenceDescription"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:layout_width="wrap_content"
@@ -228,7 +249,8 @@
 						android:layout_height="wrap_content"
 						android:layout_marginLeft="5sp"
 						android:layout_width="wrap_content"
-						android:id="@+id/conferenceOrganiser" android:layout_weight="1"></TextView>
+						android:id="@+id/conferenceOrganiser"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 				<TableRow
 					android:id="@+id/TableRow12"
@@ -238,7 +260,8 @@
 						android:layout_width="wrap_content"
 						android:text="Locations"
 						android:layout_height="wrap_content"
-						android:textSize="@dimen/ts_attribute" android:id="@+id/conferenceLocText"></TextView>
+						android:textSize="@dimen/ts_attribute"
+						android:id="@+id/conferenceLocText"></TextView>
 					<TextView
 						android:padding="1sp"
 						android:id="@+id/conferenceLocations"
@@ -246,9 +269,29 @@
 						android:layout_width="wrap_content"
 						android:text="@string/empty_value"
 						android:layout_height="wrap_content"
-						android:textSize="@dimen/ts_attribute" android:layout_weight="1"></TextView>
+						android:textSize="@dimen/ts_attribute"
+						android:layout_weight="1"></TextView>
 				</TableRow>
 			</TableLayout>
+			<TextView
+				android:background="@drawable/rateslider"
+				android:textSize="@dimen/ts_group"
+				android:id="@+id/TextView26"
+				android:layout_width="fill_parent"
+				android:paddingRight="5sp"
+				android:paddingLeft="5sp"
+				android:textColor="@color/textcolor_header"
+				android:paddingBottom="2sp"
+				android:layout_height="wrap_content"
+				android:paddingTop="2sp" android:text="Breaks"></TextView>
+			<TextView
+				android:id="@+id/breakTime"
+				android:textSize="@dimen/ts_attribute"
+				android:layout_width="fill_parent"
+				android:layout_marginLeft="5sp"
+				android:padding="1sp"
+				android:text="@string/empty_value"
+				android:minLines="1" android:maxLines="5" android:layout_height="wrap_content"></TextView>
 		</LinearLayout>
 	</ScrollView>
 </RelativeLayout>

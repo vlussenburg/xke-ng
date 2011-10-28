@@ -37,16 +37,16 @@ public class SessionAdapter extends BaseAdapter {
 	public View getView(int paramInt, View paramView, ViewGroup parent) {
 
 		Session session = (Session) getItem(paramInt);
+		
 		int colorId = ctx.getResources().getColor(R.color.tc_itemdefault);
 		if (session.isExpired()) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemgone);
 		} else if (session.isRunning()) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemactive);
 		}
-		if (session.isMandatory()) {
-			return constructMandatoryView(parent, session, colorId);
-		}
-		return constructSessionView(parent, session, colorId);
+		return session.isMandatory() ? 
+				constructMandatoryView(parent, session, colorId) : 
+				constructSessionView(parent, session, colorId);
 	}
 
 	private View constructSessionView(ViewGroup parent, final Session session, int colorId) {

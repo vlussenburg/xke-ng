@@ -21,8 +21,8 @@
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
 				android:src="@drawable/x_conference"
-				android:id="@+id/conferenceButton"
-				android:layout_alignParentLeft="true"></ImageView>
+				android:layout_alignParentLeft="true"
+				android:id="@+id/conferenceButton"></ImageView>
 			<TextView
 				android:layout_height="fill_parent"
 				android:paddingLeft="7sp"
@@ -76,7 +76,8 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="Right"
-					android:paddingRight="3dp" android:id="@+id/rightText"></TextView>
+					android:paddingRight="3dp"
+					android:id="@+id/rightText"></TextView>
 				<ImageView
 					android:id="@+id/ImageView04"
 					android:layout_width="wrap_content"
@@ -98,7 +99,8 @@
 					android:layout_height="wrap_content"
 					android:text="Left"
 					android:layout_gravity="left"
-					android:paddingLeft="3dp" android:id="@+id/leftText"></TextView>
+					android:paddingLeft="3dp"
+					android:id="@+id/leftText"></TextView>
 			</LinearLayout>
 		</FrameLayout>
 		<View
@@ -114,11 +116,6 @@
 		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
 		android:id="@+id/sc_navigate">
-		<View
-			android:layout_height="2dp"
-			android:layout_width="fill_parent"
-			android:background="@color/linebreak"
-			android:id="@+id/thirdDivider" />
 		<LinearLayout
 			android:layout_height="wrap_content"
 			android:id="@+id/linearLayout3"
@@ -131,7 +128,7 @@
 				android:layout_width="fill_parent"
 				android:gravity="center"
 				android:background="@drawable/touchtext"
-				android:layout_height="wrap_content">
+				android:layout_height="fill_parent">
 				<ImageView
 					android:id="@+id/imageView1"
 					android:layout_width="wrap_content"
@@ -141,9 +138,9 @@
 					android:id="@+id/textPreviousSession"
 					android:layout_height="wrap_content"
 					android:text="Previous Session"
-					android:padding="2sp"
 					android:gravity="center"
-					android:layout_width="wrap_content"></TextView>
+					android:layout_width="wrap_content"
+					android:padding="4sp"></TextView>
 				<ImageView
 					android:id="@+id/ImageView01"
 					android:layout_width="wrap_content"
@@ -158,7 +155,8 @@
 				android:layout_width="fill_parent"
 				android:gravity="center"
 				android:layout_height="wrap_content"
-				android:background="@drawable/touchtext" android:id="@+id/nextSessionLayout">
+				android:background="@drawable/touchtext"
+				android:id="@+id/nextSessionLayout">
 				<ImageView
 					android:id="@+id/ImageView03"
 					android:layout_width="wrap_content"
@@ -166,11 +164,11 @@
 					android:layout_height="fill_parent"></ImageView>
 				<TextView
 					android:text="Next Session"
-					android:padding="2sp"
 					android:gravity="center"
 					android:layout_height="wrap_content"
 					android:id="@+id/textNextSession"
-					android:layout_width="wrap_content"></TextView>
+					android:layout_width="wrap_content"
+					android:padding="4sp"></TextView>
 				<ImageView
 					android:id="@+id/ImageView02"
 					android:layout_width="wrap_content"
@@ -414,15 +412,16 @@
 				android:scrollbarFadeDuration="0"
 				android:layout_margin="1sp"
 				android:layout_height="100sp"
-				android:scrollbarStyle="insideOverlay">
+				android:scrollbarStyle="insideOverlay"
+				android:fillViewport="true">
 				<TextView
 					android:id="@+id/scComments"
 					android:layout_width="fill_parent"
 					android:textSize="10sp"
 					android:textColor="@android:color/black"
 					android:layout_height="fill_parent"
-					android:text="This is to be a very long text which requires scrolling from top to bottom and not from left to right."
-					android:padding="2px" />
+					android:padding="2px"
+					android:clickable="true" />
 			</ScrollView>
 		</LinearLayout>
 	</ScrollView>

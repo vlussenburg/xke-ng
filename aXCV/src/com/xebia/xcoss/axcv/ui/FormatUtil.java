@@ -32,11 +32,11 @@ public class FormatUtil {
 		return sb.toString();
 	}
 
-	public static <T> String getList(Set<T> data) {
+	public static <T> String getList(Iterable<T> data) {
 		return getList(data, true);
 	}
 
-	public static <T> String getList(Set<T> data, boolean emptyIndication) {
+	public static <T> String getList(Iterable<T> data, boolean emptyIndication) {
 		if ( data == null ) {
 			return null;
 		}

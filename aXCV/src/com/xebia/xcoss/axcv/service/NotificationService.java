@@ -1,6 +1,7 @@
 package com.xebia.xcoss.axcv.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -131,18 +132,18 @@ public class NotificationService extends Service {
 	}
 
 	protected void checkSessionsForChange(boolean owned) {
-		String[] sessionIds = owned ? getChangesInOwnedSessions() : getChangesInTrackedSessions();
-		if (sessionIds.length > 0) {
+		ArrayList<String> sessionIds = owned ? getChangesInOwnedSessions() : getChangesInTrackedSessions();
+		if (sessionIds.size() > 0) {
 			Message message = Message.obtain(handler);
 			Bundle data = new Bundle();
-			data.putStringArray(owned ? TAG_OWNED : TAG_TRACKED, sessionIds);
+			data.putStringArrayList(owned ? TAG_OWNED : TAG_TRACKED, sessionIds);
 			message.setData(data);
 			handler.sendMessage(message);
 		}
 	}
 
-	protected String[] getChangesInOwnedSessions() {
-		List<String> modified = new ArrayList<String>();
+	protected ArrayList<String> getChangesInOwnedSessions() {
+		ArrayList<String> modified = new ArrayList<String>();
 		ProfileManager pm = new ProfileManager(this);
 		try {
 			pm.openConnection();
@@ -179,19 +180,15 @@ public class NotificationService extends Service {
 					modified.add(session.getId());
 				}
 			}
-			String[] result = new String[modified.size()];
-			for (int i = 0; i < result.length; i++) {
-				result[i] = modified.get(i);
-			}
-			return result;
+			return modified;
 		}
 		finally {
 			pm.closeConnection();
 		}
 	}
 
-	protected String[] getChangesInTrackedSessions() {
-		List<String> modified = new ArrayList<String>();
+	protected ArrayList<String> getChangesInTrackedSessions() {
+		ArrayList<String> modified = new ArrayList<String>();
 		ConferenceServer server = ConferenceServer.getInstance();
 		ProfileManager pm = new ProfileManager(this);
 		try {
@@ -206,11 +203,7 @@ public class NotificationService extends Service {
 					modified.add(session.getId());
 				}
 			}
-			String[] result = new String[modified.size()];
-			for (int i = 0; i < result.length; i++) {
-				result[i] = modified.get(i);
-			}
-			return result;
+			return modified;
 		}
 		finally {
 			pm.closeConnection();
@@ -232,11 +225,11 @@ public class NotificationService extends Service {
 		boolean silent = (am.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) || (am.getMode() != AudioManager.MODE_NORMAL);
 		NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-		String[] sessionIds = bundle.getStringArray(TAG_TRACKED);
+		ArrayList<String> sessionIds = bundle.getStringArrayList(TAG_TRACKED);
 		if (sessionIds != null) {
-			for (int i = 0; i < sessionIds.length; i++) {
+			for (String sessionId : sessionIds) {
 				String title = "Track rescheduled";
-				String message = getSessionChange(sessionIds[i]);
+				String message = getSessionChange(sessionId);
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
 				Notification noty = new Notification(R.drawable.x_stat_track, title, currentTimeMillis);
 				noty.setLatestEventInfo(ctx, title, message, clickIntent);
@@ -246,15 +239,15 @@ public class NotificationService extends Service {
 					noty.sound = Uri.parse(soundUri);
 				}
 				// Use session id for notifyCount - This way there is one per session.
-				mgr.notify(sessionIds[i].hashCode(), noty);
+				mgr.notify(sessionId.hashCode(), noty);
 			}
 		}
 
-		sessionIds = bundle.getStringArray(TAG_OWNED);
+		sessionIds = bundle.getStringArrayList(TAG_OWNED);
 		if (sessionIds != null) {
-			for (int i = 0; i < sessionIds.length; i++) {
+			for (String sessionId : sessionIds) {
 				String title = "Session change!";
-				String message = getSessionChange(sessionIds[i]);
+				String message = getSessionChange(sessionId);
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
 				Notification noty = new Notification(R.drawable.x_stat_owned, title, currentTimeMillis);
 				noty.setLatestEventInfo(ctx, title, message, clickIntent);
@@ -264,7 +257,7 @@ public class NotificationService extends Service {
 					noty.sound = Uri.parse(soundUri);
 				}
 				// Use session id for notifyCount - This way there is one per session.
-				mgr.notify(sessionIds[i].hashCode(), noty);
+				mgr.notify(sessionId.hashCode(), noty);
 			}
 		}
 	}

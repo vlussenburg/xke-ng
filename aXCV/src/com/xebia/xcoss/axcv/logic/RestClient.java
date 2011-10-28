@@ -138,7 +138,7 @@ public class RestClient {
 			}
 			reader = getReader(new HttpPut(url), postData, token);
 			T result = getGson().fromJson(reader, (Class<T>) object.getClass());
-			// TODO : Id changes....
+			// TODO Is result an empty string?
 			return result;
 		}
 		finally {

@@ -83,7 +83,7 @@ public abstract class DataCache {
 
 	public void add(String conferenceId, Session result) {
 		result.setConferenceId(conferenceId);
-		doPutCachedObject(result.getId(), new CachedObject<Session>(result));
+		doPutCachedObject(result.getId().toString(), new CachedObject<Session>(result));
 	}
 
 	public void add(String conferenceId, Iterable<Session> result) {
@@ -102,7 +102,7 @@ public abstract class DataCache {
 	}
 
 	public void remove(Session session) {
-		doRemoveCachedObject(session.getId(), Session.class);
+		doRemoveCachedObject(session.getId().toString(), Session.class);
 	}
 
 	public void remove(Conference conference) {

@@ -6,10 +6,19 @@ public class Credential {
 	@SuppressWarnings("unused")
 	private String name;
 	@SuppressWarnings("unused")
-	private String cryptedPassword;
-	
+	private String password;
+	@SuppressWarnings("unused")
+	private String encryptedPassword;
+
 	public Credential(String name, String plain) {
+		this(name, plain, false);
+	}
+
+	public Credential(String name, String plain, boolean encryptedOnly) {
 		this.name = name;
-		this.cryptedPassword = SecurityUtils.encrypt(plain);
+		if (!encryptedOnly) {
+			this.password = plain;
+		}
+		this.encryptedPassword = SecurityUtils.encrypt(plain);
 	}
 }

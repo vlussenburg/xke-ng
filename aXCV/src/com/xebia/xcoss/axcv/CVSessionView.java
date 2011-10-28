@@ -41,8 +41,8 @@ public class CVSessionView extends SessionSwipeActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		setContentView(R.layout.sessionview);
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.session);
 		addGestureDetection(R.id.relativeLayoutLowest);
 	}
 
@@ -50,7 +50,7 @@ public class CVSessionView extends SessionSwipeActivity {
 	protected void onResume() {
 		Conference conference = getCurrentConference();
 		currentSession = getSelectedSession(conference);
-		if ( currentSession == null ) {
+		if (currentSession == null) {
 			Location location = getCurrentLocation();
 			for (Session s : conference.getSessions()) {
 				if (s.getLocation().equals(location)) {
@@ -59,14 +59,16 @@ public class CVSessionView extends SessionSwipeActivity {
 				}
 			}
 		}
-		if ( currentSession == null ) {
+		if (currentSession == null) {
 			currentSession = getDefaultSession(conference);
 		}
-		updateLocation(currentSession);
-		fill(conference);
-		updateLocations();
-		updateSessions();
-		updateRateAndReview();
+		if (currentSession != null) {
+			updateLocation(currentSession);
+			fill(conference);
+			updateLocations();
+			updateSessions();
+			updateRateAndReview();
+		}
 		super.onResume();
 	}
 
@@ -143,7 +145,7 @@ public class CVSessionView extends SessionSwipeActivity {
 			});
 		}
 	}
-	
+
 	private void updateRateAndReview() {
 		ConferenceServer server = getConferenceServer();
 
@@ -158,6 +160,9 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	private void updateSessions() {
 		Session session = getNextSession(getCurrentLocation());
+		// Log.i(XCS.LOG.NAVIGATE, "Find sessions at " + getCurrentLocation());
+		// Log.i(XCS.LOG.NAVIGATE, "Current session = " + currentSession);
+		// Log.i(XCS.LOG.NAVIGATE, "Next session = " + session);
 		View viewById = findViewById(R.id.textNextSession);
 		LinearLayout layout = (LinearLayout) viewById.getParent();
 		if (session == null) {
@@ -169,12 +174,13 @@ public class CVSessionView extends SessionSwipeActivity {
 			sessionText.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					onSwipeRightToLeft();
+					onSwipeBottomToTop();
 				}
 			});
 		}
 
 		session = getPreviousSession(getCurrentLocation());
+		// Log.i(XCS.LOG.NAVIGATE, "Previous session = " + session);
 		viewById = findViewById(R.id.textPreviousSession);
 		layout = (LinearLayout) viewById.getParent();
 		if (session == null) {
@@ -186,7 +192,7 @@ public class CVSessionView extends SessionSwipeActivity {
 			sessionText.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					onSwipeLeftToRight();
+					onSwipeTopToBottom();
 				}
 			});
 		}
@@ -319,7 +325,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		int max = sessions.size() - 1;
 		while (index < max) {
 			Session session = sessions.get(++index);
-			if ( session.getLocation().equals(location) ) {
+			if (session.getLocation().equals(location)) {
 				return session;
 			}
 		}
@@ -332,7 +338,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		int index = sessions.indexOf(currentSession);
 		while (index > 0) {
 			Session session = sessions.get(--index);
-			if ( session.getLocation().equals(location) ) {
+			if (session.getLocation().equals(location)) {
 				return session;
 			}
 		}

@@ -1,5 +1,7 @@
 package com.xebia.xcoss.axcv;
 
+import java.util.Set;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -15,7 +17,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
@@ -60,12 +61,12 @@ public abstract class BaseActivity extends Activity {
 		if (rootActivity == null) {
 			rootActivity = this;
 		}
-		Log.e("XCS", "========== ROOT activity [" + rootActivity.getLocalClassName() + "] ========== ");
-		if ((rootActivity instanceof CVSplashLoader) == false) {
-			Log.e("XCS", "========== ROOT activity RESET ========== ");
-			resetApplication(true);
-			return;
-		}
+//		Log.e("XCS", "========== ROOT activity [" + rootActivity.getLocalClassName() + "] ========== ");
+//		if ((rootActivity instanceof CVSplashLoader) == false) {
+//			Log.e("XCS", "========== ROOT activity RESET ========== ");
+//			resetApplication(true);
+//			return;
+//		}
 
 		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);
 		if (conferenceButton != null) {
@@ -97,10 +98,6 @@ public abstract class BaseActivity extends Activity {
 		miEdit = menu.add(0, XCS.MENU.EDIT, Menu.NONE, R.string.menu_edit);
 		miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
 		miSearch = menu.add(0, XCS.MENU.SEARCH, Menu.NONE, R.string.menu_search);
-		if (!StringUtil.isEmpty(getUser())) {
-			miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
-			miTrack.setIcon(android.R.drawable.ic_menu_agenda);
-		}
 		miExit = menu.add(0, XCS.MENU.EXIT, Menu.NONE, R.string.menu_exit);
 
 		miAdd.setIcon(android.R.drawable.ic_menu_add);
@@ -109,6 +106,10 @@ public abstract class BaseActivity extends Activity {
 		miSearch.setIcon(android.R.drawable.ic_menu_search);
 		miExit.setIcon(R.drawable.ic_menu_exit);
 
+		if (!StringUtil.isEmpty(getUser())) {
+			miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
+			miTrack.setIcon(android.R.drawable.ic_menu_agenda);
+		}
 		return true;
 	}
 
@@ -142,6 +143,8 @@ public abstract class BaseActivity extends Activity {
 		// Clears out the activity call stack
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
+		// Finish the current activity
+		finish();
 	}
 
 	public Conference getConference() {
@@ -182,12 +185,13 @@ public abstract class BaseActivity extends Activity {
 	}
 
 	protected Session getDefaultSession(Conference conference) {
-		for (Session s : conference.getSessions()) {
+		Set<Session> sessions = conference.getSessions();
+		for (Session s : sessions) {
 			if (!s.isExpired()) {
 				return s;
 			}
 		}
-		return conference.getSessions().iterator().next();
+		return sessions.isEmpty() ? null : sessions.iterator().next();
 	}
 
 	protected ConferenceServer getConferenceServer() {

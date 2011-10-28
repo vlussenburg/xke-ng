@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -24,11 +25,17 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
+import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.model.Location;
+import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.ui.AddBreakDialog;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
+import com.xebia.xcoss.axcv.ui.LocationInputDialog;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.TextInputDialog;
 import com.xebia.xcoss.axcv.util.StringUtil;
@@ -42,14 +49,18 @@ public class CVConferenceAdd extends AdditionActivity {
 	private Conference originalConference;
 	private Conference conference;
 	private boolean create = false;
+	private List<Session> breakSessions;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.add_conference);
-		this.timeFormatter = new ScreenTimeUtil(this);
+		super.onCreate(savedInstanceState);
 
-		originalConference = getConference(false);
+		this.timeFormatter = new ScreenTimeUtil(this);
+		this.originalConference = getConference(false);
+		this.breakSessions = new ArrayList<Session>();
+		
 		if (originalConference == null) {
 			create = true;
 			conference = new Conference();
@@ -61,7 +72,6 @@ public class CVConferenceAdd extends AdditionActivity {
 
 		showConference();
 		registerActions();
-		super.onCreate(savedInstanceState);
 	}
 
 	private void showConference() {
@@ -88,12 +98,42 @@ public class CVConferenceAdd extends AdditionActivity {
 
 			view = (TextView) findViewById(R.id.conferenceLocations);
 			view.setText(FormatUtil.getList(conference.getLocations()));
+
+			List<Session> breakSessions = findBreakSessions();
+			StringBuilder sb = new StringBuilder();
+			String NL = System.getProperty("line.separator");
+			for (Session s : breakSessions) {
+				if (sb.length() > 0) {
+					sb.append(NL);
+				}
+				sb.append(s.getTitle());
+				sb.append(" [").append(s.getLocation());
+				sb.append(" @ ").append(timeFormatter.getAbsoluteTime(s.getStartTime()));
+				sb.append("]");
+			}
+			if (sb.length() == 0) {
+				sb.append(FormatUtil.NONE_FOUND);
+			}
+			view = (TextView) findViewById(R.id.breakTime);
+			view.setText(sb.toString());
 		}
+	}
+
+	private List<Session> findBreakSessions() {
+		ArrayList<Session> breaks = new ArrayList<Session>();
+		for (Session s : conference.getSessions()) {
+			if (s.isBreak()) {
+				breaks.add(s);
+			}
+		}
+		breaks.addAll(breakSessions);
+		return breaks;
 	}
 
 	private void registerActions() {
 		int[] identifiers = new int[] { R.id.conferenceName, R.id.conferenceDate, R.id.conferenceStart,
-				R.id.conferenceEnd, R.id.conferenceDescription, R.id.conferenceOrganiser, R.id.conferenceLocations };
+				R.id.conferenceEnd, R.id.conferenceDescription, R.id.conferenceOrganiser, R.id.conferenceLocations,
+				R.id.breakTime };
 
 		activateViews(identifiers);
 
@@ -109,23 +149,85 @@ public class CVConferenceAdd extends AdditionActivity {
 				}
 
 				if (create) {
-					Conference.create(conference);
+					conference = Conference.create(conference);
 				} else {
 					conference.update();
+				}
+				for (Session s : breakSessions) {
+					try {
+						conference.addSession(s, true);
+					} catch (CommException e) {
+						Log.e(XCS.LOG.COMMUNICATE, "Cannot add break session " + s);
+					}
 				}
 				CVConferenceAdd.this.finish();
 			}
 		});
 		button = (Button) findViewById(R.id.actionDelete);
-		if (create) {
+		if (create || conference.getDate().isInThePast(XCS.TZ)) {
 			button.setVisibility(View.GONE);
 		} else {
 			button.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View paramView) {
-					// TODO Confirmation dialog
-					conference.delete();
-					CVConferenceAdd.this.finish();
+					int size = conference.getSessions().size();
+					StringBuilder message = new StringBuilder();
+					String NEWLINE = System.getProperty("line.separator");
+					if (size > 0) {
+						message.append("Warning!");
+						message.append(NEWLINE);
+						message.append("This conference has ").append(size).append(" session(s).");
+						message.append(NEWLINE);
+					}
+					message.append("Are you sure to delete conference '").append(conference.getTitle()).append("'");
+					message.append(" on ");
+					message.append(timeFormatter.getAbsoluteDate(conference.getDate()));
+					message.append("?");
+
+					AlertDialog.Builder builder = new AlertDialog.Builder(CVConferenceAdd.this);
+					builder.setTitle("Delete conference");
+					builder.setMessage(message.toString());
+					builder.setIcon(android.R.drawable.ic_dialog_alert);
+					builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					});
+					builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							conference.delete();
+							CVConferenceAdd.this.finish();
+						}
+					});
+					if (size > 0) {
+						builder.setNeutralButton("Move & delete", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								Conference nextConference = getConferenceServer().getUpcomingConference(
+										conference.getDate().plusDays(1));
+								Set<Session> sessions = conference.getSessions();
+								for (Session s : sessions) {
+									SortedSet<TimeSlot> slots = nextConference.getAvailableTimeSlots(s.getDuration());
+									if (slots.isEmpty()) {
+										dialog.dismiss();
+										Toast.makeText(CVConferenceAdd.this, "Failed! Session cannot be moved.",
+												Toast.LENGTH_LONG);
+										return;
+									}
+									s.reschedule(nextConference, slots.first());
+									if (!nextConference.addSession(s, false)) {
+										dialog.dismiss();
+										Toast.makeText(CVConferenceAdd.this, "Failed! Session cannot be moved.",
+												Toast.LENGTH_LONG);
+										return;
+									}
+								}
+								conference.delete();
+								CVConferenceAdd.this.finish();
+							}
+						});
+					}
+					AlertDialog alertDialog = builder.create();
+					alertDialog.show();
 				}
 			});
 		}
@@ -165,40 +267,40 @@ public class CVConferenceAdd extends AdditionActivity {
 			break;
 			case R.id.conferenceLocText:
 				if (!StringUtil.isEmpty(value)) {
-					getConferenceServer().createLocation(value);
-				}
-			// fallThrough
-			case R.id.conferenceLocations:
-				if (checked) {
-					if (ADD_NEW_LOCATION.equals(value)) {
-						showDialog(XCS.DIALOG.CREATE_LOCATION);
-						removeDialog(XCS.DIALOG.INPUT_LOCATION);
-						return;
+					if (selection instanceof Location) {
+						getConferenceServer().createLocation((Location) selection);
 					}
+				}
+				// fallThrough
+			case R.id.conferenceLocations:
+				if (ADD_NEW_LOCATION.equals(value)) {
+					showDialog(XCS.DIALOG.CREATE_LOCATION);
+					removeDialog(XCS.DIALOG.INPUT_LOCATION);
+					return;
+				}
+
+				if (checked) {
 					// Add the location
 					Location[] locations = getConferenceServer().getLocations();
-					Location selected = null;
 					for (int i = 0; i < locations.length; i++) {
 						if (locations[i].getDescription().equals(value)) {
-							selected = locations[i];
+							conference.addLocation(locations[i]);
 							break;
 						}
 					}
-					if (selected != null) {
-						conference.getLocations().add(selected);
-					}
-				} else if (!ADD_NEW_LOCATION.equals(value)) {
-					Location contained = null;
-					Set<Location> locations = conference.getLocations();
+				} else {
+					Iterable<Location> locations = conference.getLocations();
 					for (Location location : locations) {
 						if (location.getDescription().equals(value)) {
-							contained = location;
+							conference.removeLocation(location);
 							break;
 						}
 					}
-					if (contained != null) {
-						locations.remove(contained);
-					}
+				}
+			break;
+			case R.id.breakTime:
+				if ( selection instanceof Session ){
+					breakSessions.add((Session) selection);
 				}
 			break;
 			default:
@@ -223,7 +325,7 @@ public class CVConferenceAdd extends AdditionActivity {
 				dialog = new TextInputDialog(this, R.id.conferenceDescription);
 			break;
 			case XCS.DIALOG.CREATE_LOCATION:
-				dialog = new TextInputDialog(this, R.id.conferenceLocText);
+				dialog = new LocationInputDialog(this, R.id.conferenceLocText);
 			break;
 			case XCS.DIALOG.INPUT_LOCATION:
 				Location[] locations = getConferenceServer().getLocations();
@@ -231,17 +333,24 @@ public class CVConferenceAdd extends AdditionActivity {
 
 				items = new String[size];
 				boolean[] check = new boolean[size];
-				
-				for (int i = 0; i < size-1; i++) {
+
+				for (int i = 0; i < size - 1; i++) {
 					items[i] = locations[i].getDescription();
 					check[i] = false;
 				}
-				items[size-1] = ADD_NEW_LOCATION;
+				items[size - 1] = ADD_NEW_LOCATION;
 
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Select locations");
 				builder.setMultiChoiceItems(items, check, new DialogHandler(this, items, R.id.conferenceLocations));
 				dialog = builder.create();
+			break;
+			case XCS.DIALOG.CREATE_BREAK:
+				if (conference.getLocations().size() == 0 || conference.getDate() == null) {
+					createDialog("Conference detail", "No locations and/or date specified yet").show();
+				} else {
+					dialog = new AddBreakDialog(this, R.id.breakTime);
+				}
 			break;
 			case XCS.DIALOG.INPUT_TIME_START:
 				time = conference.getStartTime();
@@ -299,19 +408,18 @@ public class CVConferenceAdd extends AdditionActivity {
 				tid.setDescription("Conference title");
 				tid.setValue(conference.getTitle());
 			break;
+			case XCS.DIALOG.CREATE_BREAK:
+				AddBreakDialog abd = (AddBreakDialog) dialog;
+				abd.setConference(conference);
+			break;
 			case XCS.DIALOG.INPUT_DESCRIPTION:
 				tid = (TextInputDialog) dialog;
 				tid.setDescription("Description");
 				tid.setValue(conference.getDescription());
 			break;
-			case XCS.DIALOG.CREATE_LOCATION:
-				tid = (TextInputDialog) dialog;
-				tid.setDescription("Location name");
-				tid.setValue("");
-				break;
 			case XCS.DIALOG.INPUT_LOCATION:
 				AlertDialog ad = (AlertDialog) dialog;
-				Set<Location> locations = conference.getLocations();
+				Iterable<Location> locations = conference.getLocations();
 				Set<String> locNames = new HashSet<String>();
 				for (Location location : locations) {
 					locNames.add(location.getDescription());
@@ -349,6 +457,9 @@ public class CVConferenceAdd extends AdditionActivity {
 			case R.id.conferenceDate:
 				showDialog(XCS.DIALOG.INPUT_DATE);
 			break;
+			case R.id.breakTime:
+				showDialog(XCS.DIALOG.CREATE_BREAK);
+			break;
 			default:
 				Log.w(XCS.LOG.NAVIGATE, "Click on text not handled: " + id);
 			break;
@@ -383,10 +494,8 @@ public class CVConferenceAdd extends AdditionActivity {
 	}
 
 	@Override
-	public void onDismiss(DialogInterface di) {
-	}
+	public void onDismiss(DialogInterface di) {}
 
 	@Override
-	public void onCancel(DialogInterface di) {
-	}
+	public void onCancel(DialogInterface di) {}
 }

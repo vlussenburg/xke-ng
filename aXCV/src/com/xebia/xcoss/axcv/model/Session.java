@@ -1,6 +1,7 @@
 package com.xebia.xcoss.axcv.model;
 
 import hirondelle.date4j.DateTime;
+import hirondelle.date4j.DateTime.DayOverflow;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -10,6 +11,7 @@ import java.util.TreeSet;
 
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -41,7 +43,7 @@ public class Session implements Serializable {
 	public static final int DEFAULT_DURATION = 60;
 
 	// Auto mapped
-	private String id;
+	private Long id;
 	private String title;
 	private String description;
 	private DateTime startTime;
@@ -50,11 +52,8 @@ public class Session implements Serializable {
 	private Type type = Type.STANDARD;
 	private Set<Author> authors;
 	private Location location;
-	// private DateTime date;
-	// private DateTime lastUpdate;
-	// private DateTime lastReschedule;
-
 	private Set<String> labels;
+	
 	private transient String conferenceId;
 	
 	// TODO : Not mapped at all at the moment...
@@ -89,7 +88,7 @@ public class Session implements Serializable {
 	}
 
 	public String getId() {
-		return id;
+		return id.toString();
 	}
 
 	public String getTitle() {
@@ -143,7 +142,9 @@ public class Session implements Serializable {
 	}
 
 	public void setStartTime(DateTime time) {
+		int duration = getDuration();
 		startTime = updateTime(startTime, time);
+		setEndTime(startTime.plus(0, 0, 0, 0, duration, 0, DayOverflow.Spillover));
 	}
 
 	public DateTime getEndTime() {
@@ -208,7 +209,7 @@ public class Session implements Serializable {
 	 * Only allow the type to be set if it has no id yet.
 	 */
 	public void setType(Type type) {
-		if (StringUtil.isEmpty(id)) {
+		if (id == null) {
 			this.type = type;
 		} else {
 			Log.w(XCS.LOG.PROPERTIES, "Could not set type to " + type + ", id = " + id);
@@ -229,14 +230,6 @@ public class Session implements Serializable {
 		return duration;
 	}
 
-	// public DateTime getLastUpdate() {
-	// return lastUpdate;
-	// }
-	//
-	// public DateTime getLastReschedule() {
-	// return lastReschedule;
-	// }
-	//
 	public boolean check(List<String> messages) {
 		if (startTime == null) {
 			messages.add("Start time");
@@ -244,17 +237,19 @@ public class Session implements Serializable {
 		if (StringUtil.isEmpty(title)) {
 			messages.add("Title");
 		}
-		if (type != Type.BREAK && authors.isEmpty()) {
-			messages.add("Author");
+		if (StringUtil.isEmpty(description)) {
+			messages.add("Description");
+		}
+		if ( type != Type.BREAK ) {
+			if (authors.isEmpty()) {
+				messages.add("Author");
+			}
+			if (StringUtil.isEmpty(limit)) {
+				messages.add("Number of people");
+			}
 		}
 		if (location == null) {
 			messages.add("Location");
-		}
-		if (StringUtil.isEmpty(limit)) {
-			messages.add("Number of people");
-		}
-		if (StringUtil.isEmpty(description)) {
-			messages.add("Description");
 		}
 		return (messages.size() == 0);
 	}
@@ -352,5 +347,13 @@ public class Session implements Serializable {
 	
 	public String getConferenceId() {
 		return conferenceId;
+	}
+
+	public void reschedule(Conference conference, TimeSlot slot) {
+		setStartTime(conference.getDate());
+		setStartTime(slot.start);
+		setEndTime(slot.end);
+		setLocation(slot.location);
+		setConferenceId(conference.getId());
 	}
 }
