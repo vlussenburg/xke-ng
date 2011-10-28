@@ -11,12 +11,27 @@ import com.xebia.xkeng.model.{ Session, Location, Conference, Author, Facility, 
 
 object Assembly extends Logger {
 
-  object XKENGDispatchAPIAssembly extends XKENGDispatchAPI with RepositoryComponent {
+  trait RepositoryComponentImpl extends RepositoryComponent {
     val conferenceRepository = new ConferenceRepositoryImpl
     val sessionRepository = new SessionRepositoryImpl
     val facilityRepository = new FacilityRepositoryImpl
     val authorRepository = new AuthorRepositoryImpl
     val labelRepository = new LabelRepositoryImpl
+
+    private val crowdSysUser = Props.get("crowd.sysuser").get
+    private val crowdSysUserPwd = Props.get("crowd.sysuser.pwd").get
+    private val crowdBase = Props.get("crowd.base.url").get
+    private val crowdConnectionCheck = Props.get("crowd.conn.check").map(_.trim.toBoolean).getOrElse(false)
+
+    val authenticationRepository = AuthenticationRepository(crowdBase, crowdSysUser, crowdSysUserPwd, crowdConnectionCheck)
+  }
+
+  object XKENGDispatchAPIAssembly extends XKENGDispatchAPI with RepositoryComponentImpl with RestHandlerComponent {
+
+  }
+
+  object SecurityAPIAssembly extends SecurityAPI with RepositoryComponentImpl {
+
   }
 
   def init() = {

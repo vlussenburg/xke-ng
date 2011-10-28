@@ -11,9 +11,11 @@ import net.liftweb.http._
 import org.joda.time._
 import net.liftweb.util.BasicTypesHelpers._
 import com.xebia.xkeng.model._
+import RestUtils._
 
 trait XKENGDispatchAPI extends RestHelper with Logger {
-  this: RepositoryComponent =>
+  this: RepositoryComponent with RestHandlerComponent =>
+    
   serve {
     // GET /conferences/<year>[/<month>[/<day>]]
     case Req("conferences" :: Nil, _, GetRequest) =>
@@ -58,8 +60,12 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     case req @ Req("conference" :: id :: "session" :: Nil, _, PostRequest) =>
       handleSessionCreate(id, req.body.toOption)
     // PUT /conference/<id>/session
+    //-> PUT session/<id>
     case req @ Req("conference" :: id :: "session" :: Nil, _, PutRequest) =>
       handleSessionUpdate(id, req.body.toOption)
+    //switch same business rules as create session
+    //PUT /session/<sessionid>/conference/<conferenceid>
+
     // GET /session/<id>
     case Req("session" :: AsLong(id) :: Nil, _, GetRequest) =>
       asJsonResp(Some(sessionRepository.findSessionById(id).map(_._2)))
@@ -116,11 +122,10 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     case req @ Req("search" :: "sessions" :: Nil, _, PostRequest) =>
       handleSearchSessions(req.body.toOption)
 
-    // POST /login
-    case req @ Req("login" :: Nil, _, PostRequest) =>
-      handleLogin(req.body.toOption)
     // POST /error
     case req @ Req("error" :: Nil, _, PostRequest) =>
+      //dump in logfile
+      //include name
       handleError(req.body.toOption)
 
     /**
@@ -142,12 +147,6 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
       handleRatingCreate(sessionId, req.body.toOption)
   }
 
-  private def asJsonResp(json: Option[JValue]): Box[LiftResponse] = json match {
-    case Some(v) => asJsonResp(v)
-    case _ => Full(NotFoundResponse())
-  }
-
-  private def asJsonResp(json: JValue): Box[LiftResponse] = Full(JsonResponse(json))
 
   private def handleConferenceUpdate(id: String, jsonBody: Option[Array[Byte]]) = {
     conferenceRepository.findConference(id) match {
@@ -226,11 +225,6 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
     Full(NotFoundResponse())
   }
 
-  private def handleLogin(jsonBody: Option[Array[Byte]]) = {
-    val confFromJson = fromCredentialJson(new String(jsonBody.get))
-    // TODO Validate the credential object
-    asJsonResp("token")
-  }
 
   private def handleError(paramBody: Option[Array[Byte]]) = {
     Full(NotFoundResponse())

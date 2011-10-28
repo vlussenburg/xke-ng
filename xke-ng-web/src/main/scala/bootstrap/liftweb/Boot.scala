@@ -34,6 +34,7 @@ class Boot {
     Assembly.init()
     val purge = Props.get("mongo.purge.data").map(_.trim.toBoolean).getOrElse(false)
     Assembly.purgeAndPushTestdata(purge)
+    LiftRules.dispatch.append(Assembly.SecurityAPIAssembly)
     LiftRules.dispatch.append(Assembly.XKENGDispatchAPIAssembly)
     /*
      * Show the spinny image when an Ajax call starts

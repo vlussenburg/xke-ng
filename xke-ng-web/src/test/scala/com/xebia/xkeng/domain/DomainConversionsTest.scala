@@ -17,7 +17,7 @@ import net.liftweb.json._
 import org.joda.time.format.ISODateTimeFormat
 import com.xebia.xkeng.rest.JsonDomainConverters._
 import com.xebia.xkeng.serialization.util._
-import org.codehaus.jackson.annotate.JsonValue
+//import org.codehaus.jackson.annotate.JsonValue
 import org.mortbay.util.ajax.JSON
 
 @RunWith(classOf[JUnitRunner])
@@ -219,5 +219,17 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
 
     json should be(expected)
   }
+  it should "deserialize credential correctly" in {
 
+    val unencryptedCredJson = """{"username":"upeter", "password":"secret"}"""
+    val Credential(username, unencryptedPwd, notencrypted) = fromCredentialJson(unencryptedCredJson)
+    username should be("upeter")
+    unencryptedPwd should be("secret")
+    notencrypted should be(false)
+
+    val encryptedCredJson = """{"username":"upeter", "encryptedPassword":"87ujy79hjy"}"""
+    val Credential(_, encryptedPwd, encrypted) = fromCredentialJson(encryptedCredJson)
+    encryptedPwd should be("87ujy79hjy")
+    encrypted should be(true)
+  }
 }

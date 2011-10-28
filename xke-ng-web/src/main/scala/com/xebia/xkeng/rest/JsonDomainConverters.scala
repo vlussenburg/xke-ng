@@ -239,9 +239,12 @@ object JsonDomainConverters extends Logger {
 
   def fromCredentialJson(jsonString: String): Credential = {
     val JObject(jsonValue) = JsonParser.parse(jsonString)
-    val JString(name) = jsonValue \\! "name"
-    val JString(pwd) = jsonValue \\! "cryptedPassword"
-    Credential(name, pwd)
+    val JString(name) = jsonValue \! "username"
+    val pwd = (jsonValue \ "password").values   
+    if(pwd != None) Credential(name, pwd.toString) else {
+      val JString(encryptedPwd) = (jsonValue \! "encryptedPassword")
+      Credential(name, encryptedPwd, true) 
+    }
   }
 
 }

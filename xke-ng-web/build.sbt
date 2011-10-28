@@ -46,8 +46,11 @@ libraryDependencies ++= {
     "org.scala-tools.testing" %% "specs" % "1.6.8" % "test->default",
     "net.databinder" %% "dispatch-http" % "0.8.5", 
     "com.h2database" % "h2" % "1.2.138",
-    "com.amazonaws" % "aws-java-sdk" % "1.2.0" % "test->default"
-  )
+    "com.amazonaws" % "aws-java-sdk" % "1.2.0" % "test->default",
+    "com.atlassian.crowd" % "crowd-integration-client-rest" % "2.1.0",
+    "com.atlassian.crowd" % "crowd-api" % "2.1.0",
+     "org.mockito" % "mockito-all" % "1.8.5" % "test->default"
+ )
 }
 
 resolvers += "Jetty Repo" at "http://repo1.maven.org/maven2/org/mortbay/jetty"

@@ -4,3 +4,7 @@ mongo.port=27017
 mongo.db.name=xkeng
 mongo.socket.timeout=30000
 mongo.purge.data=false
+crowd.sysuser=xkeng
+crowd.sysuser.pwd=8gUpotirx
+crowd.base.url=https://sso.xebia.com/crowd/
+crowd.conn.check=true

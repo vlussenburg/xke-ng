@@ -206,7 +206,7 @@ object AuthorDoc extends MongoDocumentMeta[AuthorDoc] {
 /**
  * Represents credentials used for authentication
  */
-case class Credential(val user: String, val cryptedPassword: String) extends ToJsonSerializer[Credential]
+case class Credential(username: String, password: String, isEncrypted:Boolean = false) extends ToJsonSerializer[Credential]
 
 /**
  * Represents a location, a physical space.

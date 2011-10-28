@@ -22,10 +22,12 @@ import com.xebia.xkeng.rest.JsonDomainConverters._
 
 object RestSmokeTestClient {
 
+  import RestUtils._
   val host = "localhost"
-     val contextRoot = ""
-//  val host = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com"
-//  val contextRoot = "xkeng"
+  val contextRoot = ""
+
+  //val host = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com"
+  //val contextRoot = "xkeng"
   val port = 8080
   val http = new Http
 
@@ -102,45 +104,17 @@ object RestSmokeTestClient {
   def commentSession(sessionId: Long, comment: Comment): List[Comment] = {
     add("feedback/" + sessionId + "/comment", ("comment" -> comment.comment))(fromCommentListJson(_))
   }
-
-  def query[T](target: String)(callback: String => T): Option[T] = {
-    val req = new Request(:/(host, port))
-    http x ((req / contextRoot / target >:> identity) {
-      case (200, response, _, _) => {
-        Some(callback(io.Source.fromInputStream(response.getEntity().getContent()).getLines.mkString))
-      }
-      case (status, _, _, _) => println("Query %s did not yield a result" format target); None
-    })
+ def login(username: String, password: String): Unit= {
+    add("login", Credential(username, password).serializeToJson)(a => Unit)
   }
-
-  //Low level http methods
-  private def add[T](target: String, json: JValue)(callback: String => T): T = {
-    http(:/(host, port).POST / contextRoot / target << serializeToJsonStr(json) >~ { resp => callback(resp.getLines.mkString) })
-
-  }
-
-  //Low level http methods
-  private def update[T](target: String, json: JValue, callback: String => T): T = {
-    http(:/(host, port).PUT / contextRoot / target <<< serializeToJsonStr(json) >~ { resp => callback(resp.getLines.mkString) })
-
-  }
-
-  private def update(target: String, json: JValue) = {
-    val req = new Request(:/(host, port).PUT)
-    val (status, headers) = http x ((req / contextRoot / target <<< serializeToJsonStr(json) >:> identity) {
-      case (status, _, _, out) => (status, out())
-    })
-    (status, headers)
-
-  }
-
-  private def delete(target: String)(callback: String => Unit = printResp) = {
-    http(:/(host, port).DELETE / contextRoot / target >~ { resp => callback(resp.getLines.mkString) })
-  }
-
+  
   val printResp = (resp: String) => println(resp)
 
   def main(args: Array[String]) {
+    println("Login...")
+    val loggedIn = login("upeter", "Iroqoxx47")
+
+
     println("Create new conference...")
     val newConf = addConference(c)
     assert(newConf._id == c._id)
@@ -215,5 +189,40 @@ object RestSmokeTestClient {
     println("found conference %s" format found)
 
   }
+  object RestUtils {
+    def query[T](target: String)(callback: String => T): Option[T] = {
+      val req = new Request(:/(host, port))
+      http x ((req / contextRoot / target >:> identity) {
+        case (200, response, _, _) => {
+          Some(callback(io.Source.fromInputStream(response.getEntity().getContent()).getLines.mkString))
+        }
+        case (status, _, _, _) => println("Query %s did not yield a result" format target); None
+      })
+    }
 
+    //Low level http methods
+    def add[T](target: String, json: JValue)(callback: String => T): T = {
+      http(:/(host, port).POST / contextRoot / target << serializeToJsonStr(json) >~ { resp => callback(resp.getLines.mkString) })
+
+    }
+
+    //Low level http methods
+    def update[T](target: String, json: JValue, callback: String => T): T = {
+      http(:/(host, port).PUT / contextRoot / target <<< serializeToJsonStr(json) >~ { resp => callback(resp.getLines.mkString) })
+
+    }
+
+    def update(target: String, json: JValue) = {
+      val req = new Request(:/(host, port).PUT)
+      val (status, headers) = http x ((req / contextRoot / target <<< serializeToJsonStr(json) >:> identity) {
+        case (status, _, _, out) => (status, out())
+      })
+      (status, headers)
+
+    }
+
+    def delete(target: String)(callback: String => Unit = printResp) = {
+      http(:/(host, port).DELETE / contextRoot / target >~ { resp => callback(resp.getLines.mkString) })
+    }
+  }
 }

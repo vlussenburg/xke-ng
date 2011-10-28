@@ -5,7 +5,15 @@ import net.liftweb.mongodb._
 import com.mongodb._
 import org.joda.time.format._
 import org.joda.time.DateTime
-import com.xebia.xkeng.model.{ Location, Session, Conference, Facility, Author, AuthorDoc, Comment, Rating, Labels, SessionListener }
+import com.xebia.xkeng.model.{ Location, Session, Conference, Facility, Author, AuthorDoc, Comment, Rating, Labels, SessionListener, Credential }
+import com.atlassian.crowd.service.client.CrowdClient
+import com.atlassian.crowd.service.client.ClientProperties
+import com.atlassian.crowd.service.client.ClientPropertiesImpl._
+import com.atlassian.crowd.integration.rest.service.factory.RestCrowdClientFactory
+import com.atlassian.crowd.model.user.User;
+import com.atlassian.crowd.exception._
+import java.util.Properties
+import net.liftweb.common.Logger
 
 trait ConferenceRepository {
   def findConferences(year: Int): List[Conference]
@@ -47,6 +55,8 @@ trait AuthorRepository {
   def removeAuthor(author: Author): Unit
 
   def findAuthorByName(name: String): Option[Author]
+    def findAuthorById(userId: String): Option[Author]
+  
 
 }
 
@@ -57,6 +67,11 @@ trait LabelRepository {
   def addLabels(label: String*): Unit
 }
 
+trait AuthenticationRepository {
+
+  def authenticate(cred: Credential): Option[User]
+}
+
 trait RepositoryComponent {
 
   val conferenceRepository: ConferenceRepository
@@ -64,6 +79,7 @@ trait RepositoryComponent {
   val facilityRepository: FacilityRepository
   val authorRepository: AuthorRepository
   val labelRepository: LabelRepository
+  val authenticationRepository: AuthenticationRepository
 
   class ConferenceRepositoryImpl extends ConferenceRepository {
 
@@ -179,14 +195,14 @@ trait RepositoryComponent {
     }
 
     def addAuthor(author: Author): Unit = {
-      findAuthorById(author.userId) match {
-        case Some(foundAuthor) => throw new IllegalArgumentException("Cannot create author %s because an author (%s) with the same userId exists does already exist".format(author, foundAuthor))
+      findAuthorDocById(author.userId) match {
+        case Some(foundAuthor) => throw new IllegalArgumentException("Cannot create author %s because an author (%s) with the same userId exists already".format(author, foundAuthor))
         case None => AuthorDoc(author).save
       }
     }
 
     def updateAuthor(author: Author): Unit = {
-      findAuthorById(author.userId) match {
+      findAuthorDocById(author.userId) match {
         case Some(currentAuthor) => currentAuthor.delete; AuthorDoc(author).save
         case None => throw new IllegalArgumentException("Cannot update author %s because author with userId %s does not exist".format(author, author.userId))
       }
@@ -201,10 +217,14 @@ trait RepositoryComponent {
     }
 
     def removeAuthor(author: Author): Unit = {
-      findAuthorById(author.userId).map(_.delete)
+      findAuthorDocById(author.userId).map(_.delete)
     }
 
-    private def findAuthorById(userId: String): Option[AuthorDoc] = {
+    def findAuthorById(userId: String): Option[Author] = {
+      AuthorDoc.find(("author.userId" -> userId)).map(_.author).orElse(None)
+    }
+
+    private def findAuthorDocById(userId: String): Option[AuthorDoc] = {
       AuthorDoc.find(("author.userId" -> userId))
     }
 
@@ -250,6 +270,77 @@ trait RepositoryComponent {
         case f :: xs => f
       }
     }
+  }
+
+  class AuthenticationRepositoryImpl(client: CrowdClient) extends AuthenticationRepository with Logger {
+
+    def authenticate(cred: Credential): Option[User] = {
+      def authenticate(userId: String, password: String) = {
+        try {
+          val authenticateUser = client.authenticateUser(userId, password);
+          info("User %s successfully authenticated." format authenticateUser)
+          Some(authenticateUser)
+        } catch {
+          case unf: UserNotFoundException =>
+            info("User %s could not be found. Reason: %s " format (userId, unf.getMessage())); None
+          case iae: InvalidAuthenticationException =>
+            info("User %s provided invalid credentials. Reason: %s " format (userId, iae.getMessage())); None
+          case e: Exception => info("User %s could not be authenticated. Reason: %s " format (userId, e.getMessage())); None
+        }
+      }
+
+      if (!cred.isEncrypted)
+        authenticate(cred.username, cred.password)
+      else {
+        val decryptedPwd = "" //decrypt(cred.password)
+        authenticate(cred.username, decryptedPwd)
+      }
+
+    }
+  }
+
+  object AuthenticationRepository extends Logger {
+
+    def apply(crowdBase: String, crowdSysUser: String, crowdSysPwd: String, crowdConnectionCheck: Boolean = true): AuthenticationRepository = {
+      val (crowdUrl, crowdClient) = createCrowdClient(crowdBase, crowdSysUser, crowdSysPwd)
+      if (crowdConnectionCheck) {
+        testCrowdConnection((crowdUrl, crowdClient))
+      }
+      new AuthenticationRepositoryImpl(crowdClient)
+    }
+
+    def createCrowdClient(crowdBase: String, crowdSysUser: String, crowdSysPwd: String): (String, CrowdClient) = {
+
+      val properties = new Properties();
+      // properties.load(CrowdTools.class.getResourceAsStream("/crowd.properties"));
+      properties.setProperty("application.name", crowdSysUser);
+      properties.setProperty("application.password", crowdSysPwd);
+      properties.setProperty("application.login.url", crowdBase + "/console/");
+      properties.setProperty("crowd.server.url", crowdBase + "/services/");
+      properties.setProperty("crowd.base.url", crowdBase);
+      properties.setProperty("session.isauthenticated", "session.isauthenticated");
+      properties.setProperty("session.tokenkey", "session.tokenkey");
+      properties.setProperty("session.validationinterval", "0");
+      properties.setProperty("session.lastvalidation", "session.lastvalidation");
+      val clientProperties: ClientProperties = newInstanceFromProperties(properties);
+      val crowdUrl = crowdSysUser + "@" + crowdBase
+      info("Using Crowd " + crowdUrl);
+      val client: CrowdClient = new RestCrowdClientFactory().newInstance(clientProperties);
+      (crowdUrl, client)
+    }
+
+    def testCrowdConnection(crowdClient: (String, CrowdClient)) = {
+      val (crowdUrl, client) = crowdClient
+      try {
+        info("Test crowd connection " + crowdUrl + " ...");
+        client.testConnection();
+        info("Crowd connection test successful");
+      } catch {
+        case e: InvalidAuthenticationException => error("Crowd connection test for url " + crowdUrl + " failed. Access to Crowd denied!", e); throw e
+      }
+
+    }
+
   }
 }
 
