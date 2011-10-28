@@ -19,6 +19,7 @@ import com.xebia.xkeng.model.{ Credential, Session, Location, Conference, Author
 import net.liftweb.common.Logger
 import com.xebia.xkeng.serialization.util._
 import com.xebia.xkeng.rest.JsonDomainConverters._
+import net.liftweb.util.Helpers._
 
 object RestSmokeTestClient {
 
@@ -104,16 +105,17 @@ object RestSmokeTestClient {
   def commentSession(sessionId: Long, comment: Comment): List[Comment] = {
     add("feedback/" + sessionId + "/comment", ("comment" -> comment.comment))(fromCommentListJson(_))
   }
- def login(username: String, password: String): Unit= {
+  def login(username: String, password: String): Unit = {
     add("login", Credential(username, password).serializeToJson)(a => Unit)
   }
-  
+
   val printResp = (resp: String) => println(resp)
 
   def main(args: Array[String]) {
     println("Login...")
-    val loggedIn = login("upeter", "Iroqoxx47")
-
+    val aUser = new String(hexDecode("49726f716f78783437"))
+    val aPwd = new String(hexDecode("757065746572"))
+    val loggedIn = login(aPwd, aUser)
 
     println("Create new conference...")
     val newConf = addConference(c)
