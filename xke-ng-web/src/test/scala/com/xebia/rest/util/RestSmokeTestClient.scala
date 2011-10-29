@@ -34,6 +34,7 @@ object RestSmokeTestClient {
 
   val xkeStartDate = new DateTime().plusDays(3)
   val l1 = Location("Maup", 20)
+  val l3 = Location("Meeting Room", 10)
   val l2 = Location("Laap", 30)
   val c1 = Comment("bla bla comment", "peteru")
   val r1 = Rating(10, "peteru")
@@ -98,6 +99,13 @@ object RestSmokeTestClient {
     }
   }
 
+  def addLocation(location:Location):Location = {
+    add("location" , locationToJValue(location)) {
+      Location(_)
+    }
+    
+  }
+  
   def rateSession(sessionId: Long, rate: Rating): List[Int] = {
     add("feedback/" + sessionId + "/rating", ("rate" -> rate.rate))(r => deserializeIntList(serializeToJson(r)))
   }
@@ -117,6 +125,11 @@ object RestSmokeTestClient {
     val aPwd = new String(hexDecode("757065746572"))
     val loggedIn = login(aPwd, aUser)
 
+    println("Create location")
+    val l = addLocation(l3)
+    assert(l.description == l3.description)
+    println("new location %s" format l)
+    
     println("Create new conference...")
     val newConf = addConference(c)
     assert(newConf._id == c._id)
