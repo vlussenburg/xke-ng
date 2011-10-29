@@ -66,7 +66,8 @@ public class ConferenceServer {
 		 requestUrl.append(baseUrl);
 		 requestUrl.append("/login");
 		 RestClient.postObject(requestUrl.toString(), new Credential(user, password), void.class, null);
-		 this.token = "fix";
+		 // RestClients holds the authentication token.
+		 this.token = "logged_in";
 	}
 
 	public boolean isLoggedIn() {

@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
@@ -47,7 +46,7 @@ public class RestClient {
 	private static final String JSESSIONID = "JSESSIONID";
 	private static final int HTTP_TIMEOUT = 5 * 1000;
 	private static GsonBuilder gsonBuilder = null;
-	private static String sessionId = null;
+	private static Cookie sessionCookie = null;
 
 	private static Gson getGson() {
 		if (gsonBuilder == null) {
@@ -218,12 +217,15 @@ public class RestClient {
 		DefaultHttpClient httpClient = null;
 		try {
 			httpClient = getHttpClient();
-			httpClient.getCookieStore().addCookie(new BasicClientCookie(JSESSIONID, sessionId));
+			if ( sessionCookie != null ) {
+				httpClient.getCookieStore().addCookie(sessionCookie);
+			}
 			HttpResponse response = httpClient.execute(request);
 	        List<Cookie> cookies = httpClient.getCookieStore().getCookies();
 	        for (Cookie cookie : cookies) {
 				if ( JSESSIONID.equals(cookie.getName()) ) {
-					sessionId = cookie.getValue();
+					sessionCookie = cookie;
+					break;
 				}
 			}
 			handleResponse(request, response);

@@ -60,10 +60,6 @@ public class CVSessionList extends SessionSwipeActivity {
 
 	private void switchTo(Conference conference, int sessionIndex) {
 		Session session = sessions[sessionIndex];
-		if (session.isBreak()) {
-			// No navigation to this session
-			return;
-		}
 		Intent intent = new Intent(this, CVSessionView.class);
 		intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
 		intent.putExtra(BaseActivity.IA_SESSION, session.getId());

@@ -325,7 +325,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		int max = sessions.size() - 1;
 		while (index < max) {
 			Session session = sessions.get(++index);
-			if (session.getLocation().equals(location)) {
+			if (session.isMandatory() || session.getLocation().equals(location)) {
 				return session;
 			}
 		}
@@ -338,7 +338,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		int index = sessions.indexOf(currentSession);
 		while (index > 0) {
 			Session session = sessions.get(--index);
-			if (session.getLocation().equals(location)) {
+			if (session.isMandatory() || session.getLocation().equals(location)) {
 				return session;
 			}
 		}
