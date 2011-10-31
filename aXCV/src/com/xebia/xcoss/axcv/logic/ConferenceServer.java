@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
 import com.xebia.xcoss.axcv.logic.cache.DataCache;
@@ -148,6 +149,9 @@ public class ConferenceServer {
 		requestUrl.append(baseUrl);
 		requestUrl.append("/conference");
 
+		Log.w(XCS.LOG.COMMUNICATE, "Conference starts at " + conference.getStartTime());
+		Log.w(XCS.LOG.COMMUNICATE, "Conference ends   at " + conference.getEndTime());
+		
 		conferenceCache.remove(conference);
 		if (create) {
 			conference = RestClient.createObject(requestUrl.toString(), conference, Conference.class, token);
@@ -206,19 +210,25 @@ public class ConferenceServer {
 	public String storeSession(Session session, String conferenceId, boolean create) {
 		StringBuilder requestUrl = new StringBuilder();
 		requestUrl.append(baseUrl);
-		requestUrl.append("/conference/");
-		requestUrl.append(conferenceId);
-		requestUrl.append("/session");
 
 		String sessionId = null;
 		if (create) {
+			requestUrl.append("/conference/");
+			requestUrl.append(conferenceId);
+			requestUrl.append("/session");
 			session = RestClient.createObject(requestUrl.toString(), session, Session.class, token);
-			conferenceCache.add(conferenceId, session);
 			sessionId = session.getId();
 		} else {
+			// TODO : New variant still does not work
+//			requestUrl.append("/session/");
+//			requestUrl.append(session.getId());
+			requestUrl.append("/conference/");
+			requestUrl.append(conferenceId);
+			requestUrl.append("/session");
 			RestClient.updateObject(requestUrl.toString(), session, token);
 			sessionId = session.getId();
 		}
+		conferenceCache.add(conferenceId, session);
 		return sessionId;
 	}
 

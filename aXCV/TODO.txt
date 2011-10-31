@@ -1,0 +1,29 @@
+IN PROGRESS
+-------------------------------------------------------------------
+
+TODO
+-------------------------------------------------------------------
+client
+-	Herziening REST API (session change)
+-	Nieuwe foutmeldingen van server (nieuwe server versie)
+-	Verbeteren van caching
+	Caching: refresh na conference edit (reopen view...)
+-	Omschakelen tussen full view/list view van sessies
+-	Breaks inplannen over alle locaties
+-	Notificaties weer werkend maken
+-	Bugfix menu popup labels/authors (Rogier)
+-	Offline support
+-	Verwijderen van locaties (Urs)
+-	Conference edit alleen door organiser (?)
+-	JodaTime (timezone related)
+
+server
+-	Session scheduling
+-	403 on session expiration
+
+DONE
+-------------------------------------------------------------------
+-	Login
+-	Breaks gelden voor elke locatie
+-	Authors
+-	Breaks verwijderen
