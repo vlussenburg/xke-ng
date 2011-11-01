@@ -20,7 +20,7 @@ server
 -	403 on session expiration
 -	Verwijderen van locaties (Urs; not supported now)
 -	Herziening REST API (session change; new URL does not work)
--	Error handling (/error URL does not work?)
+-	Error handling (/error URL does not work - no auth wanted)
 -	Nieuwe foutmeldingen van server (nieuwe server versie)
 
 DONE

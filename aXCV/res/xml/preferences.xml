@@ -47,16 +47,14 @@
 			android:title="Time format"
 			android:summary="(default)"
 			android:defaultValue="HH:mm'u'" />
-<!--
-		<ListPreference
-			android:title="Date format"
-			android:summary="Specifies the format of dates"
+<!-- 		<ListPreference
+			android:title="Caching"
+			android:summary="Which caching policy?"
 			android:key="DateFormat"
 			android:defaultValue="1"
-			android:entries="@array/dates"
-			android:entryValues="@array/dates" />
-  -->
-	</PreferenceCategory>
+			android:entries="@array/cacheClassNames"
+			android:entryValues="@array/cacheNames" />
+ -->	</PreferenceCategory>
 	<PreferenceCategory
 		android:title="Notification">
 		<RingtonePreference

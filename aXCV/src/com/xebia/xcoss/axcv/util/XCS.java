@@ -1,12 +1,8 @@
 package com.xebia.xcoss.axcv.util;
 
 import java.util.TimeZone;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.text.util.Linkify.MatchFilter;
-import android.text.util.Linkify.TransformFilter;
-import android.util.Log;
 import android.view.Menu;
 
 public class XCS {

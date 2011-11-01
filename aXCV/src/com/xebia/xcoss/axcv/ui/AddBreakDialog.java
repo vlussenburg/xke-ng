@@ -142,7 +142,7 @@ public class AddBreakDialog extends Dialog {
 			int duration = getDuration();
 			if (duration == 0) duration = TimeSlot.LENGTH;
 
-			Set<TimeSlot> timeSlots = conference.getAvailableTimeSlots(duration);
+			Set<TimeSlot> timeSlots = conference.getAvailableTimeSlots(duration, conference.getLocations());
 
 			for (TimeSlot timeSlot : timeSlots) {
 				locations.add(timeSlot.location);
@@ -156,7 +156,7 @@ public class AddBreakDialog extends Dialog {
 			String[] startarray = startdata.toArray(new String[startdata.size()]);
 			Spinner spinner = (Spinner) findViewById(R.id.bStartTime);
 			Object selectedItem = spinner.getSelectedItem();
-			spinner.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, startarray));
+			spinner.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, startarray));
 			int position = 0;
 			for (int i = 0; i < startarray.length; i++) {
 				if ( startarray[i].equals(selectedItem)) {

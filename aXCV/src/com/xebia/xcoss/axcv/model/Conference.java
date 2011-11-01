@@ -304,6 +304,21 @@ public class Conference implements Serializable {
 		}
 	}
 
+	private boolean isTimeSlotAvailable(DateTime start, int length, Location location) {
+
+		// Sessions are sorted on start time!
+		for (Session session : getSessions()) {
+			if (!location.equals(session.getLocation()) || start.gt(session.getStartTime())) {
+				continue;
+			}
+			
+			// We have space between start and the session to start
+			int delta = getTime(session.getStartTime()) - getTime(start);
+			return delta >= length;
+		}
+		return false;
+	}
+
 	public TimeSlot getNextAvailableTimeSlot(Session rescheduleSession, DateTime start, final int duration,
 			Location location) {
 
@@ -355,6 +370,31 @@ public class Conference implements Serializable {
 		while ((t = getNextAvailableTimeSlot(null, start, length, loc)) != null) {
 			list.add(t);
 			start = start.plus(0, 0, 0, 0, length, 0, DayOverflow.Spillover);
+		}
+		return list;
+	}
+
+	public SortedSet<TimeSlot> getAvailableTimeSlots(int duration, List<Location> locs) {
+		if (locs == null || locs.isEmpty()) {
+			return getAvailableTimeSlots(duration);
+		}
+		Location[] allLocations = locs.toArray(new Location[locs.size()]);
+		Location firstLocation = allLocations[0];
+		TreeSet<TimeSlot> list = new TreeSet<TimeSlot>(new TimeSlotComparator());
+		TimeSlot t;
+		int length = duration < TimeSlot.MIN_LENGTH ? TimeSlot.LENGTH : duration;
+		DateTime start = startTime;
+		while ((t = getNextAvailableTimeSlot(null, start, length, firstLocation)) != null) {
+			// Check the remainder of the locations for this slot
+			boolean availableOnAllLocations = true;
+			for (int i = 1; i < allLocations.length; i++) {
+				availableOnAllLocations = availableOnAllLocations
+						&& isTimeSlotAvailable(start, length, allLocations[i]);
+			}
+			if (availableOnAllLocations) {
+				list.add(t);
+				start = start.plus(0, 0, 0, 0, length, 0, DayOverflow.Spillover);
+			}
 		}
 		return list;
 	}

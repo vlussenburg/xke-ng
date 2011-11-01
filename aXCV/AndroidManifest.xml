@@ -101,7 +101,6 @@
 					android:host="xebia" />
 			</intent-filter>
 		</activity>
-		<!--
 		<activity
 			android:name="de.quist.app.errorreporter.ExceptionReportActivity"
 			android:process=":exceptionReporter"
@@ -112,13 +111,14 @@
 		<meta-data
 			android:name="de.quist.app.errorreporter.targetUrl"
 			android:value="http://ec2-46-137-184-99.eu-west-1.compute.amazonaws.com:8080/xkeng/error" />
-		-->
+		<!--
 		<meta-data
 			android:name="com.xebia.xcoss.serverUrl"
-			android:value="http://10.0.2.2:8080" />
+			android:value="http://10.0.2.2:9999" />
 		<meta-data
 			android:name="de.quist.app.errorreporter.targetUrl"
-			android:value="http://10.0.2.2:8080/error" />
+			android:value="http://10.0.2.2:9999/error" />
+		-->
 		<meta-data
 			android:name="de.quist.app.errorreporter.reportOnFroyo"
 			android:value="true" />

@@ -6,7 +6,6 @@ import com.xebia.xcoss.axcv.util.StringUtil;
 public class Credential {
 	@SuppressWarnings("unused")
 	private String username;
-	@SuppressWarnings("unused")
 	private String password;
 	@SuppressWarnings("unused")
 	private String encryptedPassword;
