@@ -1,7 +1,5 @@
 package com.xebia.xcoss.axcv;
 
-import hirondelle.date4j.DateTime;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,6 +26,7 @@ import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.model.Location;
+import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.Session.Type;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
@@ -48,7 +47,7 @@ public class CVSessionAdd extends AdditionActivity {
 
 	/** Called when the activity is first created. */
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {	
 		setContentView(R.layout.add_session);
 		this.timeFormatter = new ScreenTimeUtil(this);
 
@@ -76,7 +75,7 @@ public class CVSessionAdd extends AdditionActivity {
 	private void showConference() {
 		if (conference != null) {
 			TextView view = (TextView) findViewById(R.id.conferenceDate);
-			view.setText(timeFormatter.getAbsoluteDate(conference.getDate()));
+			view.setText(timeFormatter.getAbsoluteDate(conference.getStartTime()));
 
 			view = (TextView) findViewById(R.id.conferenceName);
 			view.setText(conference.getTitle());
@@ -88,7 +87,7 @@ public class CVSessionAdd extends AdditionActivity {
 			session = getSelectedSession(conference);
 		}
 		if (session != null) {
-			DateTime startTime = session.getStartTime();
+			Moment startTime = session.getStartTime();
 			int duration = session.getDuration();
 
 			TextView view = (TextView) findViewById(R.id.sessionTitle);
@@ -211,7 +210,10 @@ public class CVSessionAdd extends AdditionActivity {
 		button.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
-				rescheduleSession(0);
+				View view = findViewById(R.id.sessionDuration);
+				CharSequence text = ((TextView)view).getText();
+				int duration = StringUtil.getFirstInteger(text.toString());
+				rescheduleSession(duration);
 				showConference();
 				showSession();
 			}
@@ -246,7 +248,7 @@ public class CVSessionAdd extends AdditionActivity {
 					+ location.getDescription()
 					+ "] => ");
 			slot = conference.getNextAvailableTimeSlot(session, session.getStartTime(), duration, location);
-			Log.v("XCS", slot == null ? "NONE" : slot.start.format("h:mm") + " till " + slot.end.format("h:mm") + " @ "
+			Log.v("XCS", slot == null ? "NONE" : slot.start + " till " + slot.end + " @ "
 							+ slot.location.getDescription());
 		}
 //		// Move up to the next conference and call this method recursively
@@ -275,19 +277,22 @@ public class CVSessionAdd extends AdditionActivity {
 	 */
 	public void updateField(int field, Object selection, boolean state) {
 		String value = selection.toString();
+		int duration;
 		switch (field) {
 			case R.id.conferenceName:
 				Identifiable ident = (Identifiable) selection;
 				conference = getConferenceServer().getConference(ident.getIdentifier());
-				session.setStartTime(conference.getDate());
+				Moment m = conference.getStartTime();
+				session.onStartTime().setDate(m.getYear(), m.getMonth(), m.getDay());
 				rescheduleSession(session.getDuration());
 			break;
 			case R.id.sessionStart:
 				TimeSlot t = (TimeSlot) selection;
-				session.setStartTime(t.start);
-				rescheduleSession(0);
+				duration = session.getDuration();
+				session.onStartTime().setTime(t.start.getHour(), t.start.getMinute());
+				rescheduleSession(duration);
 			case R.id.sessionDuration:
-				int duration = StringUtil.getFirstInteger(value);
+				duration = StringUtil.getFirstInteger(value);
 				rescheduleSession(duration);
 			break;
 			case R.id.sessionLanguage:
@@ -314,7 +319,7 @@ public class CVSessionAdd extends AdditionActivity {
 			break;
 			case R.id.sessionLocation:
 				session.setLocation((Location) selection);
-				rescheduleSession(0);
+				rescheduleSession(session.getDuration());
 			break;
 			case R.id.sessionType:
 				Type type = (Type) selection;

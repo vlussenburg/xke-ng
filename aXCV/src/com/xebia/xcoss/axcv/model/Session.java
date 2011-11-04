@@ -1,8 +1,5 @@
 package com.xebia.xcoss.axcv.model;
 
-import hirondelle.date4j.DateTime;
-import hirondelle.date4j.DateTime.DayOverflow;
-
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +9,7 @@ import java.util.TreeSet;
 import android.util.Log;
 
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
+import com.xebia.xcoss.axcv.model.Moment.FixedMoment;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -46,8 +44,8 @@ public class Session implements Serializable {
 	private Long id;
 	private String title;
 	private String description;
-	private DateTime startTime;
-	private DateTime endTime;
+	private Moment startTime;
+	private Moment endTime;
 	private String limit = "Unlimited";
 	private Type type = Type.STANDARD;
 	private Set<Author> authors;
@@ -75,8 +73,8 @@ public class Session implements Serializable {
 
 		title = original.title;
 		location = original.location;
-		startTime = original.startTime;
-		endTime = original.endTime;
+		startTime = new Moment(original.startTime);
+		endTime = new Moment(original.endTime);
 		description = original.description;
 		intendedAudience = original.intendedAudience;
 		limit = original.limit;
@@ -137,36 +135,26 @@ public class Session implements Serializable {
 		}
 	}
 
-	public DateTime getStartTime() {
+	public Moment getStartTime() {
+		return startTime == null ? null : startTime.new FixedMoment(startTime);
+	}
+
+	public Moment onStartTime() {
+		if ( startTime == null ) {
+			startTime = new Moment();
+		}
 		return startTime;
 	}
 
-	public void setStartTime(DateTime time) {
-		int duration = getDuration();
-		startTime = updateTime(startTime, time);
-		setEndTime(startTime.plus(0, 0, 0, 0, duration, 0, DayOverflow.Spillover));
+	public Moment getEndTime() {
+		return endTime == null ? null : endTime.new FixedMoment(endTime);
 	}
 
-	public DateTime getEndTime() {
+	public Moment onEndTime() {
+		if ( endTime == null ) {
+			endTime = new Moment();
+		}
 		return endTime;
-	}
-
-	public void setEndTime(DateTime time) {
-		endTime = updateTime(endTime, time);
-	}
-
-	private DateTime updateTime(final DateTime baseTime, final DateTime time) {
-		DateTime result = baseTime;
-		if ( result == null ) {
-			result = DateTime.now(XCS.TZ);
-		}
-		if (time.hasYearMonthDay()) {
-			result = new DateTime(time.getYear(), time.getMonth(), time.getDay(), result.getHour(), result.getMinute(), 0, 0);
-		}
-		if (time.hasHourMinuteSecond()) {
-			result = new DateTime(result.getYear(), result.getMonth(), result.getDay(), time.getHour(), time.getMinute(), 0, 0);
-		}
-		return result;
 	}
 
 	public String getDescription() {
@@ -223,8 +211,8 @@ public class Session implements Serializable {
 	public int getDuration() {
 		int duration = DEFAULT_DURATION;
 		if (startTime != null && endTime != null) {
-			int start = startTime.getHour() * 60 + startTime.getMinute();
-			int end = endTime.getHour() * 60 + endTime.getMinute();
+			int start = startTime.asMinutes();
+			int end = endTime.asMinutes();
 			duration = end - start;
 		}
 		return duration;
@@ -326,14 +314,14 @@ public class Session implements Serializable {
 		if (getEndTime() == null) {
 			return false;
 		}
-		return getEndTime().isInThePast(XCS.TZ);
+		return getEndTime().isBeforeNow();
 	}
 
 	public boolean isRunning() {
 		if (getStartTime() == null) {
 			return false;
 		}
-		return DateTime.now(XCS.TZ).gteq(getStartTime()) && !isExpired();
+		return getStartTime().isAfterNow() && !isExpired();
 	}
 
 	public long getModificationHash() {
@@ -350,9 +338,10 @@ public class Session implements Serializable {
 	}
 
 	public void reschedule(Conference conference, TimeSlot slot) {
-		setStartTime(conference.getDate());
-		setStartTime(slot.start);
-		setEndTime(slot.end);
+		startTime = new Moment(conference.getStartTime());
+		startTime.setTime(slot.start.getHour(), slot.start.getMinute());
+		endTime = new Moment(conference.getStartTime());
+		endTime.setTime(slot.end.getHour(), slot.end.getMinute());
 		setLocation(slot.location);
 		setConferenceId(conference.getId());
 	}

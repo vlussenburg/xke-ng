@@ -1,8 +1,5 @@
 package com.xebia.xcoss.axcv.ui;
 
-import hirondelle.date4j.DateTime;
-import hirondelle.date4j.DateTime.DayOverflow;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
@@ -23,6 +20,7 @@ import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.model.Location;
+import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.Session.Type;
 import com.xebia.xcoss.axcv.util.StringUtil;
@@ -71,22 +69,26 @@ public class AddBreakDialog extends Dialog {
 			public void onClick(View paramView) {
 				int duration = getDuration();
 				Location location = getLocation();
-				DateTime starttime = getDateTime();
+				Moment time = getMoment();
 				TextView view = (TextView) findViewById(R.id.seValue);
 				String title = view.getText().toString();
 				if (StringUtil.isEmpty(title)) {
 					title = activity.getResources().getText(R.string.default_break_name).toString();
 				}
 
-				if (duration > 0 && location != null && starttime != null) {
+				if (duration > 0 && location != null && time != null) {
 					Session session = new Session();
 					session.setType(Type.BREAK);
 					session.setTitle(title);
 					session.setDescription(title);
 					session.setLocation(location);
-					session.setStartTime(conference.getDate());
-					session.setStartTime(starttime);
-					session.setEndTime(session.getStartTime().plus(0, 0, 0, 0, duration, 0, DayOverflow.Spillover));
+					Moment s = conference.getStartTime();
+					session.onStartTime().setDate(s.getYear(), s.getMonth(), s.getDay());
+					session.onStartTime().setTime(time.getHour(), time.getMinute());
+
+					time = session.getStartTime().plusMinutes(duration);
+					session.onEndTime().setDate(s.getYear(), s.getMonth(), s.getDay());
+					session.onEndTime().setTime(time.getHour(), time.getMinute());
 
 					activity.updateField(identifier, session, true);
 					dismiss();
@@ -113,7 +115,7 @@ public class AddBreakDialog extends Dialog {
 		return (Location) spinner.getSelectedItem();
 	}
 
-	private DateTime getDateTime() {
+	private Moment getMoment() {
 		Spinner spinner = (Spinner) findViewById(R.id.bStartTime);
 		String date = (String) spinner.getSelectedItem();
 		return timeFormatter.getAbsoluteTime(date);
@@ -137,7 +139,7 @@ public class AddBreakDialog extends Dialog {
 		Set<Location> locations = new HashSet<Location>();
 
 		if (conference != null) {
-			Set<DateTime> startTime = new HashSet<DateTime>();
+			Set<Moment> startTime = new HashSet<Moment>();
 
 			int duration = getDuration();
 			if (duration == 0) duration = TimeSlot.LENGTH;
@@ -150,7 +152,7 @@ public class AddBreakDialog extends Dialog {
 			}
 
 			SortedSet<String> startdata = new TreeSet<String>();
-			for (DateTime dateTime : startTime) {
+			for (Moment dateTime : startTime) {
 				startdata.add(timeFormatter.getAbsoluteTime(dateTime));
 			}
 			String[] startarray = startdata.toArray(new String[startdata.size()]);

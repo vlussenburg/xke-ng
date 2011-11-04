@@ -161,7 +161,7 @@ public class NotificationService extends Service {
 						sessionFoundInMarkList = true;
 						if ( ids[i].hash != lastNotification) {
 							ids[i].hash = lastNotification;
-							ids[i].date = session.getStartTime();
+							ids[i].date = session.getStartTime().getLong();
 							pm.updateOwnedSession(ids[i]);
 							modified.add(session.getId());
 						}
@@ -171,7 +171,7 @@ public class NotificationService extends Service {
 				// What to do with sessions added elsewhere? We notify for now...
 				if (!sessionFoundInMarkList) {
 					Trackable add = pm.new Trackable();
-					add.date = session.getStartTime();
+					add.date = session.getStartTime().getLong();
 					add.sessionId = session.getId();
 					add.userId = getUser();
 					add.hash = lastNotification;
@@ -197,7 +197,7 @@ public class NotificationService extends Service {
 				Session session = server.getSession(ids[i].sessionId);
 				if ( ids[i].hash != session.getModificationHash()) {
 					ids[i].hash = session.getModificationHash();
-					ids[i].date = session.getStartTime();
+					ids[i].date = session.getStartTime().getLong();
 					pm.updateMarkedSession(ids[i]);
 					modified.add(session.getId());
 				}

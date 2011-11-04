@@ -1,7 +1,5 @@
 package com.xebia.xcoss.axcv;
 
-import hirondelle.date4j.DateTime;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,13 +41,11 @@ public class CVTrack extends BaseActivity {
 		ConferenceServer server = getConferenceServer();
 		String[] markedSessions = getProfileManager().getMarkedSessionIds(getUser());
 		boolean hasExpiredSession = false;
-		DateTime today = DateTime.today(XCS.TZ);
 		for (String id : markedSessions) {
 			try {
 				Session session = server.getSession(id);
 				if (session != null) {
-					// session.isExpired() works also on the day itself
-					if (today.gt(session.getStartTime())) {
+					if (session.isExpired()) {
 						hasExpiredSession = true;
 					} else {
 						selectedSessions.add(session);
@@ -61,7 +57,7 @@ public class CVTrack extends BaseActivity {
 			}
 		}
 		if ( hasExpiredSession ) {
-			getProfileManager().pruneMarked(today);
+			getProfileManager().pruneMarked();
 		}
 		sessions = selectedSessions.toArray(new Session[selectedSessions.size()]);
 		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, sessions);

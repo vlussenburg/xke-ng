@@ -15,9 +15,7 @@ public class ConferenceStatus {
 	public static String getStatus(Conference cfr) {
 		try {
 			int locsize = cfr.getLocations().size();
-			int trackDuration = cfr.getEndTime().getHour() * 60 + cfr.getEndTime().getMinute()
-					- cfr.getStartTime().getHour() * 60 - cfr.getStartTime().getMinute();
-
+			int trackDuration = cfr.getEndTime().asMinutes() - cfr.getStartTime().asMinutes();
 			Set<Session> sessions = cfr.getSessions();
 			int mandatoryDuration = 0;
 			int bookedDuration = 0;

@@ -1,7 +1,5 @@
 package com.xebia.xcoss.axcv.logic;
 
-import hirondelle.date4j.DateTime;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -34,7 +32,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.xebia.xcoss.axcv.logic.gson.GsonDateTimeAdapter;
+import com.xebia.xcoss.axcv.logic.gson.GsonMomentAdapter;
+import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.util.StreamUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -50,7 +49,7 @@ public class RestClient {
 	private static Gson getGson() {
 		if (gsonBuilder == null) {
 			gsonBuilder = new GsonBuilder();
-			gsonBuilder.registerTypeAdapter(DateTime.class, new GsonDateTimeAdapter());
+			gsonBuilder.registerTypeAdapter(Moment.class, new GsonMomentAdapter());
 		}
 		return gsonBuilder.create();
 	}
@@ -217,12 +216,14 @@ public class RestClient {
 		try {
 			httpClient = getHttpClient();
 			if ( sessionCookie != null ) {
+//				Log.e(XCS.LOG.COMMUNICATE, "Sending cookie " + sessionCookie);
 				httpClient.getCookieStore().addCookie(sessionCookie);
 			}
 			HttpResponse response = httpClient.execute(request);
 	        List<Cookie> cookies = httpClient.getCookieStore().getCookies();
 	        for (Cookie cookie : cookies) {
 				if ( JSESSIONID.equals(cookie.getName()) ) {
+//					Log.e(XCS.LOG.COMMUNICATE, "Retrieving cookie " + sessionCookie);
 					sessionCookie = cookie;
 					break;
 				}

@@ -1,8 +1,5 @@
 package com.xebia.xcoss.axcv.logic.cache;
 
-import hirondelle.date4j.DateTime;
-import hirondelle.date4j.DateTime.Unit;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +7,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -30,7 +28,7 @@ public abstract class DataCache {
 	public List<Conference> getConferences(Integer year) {
 		List<Conference> result = new ArrayList<Conference>();
 		for (CachedObject<Conference> co : doGetCachedObjects(Conference.class)) {
-			if (co.object.getDate().getYear().equals(year)) {
+			if (co.object.getStartTime().getYear().equals(year)) {
 				// Not checking on validity...
 				if (co.object != null) {
 					result.add(co.object);
@@ -40,28 +38,29 @@ public abstract class DataCache {
 		return result;
 	}
 
-	public Conference getConference(DateTime date) {
+	public Conference getConference(Moment date) {
 		for (CachedObject<Conference> co : doGetCachedObjects(Conference.class)) {
-			if (co.object.getDate().equals(date)) {
+			if (co.object.getStartTime().compare(date) == 0) {
 				return checkValid(co);
 			}
 		}
 		return null;
 	}
 
-	public List<Conference> getConferences(DateTime date) {
+	public List<Conference> getConferences(Moment date) {
 		List<Conference> list = getConferences(date.getYear());
-		if (list == null || !date.unitsAllPresent(Unit.MONTH)) {
+		if (list == null) {
 			return list;
 		}
 		List<Conference> result = new ArrayList<Conference>();
-		boolean hasDay = date.unitsAllPresent(Unit.DAY);
 		for (Conference conference : list) {
-			if (conference.getDate().getMonth() == date.getMonth()) {
-				if (hasDay && conference.getDate().getDay() != date.getDay()) {
-					continue;
-				}
+			Moment m = conference.getStartTime();
+			if ( date.getMonth() == null ) {
 				result.add(conference);
+			} else if (date.getMonth().equals(m.getMonth())) {
+				if ( date.getDay() == null || date.getDay().equals(m.getDay())) {
+					result.add(conference);
+				}
 			}
 		}
 		return result;

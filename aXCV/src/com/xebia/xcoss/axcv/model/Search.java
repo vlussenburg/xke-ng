@@ -1,7 +1,5 @@
 package com.xebia.xcoss.axcv.model;
 
-import hirondelle.date4j.DateTime;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,12 +30,4 @@ public class Search {
 		}
 		return this;
 	}
-
-	public Search onDateStart(DateTime dt) {
-		if (dt != null) {
-			searchParms.put(Field.FROM, dt.format("YYYY-MM-DD|T|hh:mm:ss.fff|Z|"));
-		}
-		return this;
-	}
-
 }

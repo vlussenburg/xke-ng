@@ -1,6 +1,5 @@
 package com.xebia.xcoss.axcv.ui;
 
-import hirondelle.date4j.DateTime;
 import android.app.Activity;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -11,7 +10,7 @@ import android.widget.TextView;
 
 import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Conference;
-import com.xebia.xcoss.axcv.util.XCS;
+import com.xebia.xcoss.axcv.model.Moment;
 
 public class ConferenceAdapter extends BaseAdapter {
 
@@ -30,15 +29,14 @@ public class ConferenceAdapter extends BaseAdapter {
 	@Override
 	public View getView(int paramInt, View paramView, ViewGroup parent) {
 
+		boolean sameDay = false;
 		Conference cfr = (Conference) getItem(paramInt);
 		int colorId = ctx.getResources().getColor(R.color.tc_itemdefault);
-		DateTime now = DateTime.today(XCS.TZ);
-		boolean sameDayAs = cfr.getDate().isSameDayAs(now);
-		if (cfr.getDate().isInThePast(XCS.TZ)) {
+		Moment dt = cfr.getStartTime();
+		if (dt.isBeforeToday()) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemgone);
-		}
-		// Don't use else, since it is also regarded as being in the past
-		if (sameDayAs) {
+		} else if ( !dt.isAfterToday() ) {
+			sameDay = true;
 			colorId = ctx.getResources().getColor(R.color.tc_itemactive);
 		}
 
@@ -50,8 +48,8 @@ public class ConferenceAdapter extends BaseAdapter {
 		TextView statusView = (TextView) row.findViewById(R.id.cnf_status);
 		TextView dateView = (TextView) row.findViewById(R.id.cnf_date);
 
-		whenView.setText(timeFormatter.getRelativeDate(cfr.getDate()));
-		dateView.setText(timeFormatter.getAbsoluteDate(cfr.getDate()));
+		whenView.setText(timeFormatter.getRelativeDate(cfr.getStartTime()));
+		dateView.setText(timeFormatter.getAbsoluteDate(cfr.getStartTime()));
 		titleView.setText(cfr.getTitle());
 		statusView.setText(ConferenceStatus.getStatus(cfr));
 
@@ -60,7 +58,7 @@ public class ConferenceAdapter extends BaseAdapter {
 		statusView.setTextColor(colorId);
 		dateView.setTextColor(colorId);
 
-		if ( sameDayAs ) {
+		if ( sameDay ) {
 			titleView.setTypeface(titleView.getTypeface(), Typeface.BOLD);
 			whenView.setTypeface(whenView.getTypeface(), Typeface.BOLD);
 		}

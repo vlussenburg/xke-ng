@@ -78,7 +78,7 @@ public class CVSessionView extends SessionSwipeActivity {
 
 		TextView date = (TextView) findViewById(R.id.conferenceDate);
 		ScreenTimeUtil timeUtil = new ScreenTimeUtil(this);
-		String val = timeUtil.getAbsoluteDate(conference.getDate());
+		String val = timeUtil.getAbsoluteDate(conference.getStartTime());
 		date.setText(val);
 
 		TextView sessionDate = (TextView) findViewById(R.id.sessionTime);

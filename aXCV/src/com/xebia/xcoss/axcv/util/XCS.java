@@ -1,6 +1,5 @@
 package com.xebia.xcoss.axcv.util;
 
-import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import android.view.Menu;
@@ -8,8 +7,6 @@ import android.view.Menu;
 public class XCS {
 
 	private static final int DIALOGID = 2348;
-
-	public static final TimeZone TZ = TimeZone.getDefault();
 
 	public static class TAG {
 		public static final String LINK = "tag://xebia/";

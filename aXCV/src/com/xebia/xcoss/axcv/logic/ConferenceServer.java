@@ -1,8 +1,5 @@
 package com.xebia.xcoss.axcv.logic;
 
-import hirondelle.date4j.DateTime;
-import hirondelle.date4j.DateTime.Unit;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +16,7 @@ import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Credential;
 import com.xebia.xcoss.axcv.model.Location;
+import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Rate;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Search;
@@ -75,7 +73,7 @@ public class ConferenceServer {
 		return (this.token != null);
 	}
 
-	public Conference getConference(DateTime date) {
+	public Conference getConference(Moment date) {
 		List<Conference> conferences = getConferences(date);
 		if (conferences == null || conferences.isEmpty()) {
 			return null;
@@ -117,17 +115,17 @@ public class ConferenceServer {
 		return result;
 	}
 
-	public List<Conference> getConferences(DateTime date) {
+	public List<Conference> getConferences(Moment date) {
 		List<Conference> result = conferenceCache.getConferences(date);
 		if (result == null || result.isEmpty()) {
 			StringBuilder requestUrl = new StringBuilder();
 			requestUrl.append(baseUrl);
 			requestUrl.append("/conferences/");
 			requestUrl.append(date.getYear());
-			if (date.unitsAllPresent(Unit.MONTH)) {
+			if (date.getMonth() != null) {
 				requestUrl.append("/");
 				requestUrl.append(date.getMonth());
-				if (date.unitsAllPresent(Unit.DAY)) {
+				if (date.getDay() != null) {
 					requestUrl.append("/");
 					requestUrl.append(date.getDay());
 				}
@@ -412,7 +410,7 @@ public class ConferenceServer {
 
 	/* Utility functions */
 
-	public Conference getNextConference(DateTime dt) {
+	public Conference getNextConference(Moment dt) {
 		List<Conference> list = getConferences(dt.getYear());
 
 		if (list.isEmpty()) {
@@ -420,18 +418,20 @@ public class ConferenceServer {
 		}
 
 		for (Conference conference : list) {
-			DateTime cdate = conference.getDate();
-			if (cdate.lt(dt) || cdate.isSameDayAs(dt)) {
+			Moment cdate = conference.getStartTime();
+			if (!cdate.isAfter(dt)) {
 				continue;
 			}
 			// List is sorted on date
 			return conference;
 		}
 		// No conference in this year.
-		return getNextConference(DateTime.forDateOnly(dt.getYear() + 1, 1, 1));
+		Moment nextYear = new Moment(dt);
+		nextYear.setDate(dt.getYear()+1, 1, 1);
+		return getNextConference(nextYear);
 	}
 
-	public Conference getPreviousConference(DateTime dt) {
+	public Conference getPreviousConference(Moment dt) {
 		List<Conference> list = getConferences(dt.getYear());
 		if (list.isEmpty()) {
 			return null;
@@ -439,21 +439,21 @@ public class ConferenceServer {
 
 		Collections.reverse(list);
 		for (Conference conference : list) {
-			DateTime cdate = conference.getDate();
-			if (cdate.gt(dt) || cdate.isSameDayAs(dt)) {
+			Moment cdate = conference.getStartTime();
+			if (!cdate.isBefore(dt)) {
 				continue;
 			}
 			// List is reversed sorted on date
 			return conference;
 		}
 		// No conference in this year.
-		return getPreviousConference(DateTime.forDateOnly(dt.getYear() - 1, 1, 1));
+		Moment prevYear = new Moment(dt);
+		prevYear.setDate(dt.getYear()-1, 1, 1);
+		return getPreviousConference(prevYear);
 	}
 
 	public List<Conference> getUpcomingConferences(int size) {
-		DateTime now = DateTime.today(XCS.TZ);
-		Integer yearValue = now.getYear();
-
+		Integer yearValue = new Moment().getYear();
 		List<Conference> list = findUpcomingConferences(yearValue, size);
 		int delta = size - list.size();
 		if (delta > 0) {
@@ -463,10 +463,10 @@ public class ConferenceServer {
 	}
 
 	public Conference getUpcomingConference() {
-		return getUpcomingConference(DateTime.today(XCS.TZ));
+		return getUpcomingConference(new Moment());
 	}
 
-	public Conference getUpcomingConference(DateTime dt) {
+	public Conference getUpcomingConference(Moment dt) {
 		List<Conference> list = getConferences(dt.getYear());
 
 		if (list.isEmpty()) {
@@ -474,15 +474,17 @@ public class ConferenceServer {
 		}
 
 		for (Conference conference : list) {
-			DateTime cdate = conference.getDate();
-			if (cdate.isInThePast(XCS.TZ) && !cdate.isSameDayAs(dt)) {
+			Moment cdate = conference.getStartTime();
+			if (cdate.isBeforeToday()) {
 				continue;
 			}
 			// List is sorted on date
 			return conference;
 		}
 		// No conference in this year.
-		return getUpcomingConference(DateTime.forDateOnly(dt.getYear() + 1, 1, 1));
+		Moment nextYear = new Moment(dt);
+		nextYear.setDate(dt.getYear()+1, 1, 1);
+		return getUpcomingConference(nextYear);
 	}
 
 	private List<Conference> findUpcomingConferences(int yearValue, int size) {
@@ -490,8 +492,8 @@ public class ConferenceServer {
 
 		List<Conference> cfs = getConferences(yearValue);
 		for (Conference conference : cfs) {
-			DateTime cdate = conference.getDate();
-			if (cdate.plusDays(1).isInThePast(XCS.TZ)) {
+			Moment cdate = conference.getStartTime();
+			if (cdate.isBeforeNow()) {
 				continue;
 			}
 			list.add(conference);

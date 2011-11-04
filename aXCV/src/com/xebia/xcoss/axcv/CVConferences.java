@@ -1,7 +1,5 @@
 package com.xebia.xcoss.axcv;
 
-import hirondelle.date4j.DateTime;
-
 import java.util.List;
 
 import android.content.Intent;
@@ -18,6 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.ui.ConferenceAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -47,7 +46,7 @@ public class CVConferences extends SwipeActivity {
 		super.onCreate(savedInstanceState);
 		addGestureDetection(R.id.conferencesSwipeBase);
 		
-		shownYear = getIntent().getIntExtra(IA_CONF_YEAR, DateTime.today(XCS.TZ).getYear());
+		shownYear = getIntent().getIntExtra(IA_CONF_YEAR, new Moment().getYear());
 
 		// Check for redirection. Not the case if menu option is used.
 		if (getIntent().getBooleanExtra(IA_REDIRECT, true)) {

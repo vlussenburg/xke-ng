@@ -1,6 +1,7 @@
 package com.xebia.xcoss.axcv.logic;
 
-import hirondelle.date4j.DateTime;
+import org.joda.time.DateTime;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -9,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -43,7 +45,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 		public long hash;
 		public String sessionId;
 		public String userId;
-		public DateTime date;
+		public long date;
 	};
 
 	private SQLiteDatabase database = null;
@@ -142,7 +144,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 			row.put(SES_COL_USER, user);
 			row.put(SES_COL_SESSION, session.getId());
 			row.put(SES_COL_HASH, session.getModificationHash());
-			row.put(SES_COL_DATE, session.getStartTime().getMilliseconds(XCS.TZ));
+			row.put(SES_COL_DATE, session.getStartTime().getLong());
 			long rv = database.insert(TRACK_TABLE, null, row);
 			return rv >= 0;
 		}
@@ -171,12 +173,12 @@ public class ProfileManager extends SQLiteOpenHelper {
 		}
 	}
 
-	public void pruneMarked(DateTime today) {
+	public void pruneMarked() {
 		Log.v(XCS.LOG.COMMUNICATE, "Pruning database");
 		try {
 			checkConnection();
 			String[] whereArgs = new String[1];
-			whereArgs[0] = String.valueOf(today.getMilliseconds(XCS.TZ));
+			whereArgs[0] = String.valueOf(new Moment().getLong());
 			database.delete(TRACK_TABLE, SES_QUERY_PRUNE, whereArgs);
 			database.delete(OWNED_TABLE, SES_QUERY_PRUNE, whereArgs);
 		}
@@ -260,7 +262,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 				trackable.sessionId = query.getString(query.getColumnIndex(SES_COL_SESSION));
 				trackable.hash = query.getLong(query.getColumnIndex(SES_COL_HASH));
 				trackable.userId = user;
-				trackable.date = DateTime.forInstant(query.getLong(query.getColumnIndex(SES_COL_DATE)), XCS.TZ);
+				trackable.date = query.getLong(query.getColumnIndex(SES_COL_DATE));
 				result[i++] = trackable;
 			}
 			query.close();
@@ -280,7 +282,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 			checkConnection();
 			String[] whereArgs = new String[2];
 			values.put(SES_COL_HASH, trackable.hash);
-			values.put(SES_COL_DATE, trackable.date.getMilliseconds(XCS.TZ));
+			values.put(SES_COL_DATE, trackable.date);
 			whereArgs[0] = trackable.userId;
 			whereArgs[1] = String.valueOf(trackable.sessionId);
 			update = database.update(table, values, SES_QUERY_TRACKABLE, whereArgs);
@@ -293,7 +295,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 				values.put(SES_COL_USER, trackable.userId);
 				values.put(SES_COL_SESSION, trackable.sessionId);
 				values.put(SES_COL_DATE, trackable.hash);
-				values.put(SES_COL_HASH, trackable.date.getMilliseconds(XCS.TZ));
+				values.put(SES_COL_HASH, trackable.date);
 				database.insert(table, null, values);
 			}
 			catch (Exception e) {
@@ -378,8 +380,8 @@ public class ProfileManager extends SQLiteOpenHelper {
 		try {
 			checkConnection();
 			String[] whereArgs = new String[1];
-			DateTime moment = DateTime.now(XCS.TZ).minusDays(DAYS_TO_KEEP_IN_CACHE);
-			whereArgs[0] = String.valueOf(moment.getMilliseconds(XCS.TZ));
+			DateTime moment = DateTime.now().minusDays(DAYS_TO_KEEP_IN_CACHE);
+			whereArgs[0] = String.valueOf(moment.getMillis());
 			database.delete(CACHE_TABLE, CACHE_QUERY_PRUNE, whereArgs);
 		}
 		catch (Exception e) {
