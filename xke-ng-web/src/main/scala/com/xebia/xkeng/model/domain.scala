@@ -43,10 +43,39 @@ trait EmbeddedDocumentOps[T] {
 
   /**
    * Mongo qry:
+   * db.confs.update({"_id":ObjectId("<id>"), "<arrayname>": { $elemMatch : { "<field>" : <valueToMatch>}}},{$addToSet :{"<arrayname>.$.<nested_arrayname>":<json>}})
+   * Example:
+   *
+   * db.confs.update({"_id":ObjectId("4eb2f886036439a1fe4a6a2b"), "sessions.id" : NumberLong("1320351878749")},{$addToSet :{"sessions.$.ratings":{"rate":5}}})
+   */
+  def updateInNestedArray(_id: ObjectId, outerArrayName: String, elemInOuterArrayQry: JValue, nestedArrayName: String, elemToAdjustInNestedArray: JValue) = {
+    performNestedArrayOperation("$addToSet", _id, outerArrayName, elemInOuterArrayQry, nestedArrayName, elemToAdjustInNestedArray)
+    // self.update(("_id" -> _id.toString) ~ (outerArrayName -> ("$elemMatch" -> elemInOuterArrayQry)), ("$set" -> (outerArrayName + ".$" + nestedArrayName -> elemToAdjustInNestedArray)))
+  }
+
+  /**
+   * Mongo qry:
    * db.confs.update({"_id" : ObjectId("<id>")},	{$pull : {<arrayname> : {"<field>" : "<valueToMatch>"}}})
    */
   def removeFromArray(_id: ObjectId, arrayName: String, elemInArrayQry: JValue) = {
     self.update(("_id" -> _id.toString), ("$pull" -> (arrayName -> elemInArrayQry)))
+  }
+
+  /**
+   * Mongo qry:
+   * db.confs.update({{"_id":ObjectId("<id>"), "<arrayname>": { $elemMatch : { "<field>" : <valueToMatch>}}},{$pull :{"<arrayname>.$.<nested_arrayname>":<json>}})
+   * Example:
+   *
+   * db.confs.update({"_id":ObjectId("4eb2f886036439a1fe4a6a2b"), "sessions.id" : NumberLong("1320351878749")},{$pull :{"sessions.$.ratings":{"rate":4}}})
+   */
+  def removeFromNestedArray(_id: ObjectId, outerArrayName: String, elemInOuterArrayQry: JValue, nestedArrayName: String, elemToRemoveInNestedArray: JValue) = {
+    performNestedArrayOperation("$pull", _id, outerArrayName, elemInOuterArrayQry, nestedArrayName, elemToRemoveInNestedArray)
+    //self.update(("_id" -> _id.toString) ~ (outerArrayName -> ("$elemMatch" -> elemInOuterArrayQry)), ("$pull" -> (outerArrayName + ".$" + nestedArrayName -> elemToRemoveInNestedArray)))
+  }
+
+  private def performNestedArrayOperation(mongoOperation: String, _id: ObjectId, outerArrayName: String, elemInOuterArrayQry: JValue, nestedArrayName: String, elemToModifyInNestedArray: JValue) = {
+    self.update(("_id" -> _id.toString) ~ (outerArrayName -> ("$elemMatch" -> elemInOuterArrayQry)), (mongoOperation -> (outerArrayName + ".$." + nestedArrayName -> elemToModifyInNestedArray)))
+
   }
 
   protected[model] def doSaveOrUpdate(_id: ObjectId, nameMongoArray: String, mongoArray: List[EmbeddedElem], elem: EmbeddedElem) = {
@@ -68,13 +97,12 @@ trait EmbeddedDocumentOps[T] {
  */
 object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps[Conference] {
   override def collectionName = "confs"
-	
+
   override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
 
-  var listeners:List[SessionListener] = Nil;
-  def addSessionListener(listener:SessionListener *) = listeners =  listeners ::: listener.toList
-  
-  
+  var listeners: List[SessionListener] = Nil;
+  def addSessionListener(listener: SessionListener*) = listeners = listeners ::: listener.toList
+
   def apply(title: String, begin: DateTime, end: DateTime, sessions: List[Session], locations: List[Location]): Conference = {
     Conference(ObjectId.get, title, begin, end, sessions, locations)
   }
@@ -111,6 +139,21 @@ case class Conference(val _id: ObjectId, title: String, begin: DateTime, end: Da
     locations
   }
 
+  protected[model] def saveOrUpdate(sessionId: Long, rating: Rating) = {
+    meta.updateInNestedArray(_id, "sessions", ("id" -> sessionId), "ratings", rating.serializeToJson)
+  }
+  protected[model] def saveOrUpdate(sessionId: Long, comment: Comment) = {
+    meta.updateInNestedArray(_id, "sessions", ("id" -> sessionId), "comments", comment.serializeToJson)
+  }
+  def remove(sessionId: Long, rating: Rating) = {
+    meta.removeFromNestedArray(_id, "sessions", ("id" -> sessionId), "ratings", rating.serializeToJson)
+
+  }
+  def remove(sessionId: Long, comment: Comment) = {
+    meta.removeFromNestedArray(_id, "sessions", ("id" -> sessionId), "comments", comment.serializeToJson)
+
+  }
+
   def remove(location: Location) = {
     if (sessions.exists(_.location.id == location.id)) {
       throw new IllegalArgumentException("The following sessions: %s still depend on the location: %s you want to remove. A location can only be removed if it has no references to sessions." format (sessions, location))
@@ -123,25 +166,49 @@ case class Conference(val _id: ObjectId, title: String, begin: DateTime, end: Da
   def getLocationById(id: Long): Option[Location] = locations.find(_.id == id)
 
   def getSessionById(id: Long): Option[Session] = sessions.find(_.id == id)
-  
+
+  def commentSessionById(sessionId: Long, comment: Comment): Session = {
+    getSessionById(sessionId) match {
+      case Some(session) => {
+        saveOrUpdate(sessionId, comment)
+        val commentedSession = session.copy(comments = comment :: session.comments)
+        sessions = commentedSession :: (sessions - session)
+        commentedSession
+
+      }
+      case None => throw new IllegalArgumentException("Session with id %s does not exist for conference %s" format (sessionId, _id.toString))
+    }
+  }
+
+  def rateSessionById(sessionId: Long, rating: Rating): Session = {
+    getSessionById(sessionId) match {
+      case Some(session) => {
+        session.isRatedBy(rating.userId).map(existing => remove(sessionId, existing))
+        saveOrUpdate(sessionId, rating)
+        session.addRating(rating)
+
+      }
+      case None => throw new IllegalArgumentException("Session with id %s does not exist for conference %s" format (sessionId, _id.toString))
+    }
+  }
 
 }
 
 /**
  * Represents a Session at a location. A Session contains time, space and session properties.
  */
-case class Session(val id: Long, val start: DateTime, val end: DateTime, val location: Location, val title: String, val description: String, sessionType: String, val limit: String, authors: List[Author], ratings: List[Rating], comments: List[Comment], labels:Set[String]) extends ToJsonSerializer[Session] {
+case class Session(val id: Long, val start: DateTime, val end: DateTime, val location: Location, val title: String, val description: String, sessionType: String, val limit: String, authors: List[Author], ratings: List[Rating], comments: List[Comment], labels: Set[String]) extends ToJsonSerializer[Session] {
   def period = new Period(start.getMillis, end.getMillis)
-  
-  def addComment(comment:Comment):Session = copy(comments = comment :: comments)
 
-  def addRating(rating:Rating):Session = {
+  protected[model] def addComment(comment: Comment): Session = copy(comments = comment :: comments)
+
+  protected[model] def isRatedBy(userId: String): Option[Rating] = ratings.find(_.userId == userId)
+  protected[model] def addRating(rating: Rating): Session = {
     ratings.find(_.userId == rating.userId) match {
       case Some(_) => copy(ratings = (rating :: ratings.filterNot(_.userId == rating.userId)))
       case None => copy(ratings = rating :: ratings)
     }
   }
-
 }
 
 /**
@@ -161,7 +228,7 @@ object Session extends FromJsonDeserializer[Session] {
   def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String, authors: List[Author], ratings: List[Rating], comments: List[Comment]) = {
     new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors, ratings, comments, Set.empty)
   }
-  def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String, authors: List[Author], ratings: List[Rating], comments: List[Comment], labels:Set[String]) = {
+  def apply(start: DateTime, end: DateTime, location: Location, title: String, description: String, sessionType: String, limit: String, authors: List[Author], ratings: List[Rating], comments: List[Comment], labels: Set[String]) = {
     new Session(nextSeq, start, end, location, title, description, sessionType, limit, authors, ratings, comments, labels)
   }
 
@@ -169,12 +236,12 @@ object Session extends FromJsonDeserializer[Session] {
 /**
  * Represents a comment for a session
  */
-case class Comment(comment: String, userId: String)
+case class Comment(comment: String, userId: String) extends ToJsonSerializer[Comment]
 
 /**
  * Represents a rating for a session
  */
-case class Rating(rate:Int, userId:String)
+case class Rating(rate: Int, userId: String) extends ToJsonSerializer[Rating]
 
 /**
  * Represents an author
@@ -206,7 +273,7 @@ object AuthorDoc extends MongoDocumentMeta[AuthorDoc] {
 /**
  * Represents credentials used for authentication
  */
-case class Credential(username: String, password: String, isEncrypted:Boolean = false) extends ToJsonSerializer[Credential]
+case class Credential(username: String, password: String, isEncrypted: Boolean = false) extends ToJsonSerializer[Credential]
 
 /**
  * Represents a location, a physical space.
@@ -253,7 +320,6 @@ object Facility extends MongoDocumentMeta[Facility] with EmbeddedDocumentOps[Fac
 
 }
 
-
 /**
  * Represents a collection of Labels.
  * This class is a case class, due to net.liftweb.mongodb requirements.
@@ -262,9 +328,9 @@ case class Labels(val _id: ObjectId, name: String, var labels: Set[String]) exte
   def meta = Labels
 
   def add(label: String) = {
-    if(!labels.contains(label)) {
-    meta.pushToArray(_id, "labels", new JString(label))
-    labels = labels + label
+    if (!labels.contains(label)) {
+      meta.pushToArray(_id, "labels", new JString(label))
+      labels = labels + label
     }
     labels
   }
@@ -285,11 +351,10 @@ object Labels extends MongoDocumentMeta[Labels] with EmbeddedDocumentOps[Labels]
 
 }
 
-
 /**
  * Listener for Session events
  */
 trait SessionListener {
-  
-  def sessionUpdated(session:Session):Unit
+
+  def sessionUpdated(session: Session): Unit
 }

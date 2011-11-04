@@ -24,11 +24,11 @@ import net.liftweb.util.Helpers._
 object RestSmokeTestClient {
 
   import RestClientUtils._
-  val host = "localhost"
-  val contextRoot = ""
+  //val host = "localhost"
+  //val contextRoot = "" 
 
-  //val host = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com"
-  //val contextRoot = "xkeng"
+  val host = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com"
+  val contextRoot = "xkeng"
   val port = 8080
   val http = new Http
 

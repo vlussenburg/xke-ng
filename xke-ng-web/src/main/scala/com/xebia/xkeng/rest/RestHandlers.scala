@@ -78,7 +78,7 @@ trait RestHandlerComponent extends Logger {
     conferenceRepository.findConference(id) match {
       case Some(confToUpdate) => {
         val confFromJson = fromConferenceJson(jsonBody)
-        val updatedConf = confFromJson.copy(_id = confToUpdate._id).copy(sessions = confToUpdate.sessions)
+        val updatedConf = confFromJson.copy(_id = confToUpdate._id, sessions = confToUpdate.sessions)
         updatedConf.save
         asJsonResp(updatedConf)
       }
@@ -121,33 +121,25 @@ trait RestHandlerComponent extends Logger {
     }
   }
 
-  def handleSessionUpdate(confId: String, jsonBody: String) = {
-    conferenceRepository.findConference(confId) match {
-      case Some(conf) => {
-        val updatedSession = fromSessionJson(false)(jsonBody)
-        conf.saveOrUpdate(updatedSession)
-        Full(OkResponse())
-      }
-      case _ => Full(NotFoundResponse())
-
-    }
+  def handleSessionUpdate(confId: String, jsonBody: String): Box[LiftResponse] = {
+    val updatedSession = fromSessionJson(false)(jsonBody)
+    handleSessionUpdate(updatedSession.id, jsonBody)
   }
 
-  def handleSessionUpdate(sessionId: Long, jsonBody: String) = {
+  def handleSessionUpdate(sessionId: Long, jsonBody: String): Box[LiftResponse] = {
     sessionRepository.findSessionById(sessionId) match {
       case Some((conf, session)) => {
         val updatedSession = fromSessionJson(false)(jsonBody)
-        conf.saveOrUpdate(updatedSession.copy(id = session.id))
+        conf.saveOrUpdate(updatedSession.copy(id = session.id, ratings = session.ratings, comments = session.comments))
         Full(OkResponse())
       }
       case _ => Full(NotFoundResponse())
-
     }
   }
 
   def handleSessionDelete(sessionId: Long) = {
     sessionRepository.deleteSessionById(sessionId)
-    Full(OkResponse()) //don't we need to handle errors?
+    Full(OkResponse()) 
   }
   /**
    * =============================
@@ -239,5 +231,5 @@ trait RestHandlerComponent extends Logger {
     val rating = fromRatingJson(jsonBody)
     asJsonResp(sessionRepository.rateSessionById(sessionId, rating))
   }
-  
+
 }

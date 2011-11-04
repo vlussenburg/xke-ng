@@ -26,8 +26,6 @@ trait ConferenceRepository {
   def findConference(id: String): Option[Conference]
 
   def findSessionsOfConference(id: String): List[Session]
-  
-
 
 }
 
@@ -58,8 +56,7 @@ trait AuthorRepository {
   def removeAuthor(author: Author): Unit
 
   def findAuthorByName(name: String): Option[Author]
-    def findAuthorById(userId: String): Option[Author]
-  
+  def findAuthorById(userId: String): Option[Author]
 
 }
 
@@ -136,16 +133,16 @@ trait RepositoryComponent {
     }
 
     def rateSessionById(id: Long, rating: Rating): List[Rating] = {
-      val (conference, session) = getSessionById(id)
-      val ratedSession = session.addRating(rating)
-      conference.saveOrUpdate(ratedSession)
+      val (conference, _) = getSessionById(id)
+      val ratedSession = conference.rateSessionById(id, rating)
+      //conference.saveOrUpdate(ratedSession)
       ratedSession.ratings
     }
 
     def commentSessionById(id: Long, comment: Comment): List[Comment] = {
-      val (conference, session) = getSessionById(id)
-      val commentedSession = session.addComment(comment)
-      conference.saveOrUpdate(commentedSession)
+      val (conference, _) = getSessionById(id)
+      val commentedSession = conference.commentSessionById(id, comment)
+      //conference.saveOrUpdate(commentedSession)
       commentedSession.comments
     }
 
@@ -272,6 +269,21 @@ trait RepositoryComponent {
         }
         case f :: xs => f
       }
+    }
+  }
+
+  class DummyAuthenticationRepositoryImpl extends AuthenticationRepository {
+    def authenticate(cred: Credential): Option[User] = {
+      Some(new User {
+        override def getDisplayName() = "Dummy User"
+        override def getEmailAddress() = "Dummy@notexisting.com"
+        override def getFirstName() = "Dummy"
+        override def getLastName() = "User"
+        override def getDirectoryId() = -1
+        override def isActive = true
+        override def getName = "udummy"
+        override def compareTo(user: com.atlassian.crowd.embedded.api.User) = 0
+      })
     }
   }
 

@@ -22,20 +22,24 @@ object Assembly extends Logger {
     private val crowdSysUserPwd = Props.get("crowd.sysuser.pwd").get
     private val crowdBase = Props.get("crowd.base.url").get
     private val crowdConnectionCheck = Props.get("crowd.conn.check").map(_.trim.toBoolean).getOrElse(false)
+     val authenticationRepository = AuthenticationRepository(crowdBase, crowdSysUser, crowdSysUserPwd, crowdConnectionCheck)
 
-    val authenticationRepository = AuthenticationRepository(crowdBase, crowdSysUser, crowdSysUserPwd, crowdConnectionCheck)
-  } 
+  }
+
+  trait DummySecurityRepositoryComponentImpl extends RepositoryComponentImpl {
+    override val authenticationRepository = new DummyAuthenticationRepositoryImpl()
+  }
 
   trait RestHandlerComponentImpl extends RestHandlerComponent with RepositoryComponentImpl
-  
-  object XKENGSecuredAPIAssembly extends XKENGSecuredAPI with RestHandlerComponentImpl  {
+
+  object XKENGSecuredAPIAssembly extends XKENGSecuredAPI with RestHandlerComponentImpl {
 
   }
 
-  object XKENGPublicAPIAssembly extends XKENGPublicAPI with RestHandlerComponentImpl {
+  class XKENGPublicAPIAssembly extends XKENGPublicAPI with RestHandlerComponentImpl {
 
   }
-  
+
   object ExceptionHandlerAssembly extends ExceptionHandler {}
 
   def init() = {

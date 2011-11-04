@@ -23,7 +23,6 @@ class SecurityUtilsTest extends FlatSpec with ShouldMatchers with BeforeAndAfter
   it should "decrypt and encrypt correctly" in {
     val token = "this is the original token"
     val encyrpted = encrypt(token)
-    println(encrypt("Iroqoxx47"))
     val decrypted = decrypt(encyrpted)
     decrypted should be(token)
 
