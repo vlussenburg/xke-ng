@@ -65,7 +65,17 @@ public class CVConferences extends SwipeActivity {
 	@Override
 	protected void onResume() {
 		List<Conference> list = getConferenceServer().getConferences(shownYear);
-		final Conference[] conferences = list.toArray(new Conference[list.size()]);
+		Conference upcomingConference = getConferenceServer().getUpcomingConference();
+		int position = 0;
+		int idx = 0;
+		final Conference[] conferences = new Conference[list.size()];
+		for (Conference conference : list) {
+			conferences[idx] = conference;
+			if ( conference.equals(upcomingConference)) {
+				position = idx;
+			}
+			idx++;
+		}
 		ConferenceAdapter adapter = new ConferenceAdapter(this, R.layout.conference_item, conferences);
 		ListView conferencesList = (ListView) findViewById(R.id.conferencesList);
 		conferencesList.setAdapter(adapter);
@@ -76,6 +86,7 @@ public class CVConferences extends SwipeActivity {
 				switchTo(conferences[paramInt]);
 			}
 		});
+		conferencesList.setSelection(position);
 		super.onResume();
 	}
 

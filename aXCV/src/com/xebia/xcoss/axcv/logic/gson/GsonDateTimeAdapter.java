@@ -6,6 +6,8 @@ import java.lang.reflect.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.util.Log;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -14,6 +16,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.xebia.xcoss.axcv.util.StringUtil;
+import com.xebia.xcoss.axcv.util.XCS;
 
 public class GsonDateTimeAdapter implements JsonSerializer<DateTime>, JsonDeserializer<DateTime> {
 
@@ -45,16 +48,21 @@ public class GsonDateTimeAdapter implements JsonSerializer<DateTime>, JsonDeseri
 			if ( hour + minute + seconds == 0) {
 				hour = minute = seconds = null;
 			}
-			// Last parameter is nanoseconds, not millis!
-			DateTime dt = new DateTime(year, month, day, hour, minute, seconds, null);
 			if ( !StringUtil.isEmpty(m.group(8)) ) {
 				switch (m.group(8).charAt(0)) {
-					// TODO Handle time zone correction
 					case 'Z': break;
-					case '+': break;
-					case '-': break;
+					case '+': 
+						hour = hour - Integer.valueOf(m.group(9), 10);
+						minute = minute - Integer.valueOf(m.group(10), 10);
+						break;
+					case '-': 
+						hour = hour + Integer.valueOf(m.group(9), 10);
+						minute = minute + Integer.valueOf(m.group(10), 10);
+						break;
 				}
 			}
+			DateTime dt = new DateTime(year, month, day, hour, minute, seconds, null);
+			Log.w(XCS.LOG.COMMUNICATE, "Date parsing: From "+value+" to " + dt);
 			return dt;
 		}
 		return null;
@@ -64,12 +72,34 @@ public class GsonDateTimeAdapter implements JsonSerializer<DateTime>, JsonDeseri
 	public JsonElement serialize(DateTime dt, Type type, JsonSerializationContext ctx) {
 		String value = "";
 		if (dt.hasHourMinuteSecond() && dt.hasYearMonthDay()) {
-			value = dt.format("YYYY-MM-DD|T|hh:mm:ss.fff|Z|");
+			value = dt.format("YYYY-MM-DD|T|hh:mm:ss.fff");
 		} else if (dt.hasHourMinuteSecond()) {
-			value = dt.format("|0000-00-00T|hh:mm:ss.fff|Z|");
+			value = dt.format("|0000-00-00T|hh:mm:ss.fff");
 		} else if (dt.hasYearMonthDay()) {
-			value = dt.format("YYYY-MM-DD|T00:00:00.000Z|");
+			value = dt.format("YYYY-MM-DD|T00:00:00.000|");
 		}
+		int offset = XCS.TZ.getRawOffset();
+		Log.w(XCS.LOG.COMMUNICATE, "Timezone value = " + offset);
+		StringBuilder tzid = new StringBuilder();
+		if ( offset == 0 ) {
+			tzid.append('Z');
+		} else {
+			if ( offset > 0 ) {
+				tzid.append("+");
+			} else {
+				tzid.append("-");
+			}
+			int offsetInMinutes = offset/(1000*60);
+			int hours = offsetInMinutes/60;
+			int minutes = offsetInMinutes%60;
+			if ( hours < 10 ) tzid.append('0');
+			tzid.append(hours);
+			if ( minutes < 10 ) tzid.append('0');
+			tzid.append(minutes);
+		}
+		
+		Log.w(XCS.LOG.COMMUNICATE, "Timezone value = " + tzid.toString());
+		value += tzid.toString();
 		return new JsonPrimitive(value);
 	}
 }

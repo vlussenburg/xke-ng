@@ -6,11 +6,11 @@ public class Location implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private int id;
+	private Integer id;
 	private String description;
 	private int capacity;
 
-	public Location(int id, String place) {
+	public Location(Integer id, String place) {
 		this.description = place;
 		this.id = id;
 	}

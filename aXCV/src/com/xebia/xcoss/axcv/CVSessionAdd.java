@@ -140,6 +140,9 @@ public class CVSessionAdd extends AdditionActivity {
 				iv.setImageResource(R.drawable.x_complete_1 + completeness - 1);
 				iv.invalidate();
 			}
+			
+			findViewById(R.id.detailsTitle).setVisibility( session.isBreak() ? View.GONE : View.VISIBLE);
+			findViewById(R.id.detailsLayout).setVisibility( session.isBreak() ? View.GONE : View.VISIBLE);
 		}
 	}
 
@@ -200,6 +203,7 @@ public class CVSessionAdd extends AdditionActivity {
 							CVSessionAdd.this.finish();
 						}
 					});
+					builder.show();
 				}
 			});
 		}

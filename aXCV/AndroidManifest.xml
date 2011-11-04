@@ -2,7 +2,7 @@
 <manifest
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.xebia.xcoss.axcv"
-	android:versionName="0.4"
+	android:versionName="0.5"
 	android:versionCode="4">
 	<uses-sdk
 		android:minSdkVersion="4" />
@@ -106,13 +106,19 @@
 			android:name="de.quist.app.errorreporter.ExceptionReportActivity"
 			android:process=":exceptionReporter"
 			android:theme="@android:style/Theme.NoDisplay" />
-		-->
 		<meta-data
 			android:name="com.xebia.xcoss.serverUrl"
 			android:value="http://ec2-46-137-184-99.eu-west-1.compute.amazonaws.com:8080/xkeng" />
 		<meta-data
 			android:name="de.quist.app.errorreporter.targetUrl"
 			android:value="http://ec2-46-137-184-99.eu-west-1.compute.amazonaws.com:8080/xkeng/error" />
+		-->
+		<meta-data
+			android:name="com.xebia.xcoss.serverUrl"
+			android:value="http://10.0.2.2:8080" />
+		<meta-data
+			android:name="de.quist.app.errorreporter.targetUrl"
+			android:value="http://10.0.2.2:8080/error" />
 		<meta-data
 			android:name="de.quist.app.errorreporter.reportOnFroyo"
 			android:value="true" />

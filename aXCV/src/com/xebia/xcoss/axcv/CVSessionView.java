@@ -275,6 +275,8 @@ public class CVSessionView extends SessionSwipeActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
+		MenuItem menuItem = menu.add(0, XCS.MENU.LIST, Menu.NONE, R.string.menu_list);
+		menuItem.setIcon(R.drawable.ic_menu_list);
 		return true;
 	}
 
@@ -283,17 +285,27 @@ public class CVSessionView extends SessionSwipeActivity {
 		// Add or edit a session
 		Intent intent = new Intent(this, CVSessionAdd.class);
 		intent.putExtra(BaseActivity.IA_CONFERENCE, getConference().getId());
-
-		if (item.getItemId() == XCS.MENU.ADD) {
-			startActivity(intent);
-			return true;
+		boolean processed = false;
+		
+		switch (item.getItemId()) {
+			case XCS.MENU.ADD:
+				startActivity(intent);
+				processed = true;
+			break;
+			case XCS.MENU.EDIT:
+				intent.putExtra(BaseActivity.IA_SESSION, currentSession.getId());
+				startActivity(intent);
+				processed = true;
+			break;
+			case XCS.MENU.LIST:
+				intent = new Intent(this, CVSessionList.class);
+				intent.putExtra(IA_LOCATION_ID, currentLocation);
+				intent.putExtra(IA_CONFERENCE, currentSession.getConferenceId());
+				startActivity(intent);
+				processed = true;
+			break;
 		}
-		if (item.getItemId() == XCS.MENU.EDIT) {
-			intent.putExtra(BaseActivity.IA_SESSION, currentSession.getId());
-			startActivity(intent);
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
+		return processed ? true : super.onOptionsItemSelected(item);
 	}
 
 	public void onSwipeBottomToTop() {
@@ -325,7 +337,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		int max = sessions.size() - 1;
 		while (index < max) {
 			Session session = sessions.get(++index);
-			if (session.getLocation().equals(location)) {
+			if (session.isMandatory() || session.getLocation().equals(location)) {
 				return session;
 			}
 		}
@@ -338,7 +350,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		int index = sessions.indexOf(currentSession);
 		while (index > 0) {
 			Session session = sessions.get(--index);
-			if (session.getLocation().equals(location)) {
+			if (session.isMandatory() || session.getLocation().equals(location)) {
 				return session;
 			}
 		}

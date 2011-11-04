@@ -1,0 +1,32 @@
+IN PROGRESS
+-------------------------------------------------------------------
+
+TODO
+-------------------------------------------------------------------
+client
+-	Notificaties weer werkend maken
+-	Breaks inplannen over alle locaties
+-	Caching: refresh na conference edit (reopen view...)
+-	Bugfix menu popup labels/authors (Rogier)
+
+later op de client
+-	Verbeteren van caching
+-	Offline support
+-	Conference edit alleen door organiser (?)
+-	JodaTime (timezone related)
+
+server
+-	Session scheduling
+-	403 on session expiration
+-	Verwijderen van locaties (Urs; not supported now)
+-	Herziening REST API (session change; new URL does not work)
+-	Error handling (/error URL does not work?)
+-	Nieuwe foutmeldingen van server (nieuwe server versie)
+
+DONE
+-------------------------------------------------------------------
+-	Login
+-	Breaks gelden voor elke locatie
+-	Authors
+-	Breaks verwijderen
+-	Omschakelen tussen full view/list view van sessies

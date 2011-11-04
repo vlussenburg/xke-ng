@@ -15,7 +15,7 @@ public abstract class SessionSwipeActivity extends SwipeActivity {
 
 	private Conference currentConference;
 	private Location[] locations;
-	private int currentLocation;
+	protected int currentLocation;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

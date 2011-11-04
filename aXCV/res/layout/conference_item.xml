@@ -4,47 +4,65 @@
 	android:stretchColumns="1"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
-	<TableRow
-		android:layout_width="fill_parent" android:layout_height="wrap_content">
-		<TextView
-			android:text="Title"
-			android:textSize="@dimen/ts_itemtitle"
-			android:id="@+id/cnf_title"
-			android:padding="3dip"
-			android:layout_column="1"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"></TextView>
-		<TextView
-			android:text="Today"
-			android:textSize="@dimen/ts_itemwhen"
-			android:id="@+id/cnf_when"
-			android:padding="3dip"
-			android:gravity="right"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"></TextView>
-	</TableRow>
-	<TableRow
-		android:layout_width="fill_parent" android:layout_height="wrap_content">
-		<TextView
-			android:layout_column="1"
-			android:text="Jun 7th, 2011"
-			android:textSize="@dimen/ts_itemdetail"
-			android:id="@+id/cnf_date"
-			android:padding="3dip"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"></TextView>
-		<TextView
-			android:text="no open slots"
-			android:textSize="@dimen/ts_itemdetail"
-			android:id="@+id/cnf_status"
-			android:padding="3dip"
-			android:gravity="right"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"></TextView>
-	</TableRow>
-	<View
-		android:id="@+id/tabDivider"
-		android:layout_height="2dp"
+	<LinearLayout
+		android:id="@+id/itemContentLayout"
 		android:layout_width="fill_parent"
-		android:background="@color/linebreak" />
+		android:layout_height="wrap_content"
+		android:orientation="vertical">
+		<LinearLayout
+			android:id="@+id/itemElements1Layout"
+			android:orientation="horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content">
+			<TextView
+				android:text="Title"
+				android:textSize="@dimen/ts_itemtitle"
+				android:id="@+id/cnf_title"
+				android:padding="3dip"
+				android:layout_height="wrap_content"
+				android:layout_gravity="left|top"
+				android:layout_width="fill_parent"
+				android:layout_weight="1"></TextView>
+			<TextView
+				android:text="Today"
+				android:textSize="@dimen/ts_itemwhen"
+				android:id="@+id/cnf_when"
+				android:padding="3dip"
+				android:gravity="right"
+				android:layout_height="wrap_content"
+				android:layout_gravity="right|top"
+				android:layout_width="fill_parent"
+				android:layout_weight="1"></TextView>
+		</LinearLayout>
+		<LinearLayout
+			android:id="@+id/itemElements2Layout"
+			android:orientation="horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content">
+			<TextView
+				android:text="Jun 7th, 2011"
+				android:textSize="@dimen/ts_itemdetail"
+				android:id="@+id/cnf_date"
+				android:padding="3dip"
+				android:layout_height="wrap_content"
+				android:layout_gravity="left|top"
+				android:layout_width="fill_parent"
+				android:layout_weight="1"></TextView>
+			<TextView
+				android:text="no open slots"
+				android:textSize="@dimen/ts_itemdetail"
+				android:id="@+id/cnf_status"
+				android:padding="3dip"
+				android:gravity="right"
+				android:layout_height="wrap_content"
+				android:layout_gravity="right|bottom"
+				android:layout_width="fill_parent"
+				android:layout_weight="1"></TextView>
+		</LinearLayout>
+		<View
+			android:id="@+id/tabDivider"
+			android:layout_height="2dp"
+			android:layout_width="fill_parent"
+			android:background="@color/linebreak" />
+	</LinearLayout>
 </TableLayout>
