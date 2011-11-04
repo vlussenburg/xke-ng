@@ -24,15 +24,19 @@ object Assembly extends Logger {
     private val crowdConnectionCheck = Props.get("crowd.conn.check").map(_.trim.toBoolean).getOrElse(false)
 
     val authenticationRepository = AuthenticationRepository(crowdBase, crowdSysUser, crowdSysUserPwd, crowdConnectionCheck)
-  }
+  } 
 
-  object XKENGDispatchAPIAssembly extends XKENGDispatchAPI with RepositoryComponentImpl with RestHandlerComponent {
-
-  }
-
-  object SecurityAPIAssembly extends SecurityAPI with RepositoryComponentImpl {
+  trait RestHandlerComponentImpl extends RestHandlerComponent with RepositoryComponentImpl
+  
+  object XKENGSecuredAPIAssembly extends XKENGSecuredAPI with RestHandlerComponentImpl  {
 
   }
+
+  object XKENGPublicAPIAssembly extends XKENGPublicAPI with RestHandlerComponentImpl {
+
+  }
+  
+  object ExceptionHandlerAssembly extends ExceptionHandler {}
 
   def init() = {
     initMongoDB()
@@ -64,7 +68,7 @@ object Assembly extends Logger {
   }
 
   private def createTestFacility: List[Location] = {
-    import XKENGDispatchAPIAssembly.facilityRepository._
+    import XKENGSecuredAPIAssembly.facilityRepository._
     val l1 = Location("Maup", 20)
     val l2 = Location("Laap", 30)
     val l3 = Location("Library", 10)
@@ -73,7 +77,7 @@ object Assembly extends Logger {
     locations
   }
   private def createTestAuthors: List[Author] = {
-    import XKENGDispatchAPIAssembly.authorRepository._
+    import XKENGSecuredAPIAssembly.authorRepository._
     val a1 = Author("peteru", "upeter@xebia.com", "Urs Peter")
     val a2 = Author("amooy", "amooy@xebia.com", "Age Mooy")
     val authors = List(a1, a2)

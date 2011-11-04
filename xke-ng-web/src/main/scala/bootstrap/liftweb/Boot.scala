@@ -16,7 +16,7 @@ import net.liftweb.util.Helpers._
  * to modify lift's environment
  */
 class Boot {
-  def boot {
+  def boot { 
 
     // where to search snippet
     LiftRules.addToPackages("com.xebia.xkeng")
@@ -36,8 +36,9 @@ class Boot {
     init()
     val purge = Props.get("mongo.purge.data").map(_.trim.toBoolean).getOrElse(false)
     purgeAndPushTestdata(purge)
-    LiftRules.dispatch.append(SecurityAPIAssembly)
-    LiftRules.dispatch.append(authenticationInterceptor guard XKENGDispatchAPIAssembly)
+    LiftRules.exceptionHandler.prepend(ExceptionHandlerAssembly)
+    LiftRules.dispatch.append(XKENGPublicAPIAssembly)
+    LiftRules.dispatch.append(authenticationInterceptor guard XKENGSecuredAPIAssembly)
     /*
      * Show the spinny image when an Ajax call starts
      */

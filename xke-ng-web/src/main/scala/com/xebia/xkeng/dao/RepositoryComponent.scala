@@ -14,6 +14,7 @@ import com.atlassian.crowd.model.user.User;
 import com.atlassian.crowd.exception._
 import java.util.Properties
 import net.liftweb.common.Logger
+import com.xebia.xkeng.security.util.SecurityUtils._
 
 trait ConferenceRepository {
   def findConferences(year: Int): List[Conference]
@@ -25,6 +26,8 @@ trait ConferenceRepository {
   def findConference(id: String): Option[Conference]
 
   def findSessionsOfConference(id: String): List[Session]
+  
+
 
 }
 
@@ -292,7 +295,7 @@ trait RepositoryComponent {
       if (!cred.isEncrypted)
         authenticate(cred.username, cred.password)
       else {
-        val decryptedPwd = "" //decrypt(cred.password)
+        val decryptedPwd = decrypt(cred.password)
         authenticate(cred.username, decryptedPwd)
       }
 

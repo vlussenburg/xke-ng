@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 import net.liftweb.json.JsonAST.{ JValue, JArray }
 import net.liftweb.json.ext.JodaTimeSerializers
 import javax.security.auth.login.LoginContext
-import com.xebia.xkeng.model.{ Credential, Session, Location, Conference, Author, Comment, Rating }
+import com.xebia.xkeng.model.{ Credential, Session, Location, Conference, Author, Comment, Rating, UserHolder }
 import net.liftweb.common.Logger
 import com.xebia.xkeng.serialization.util._
 
@@ -208,8 +208,8 @@ object JsonDomainConverters extends Logger {
   def fromCommentJson(jsonString: String): Comment = {
     val JObject(jsonValue) = JsonParser.parse(jsonString)
     val JString(comment) = jsonValue \! "comment"
-    //TODO dynamically get current logged in user
-    Comment(comment, "guest")
+    val user = if(UserHolder.isLoggedIn) UserHolder.loggedInAuthor.userId else "guest"
+    Comment(comment, user)
   }
 
   def fromCommentListJson(jsonString: String): List[Comment] = {
@@ -226,8 +226,8 @@ object JsonDomainConverters extends Logger {
   def fromRatingJson(jsonString: String): Rating = {
     val JObject(jsonValue) = JsonParser.parse(jsonString)
     val JInt(rate) = jsonValue \! "rate"
-    //TODO dynamically get current logged in user
-    Rating(rate.toInt, "guest")
+    val user = if(UserHolder.isLoggedIn) UserHolder.loggedInAuthor.userId else "guest"
+    Rating(rate.toInt, user)
   }
 
   def fromRatingFullJson(jsonString: String): Rating = {
