@@ -34,10 +34,15 @@ class SessionRepositoryTest extends FlatSpec with ShouldMatchers with BeforeAndA
 
   it should "rate a session" in {
     val rating = Rating(3, "peteru")
-    val ratings = sessionRepository.rateSessionById(s1.id, rating)
+        val rating2 = Rating(6, "amooy")
+    var ratings = sessionRepository.rateSessionById(s1.id, rating)
     ratings.isEmpty should not be true
     ratings.size should equal(1)
     ratings.head should equal(rating)
+    ratings = sessionRepository.rateSessionById(s1.id, rating2)
+    ratings.isEmpty should not be true
+    ratings.size should equal(2)
+    ratings.head should equal(rating2)    
   }
   it should "adjust rate of rating by the same user" in {
     val rating = Rating(3, "peteru")

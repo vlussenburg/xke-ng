@@ -13,8 +13,8 @@ import net.liftweb.util.BasicTypesHelpers._
 import com.xebia.xkeng.model._
 import RestUtils._
 
-trait XKENGDispatchAPI extends RestHelper with Logger {
-  this: RepositoryComponent with RestHandlerComponent =>
+trait XKENGSecuredAPI extends RestHelper with Logger {
+  this: RestHandlerComponent =>
 
   serve {
     // GET /conferences/<year>[/<month>[/<day>]]
@@ -39,10 +39,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
       }
     // GET /conference/<id>
     case Req("conference" :: id :: Nil, _, GetRequest) =>
-      conferenceRepository.findConference(id) match {
-        case Some(c) => asJsonResp(c)
-        case _ => Full(NotFoundResponse())
-      }
+    	getConference(id)
     // PUT /conference
     case req @ Req("conference" :: id :: Nil, _, PutRequest) =>
       doWithRequestBody(req.body) {
@@ -71,7 +68,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
       doWithRequestBody(req.body) {
         handleSessionUpdate(id, _)
       }
-    case req @ Req("session" :: id :: Nil, _, PutRequest) =>
+    case req @ Req("session" :: AsLong(id) :: Nil, _, PutRequest) =>
       doWithRequestBody(req.body) {
         handleSessionUpdate(id, _)
       }
@@ -139,14 +136,7 @@ trait XKENGDispatchAPI extends RestHelper with Logger {
         handleSearchSessions(_)
       }
 
-    // POST /error
-    case req @ Req("error" :: Nil, _, PostRequest) =>
-      //dump in logfile
-      //include name
-      doWithRequestBody(req.body) {
-        handleError(_)
-      }
-
+  
     /**
      * *******************
      * feedback

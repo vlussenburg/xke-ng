@@ -18,6 +18,36 @@ trait RestHandlerComponent extends Logger {
 
   /**
    * =============================
+   * Login
+   * =============================
+   */
+  def login(json: String): Box[LiftResponse] = {
+    val credential = fromCredentialJson(json)
+    authenticationRepository.authenticate(credential) match {
+      case Some(user) => {
+        val author = updateAuthors(user)
+        UserHolder.addToSession(author)
+        Full(OkResponse())
+      }
+      case None => Full(ForbiddenResponse("Invalid username or password"))
+    }
+  }
+
+  private def updateAuthors(user: CrowdUser): Author = {
+    authorRepository.findAuthorById(user.getName) match {
+      case None => {
+        val author = Author(user.getName(), user.getEmailAddress(), user.getDisplayName())
+        authorRepository.addAuthor(author)
+        info("User %s added to list of authors" format author)
+        author
+
+      }
+      case Some(author) => author
+    }
+  }
+
+  /**
+   * =============================
    * Conferences
    * =============================
    */
@@ -37,11 +67,18 @@ trait RestHandlerComponent extends Logger {
     asJsonResp(conferenceRepository.findConferences(year, month, day))
   }
 
+  def getConference(id: String) = {
+    conferenceRepository.findConference(id) match {
+      case Some(c) => asJsonResp(c)
+      case _ => Full(NotFoundResponse())
+    }
+  }
+
   def handleConferenceUpdate(id: String, jsonBody: String) = {
     conferenceRepository.findConference(id) match {
       case Some(confToUpdate) => {
         val confFromJson = fromConferenceJson(jsonBody)
-        val updatedConf = confFromJson.copy(_id = confToUpdate._id).copy(sessions = confToUpdate.sessions)
+        val updatedConf = confFromJson.copy(_id = confToUpdate._id, sessions = confToUpdate.sessions)
         updatedConf.save
         asJsonResp(updatedConf)
       }
@@ -84,21 +121,25 @@ trait RestHandlerComponent extends Logger {
     }
   }
 
-  def handleSessionUpdate(confId: String, jsonBody: String) = {
-    conferenceRepository.findConference(confId) match {
-      case Some(conf) => {
+  def handleSessionUpdate(confId: String, jsonBody: String): Box[LiftResponse] = {
+    val updatedSession = fromSessionJson(false)(jsonBody)
+    handleSessionUpdate(updatedSession.id, jsonBody)
+  }
+
+  def handleSessionUpdate(sessionId: Long, jsonBody: String): Box[LiftResponse] = {
+    sessionRepository.findSessionById(sessionId) match {
+      case Some((conf, session)) => {
         val updatedSession = fromSessionJson(false)(jsonBody)
-        conf.saveOrUpdate(updatedSession)
+        conf.saveOrUpdate(updatedSession.copy(id = session.id, ratings = session.ratings, comments = session.comments))
         Full(OkResponse())
       }
       case _ => Full(NotFoundResponse())
-
     }
   }
 
   def handleSessionDelete(sessionId: Long) = {
     sessionRepository.deleteSessionById(sessionId)
-    Full(OkResponse()) //don't we need to handle errors?
+    Full(OkResponse()) 
   }
   /**
    * =============================
@@ -110,7 +151,7 @@ trait RestHandlerComponent extends Logger {
   }
 
   def getLabels = asJsonResp(labelRepository.findAllLabels())
-  def getLabelsByAuthor(authorId:String) = asJsonResp(labelRepository.findLabelsByAuthorId(authorId))
+  def getLabelsByAuthor(authorId: String) = asJsonResp(labelRepository.findLabelsByAuthorId(authorId))
 
   /**
    * =============================
@@ -146,16 +187,15 @@ trait RestHandlerComponent extends Logger {
   def handleSearchSessions(jsonBody: String) = {
     Full(NotFoundResponse())
   }
-  
-  
+
   /**
    * =============================
    * Device error
    * =============================
    */
   def handleError(paramBody: String) = {
-    val user = if (UserHolder.isLoggedIn) UserHolder.loggedInAuthor.userId else "unknown" 
-    error("Device error of user %s. Error is %s" format(user, paramBody))
+    val user = if (UserHolder.isLoggedIn) UserHolder.loggedInAuthor.userId else "unknown"
+    error("Device error of user %s. Error is %s" format (user, paramBody))
     Full(OkResponse())
   }
   /**
@@ -191,4 +231,5 @@ trait RestHandlerComponent extends Logger {
     val rating = fromRatingJson(jsonBody)
     asJsonResp(sessionRepository.rateSessionById(sessionId, rating))
   }
+
 }

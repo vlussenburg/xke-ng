@@ -7,9 +7,9 @@ import _root_.net.liftweb.sitemap._
 import com.xebia.xkeng.rest.Assembly._
 import com.xebia.xkeng.rest.SecurityInterceptor._
 import net.liftweb.util.Props
-import net.liftweb.mongodb.{DefaultMongoIdentifier, MongoDB}
-import com.mongodb.{Mongo, MongoOptions, ServerAddress}
-import net.liftweb.util.Helpers._ 
+import net.liftweb.mongodb.{ DefaultMongoIdentifier, MongoDB }
+import com.mongodb.{ Mongo, MongoOptions, ServerAddress }
+import net.liftweb.util.Helpers._
 
 /**
  * A class that's instantiated early and run.  It allows the application
@@ -32,12 +32,19 @@ class Boot {
 
     //    LiftRules.setSiteMapFunc(() => User.sitemapMutator(sitemap()))
 
-
     init()
     val purge = Props.get("mongo.purge.data").map(_.trim.toBoolean).getOrElse(false)
+    val enableSecurity = Props.get("enable.secruity").map(_.trim.toBoolean).getOrElse(true)
+
     purgeAndPushTestdata(purge)
-    LiftRules.dispatch.append(SecurityAPIAssembly)
-    LiftRules.dispatch.append(authenticationInterceptor guard XKENGDispatchAPIAssembly)
+    LiftRules.exceptionHandler.prepend(ExceptionHandlerAssembly)
+    if (enableSecurity) {
+      LiftRules.dispatch.append(new XKENGPublicAPIAssembly)
+    } else {
+      warn("Starting application in dev mode without security")
+      LiftRules.dispatch.append(new XKENGPublicAPIAssembly with DummySecurityRepositoryComponentImpl)
+    }
+    LiftRules.dispatch.append(authenticationInterceptor guard XKENGSecuredAPIAssembly)
     /*
      * Show the spinny image when an Ajax call starts
      */
@@ -59,7 +66,5 @@ class Boot {
   private def makeUtf8(req: HTTPRequest) {
     req.setCharacterEncoding("UTF-8")
   }
-
-
 
 }

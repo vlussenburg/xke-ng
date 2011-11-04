@@ -23,12 +23,12 @@ import net.liftweb.util.Helpers._
 
 object RestSmokeTestClient {
 
-  import RestUtils._
-  val host = "localhost"
-  val contextRoot = ""
+  import RestClientUtils._
+  //val host = "localhost"
+  //val contextRoot = "" 
 
-  //val host = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com"
-  //val contextRoot = "xkeng"
+  val host = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com"
+  val contextRoot = "xkeng"
   val port = 8080
   val http = new Http
 
@@ -114,16 +114,20 @@ object RestSmokeTestClient {
     add("feedback/" + sessionId + "/comment", ("comment" -> comment.comment))(fromCommentListJson(_))
   }
   def login(username: String, password: String): Unit = {
-    add("login", Credential(username, password).serializeToJson)(a => Unit)
+    login(username, password, false)
+  }
+  
+   def login(username: String, password: String, encrypted:Boolean): Unit = {
+    add("login", if(encrypted) ("username" -> username) ~ ("encryptedPassword" -> password) else Credential(username, password, encrypted).serializeToJson)(a => Unit)
   }
 
   val printResp = (resp: String) => println(resp)
-
+ 
   def main(args: Array[String]) {
     println("Login...")
-    val aUser = new String(hexDecode("49726f716f78783437"))
     val aPwd = new String(hexDecode("757065746572"))
-    val loggedIn = login(aPwd, aUser)
+    val aUser = "716AF9A87BD5A9735C20AC8FCED05F40"
+    val loggedIn = login(aPwd, aUser, true)
 
     println("Create location")
     val l = addLocation(l3)
@@ -204,7 +208,7 @@ object RestSmokeTestClient {
     println("found conference %s" format found)
 
   }
-  object RestUtils {
+  object RestClientUtils {
     def query[T](target: String)(callback: String => T): Option[T] = {
       val req = new Request(:/(host, port))
       http x ((req / contextRoot / target >:> identity) {
