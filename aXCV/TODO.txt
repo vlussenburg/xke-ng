@@ -1,12 +1,11 @@
 IN PROGRESS
 -------------------------------------------------------------------
 
--	Number of available slots not correct.
+-	Notificaties weer werkend maken
 
 TODO
 -------------------------------------------------------------------
 client
--	Notificaties weer werkend maken
 -	Caching: refresh na conference edit (reopen view...)
 -	Bugfix menu popup labels/authors (Rogier)
 -	Nieuwe foutmeldingen van server (nieuwe server versie)
@@ -34,3 +33,4 @@ DONE
 -	Omschakelen tussen full view/list view van sessies
 -	JodaTime (timezone related)
 -	Breaks inplannen over alle locaties
+-	Number of available slots not correct.
