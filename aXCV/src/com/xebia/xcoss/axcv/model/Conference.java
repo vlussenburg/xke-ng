@@ -40,9 +40,9 @@ public class Conference implements Serializable {
 	private String description;
 	private Author organiser;
 	@SerializedName("begin")
-	private Moment startTime = new Moment(16,0);
+	private Moment startTime = new Moment(16, 0);
 	@SerializedName("end")
-	private Moment endTime = new Moment(21,0);
+	private Moment endTime = new Moment(21, 0);
 	private Set<Location> locations;
 	private Set<Session> sessions;
 
@@ -131,7 +131,7 @@ public class Conference implements Serializable {
 	}
 
 	public Moment onStartTime() {
-		if ( startTime == null ) {
+		if (startTime == null) {
 			startTime = new Moment();
 		}
 		return startTime;
@@ -142,7 +142,7 @@ public class Conference implements Serializable {
 	}
 
 	public Moment onEndTime() {
-		if ( endTime == null ) {
+		if (endTime == null) {
 			endTime = new Moment();
 		}
 		return endTime;
@@ -197,7 +197,7 @@ public class Conference implements Serializable {
 	// Utilities
 
 	public boolean check(List<String> messages) {
-		if (startTime == null || endTime == null ) {
+		if (startTime == null || endTime == null) {
 			messages.add("Date, start/end time");
 		}
 		if (StringUtil.isEmpty(title)) {
@@ -284,18 +284,26 @@ public class Conference implements Serializable {
 	}
 
 	private boolean isTimeSlotAvailable(Moment start, int length, Location location) {
-
 		// Sessions are sorted on start time!
 		for (Session session : getSessions()) {
-			if (!location.equals(session.getLocation()) || start.isAfter(session.getStartTime())) {
+			if (location.equals(session.getLocation()) == false) {
 				continue;
 			}
-			
-			// We have space between start and the session to start
-			int delta = session.getStartTime().asMinutes() - start.asMinutes();
-			return delta >= length;
+			if (start.isAfter(session.getStartTime())) {
+				if (start.isBefore(session.getEndTime())) {
+					return false;
+				}
+				// There might still be room after this session.
+				// But we do not know how much...
+			} else {
+				// start is before this session or the same time
+				long space = session.getStartTime().asMinutes() - start.asMinutes();
+				return (space >= length);
+			}
 		}
-		return false;
+		// Either we have no more sessions, or there is space between the last and the end of the conference.
+		long space = getEndTime().asMinutes() - start.asMinutes();
+		return (space >= length);
 	}
 
 	public TimeSlot getNextAvailableTimeSlot(Session rescheduleSession, Moment start, final int duration,
@@ -372,8 +380,8 @@ public class Conference implements Serializable {
 			}
 			if (availableOnAllLocations) {
 				list.add(t);
-				start = start.plusMinutes(length);
 			}
+			start = start.plusMinutes(length);
 		}
 		return list;
 	}

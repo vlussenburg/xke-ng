@@ -1,6 +1,7 @@
 package com.xebia.xcoss.axcv.ui;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -61,8 +62,6 @@ public class AddBreakDialog extends Dialog {
 			public void onNothingSelected(AdapterView<?> arg0) {}
 		});
 
-		updateSpinners();
-
 		Button submit = (Button) findViewById(R.id.seCommit);
 		submit.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -102,6 +101,8 @@ public class AddBreakDialog extends Dialog {
 				dismiss();
 			}
 		});
+
+		updateSpinners();
 	}
 
 	private int getDuration() {
@@ -128,16 +129,19 @@ public class AddBreakDialog extends Dialog {
 		spinner.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, durations));
 		spinner.setSelection(4);
 
-		Set<Location> locations = updateStartTimes();
-
-		Location[] locarray = locations.toArray(new Location[locations.size()]);
-		spinner = (Spinner) findViewById(R.id.bLocation);
-		spinner.setAdapter(new ArrayAdapter<Location>(getContext(), android.R.layout.simple_spinner_item, locarray));
+		Button submit = (Button) findViewById(R.id.seCommit);
+		boolean updateStartTimes = updateStartTimes();
+		if (updateStartTimes) {
+			List<Location> locations = conference.getLocations();
+			Location[] locarray = locations.toArray(new Location[locations.size()]);
+			spinner = (Spinner) findViewById(R.id.bLocation);
+			spinner.setAdapter(new ArrayAdapter<Location>(getContext(), android.R.layout.simple_spinner_item, locarray));
+		}
+		submit.setEnabled(updateStartTimes);
 	}
 
-	private Set<Location> updateStartTimes() {
-		Set<Location> locations = new HashSet<Location>();
-
+	private boolean updateStartTimes() {
+		boolean hasTimeSlots = false;
 		if (conference != null) {
 			Set<Moment> startTime = new HashSet<Moment>();
 
@@ -147,7 +151,6 @@ public class AddBreakDialog extends Dialog {
 			Set<TimeSlot> timeSlots = conference.getAvailableTimeSlots(duration, conference.getLocations());
 
 			for (TimeSlot timeSlot : timeSlots) {
-				locations.add(timeSlot.location);
 				startTime.add(timeSlot.start);
 			}
 
@@ -158,16 +161,18 @@ public class AddBreakDialog extends Dialog {
 			String[] startarray = startdata.toArray(new String[startdata.size()]);
 			Spinner spinner = (Spinner) findViewById(R.id.bStartTime);
 			Object selectedItem = spinner.getSelectedItem();
-			spinner.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, startarray));
+			spinner.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item,
+					startarray));
 			int position = 0;
 			for (int i = 0; i < startarray.length; i++) {
-				if ( startarray[i].equals(selectedItem)) {
+				if (startarray[i].equals(selectedItem)) {
 					position = i;
 				}
 			}
 			spinner.setSelection(position);
+			hasTimeSlots = timeSlots.size() > 0;
 		}
-		return locations;
+		return hasTimeSlots;
 	}
 
 	public void setConference(Conference conf) {

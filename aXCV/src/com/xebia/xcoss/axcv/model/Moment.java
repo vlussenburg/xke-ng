@@ -59,6 +59,12 @@ public class Moment {
 		this.year = year;
 	}
 
+	public void setDate(Moment moment) {
+		this.day = moment.day;
+		this.month = moment.month;
+		this.year = moment.year;
+	}
+
 	public void setTime(int hour, int minute) {
 		this.hour = hour;
 		this.minute = minute;

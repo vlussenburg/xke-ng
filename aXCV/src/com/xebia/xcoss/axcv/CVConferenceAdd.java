@@ -16,6 +16,7 @@ import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -250,15 +251,21 @@ public class CVConferenceAdd extends AdditionActivity {
 			break;
 			case R.id.conferenceDate:
 				moment = (Moment) selection;
-				conference.onStartTime().setDate(moment.getYear(), moment.getMonth(), moment.getDay());
-				conference.onEndTime().setDate(moment.getYear(), moment.getMonth(), moment.getDay());
+				conference.onStartTime().setDate(moment);
+				conference.onEndTime().setDate(moment);
+				for (Session session : conference.getSessions()) {
+					session.onStartTime().setDate(moment);
+					session.onEndTime().setDate(moment);
+				}
 			break;
 			case R.id.conferenceStart:
 				moment = (Moment) selection;
+				// TODO : Check if there are sessions invalid
 				conference.onStartTime().setTime(moment.getHour(), moment.getMinute());
 			break;
 			case R.id.conferenceEnd:
 				moment = (Moment) selection;
+				// TODO : Check if there are sessions invalid
 				conference.onEndTime().setTime(moment.getHour(), moment.getMinute());
 			break;
 			case R.id.conferenceDescription:

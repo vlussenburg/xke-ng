@@ -24,6 +24,7 @@ server
 -	Herziening REST API (session change; new URL does not work)
 -	Error handling (/error URL does not work - no auth wanted)
 -	Run in non-auth mode for local testing?
+-	Nieuwe datum conferentie leidt niet tot nieuwe datum sessies (wordt wel gestuurd)
 
 DONE
 -------------------------------------------------------------------

@@ -1,52 +1,36 @@
 package com.xebia.xcoss.axcv.test;
 
-import hirondelle.date4j.DateTime;
-import android.test.AndroidTestCase;
+import java.util.Date;
 
-import com.xebia.xcoss.axcv.logic.gson.GsonDateTimeAdapter;
+import com.xebia.xcoss.axcv.model.Moment;
+
+import android.test.AndroidTestCase;
 
 public class DateTimeTest extends AndroidTestCase {
 
 	public DateTimeTest() {
 	}
 	
-	public void testDateOnly() {
-		DateTime extractDate = GsonDateTimeAdapter.extractDate("2011-03-01T00:00:00.000Z");
-		assertEquals("2011-03-01", extractDate.toString());
-		assertEquals(false, extractDate.hasHourMinuteSecond());
-		assertEquals(true, extractDate.hasYearMonthDay());
+	public void testCreateNewDate() {
+		Moment moment = new Moment();
+		Date now = new Date();
+		assertEquals(1900+now.getYear(), (int)moment.getYear());
+		assertEquals(1+now.getMonth(), (int)moment.getMonth());
+		assertEquals(now.getDay(), (int)moment.getDay());
+		assertEquals(now.getMinutes(), (int)moment.getMinute());
+		assertEquals(now.getHours(), (int)moment.getHour());
 	}
-
-	public void testTimeOnly() {
-		DateTime extractDate = GsonDateTimeAdapter.extractDate("0000-00-00T12:01:01.345Z");
-		assertEquals("12:01:01", extractDate.toString());
-		assertEquals(true, extractDate.hasHourMinuteSecond());
-		assertEquals(false, extractDate.hasYearMonthDay());
-	}
-
-	public void testNoTimezone() {
-		DateTime extractDate = GsonDateTimeAdapter.extractDate("2011-03-01T12:01:01.345");
-		assertEquals("2011-03-01 12:01:01", extractDate.toString());
-	}
-
-	public void testStandardTimezone() {
-		DateTime extractDate = GsonDateTimeAdapter.extractDate("2011-03-01T12:01:01.345Z");
-		assertEquals("2011-03-01 12:01:01", extractDate.toString());
-	}
-
-	public void testShiftPlusTwoTimezone() {
-		DateTime extractDate = GsonDateTimeAdapter.extractDate("2011-03-01T12:01:01.345+02:00");
-		assertEquals("2011-03-01 12:01:01", extractDate.toString());
-	}
-
-	public void testShiftMinusTwoTimezone() {
-		DateTime extractDate = GsonDateTimeAdapter.extractDate("2011-03-01T12:01:01.345-02:00");
-		assertEquals("2011-03-01 12:01:01", extractDate.toString());
-	}
-
-	public void testBeforeNoon() {
-		DateTime extractDate = GsonDateTimeAdapter.extractDate("2011-03-01T08:01:01.345");
-		assertEquals("2011-03-01 08:01:01", extractDate.toString());
+	
+	public void testA() {
+		Moment moment = new Moment();
+		Moment copy = new Moment(moment);
+		assertTrue(moment.asMinutes() > 0);
+		assertTrue(moment.compare(copy) == 0);
+		// is in millis
+//		assertTrue(moment.isAfterNow());
+		assertFalse(moment.isAfter(copy));
+		assertFalse(moment.isBefore(copy));
+		assertEquals("non", moment.toString());
 	}
 
 }
