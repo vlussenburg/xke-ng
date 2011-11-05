@@ -33,7 +33,7 @@ public abstract class SessionSwipeActivity extends SwipeActivity {
 	}
 
 	protected void updateLocation(Session session) {
-		if (session != null) {
+		if (session != null && !session.isBreak()) {
 			for (int i = 0; i < locations.length; i++) {
 				if (locations[i].equals(session.getLocation())) {
 					currentLocation = i;

@@ -2,6 +2,7 @@ package com.xebia.xcoss.axcv.ui;
 
 import android.content.Intent;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,9 +36,7 @@ public class SessionAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int paramInt, View paramView, ViewGroup parent) {
-
 		Session session = (Session) getItem(paramInt);
-		
 		int colorId = ctx.getResources().getColor(R.color.tc_itemdefault);
 		if (session.isExpired()) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemgone);

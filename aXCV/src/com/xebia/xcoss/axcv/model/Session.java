@@ -321,7 +321,7 @@ public class Session implements Serializable {
 		if (getStartTime() == null) {
 			return false;
 		}
-		return getStartTime().isAfterNow() && !isExpired();
+		return getStartTime().isBeforeNow() && !isExpired();
 	}
 
 	public long getModificationHash() {

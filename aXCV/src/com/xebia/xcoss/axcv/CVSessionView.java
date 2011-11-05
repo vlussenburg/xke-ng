@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +34,7 @@ import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
+import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class CVSessionView extends SessionSwipeActivity {
 
@@ -50,13 +52,24 @@ public class CVSessionView extends SessionSwipeActivity {
 	protected void onResume() {
 		Conference conference = getCurrentConference();
 		currentSession = getSelectedSession(conference);
+		
 		if (currentSession == null) {
 			Location location = getCurrentLocation();
+			ArrayList<Session> options = new ArrayList<Session>();
 			for (Session s : conference.getSessions()) {
-				if (s.getLocation().equals(location)) {
-					currentSession = s;
+				if (s.getLocation().equals(location) || s.isBreak()) {
+					options.add(s);
+				}
+			}
+			int start = getIntent().getIntExtra(IA_SESSION_START, 0);
+			for (Session session : options) {
+				if ( session.getStartTime().asMinutes() == start ) {
+					currentSession = session;
 					break;
 				}
+			}
+			if ( currentSession == null && options.size() > 0) {
+				currentSession = options.get(0);
 			}
 		}
 		if (currentSession == null) {
@@ -330,6 +343,17 @@ public class CVSessionView extends SessionSwipeActivity {
 		}
 	}
 
+	@Override
+	public void onSwipeLeftToRight() {
+		getIntent().putExtra(IA_SESSION_START, currentSession.getStartTime().asMinutes());
+		super.onSwipeLeftToRight();
+	}
+	
+	@Override
+	public void onSwipeRightToLeft() {
+		getIntent().putExtra(IA_SESSION_START, currentSession.getStartTime().asMinutes());
+		super.onSwipeRightToLeft();
+	}
 	private Session getNextSession(Location location) {
 		Set<Session> sessionsSet = this.getConference().getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);

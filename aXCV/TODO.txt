@@ -1,13 +1,12 @@
 IN PROGRESS
 -------------------------------------------------------------------
 
--	JodaTime (timezone related)
+-	Number of available slots not correct.
 
 TODO
 -------------------------------------------------------------------
 client
 -	Notificaties weer werkend maken
--	Breaks inplannen over alle locaties
 -	Caching: refresh na conference edit (reopen view...)
 -	Bugfix menu popup labels/authors (Rogier)
 -	Nieuwe foutmeldingen van server (nieuwe server versie)
@@ -33,3 +32,5 @@ DONE
 -	Authors
 -	Breaks verwijderen
 -	Omschakelen tussen full view/list view van sessies
+-	JodaTime (timezone related)
+-	Breaks inplannen over alle locaties
