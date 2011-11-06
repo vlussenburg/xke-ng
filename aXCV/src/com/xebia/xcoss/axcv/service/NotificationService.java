@@ -22,12 +22,14 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.CVSplashLoader;
 import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.logic.ProfileManager.Trackable;
 import com.xebia.xcoss.axcv.model.Author;
+import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Search;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.StringUtil;
@@ -35,7 +37,7 @@ import com.xebia.xcoss.axcv.util.XCS;
 
 public class NotificationService extends Service {
 
-	private static final int NOTIFICATION_PERIOD = 30 * 1000;
+	private static final int NOTIFICATION_PERIOD = 15 * 60 * 1000;
 	private static final String TAG_OWNED = "id-owned_ses";
 	private static final String TAG_TRACKED = "id-track-ses";
 	private static final long[] VIBRATE_PATTERN = new long[] { 1000, 200, 1000 };
@@ -149,9 +151,23 @@ public class NotificationService extends Service {
 			ConferenceServer server = ConferenceServer.getInstance();
 
 			// Not all owned sessions need to be locally available.
-			Trackable[] ids = pm.getOwnedSessions(getUser());
-			Search search = new Search().onAuthor(new Author(getUser(), null, null, null));
+			String user = getUser();
+			Trackable[] ids = pm.getOwnedSessions(user);
+			// Search active sessions on the author
+			Search search = new Search().onAuthor(new Author(user, null, null, null)).after(new Moment());
 			List<Session> sessions = server.searchSessions(search);
+			if (sessions == null || sessions.isEmpty()) {
+				// TODO Search not implemented yet on server
+				sessions = new ArrayList<Session>();
+				List<Session> nextSessions = server.getSessions(server.getUpcomingConference());
+				for (Session session : nextSessions) {
+					for (Author author : session.getAuthors()) {
+						if (author.getUserId().equals(user)) {
+							sessions.add(session);
+						}
+					}
+				}
+			}
 			for (Session session : sessions) {
 				boolean sessionFoundInMarkList = false;
 				long lastNotification = session.getModificationHash();
@@ -159,9 +175,9 @@ public class NotificationService extends Service {
 				for (int i = 0; i < ids.length; i++) {
 					if (id.equals(ids[i].sessionId)) {
 						sessionFoundInMarkList = true;
-						if ( ids[i].hash != lastNotification) {
+						if (ids[i].hash != lastNotification) {
 							ids[i].hash = lastNotification;
-							ids[i].date = session.getStartTime().getLong();
+							ids[i].date = session.getStartTime().asLong();
 							pm.updateOwnedSession(ids[i]);
 							modified.add(session.getId());
 						}
@@ -169,11 +185,12 @@ public class NotificationService extends Service {
 					}
 				}
 				// What to do with sessions added elsewhere? We notify for now...
+				// If there is a second author, she/he is notified.
 				if (!sessionFoundInMarkList) {
 					Trackable add = pm.new Trackable();
-					add.date = session.getStartTime().getLong();
+					add.date = session.getStartTime().asLong();
 					add.sessionId = session.getId();
-					add.userId = getUser();
+					add.userId = user;
 					add.hash = lastNotification;
 					pm.updateOwnedSession(add);
 					modified.add(session.getId());
@@ -195,9 +212,10 @@ public class NotificationService extends Service {
 			Trackable[] ids = pm.getMarkedSessions(getUser());
 			for (int i = 0; i < ids.length; i++) {
 				Session session = server.getSession(ids[i].sessionId);
-				if ( ids[i].hash != session.getModificationHash()) {
-					ids[i].hash = session.getModificationHash();
-					ids[i].date = session.getStartTime().getLong();
+				long modificationHash = session.getModificationHash();
+				if (!session.isExpired() && ids[i].hash != modificationHash) {
+					ids[i].hash = modificationHash;
+					ids[i].date = session.getStartTime().asLong();
 					pm.updateMarkedSession(ids[i]);
 					modified.add(session.getId());
 				}
@@ -213,28 +231,32 @@ public class NotificationService extends Service {
 		Context ctx = NotificationService.this;
 		long currentTimeMillis = System.currentTimeMillis();
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(NotificationService.this);
-		
+
 		// This pending intent brings the current app to the front.
 		Intent intent = new Intent(ctx, CVSplashLoader.class);
 		intent.setAction("android.intent.action.MAIN");
 		intent.addCategory("android.intent.category.LAUNCHER");
-		PendingIntent clickIntent = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
 		String soundUri = sp.getString(XCS.PREF.NOTIFYSOUND, null);
 		AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-		boolean silent = (am.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) || (am.getMode() != AudioManager.MODE_NORMAL);
+		boolean silent = (am.getRingerMode() != AudioManager.RINGER_MODE_NORMAL)
+				|| (am.getMode() != AudioManager.MODE_NORMAL);
 		NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
 		ArrayList<String> sessionIds = bundle.getStringArrayList(TAG_TRACKED);
 		if (sessionIds != null) {
 			for (String sessionId : sessionIds) {
-				String title = "Track rescheduled";
+				String title = "Track change!";
 				String message = getSessionChange(sessionId);
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
 				Notification noty = new Notification(R.drawable.x_stat_track, title, currentTimeMillis);
+				intent.putExtra(BaseActivity.IA_NOTIFICATION_ID, sessionId);
+				PendingIntent clickIntent = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 				noty.setLatestEventInfo(ctx, title, message, clickIntent);
-				if ( silent ) {
+				if (silent) {
 					noty.vibrate = VIBRATE_PATTERN;
-				} else if ( !StringUtil.isEmpty(soundUri)) {
+					noty.defaults |= Notification.DEFAULT_VIBRATE;
+				} else if (!StringUtil.isEmpty(soundUri)) {
 					noty.sound = Uri.parse(soundUri);
 				}
 				// Use session id for notifyCount - This way there is one per session.
@@ -249,10 +271,12 @@ public class NotificationService extends Service {
 				String message = getSessionChange(sessionId);
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
 				Notification noty = new Notification(R.drawable.x_stat_owned, title, currentTimeMillis);
+				intent.putExtra(BaseActivity.IA_NOTIFICATION_ID, sessionId);
+				PendingIntent clickIntent = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 				noty.setLatestEventInfo(ctx, title, message, clickIntent);
-				if ( silent ) {
+				if (silent) {
 					noty.vibrate = VIBRATE_PATTERN;
-				} else if ( !StringUtil.isEmpty(soundUri)) {
+				} else if (!StringUtil.isEmpty(soundUri)) {
 					noty.sound = Uri.parse(soundUri);
 				}
 				// Use session id for notifyCount - This way there is one per session.

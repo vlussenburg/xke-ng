@@ -126,7 +126,10 @@ public class AddBreakDialog extends Dialog {
 
 		String[] durations = new String[] { "5 min", "10 min", "15 min", "30 min", "60 min", "90 min", "120 min" };
 		Spinner spinner = (Spinner) findViewById(R.id.bDuration);
-		spinner.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, durations));
+		ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item,
+				durations);
+		adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinner.setAdapter(adapter1);
 		spinner.setSelection(4);
 
 		Button submit = (Button) findViewById(R.id.seCommit);
@@ -135,7 +138,10 @@ public class AddBreakDialog extends Dialog {
 			List<Location> locations = conference.getLocations();
 			Location[] locarray = locations.toArray(new Location[locations.size()]);
 			spinner = (Spinner) findViewById(R.id.bLocation);
-			spinner.setAdapter(new ArrayAdapter<Location>(getContext(), android.R.layout.simple_spinner_item, locarray));
+			ArrayAdapter<Location> adapter2 = new ArrayAdapter<Location>(getContext(),
+					android.R.layout.simple_spinner_item, locarray);
+			adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			spinner.setAdapter(adapter2);
 		}
 		submit.setEnabled(updateStartTimes);
 	}
@@ -161,8 +167,10 @@ public class AddBreakDialog extends Dialog {
 			String[] startarray = startdata.toArray(new String[startdata.size()]);
 			Spinner spinner = (Spinner) findViewById(R.id.bStartTime);
 			Object selectedItem = spinner.getSelectedItem();
-			spinner.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item,
-					startarray));
+			ArrayAdapter<String> adapter3 = new ArrayAdapter<String>(getContext(),
+					android.R.layout.simple_spinner_item, startarray);
+			adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			spinner.setAdapter(adapter3);
 			int position = 0;
 			for (int i = 0; i < startarray.length; i++) {
 				if (startarray[i].equals(selectedItem)) {

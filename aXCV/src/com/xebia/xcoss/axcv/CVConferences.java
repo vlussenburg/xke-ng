@@ -82,6 +82,7 @@ public class CVConferences extends SwipeActivity {
 			@Override
 			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
 				// Adapter = listview, view = tablelayout.
+				Log.e(XCS.LOG.NAVIGATE, "Switching to " + conferences[paramInt].getTitle());
 				switchTo(conferences[paramInt]);
 			}
 		});
@@ -129,7 +130,7 @@ public class CVConferences extends SwipeActivity {
 		intent.putExtra(IA_CONF_YEAR, shownYear - 1);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
-		overridePendingTransition(R.anim.slide_right, R.anim.slide_left);
+		overridePendingTransition(R.anim.slide_right, 0);
 	}
 
 	@Override
@@ -139,7 +140,7 @@ public class CVConferences extends SwipeActivity {
 		intent.putExtra(IA_CONF_YEAR, shownYear + 1);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
-		overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
+		overridePendingTransition(R.anim.slide_left, 0);
 	}
 
 	@Override

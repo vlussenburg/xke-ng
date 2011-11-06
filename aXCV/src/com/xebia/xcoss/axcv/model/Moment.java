@@ -1,6 +1,7 @@
 package com.xebia.xcoss.axcv.model;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -154,7 +155,7 @@ public class Moment {
 		return getDate().compareTo(m2.getDate());
 	}
 
-	public long getLong() {
+	public long asLong() {
 		return getDate().getMillis();
 	}
 
@@ -168,8 +169,9 @@ public class Moment {
 
 	public static Moment fromString(String timeValue) {
 		DateTime dt = DateTime.parse(timeValue);
-		Moment moment = new Moment(dt.getHourOfDay(), dt.getMinuteOfHour());
-		moment.setDate(dt.getYear(), dt.getMonthOfYear(), dt.getDayOfMonth());
+		DateTime dtLocal = dt.withZone(DateTimeZone.getDefault());
+		Moment moment = new Moment(dtLocal.getHourOfDay(), dtLocal.getMinuteOfHour());
+		moment.setDate(dtLocal.getYear(), dtLocal.getMonthOfYear(), dtLocal.getDayOfMonth());
 		return moment;
 	}
 }

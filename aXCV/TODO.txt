@@ -1,17 +1,17 @@
 IN PROGRESS
 -------------------------------------------------------------------
 
--	Notificaties weer werkend maken
-
 TODO
 -------------------------------------------------------------------
 client
--	Caching: refresh na conference edit (reopen view...)
 -	Bugfix menu popup labels/authors (Rogier)
 -	Nieuwe foutmeldingen van server (nieuwe server versie)
+-	Https connectie
+-	Timeouts on retrieving labels & authors should be handled in a notification!
 
 later op de client
 -	Verbeteren van caching
+-	Caching: refresh na conference edit (reopen view...)
 -	Offline support
 -	Conference edit alleen door organiser (?)
 
@@ -34,3 +34,4 @@ DONE
 -	JodaTime (timezone related)
 -	Breaks inplannen over alle locaties
 -	Number of available slots not correct.
+-	Notificaties weer werkend maken

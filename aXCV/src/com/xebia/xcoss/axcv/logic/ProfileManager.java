@@ -144,7 +144,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 			row.put(SES_COL_USER, user);
 			row.put(SES_COL_SESSION, session.getId());
 			row.put(SES_COL_HASH, session.getModificationHash());
-			row.put(SES_COL_DATE, session.getStartTime().getLong());
+			row.put(SES_COL_DATE, session.getStartTime().asLong());
 			long rv = database.insert(TRACK_TABLE, null, row);
 			return rv >= 0;
 		}
@@ -178,7 +178,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 		try {
 			checkConnection();
 			String[] whereArgs = new String[1];
-			whereArgs[0] = String.valueOf(new Moment().getLong());
+			whereArgs[0] = String.valueOf(new Moment().asLong());
 			database.delete(TRACK_TABLE, SES_QUERY_PRUNE, whereArgs);
 			database.delete(OWNED_TABLE, SES_QUERY_PRUNE, whereArgs);
 		}

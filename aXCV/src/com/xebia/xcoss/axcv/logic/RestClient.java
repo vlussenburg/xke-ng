@@ -6,24 +6,43 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
 
 import android.util.Log;
 
@@ -215,15 +234,15 @@ public class RestClient {
 		DefaultHttpClient httpClient = null;
 		try {
 			httpClient = getHttpClient();
-			if ( sessionCookie != null ) {
-//				Log.e(XCS.LOG.COMMUNICATE, "Sending cookie " + sessionCookie);
+			if (sessionCookie != null) {
+				// Log.e(XCS.LOG.COMMUNICATE, "Sending cookie " + sessionCookie);
 				httpClient.getCookieStore().addCookie(sessionCookie);
 			}
 			HttpResponse response = httpClient.execute(request);
-	        List<Cookie> cookies = httpClient.getCookieStore().getCookies();
-	        for (Cookie cookie : cookies) {
-				if ( JSESSIONID.equals(cookie.getName()) ) {
-//					Log.e(XCS.LOG.COMMUNICATE, "Retrieving cookie " + sessionCookie);
+			List<Cookie> cookies = httpClient.getCookieStore().getCookies();
+			for (Cookie cookie : cookies) {
+				if (JSESSIONID.equals(cookie.getName())) {
+					// Log.e(XCS.LOG.COMMUNICATE, "Retrieving cookie " + sessionCookie);
 					sessionCookie = cookie;
 					break;
 				}
@@ -240,7 +259,8 @@ public class RestClient {
 		finally {
 			try {
 				httpClient.getConnectionManager().closeExpiredConnections();
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				Log.i(XCS.LOG.COMMUNICATE, "Close expired failed: " + StringUtil.getExceptionMessage(e));
 			}
 		}
@@ -267,10 +287,46 @@ public class RestClient {
 	}
 
 	private static DefaultHttpClient getHttpClient() {
-		HttpParams httpParams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpParams, HTTP_TIMEOUT);
-		HttpConnectionParams.setSoTimeout(httpParams, HTTP_TIMEOUT);
-		return new DefaultHttpClient(httpParams);
+        HttpParams params = new BasicHttpParams();
+        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+        HttpProtocolParams.setContentCharset(params, "utf-8");
+		HttpConnectionParams.setConnectionTimeout(params, HTTP_TIMEOUT);
+		HttpConnectionParams.setSoTimeout(params, HTTP_TIMEOUT);
+        params.setBooleanParameter("http.protocol.expect-continue", false);
+ 
+        //registers schemes for both http and https
+        SchemeRegistry registry = new SchemeRegistry();
+        registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        final SSLSocketFactory sslSocketFactory = SSLSocketFactory.getSocketFactory();
+//        sslSocketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        sslSocketFactory.setHostnameVerifier(SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+//        sslSocketFactory.setHostnameVerifier(new X509HostnameVerifier() {
+//			
+//			@Override
+//			public void verify(String host, String[] cns, String[] subjectAlts) throws SSLException {
+//				Log.e("debug", "Validating [1] " + host + ": " + Arrays.toString(cns) + " * " + Arrays.toString(subjectAlts));
+//			}
+//			
+//			@Override
+//			public void verify(String host, X509Certificate cert) throws SSLException {
+//				Log.e("debug", "Validating [2] " + host + ": " + cert.toString());
+//			}
+//			
+//			@Override
+//			public void verify(String host, SSLSocket ssl) throws IOException {
+//				Log.e("debug", "Validating [3] " + host + ": " + ssl.toString());
+//			}
+//			
+//			@Override
+//			public boolean verify(String host, SSLSession session) {
+//				Log.e("debug", "Validating [4] " + host + ": " + session.toString());
+//				return true;
+//			}
+//		});
+        registry.register(new Scheme("https", sslSocketFactory, 443));
+ 
+        ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager(params, registry);
+        return new DefaultHttpClient(manager, params);
 	}
 
 	private static void handleResponse(HttpRequestBase request, HttpResponse response) {
@@ -290,15 +346,18 @@ public class RestClient {
 			case 500:
 				try {
 					message = readResponse(response);
-				} catch (IOException e) {}
+				}
+				catch (IOException e) {}
 				Log.e(XCS.LOG.COMMUNICATE, "Server error on '" + request.getURI().toString() + "': " + message);
 				throw new ServerException(request.getURI().getPath());
 			default:
 				if (responseCode >= 400) {
 					try {
 						message = readResponse(response);
-					} catch (IOException e) {}
-					Log.e(XCS.LOG.COMMUNICATE, "Error " + responseCode + " on '" + request.getURI().toString() + "': " + message);
+					}
+					catch (IOException e) {}
+					Log.e(XCS.LOG.COMMUNICATE, "Error " + responseCode + " on '" + request.getURI().toString() + "': "
+							+ message);
 					throw new CommException(request.getURI(), responseCode);
 				}
 			break;

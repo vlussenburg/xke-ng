@@ -5,6 +5,8 @@ import java.util.Set;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -42,6 +44,7 @@ public abstract class BaseActivity extends Activity {
 	public static final String IA_REDIRECT = "ID-redirect";
 	public static final String IA_LOCATION_ID = "ID-location";
 	public static final String IA_SESSION_START = "ID-sstart";
+	public static final String IA_NOTIFICATION_ID = "ID-notified";
 
 	private MenuItem miSettings;
 	private MenuItem miSearch;
@@ -69,6 +72,12 @@ public abstract class BaseActivity extends Activity {
 //			return;
 //		}
 
+		String notificationId = getIntent().getStringExtra(IA_NOTIFICATION_ID);
+		if ( notificationId != null ) {
+			NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			mgr.cancel(notificationId.hashCode());
+		}
+		
 		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);
 		if (conferenceButton != null) {
 			conferenceButton.setOnClickListener(new View.OnClickListener() {

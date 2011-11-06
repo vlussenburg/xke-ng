@@ -324,11 +324,23 @@ public class Session implements Serializable {
 		return getStartTime().isBeforeNow() && !isExpired();
 	}
 
+
 	public long getModificationHash() {
-		// TODO Auto-generated method stub
-		return 0;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		result = prime * result + ((authors == null) ? 0 : authors.hashCode());
+		result = prime * result + ((location == null) ? 0 : location.hashCode());
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((endTime == null) ? 0 : (int) endTime.asLong());
+		result = prime * result + ((startTime == null) ? 0 : (int) startTime.asLong());
+		result = prime * result + ((preparation == null) ? 0 : preparation.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((labels == null) ? 0 : labels.hashCode());
+		result = prime * result + ((intendedAudience == null) ? 0 : intendedAudience.hashCode());
+		return result;
 	}
-	
+
 	public void setConferenceId(String conferenceId) {
 		this.conferenceId = conferenceId;
 	}

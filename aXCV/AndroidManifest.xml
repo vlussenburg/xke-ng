@@ -106,6 +106,10 @@
 			android:process=":exceptionReporter"
 			android:theme="@android:style/Theme.NoDisplay" />
 		<meta-data
+			android:name="de.quist.app.errorreporter.reportOnFroyo"
+			android:value="true" />
+
+		<meta-data
 			android:name="com.xebia.xcoss.serverUrl"
 			android:value="http://ec2-46-137-184-99.eu-west-1.compute.amazonaws.com:8080/xkeng" />
 		<meta-data
@@ -114,13 +118,10 @@
 		<!--
 		<meta-data
 			android:name="com.xebia.xcoss.serverUrl"
-			android:value="http://10.0.2.2:9999" />
+			android:value="http://10.0.2.2:8080" />
 		<meta-data
 			android:name="de.quist.app.errorreporter.targetUrl"
-			android:value="http://10.0.2.2:9999/error" />
+			android:value="http://10.0.2.2:8080/error" />
 		-->
-		<meta-data
-			android:name="de.quist.app.errorreporter.reportOnFroyo"
-			android:value="true" />
 	</application>
 </manifest>
