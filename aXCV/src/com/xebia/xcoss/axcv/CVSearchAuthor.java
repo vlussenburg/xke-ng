@@ -172,6 +172,7 @@ public class CVSearchAuthor extends BaseActivity {
 		
 		switch (menuItem.getItemId()) {
 			case R.id.view:
+				// TODO, Store current items
 				Author author = selectedAuthors.get(position);
 				Intent intent = new Intent(this, CVAuthor.class);
 				intent.putExtra(BaseActivity.IA_AUTHOR, author.getUserId());

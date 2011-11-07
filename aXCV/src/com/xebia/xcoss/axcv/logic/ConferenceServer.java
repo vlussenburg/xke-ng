@@ -23,6 +23,7 @@ import com.xebia.xcoss.axcv.model.Search;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.util.ConferenceComparator;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
+import com.xebia.xcoss.axcv.util.SecurityUtils;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class ConferenceServer {
@@ -64,7 +65,8 @@ public class ConferenceServer {
 		 StringBuilder requestUrl = new StringBuilder();
 		 requestUrl.append(baseUrl);
 		 requestUrl.append("/login");
-		 RestClient.postObject(requestUrl.toString(), new Credential(user, password), void.class, null);
+		 String decrypt = SecurityUtils.decrypt(password);
+		 RestClient.postObject(requestUrl.toString(), new Credential(user, decrypt, false), void.class, null);
 		 // RestClients holds the authentication token.
 		 this.token = "logged_in";
 	}
@@ -217,12 +219,11 @@ public class ConferenceServer {
 			session = RestClient.createObject(requestUrl.toString(), session, Session.class, token);
 			sessionId = session.getId();
 		} else {
-			// TODO : New variant still does not work
-//			requestUrl.append("/session/");
-//			requestUrl.append(session.getId());
-			requestUrl.append("/conference/");
-			requestUrl.append(conferenceId);
-			requestUrl.append("/session");
+			requestUrl.append("/session/");
+			requestUrl.append(session.getId());
+//			requestUrl.append("/conference/");
+//			requestUrl.append(conferenceId);
+//			requestUrl.append("/session");
 			RestClient.updateObject(requestUrl.toString(), session, token);
 			sessionId = session.getId();
 		}

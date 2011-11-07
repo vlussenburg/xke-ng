@@ -7,6 +7,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import android.app.Dialog;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
@@ -123,25 +124,34 @@ public class AddBreakDialog extends Dialog {
 	}
 
 	private void updateSpinners() {
-
-		String[] durations = new String[] { "5 min", "10 min", "15 min", "30 min", "60 min", "90 min", "120 min" };
-		Spinner spinner = (Spinner) findViewById(R.id.bDuration);
-		ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item,
-				durations);
-		adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinner.setAdapter(adapter1);
-		spinner.setSelection(4);
+		final Spinner spinner = (Spinner) findViewById(R.id.bDuration);
+		if (spinner.getSelectedItemPosition() == Spinner.INVALID_POSITION) {
+			String[] durations = new String[] { "5 min", "10 min", "15 min", "30 min", "60 min", "90 min", "120 min" };
+			ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(getContext(),
+					android.R.layout.simple_spinner_item, durations);
+			adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			spinner.setAdapter(adapter1);
+			spinner.setSelection(4);
+			// TODO
+//			adapter1..gsetOnClickListener(new View.OnClickListener() {
+//				@Override
+//				public void onClick(View v) {
+//					Log.e("debug", "Clicked on view " + v + " = " + spinner.getSelectedItemPosition());
+//					updateSpinners();
+//				}
+//			});
+		}
 
 		Button submit = (Button) findViewById(R.id.seCommit);
 		boolean updateStartTimes = updateStartTimes();
 		if (updateStartTimes) {
 			List<Location> locations = conference.getLocations();
 			Location[] locarray = locations.toArray(new Location[locations.size()]);
-			spinner = (Spinner) findViewById(R.id.bLocation);
+			Spinner spinner2 = (Spinner) findViewById(R.id.bLocation);
 			ArrayAdapter<Location> adapter2 = new ArrayAdapter<Location>(getContext(),
 					android.R.layout.simple_spinner_item, locarray);
 			adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-			spinner.setAdapter(adapter2);
+			spinner2.setAdapter(adapter2);
 		}
 		submit.setEnabled(updateStartTimes);
 	}

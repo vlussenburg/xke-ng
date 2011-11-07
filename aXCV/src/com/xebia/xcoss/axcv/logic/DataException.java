@@ -9,7 +9,7 @@ public class DataException extends CommException {
 	private Code code;
 	
 	public enum Code {
-		NOT_ALLOWED, NOT_FOUND
+		NOT_ALLOWED, NOT_FOUND, TIME_OUT, NOT_HANDLED
 	}
 
 	public DataException(Code code, URI uri) {
@@ -24,4 +24,9 @@ public class DataException extends CommException {
 	public boolean denied() {
 		return ( code == Code.NOT_ALLOWED);
 	}
+
+	public boolean timedOut() {
+		return ( code == Code.TIME_OUT);
+	}
+	
 }

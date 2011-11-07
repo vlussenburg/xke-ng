@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
+import java.net.SocketTimeoutException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -51,6 +52,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.xebia.xcoss.axcv.logic.DataException.Code;
 import com.xebia.xcoss.axcv.logic.gson.GsonMomentAdapter;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.util.StreamUtil;
@@ -61,7 +63,7 @@ import com.xebia.xcoss.axcv.util.XCS.LOG;
 public class RestClient {
 
 	private static final String JSESSIONID = "JSESSIONID";
-	private static final int HTTP_TIMEOUT = 5 * 1000;
+	private static final int HTTP_TIMEOUT = 15 * 1000;
 	private static GsonBuilder gsonBuilder = null;
 	private static Cookie sessionCookie = null;
 
@@ -210,6 +212,7 @@ public class RestClient {
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
+//			Log.d(LOG.COMMUNICATE, "Post dating [" + postData + "]");
 			reader = getReader(new HttpPost(url), postData, token);
 			return getGson().fromJson(reader, rvClass);
 		}
@@ -253,8 +256,11 @@ public class RestClient {
 			Log.i(XCS.LOG.COMMUNICATE, "Read: " + result);
 			return new StringReader(result);
 		}
+		catch (SocketTimeoutException e) {
+			throw new DataException(Code.TIME_OUT, request.getURI());
+		}
 		catch (IOException e) {
-			throw new ServerException(request.getURI().toString(), e);
+			throw new ServerException(e.getClass().getSimpleName() + ": " + request.getURI().toString(), e);
 		}
 		finally {
 			try {
@@ -287,46 +293,47 @@ public class RestClient {
 	}
 
 	private static DefaultHttpClient getHttpClient() {
-        HttpParams params = new BasicHttpParams();
-        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-        HttpProtocolParams.setContentCharset(params, "utf-8");
+		HttpParams params = new BasicHttpParams();
+		HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+		HttpProtocolParams.setContentCharset(params, "utf-8");
 		HttpConnectionParams.setConnectionTimeout(params, HTTP_TIMEOUT);
 		HttpConnectionParams.setSoTimeout(params, HTTP_TIMEOUT);
-        params.setBooleanParameter("http.protocol.expect-continue", false);
- 
-        //registers schemes for both http and https
-        SchemeRegistry registry = new SchemeRegistry();
-        registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        final SSLSocketFactory sslSocketFactory = SSLSocketFactory.getSocketFactory();
-//        sslSocketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-        sslSocketFactory.setHostnameVerifier(SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
-//        sslSocketFactory.setHostnameVerifier(new X509HostnameVerifier() {
-//			
-//			@Override
-//			public void verify(String host, String[] cns, String[] subjectAlts) throws SSLException {
-//				Log.e("debug", "Validating [1] " + host + ": " + Arrays.toString(cns) + " * " + Arrays.toString(subjectAlts));
-//			}
-//			
-//			@Override
-//			public void verify(String host, X509Certificate cert) throws SSLException {
-//				Log.e("debug", "Validating [2] " + host + ": " + cert.toString());
-//			}
-//			
-//			@Override
-//			public void verify(String host, SSLSocket ssl) throws IOException {
-//				Log.e("debug", "Validating [3] " + host + ": " + ssl.toString());
-//			}
-//			
-//			@Override
-//			public boolean verify(String host, SSLSession session) {
-//				Log.e("debug", "Validating [4] " + host + ": " + session.toString());
-//				return true;
-//			}
-//		});
-        registry.register(new Scheme("https", sslSocketFactory, 443));
- 
-        ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager(params, registry);
-        return new DefaultHttpClient(manager, params);
+		params.setBooleanParameter("http.protocol.expect-continue", false);
+
+		// registers schemes for both http and https
+		SchemeRegistry registry = new SchemeRegistry();
+		registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+		final SSLSocketFactory sslSocketFactory = SSLSocketFactory.getSocketFactory();
+		// sslSocketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+		sslSocketFactory.setHostnameVerifier(SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+		// sslSocketFactory.setHostnameVerifier(new X509HostnameVerifier() {
+		//
+		// @Override
+		// public void verify(String host, String[] cns, String[] subjectAlts) throws SSLException {
+		// Log.e("debug", "Validating [1] " + host + ": " + Arrays.toString(cns) + " * " +
+		// Arrays.toString(subjectAlts));
+		// }
+		//
+		// @Override
+		// public void verify(String host, X509Certificate cert) throws SSLException {
+		// Log.e("debug", "Validating [2] " + host + ": " + cert.toString());
+		// }
+		//
+		// @Override
+		// public void verify(String host, SSLSocket ssl) throws IOException {
+		// Log.e("debug", "Validating [3] " + host + ": " + ssl.toString());
+		// }
+		//
+		// @Override
+		// public boolean verify(String host, SSLSession session) {
+		// Log.e("debug", "Validating [4] " + host + ": " + session.toString());
+		// return true;
+		// }
+		// });
+		registry.register(new Scheme("https", sslSocketFactory, 443));
+
+		ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager(params, registry);
+		return new DefaultHttpClient(manager, params);
 	}
 
 	private static void handleResponse(HttpRequestBase request, HttpResponse response) {
@@ -336,6 +343,14 @@ public class RestClient {
 			case 200:
 			// This is an ok status
 			break;
+			case 400:
+				try {
+					message = readResponse(response);
+				}
+				catch (IOException e) {}
+				Log.w(XCS.LOG.COMMUNICATE, "Server said warning '" + request.getURI().toString() + "': " + message
+						+ ".");
+				throw new DataException(DataException.Code.NOT_HANDLED, request.getURI());
 			case 403:
 				Log.w(XCS.LOG.COMMUNICATE, "Not authenticated for URL '" + request.getURI().toString() + "'.");
 				throw new DataException(DataException.Code.NOT_ALLOWED, request.getURI());

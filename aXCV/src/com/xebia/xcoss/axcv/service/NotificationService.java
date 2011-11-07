@@ -246,6 +246,7 @@ public class NotificationService extends Service {
 		ArrayList<String> sessionIds = bundle.getStringArrayList(TAG_TRACKED);
 		if (sessionIds != null) {
 			for (String sessionId : sessionIds) {
+				Log.w("debug", "Change [1] on " + sessionId);
 				String title = "Track change!";
 				String message = getSessionChange(sessionId);
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
@@ -267,6 +268,7 @@ public class NotificationService extends Service {
 		sessionIds = bundle.getStringArrayList(TAG_OWNED);
 		if (sessionIds != null) {
 			for (String sessionId : sessionIds) {
+				Log.w("debug", "Change [2] on " + sessionId);
 				String title = "Session change!";
 				String message = getSessionChange(sessionId);
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();

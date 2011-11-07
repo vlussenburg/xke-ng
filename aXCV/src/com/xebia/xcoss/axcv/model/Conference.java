@@ -16,7 +16,6 @@ import com.google.gson.annotations.SerializedName;
 import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
-import com.xebia.xcoss.axcv.model.Moment.FixedMoment;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.model.util.TimeSlotComparator;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
@@ -31,6 +30,11 @@ public class Conference implements Serializable {
 		public Moment start;
 		public Moment end;
 		public Location location;
+		
+		@Override
+		public String toString() {
+			return "TS ["+location+" "+ (start==null?"?":start.getHour()+":"+start.getMinute()) + " -> " + (end==null?"?":end.getHour()+":"+end.getMinute()) +"]";
+		}
 	}
 
 	private static final long serialVersionUID = 2L;
@@ -297,7 +301,7 @@ public class Conference implements Serializable {
 				// But we do not know how much...
 			} else {
 				// start is before this session or the same time
-				long space = session.getStartTime().asMinutes() - start.asMinutes();
+				long space = start.asMinutes() - session.getStartTime().asMinutes();
 				return (space >= length);
 			}
 		}
@@ -372,11 +376,13 @@ public class Conference implements Serializable {
 		int length = duration < TimeSlot.MIN_LENGTH ? TimeSlot.LENGTH : duration;
 		Moment start = startTime;
 		while ((t = getNextAvailableTimeSlot(null, start, length, firstLocation)) != null) {
+			Log.i("debug", "Available: " + t);
 			// Check the remainder of the locations for this slot
 			boolean availableOnAllLocations = true;
 			for (int i = 1; i < allLocations.length; i++) {
-				availableOnAllLocations = availableOnAllLocations
-						&& isTimeSlotAvailable(start, length, allLocations[i]);
+				boolean slotAvailable = isTimeSlotAvailable(start, length, allLocations[i]);
+				Log.i("debug", "  On '"+allLocations[i]+"' : " + slotAvailable);
+				availableOnAllLocations = availableOnAllLocations && slotAvailable;
 			}
 			if (availableOnAllLocations) {
 				list.add(t);
