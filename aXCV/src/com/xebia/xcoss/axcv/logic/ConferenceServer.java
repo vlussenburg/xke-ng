@@ -7,6 +7,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
@@ -24,6 +26,7 @@ import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.util.ConferenceComparator;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
+import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class ConferenceServer {
@@ -34,11 +37,10 @@ public class ConferenceServer {
 	private static final String AUTHOR_LABEL_CACHE_KEY = "aulblcache--";
 	private static final String REMARK_CACHE_KEY = "remarkcache--";
 
-	private String baseUrl;
-	private String token;
-
 	private static ConferenceServer instance;
 
+	private String baseUrl;
+	private String token;
 	private DataCache conferenceCache;
 
 	public static ConferenceServer getInstance() {
@@ -53,12 +55,21 @@ public class ConferenceServer {
 	}
 
 	protected ConferenceServer(String base, Context ctx) {
-		this.baseUrl = base;
-		// TODO Make configurable
-		// this.conferenceCache = new DatabaseCache(ctx);
-		// this.conferenceCache = new NoCache(ctx);
-		this.conferenceCache = new MemoryCache(ctx);
-		this.conferenceCache.init();
+		baseUrl = base;
+		String type = "?";
+		try {
+			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+			type = sp.getString(XCS.PREF.CACHETYPE, null);
+			if ( type == null ) {
+				type = DataCache.Type.Memory.name();
+				sp.edit().putString(XCS.PREF.CACHETYPE, type).commit();
+			}
+			conferenceCache = DataCache.Type.valueOf(type).newInstance(ctx);
+		} catch (Exception e) {
+			Log.w(XCS.LOG.PROPERTIES, "Cannot instantiate cache of type " + type + ": " + StringUtil.getExceptionMessage(e));
+			conferenceCache = new MemoryCache(ctx);
+		}
+		conferenceCache.init();
 	}
 
 	public void login(String user, String password) {

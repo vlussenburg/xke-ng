@@ -74,5 +74,6 @@ public class XCS {
 		public static final String NOTIFYOWNED = "NotifyOwned";
 		public static final String DATEFORMAT = "DateFormat";
 		public static final String TIMEFORMAT = "TimeFormat";
+		public static final String CACHETYPE = "CacheType";
 	}
 }

@@ -1,5 +1,6 @@
 package com.xebia.xcoss.axcv.logic.cache;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,19 @@ import com.xebia.xcoss.axcv.util.XCS;
 public abstract class DataCache {
 	protected static final long CACHETIME = 30 * 60 * 1000;
 
+	public enum Type {
+		Memory (MemoryCache.class), Database (DatabaseCache.class), None (NoCache.class);
+		
+		private Class<?> clazz;
+
+		Type(Class<?> clz) {
+			this.clazz = clz;
+		}
+
+		public DataCache newInstance(Context ctx) throws Exception {
+			return (DataCache) clazz.getConstructor(Context.class).newInstance(ctx);
+		}
+	}
 	public DataCache(Context ctx) {
 	}
 

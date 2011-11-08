@@ -1,6 +1,8 @@
 IN PROGRESS
 -------------------------------------------------------------------
 
+-	Offline support
+
 TODO
 -------------------------------------------------------------------
 client
@@ -14,7 +16,6 @@ client
 later op de client
 -	Verbeteren van caching
 -	Caching: refresh na conference edit/add break (reopen view...)
--	Offline support
 -	Conference edit alleen door organiser (?)
 
 server

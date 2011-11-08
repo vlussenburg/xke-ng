@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:key="xcvpreferences"
-	>
-	<PreferenceCategory
-		android:title="Account">
+	android:key="xcvpreferences">
+	<PreferenceCategory android:title="Account">
 		<com.xebia.xcoss.axcv.preference.EditTextPreference
 			android:dialogTitle="Enter username"
 			android:dialogMessage="Specify your account name"
@@ -20,9 +18,8 @@
 			android:title="Password"
 			android:singleLine="true"
 			android:summary="None set" />
-   	</PreferenceCategory>
-	<PreferenceCategory
-		android:title="Preferences">
+	</PreferenceCategory>
+	<PreferenceCategory android:title="Preferences">
 		<CheckBoxPreference
 			android:key="Upcoming"
 			android:title="Open conference"
@@ -51,24 +48,22 @@
 			android:summary="(default)"
 			android:singleLine="true"
 			android:defaultValue="HH:mm'u'" />
-<!-- 		<ListPreference
+		<ListPreference
 			android:title="Caching"
 			android:summary="Which caching policy?"
-			android:key="DateFormat"
+			android:key="CacheType"
 			android:defaultValue="1"
 			android:entries="@array/cacheClassNames"
 			android:entryValues="@array/cacheNames" />
- -->	</PreferenceCategory>
-	<PreferenceCategory
-		android:title="Notification">
+	</PreferenceCategory>
+	<PreferenceCategory android:title="Notification">
 		<RingtonePreference
 			android:ringtoneType="all"
 			android:key="NotificationSound"
 			android:title="Notification sound"
 			android:showDefault="true"
 			android:showSilent="true"
-			android:summary="Sound used for notification"
-		/>
+			android:summary="Sound used for notification" />
 		<com.xebia.xcoss.axcv.preference.CheckBoxPreference
 			signalRetriever=".service.NotificationServiceManager"
 			android:key="NotifyOwned"
@@ -87,15 +82,15 @@
 	<PreferenceCategory android:title="About">
 		<Preference
 			android:key="ApplicationName"
-			android:title="Xebia Conference Viewer"/>
+			android:title="Xebia Conference Viewer" />
 		<Preference
 			android:key="ApplicationVersion"
 			android:title="Version"
-			android:summary="0.4"/>
+			android:summary="0.4" />
 		<com.xebia.xcoss.axcv.preference.LinkPreference
 			url="http://www.xebiamobile.com/"
 			android:key="ApplicationHelp"
 			android:title="Show tutorial"
-			android:summary="Online tutorial on xebia.com"/>
+			android:summary="Online tutorial on xebia.com" />
 	</PreferenceCategory>
 </PreferenceScreen>
