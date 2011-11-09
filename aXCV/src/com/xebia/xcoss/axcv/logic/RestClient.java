@@ -253,7 +253,7 @@ public class RestClient {
 			handleResponse(request, response);
 
 			String result = readResponse(response);
-			Log.i(XCS.LOG.COMMUNICATE, "Read: " + result);
+//			Log.i(XCS.LOG.COMMUNICATE, "Read: " + result);
 			return new StringReader(result);
 		}
 		catch (SocketTimeoutException e) {
