@@ -23,10 +23,11 @@
 	<string name="empty_value">&lt;specify value&gt;</string>
 	<string name="default_input_text">&lt;start typing&gt;</string>
 	<string name="my_track_title">My track list</string>
-	<string name="context_menu_author_title">Author</string>
 	<string name="context_menu_author_view">View author</string>
 	<string name="context_menu_author_remove">Remove author</string>
 	<string name="context_menu_label_remove">Remove label</string>
+	<string name="context_menu_session_edit">Edit</string>
+	<string name="context_menu_session_view">View</string>
 	<string name="sizeLabel">Room size</string>
 	<string name="newLocationLabel">Location name</string>
 	<string name="breakLabel">Break</string>

@@ -204,7 +204,7 @@ public class ConferenceServer {
 		return result;
 	}
 
-	public Session getSession(String id) {
+	public Session getSession(String id, String cid) {
 		Session result = conferenceCache.getSession(id);
 		if (result == null) {
 			StringBuilder requestUrl = new StringBuilder();
@@ -213,7 +213,10 @@ public class ConferenceServer {
 			requestUrl.append(id);
 
 			result = RestClient.loadObject(requestUrl.toString(), Session.class, token);
-			// Not added to the cache, since we do not know the conference ID
+			if ( cid != null) {
+				result.setConferenceId(cid);
+				conferenceCache.add(cid, result);
+			}
 		}
 		return result;
 	}

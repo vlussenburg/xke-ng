@@ -1,5 +1,7 @@
 package com.xebia.xcoss.axcv.model;
 
+import java.io.Serializable;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
@@ -9,7 +11,7 @@ import android.util.Log;
 
 import com.xebia.xcoss.axcv.util.XCS;
 
-public class Moment {
+public class Moment implements Serializable {
 	private Integer year;
 	private Integer month;
 	private Integer day;

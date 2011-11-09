@@ -211,7 +211,7 @@ public class NotificationService extends Service {
 			pm.openConnection();
 			Trackable[] ids = pm.getMarkedSessions(getUser());
 			for (int i = 0; i < ids.length; i++) {
-				Session session = server.getSession(ids[i].sessionId);
+				Session session = server.getSession(ids[i].sessionId, ids[i].conferenceId);
 				long modificationHash = session.getModificationHash();
 				if (!session.isExpired() && ids[i].hash != modificationHash) {
 					ids[i].hash = modificationHash;
@@ -289,7 +289,7 @@ public class NotificationService extends Service {
 
 	private String getSessionChange(String id) {
 		try {
-			Session session = ConferenceServer.getInstance().getSession(id);
+			Session session = ConferenceServer.getInstance().getSession(id, null);
 			if (session == null) {
 				return "A session has been deleted";
 			}

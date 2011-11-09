@@ -184,9 +184,9 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public Session getSession(String id) {
+	public Session getSession(String id, String cid) {
 		try {
-			return super.getSession(id);
+			return super.getSession(id, cid);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "get session", e);

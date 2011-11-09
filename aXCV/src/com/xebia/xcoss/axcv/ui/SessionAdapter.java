@@ -1,11 +1,18 @@
 package com.xebia.xcoss.axcv.ui;
 
 import android.content.Intent;
+import android.text.TextPaint;
+import android.text.TextUtils;
+import android.text.TextUtils.TruncateAt;
 import android.text.util.Linkify;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnCreateContextMenuListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,6 +32,7 @@ public class SessionAdapter extends BaseAdapter {
 	private Session[] data;
 	private ScreenTimeUtil timeUtil;
 	private boolean includeDate = false;
+	private boolean includeMenu = true;
 
 	public SessionAdapter(BaseActivity context, int viewResourceId, int altViewResourceId, Session[] data) {
 		this.ctx = context;
@@ -43,15 +51,25 @@ public class SessionAdapter extends BaseAdapter {
 		} else if (session.isRunning()) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemactive);
 		}
-		return session.isMandatory() ? 
-				constructMandatoryView(parent, session, colorId) : 
-				constructSessionView(parent, session, colorId);
+		return session.isMandatory() ? constructMandatoryView(parent, session, colorId, paramInt)
+				: constructSessionView(parent, session, colorId, paramInt);
 	}
 
-	private View constructSessionView(ViewGroup parent, final Session session, int colorId) {
+	private View constructSessionView(ViewGroup parent, final Session session, int colorId, final int position) {
 
 		LayoutInflater inflater = ctx.getLayoutInflater();
 		View row = inflater.inflate(viewResource, parent, false);
+		if (includeMenu) {
+			row.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
+				@Override
+				public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+					menu.setHeaderTitle(session.getTitle());
+					menu.add(position, R.id.edit, Menu.NONE, R.string.context_menu_session_edit);
+					menu.add(position, R.id.view, Menu.NONE, R.string.context_menu_session_view);
+					// menu.add(position, R.id.delete, Menu.NONE, R.string.context_menu_session_delete);
+				}
+			});
+		}
 
 		TextView titleView = (TextView) row.findViewById(R.id.ses_title);
 		TextView authorView = (TextView) row.findViewById(R.id.ses_author);
@@ -106,10 +124,21 @@ public class SessionAdapter extends BaseAdapter {
 		return row;
 	}
 
-	private View constructMandatoryView(ViewGroup parent, Session session, int colorId) {
+	private View constructMandatoryView(ViewGroup parent, final Session session, int colorId, final int position) {
 
 		LayoutInflater inflater = ctx.getLayoutInflater();
 		View row = inflater.inflate(alternativeViewResource, parent, false);
+		if (includeMenu) {
+			row.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
+				@Override
+				public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+					menu.setHeaderTitle(session.getTitle());
+					menu.add(position, R.id.edit, Menu.NONE, R.string.context_menu_session_edit);
+					menu.add(position, R.id.view, Menu.NONE, R.string.context_menu_session_view);
+					// menu.add(position, R.id.delete, Menu.NONE, R.string.context_menu_session_delete);
+				}
+			});
+		}
 
 		TextView titleView = (TextView) row.findViewById(R.id.ses_title);
 		TextView locDateView = (TextView) row.findViewById(R.id.ses_locdate);
@@ -161,5 +190,9 @@ public class SessionAdapter extends BaseAdapter {
 
 	public void setIncludeDate(boolean state) {
 		includeDate = state;
+	}
+
+	public void setIncludeMenu(boolean includeMenu) {
+		this.includeMenu = includeMenu;
 	}
 }

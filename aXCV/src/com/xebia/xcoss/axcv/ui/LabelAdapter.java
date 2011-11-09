@@ -29,14 +29,14 @@ public class LabelAdapter extends BaseAdapter {
 	
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
-		String label = (String) getItem(position);
+		final String label = (String) getItem(position);
 		LayoutInflater inflater = ctx.getLayoutInflater();
 		View row = inflater.inflate(viewResource, parent, false);
 		TextView titleView = (TextView) row.findViewById(R.id.author_name);
-		titleView.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
+		row.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
 			@Override
 			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-				createContextMenu(menu, v, menuInfo, position);
+				createContextMenu(menu, v, menuInfo, position, label);
 			}
 		});
 		titleView.setText(label);
@@ -44,7 +44,8 @@ public class LabelAdapter extends BaseAdapter {
 	}
 	
 	
-	protected void createContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo, int position) {
+	protected void createContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo, int position, String label) {
+		menu.setHeaderTitle(label);
 		menu.add(position, R.id.remove, Menu.NONE, R.string.context_menu_label_remove);
 	}
 

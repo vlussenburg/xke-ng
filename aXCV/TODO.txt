@@ -2,16 +2,18 @@ IN PROGRESS
 -------------------------------------------------------------------
 
 -	Offline support
+-	Acties vanuit Tracklist werken niet altijd (afh. current conference)
 
 TODO
 -------------------------------------------------------------------
 client
--	Bugfix menu popup labels/authors (Rogier)
--	Menu op longclick op sessie adapter en conference adapter
+-	Menu op longclick op conference adapter
+-	Conferenties verdwijnen uit lijst...
+-	Lijst (conferenties) scrollt niet terug naar eerste item (blijft hangen) Tracklist/Sessionlist wel ok.
 -	Https connectie
 -	Timeouts on retrieving labels & authors should be handled in a notification!
 -	Uitzoeken hoe encryption werkt (want lukt nog niet bij mij...)
-•	Als er een exception optreedt krijg je nu keurig een 400 met bijhorende reason (geen json btw volgens het web is een textuele beschrijving de standaard)
+-	Afhandeling 400 meldingen
 
 later op de client
 -	Verbeteren van caching
@@ -19,10 +21,11 @@ later op de client
 -	Conference edit alleen door organiser (?)
 
 server
+-	Https connectie
 -	Session scheduling
 -	403 on session expiration
 -	Verwijderen van locaties (Urs; not supported now)
--	Error handling (/error URL does not work - no auth wanted)
+-	Error handling (/error URL geeft 400 zonder verdere melding)
 -	Nieuwe datum conferentie leidt niet tot nieuwe datum sessies (wordt wel gestuurd)
 
 DONE
@@ -36,3 +39,5 @@ DONE
 -	Breaks inplannen over alle locaties
 -	Number of available slots not correct.
 -	Notificaties weer werkend maken
+-	Context menu in session list view (view/edit)
+-	Bugfix menu popup labels/authors (Rogier)

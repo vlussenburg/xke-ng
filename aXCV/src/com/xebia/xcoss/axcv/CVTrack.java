@@ -3,15 +3,19 @@ package com.xebia.xcoss.axcv;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
+import com.xebia.xcoss.axcv.logic.ProfileManager.Trackable;
+import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.ui.SessionAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -29,21 +33,29 @@ public class CVTrack extends BaseActivity {
 		sessionList.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
-				markSession(sessions[paramInt], view, true);
+				switchTo(paramInt);
 			}
 		});
 		super.onCreate(savedInstanceState);
+	}
+
+	private void switchTo(int sessionIndex) {
+		Session session = sessions[sessionIndex];
+		Intent intent = new Intent(this, CVSessionView.class);
+		intent.putExtra(BaseActivity.IA_CONFERENCE, session.getConferenceId());
+		intent.putExtra(BaseActivity.IA_SESSION, session.getId());
+		startActivity(intent);
 	}
 
 	@Override
 	protected void onResume() {
 		List<Session> selectedSessions = new ArrayList<Session>();
 		ConferenceServer server = getConferenceServer();
-		String[] markedSessions = getProfileManager().getMarkedSessionIds(getUser());
+		Trackable[] markedSessions = getProfileManager().getMarkedSessions(getUser());
 		boolean hasExpiredSession = false;
-		for (String id : markedSessions) {
+		for (Trackable id : markedSessions) {
 			try {
-				Session session = server.getSession(id);
+				Session session = server.getSession(id.sessionId, id.conferenceId);
 				if (session != null) {
 					if (session.isExpired()) {
 						hasExpiredSession = true;
@@ -62,6 +74,7 @@ public class CVTrack extends BaseActivity {
 		sessions = selectedSessions.toArray(new Session[selectedSessions.size()]);
 		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, sessions);
 		adapter.setIncludeDate(true);
+		adapter.setIncludeMenu(false);
 		ListView sessionList = (ListView) findViewById(R.id.sessionList);
 		sessionList.setAdapter(adapter);
 		super.onResume();

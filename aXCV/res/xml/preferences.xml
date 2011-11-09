@@ -53,8 +53,8 @@
 			android:summary="Which caching policy?"
 			android:key="CacheType"
 			android:defaultValue="1"
-			android:entries="@array/cacheClassNames"
-			android:entryValues="@array/cacheNames" />
+			android:entries="@array/cacheNames"
+			android:entryValues="@array/cacheClassNames" />
 	</PreferenceCategory>
 	<PreferenceCategory android:title="Notification">
 		<RingtonePreference

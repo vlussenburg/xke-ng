@@ -82,7 +82,7 @@ public class CVConferences extends SwipeActivity {
 			@Override
 			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
 				// Adapter = listview, view = tablelayout.
-				Log.e(XCS.LOG.NAVIGATE, "Switching to " + conferences[paramInt].getTitle());
+				Log.v(XCS.LOG.NAVIGATE, "Switching to " + conferences[paramInt].getTitle());
 				switchTo(conferences[paramInt]);
 			}
 		});

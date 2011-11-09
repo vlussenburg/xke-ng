@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
@@ -89,5 +90,24 @@ public class CVSessionList extends SessionSwipeActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem menuItem) {
+		int position = menuItem.getGroupId();
+		
+		switch (menuItem.getItemId()) {
+			case R.id.view:
+				switchTo(getCurrentConference(), position);
+				return true;
+			case R.id.edit:
+				Intent intent = new Intent(this, CVSessionAdd.class);
+				intent.putExtra(BaseActivity.IA_CONFERENCE, getCurrentConference().getId());
+				intent.putExtra(BaseActivity.IA_SESSION, sessions[position].getId());
+				startActivity(intent);
+				return true;
+			default:
+				return super.onContextItemSelected(menuItem);
+		}		
 	}
 }
