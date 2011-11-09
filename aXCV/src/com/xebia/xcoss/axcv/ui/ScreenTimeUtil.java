@@ -23,6 +23,14 @@ public class ScreenTimeUtil {
 	}
 
 	public String getRelativeDate(Moment date) {
+		int year = date.getYearOffset();
+		if ( year == 1 ) {
+			return "Next year";
+		}
+		if ( year != 0 ) {
+			return "";
+		}
+		
 		int days = date.getDaysFromNow();
 		switch (days) {
 			case -7:

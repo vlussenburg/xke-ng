@@ -14,6 +14,7 @@ client
 -	Timeouts on retrieving labels & authors should be handled in a notification!
 -	Uitzoeken hoe encryption werkt (want lukt nog niet bij mij...)
 -	Afhandeling 400 meldingen
+-	Auto close after radio button selection
 
 later op de client
 -	Verbeteren van caching

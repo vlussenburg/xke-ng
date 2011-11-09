@@ -169,6 +169,12 @@ public class Moment implements Serializable {
 		return yearDiff*365 + daysDiff;
 	}
 
+	public int getYearOffset() {
+		DateTime now = DateTime.now();
+		DateTime ths = getDate();
+		return ths.getYear() - now.getYear();
+	}
+	
 	public static Moment fromString(String timeValue) {
 		DateTime dt = DateTime.parse(timeValue);
 		DateTime dtLocal = dt.withZone(DateTimeZone.getDefault());

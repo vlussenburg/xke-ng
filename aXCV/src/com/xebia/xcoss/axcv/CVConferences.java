@@ -21,21 +21,25 @@ import com.xebia.xcoss.axcv.ui.ConferenceAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
 
 /**
- * <p>Shows the conferences of a specific year.</p>
+ * <p>
+ * Shows the conferences of a specific year.
+ * </p>
  * <p>
  * The parameters used are:
  * <ul>
  * <li>IA_CONF_YEAR - Year to display (yyyy); defaults to the current year.
  * <li>IA_REDIRECT - Boolean indicating to progress directly to the upcoming conference. Must be enabled in preferences
- * </ul></p>
+ * </ul>
+ * </p>
  * 
  * @author Michael
  */
 public class CVConferences extends SwipeActivity {
 
 	private int shownYear;
+	private Conference[] conferences;
 
-	/** 
+	/**
 	 * Called when the activity is first created.
 	 * Builds up the screen and loads the conferences for a certain year (not refreshed until
 	 * the activity is newly created.
@@ -45,7 +49,7 @@ public class CVConferences extends SwipeActivity {
 		setContentView(R.layout.conferences);
 		super.onCreate(savedInstanceState);
 		addGestureDetection(R.id.conferencesSwipeBase);
-		
+
 		shownYear = getIntent().getIntExtra(IA_CONF_YEAR, new Moment().getYear());
 
 		// Check for redirection. Not the case if menu option is used.
@@ -59,6 +63,15 @@ public class CVConferences extends SwipeActivity {
 
 		TextView title = (TextView) findViewById(R.id.conferencesTitle);
 		title.setText(title.getText() + " " + shownYear);
+
+		ListView conferencesList = (ListView) findViewById(R.id.conferencesList);
+		conferencesList.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
+				// Adapter = listview, view = tablelayout.
+				switchTo(paramInt);
+			}
+		});
 	}
 
 	@Override
@@ -67,10 +80,10 @@ public class CVConferences extends SwipeActivity {
 		Conference upcomingConference = getConferenceServer().getUpcomingConference();
 		int position = 0;
 		int idx = 0;
-		final Conference[] conferences = new Conference[list.size()];
+		conferences = new Conference[list.size()];
 		for (Conference conference : list) {
 			conferences[idx] = conference;
-			if ( conference.equals(upcomingConference)) {
+			if (conference.equals(upcomingConference)) {
 				position = idx;
 			}
 			idx++;
@@ -78,16 +91,12 @@ public class CVConferences extends SwipeActivity {
 		ConferenceAdapter adapter = new ConferenceAdapter(this, R.layout.conference_item, conferences);
 		ListView conferencesList = (ListView) findViewById(R.id.conferencesList);
 		conferencesList.setAdapter(adapter);
-		conferencesList.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
-				// Adapter = listview, view = tablelayout.
-				Log.v(XCS.LOG.NAVIGATE, "Switching to " + conferences[paramInt].getTitle());
-				switchTo(conferences[paramInt]);
-			}
-		});
 		conferencesList.setSelection(position);
 		super.onResume();
+	}
+
+	private void switchTo(int index) {
+		switchTo(conferences[index]);
 	}
 
 	private void switchTo(Conference conference) {
