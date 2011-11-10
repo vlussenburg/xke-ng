@@ -373,6 +373,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 			database.delete(CACHE_TABLE, CACHE_QUERY, whereArgs);
 		}
 		catch (Exception e) {
+			// TODO Got message database not started....
 			Log.w(XCS.LOG.COMMUNICATE, "Delete failed: " + StringUtil.getExceptionMessage(e));
 		}
 	}

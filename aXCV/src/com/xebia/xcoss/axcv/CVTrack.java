@@ -1,13 +1,12 @@
 package com.xebia.xcoss.axcv;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.TreeSet;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -15,8 +14,8 @@ import android.widget.ListView;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.logic.ProfileManager.Trackable;
-import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.ui.SessionAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -49,7 +48,7 @@ public class CVTrack extends BaseActivity {
 
 	@Override
 	protected void onResume() {
-		List<Session> selectedSessions = new ArrayList<Session>();
+		TreeSet<Session> selectedSessions = new TreeSet<Session>(new SessionComparator());
 		ConferenceServer server = getConferenceServer();
 		Trackable[] markedSessions = getProfileManager().getMarkedSessions(getUser());
 		boolean hasExpiredSession = false;
