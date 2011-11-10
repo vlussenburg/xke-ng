@@ -13,12 +13,14 @@ import com.xebia.xcoss.axcv.util.XCS;
 
 public class ScreenTimeUtil {
 
+	private DateTimeFormatter dateShortFormat;
 	private DateTimeFormatter dateFormat;
 	private DateTimeFormatter timeFormat;
 
 	public ScreenTimeUtil(Activity ctx) {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
 		this.dateFormat = DateTimeFormat.forPattern(sp.getString(XCS.PREF.DATEFORMAT, "d MMMM yyyy"));
+		this.dateShortFormat = DateTimeFormat.forPattern("d/MM/yy");
 		this.timeFormat = DateTimeFormat.forPattern(sp.getString(XCS.PREF.TIMEFORMAT, "HH:mm'u'"));
 	}
 
@@ -56,6 +58,10 @@ public class ScreenTimeUtil {
 		return "In " + days / 7 + " weeks";
 	}
 
+	public String getAbsoluteShortDate(Moment date) {
+		return dateShortFormat.print(new DateTime(date.getYear(), date.getMonth(), date.getDay(), 0, 0));
+	}
+
 	public String getAbsoluteDate(Moment date) {
 		return dateFormat.print(new DateTime(date.getYear(), date.getMonth(), date.getDay(), 0, 0));
 	}
@@ -68,4 +74,5 @@ public class ScreenTimeUtil {
 		DateTime date = timeFormat.parseDateTime(value);
 		return new Moment(date.getHourOfDay(), date.getMinuteOfHour());
 	}
+
 }

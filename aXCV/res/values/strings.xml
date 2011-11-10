@@ -42,4 +42,6 @@
 		<item>Database</item>
 		<item>None</item>
 	</string-array>
+	<string name="cancel_button">Cancel</string>
+	<string name="close_button">Close</string>
 </resources>

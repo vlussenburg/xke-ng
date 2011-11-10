@@ -64,6 +64,7 @@ public class ConferenceServer {
 				type = DataCache.Type.Memory.name();
 				sp.edit().putString(XCS.PREF.CACHETYPE, type).commit();
 			}
+			Log.i(XCS.LOG.PROPERTIES, "Using cache type: " + type);
 			conferenceCache = DataCache.Type.valueOf(type).newInstance(ctx);
 		} catch (Exception e) {
 			Log.w(XCS.LOG.PROPERTIES, "Cannot instantiate cache of type " + type + ": " + StringUtil.getExceptionMessage(e));

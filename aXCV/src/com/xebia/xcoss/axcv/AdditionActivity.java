@@ -68,6 +68,7 @@ public abstract class AdditionActivity extends BaseActivity implements OnCancelL
 		private int field;
 		private Object[] items;
 		private AdditionActivity activity;
+		private boolean closeOnSelection = true;
 
 		public DialogHandler(AdditionActivity activity, Object[] items, int field) {
 			this.activity = activity;
@@ -82,6 +83,13 @@ public abstract class AdditionActivity extends BaseActivity implements OnCancelL
 		@Override
 		public void onClick(DialogInterface dialog, int item, boolean state) {
 			activity.updateField(field, items[item], state);
+			if ( closeOnSelection ) {
+				dialog.dismiss();
+			}
+		}
+		
+		public void setCloseOnSelection(boolean closeOnSelection) {
+			this.closeOnSelection = closeOnSelection;
 		}
 	}
 

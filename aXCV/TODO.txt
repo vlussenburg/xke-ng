@@ -3,6 +3,7 @@ IN PROGRESS
 
 -	Offline support
 -	Error handling (check server, 6:55)
+- 	Fix menu popups in conference add/edit
 
 TODO
 -------------------------------------------------------------------
@@ -13,7 +14,7 @@ client
 -	Timeouts on retrieving labels & authors should be handled in a notification!
 -	Uitzoeken hoe encryption werkt (want lukt nog niet bij mij...)
 -	Afhandeling 400 meldingen
--	Auto close after radio button selection
+-	Use cache on startup process
 
 later op de client
 -	Verbeteren van caching
@@ -42,3 +43,6 @@ DONE
 -	Notificaties weer werkend maken
 -	Bugfix menu popup labels/authors (Rogier)
 -	Acties vanuit Tracklist werken niet altijd (afh. current conference)
+-	Sorting in tracklist
+- 	Fix menu popups in session add/edit
+

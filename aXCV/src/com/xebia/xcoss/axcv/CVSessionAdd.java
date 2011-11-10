@@ -44,12 +44,20 @@ public class CVSessionAdd extends AdditionActivity {
 	private Session session;
 	private Session originalSession;
 	private boolean create = false;
+	private DialogInterface.OnClickListener cancelClickListener;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {	
 		setContentView(R.layout.add_session);
 		this.timeFormatter = new ScreenTimeUtil(this);
+
+		cancelClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		};
 
 		conference = getConference();
 		originalSession = getSelectedSession(conference);
@@ -191,11 +199,7 @@ public class CVSessionAdd extends AdditionActivity {
 					builder.setTitle("Delete session");
 					builder.setMessage(message.toString());
 					builder.setIcon(android.R.drawable.ic_dialog_alert);
-					builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							dialog.dismiss();
-						}
-					});
+					builder.setPositiveButton(R.string.cancel_button, cancelClickListener);
 					builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
 							conference.deleteSession(originalSession);
@@ -354,10 +358,12 @@ public class CVSessionAdd extends AdditionActivity {
 				Identifiable[] data = new Identifiable[list.size()];
 				idx = 0;
 				for (Conference conference : list) {
-					data[idx++] = new Identifiable(conference.getTitle(), conference.getId());
+					String title = conference.getTitle() + " (" + timeFormatter.getAbsoluteShortDate(conference.getStartTime()) + ")";
+					data[idx++] = new Identifiable(title, conference.getId());
 				}
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Pick a conference");
+				builder.setNegativeButton(R.string.cancel_button, cancelClickListener);
 				builder.setItems(Identifiable.stringValue(data), new DialogHandler(this, data, R.id.conferenceName));
 				dialog = builder.create();
 			break;
@@ -382,6 +388,7 @@ public class CVSessionAdd extends AdditionActivity {
 					}
 					builder.setItems(items, new DialogHandler(this, slots, R.id.sessionStart));
 				}
+				builder.setNegativeButton(R.string.cancel_button, cancelClickListener);
 				dialog = builder.create();
 				dialog.setOnCancelListener(this);
 				dialog.setOnDismissListener(this);
@@ -391,14 +398,17 @@ public class CVSessionAdd extends AdditionActivity {
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Pick a duration");
 				builder.setItems(items, new DialogHandler(this, items, R.id.sessionDuration));
+				builder.setNegativeButton(R.string.cancel_button, cancelClickListener);
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.INPUT_LANGUAGE:
 				items = new String[] { "Dutch", "English", "French", "Hindi" };
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Select languages");
-				builder.setMultiChoiceItems(items, new boolean[items.length], new DialogHandler(this, items,
-						R.id.sessionLanguage));
+				DialogHandler msdhandler = new DialogHandler(this, items, R.id.sessionLanguage);
+				msdhandler.setCloseOnSelection(false);
+				builder.setMultiChoiceItems(items, new boolean[items.length], msdhandler);
+				builder.setPositiveButton(R.string.close_button, cancelClickListener);
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.INPUT_LOCATION:
@@ -431,6 +441,7 @@ public class CVSessionAdd extends AdditionActivity {
 				builder.setTitle("Pick a type");
 				ListAdapter ta = new ArrayAdapter<Type>(this, R.layout.simple_list_item_single_choice, values);
 				builder.setSingleChoiceItems(ta, -1, new DialogHandler(this, values, R.id.sessionType));
+				builder.setNegativeButton(R.string.cancel_button, cancelClickListener);
 				dialog = builder.create();
 			break;
 		}

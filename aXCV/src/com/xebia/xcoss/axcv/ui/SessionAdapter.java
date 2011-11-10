@@ -138,17 +138,17 @@ public class SessionAdapter extends BaseAdapter {
 
 		LayoutInflater inflater = ctx.getLayoutInflater();
 		View row = inflater.inflate(alternativeViewResource, parent, false);
-		if (includeMenu) {
-			row.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
-				@Override
-				public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-					menu.setHeaderTitle(session.getTitle());
-					menu.add(position, R.id.edit, Menu.NONE, R.string.context_menu_session_edit);
-					menu.add(position, R.id.view, Menu.NONE, R.string.context_menu_session_view);
-					// menu.add(position, R.id.delete, Menu.NONE, R.string.context_menu_session_delete);
-				}
-			});
-		}
+//		if (includeMenu) {
+//			row.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
+//				@Override
+//				public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+//					menu.setHeaderTitle(session.getTitle());
+//					menu.add(position, R.id.edit, Menu.NONE, R.string.context_menu_session_edit);
+//					menu.add(position, R.id.view, Menu.NONE, R.string.context_menu_session_view);
+//					// menu.add(position, R.id.delete, Menu.NONE, R.string.context_menu_session_delete);
+//				}
+//			});
+//		}
 
 		TextView titleView = (TextView) row.findViewById(R.id.ses_title);
 		TextView locDateView = (TextView) row.findViewById(R.id.ses_locdate);
