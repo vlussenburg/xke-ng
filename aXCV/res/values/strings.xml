@@ -35,7 +35,7 @@
 	<string-array name="cacheNames">
 		<item>In memory</item>
 		<item>Store in database</item>
-		<item>Do not cache</item>
+		<item>Do not cache (purge)</item>
 	</string-array>
 	<string-array name="cacheClassNames">
 		<item>Memory</item>

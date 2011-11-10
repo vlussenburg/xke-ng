@@ -9,11 +9,11 @@ public class DataException extends CommException {
 	private Code code;
 	
 	public enum Code {
-		NOT_ALLOWED, NOT_FOUND, TIME_OUT, NOT_HANDLED
+		NOT_ALLOWED, NOT_FOUND, TIME_OUT, NOT_HANDLED, NO_NETWORK
 	}
 
 	public DataException(Code code, URI uri) {
-		super("Data " + code.name() + " on " + uri.toString());
+		super(code.name() + " on " + uri.toString());
 		this.code = code;
 	}
 
@@ -26,7 +26,7 @@ public class DataException extends CommException {
 	}
 
 	public boolean timedOut() {
-		return ( code == Code.TIME_OUT);
+		return ( code == Code.TIME_OUT || code == Code.NO_NETWORK);
 	}
 	
 }

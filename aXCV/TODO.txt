@@ -2,12 +2,11 @@ IN PROGRESS
 -------------------------------------------------------------------
 
 -	Offline support
--	Acties vanuit Tracklist werken niet altijd (afh. current conference)
+-	Error handling (check server, 6:55)
 
 TODO
 -------------------------------------------------------------------
 client
--	Menu op longclick op conference adapter
 -	Conferenties verdwijnen uit lijst...
 -	Lijst (conferenties) scrollt niet terug naar eerste item (blijft hangen) Tracklist/Sessionlist wel ok.
 -	Https connectie
@@ -20,6 +19,7 @@ later op de client
 -	Verbeteren van caching
 -	Caching: refresh na conference edit/add break (reopen view...)
 -	Conference edit alleen door organiser (?)
+-	Menu op longclick op conference en session adapter [click werkt niet meer]
 
 server
 -	Https connectie
@@ -40,5 +40,5 @@ DONE
 -	Breaks inplannen over alle locaties
 -	Number of available slots not correct.
 -	Notificaties weer werkend maken
--	Context menu in session list view (view/edit)
 -	Bugfix menu popup labels/authors (Rogier)
+-	Acties vanuit Tracklist werken niet altijd (afh. current conference)

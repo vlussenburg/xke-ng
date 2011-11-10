@@ -7,19 +7,10 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -30,12 +21,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -258,6 +247,9 @@ public class RestClient {
 		}
 		catch (SocketTimeoutException e) {
 			throw new DataException(Code.TIME_OUT, request.getURI());
+		}
+		catch (UnknownHostException e) {
+			throw new DataException(Code.NO_NETWORK, request.getURI());
 		}
 		catch (IOException e) {
 			throw new ServerException(e.getClass().getSimpleName() + ": " + request.getURI().toString(), e);

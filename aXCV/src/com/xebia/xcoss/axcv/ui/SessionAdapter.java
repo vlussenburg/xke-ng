@@ -16,6 +16,7 @@ import android.view.View.OnCreateContextMenuListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.CVSessionAdd;
@@ -59,17 +60,25 @@ public class SessionAdapter extends BaseAdapter {
 
 		LayoutInflater inflater = ctx.getLayoutInflater();
 		View row = inflater.inflate(viewResource, parent, false);
-		if (includeMenu) {
-			row.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
-				@Override
-				public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-					menu.setHeaderTitle(session.getTitle());
-					menu.add(position, R.id.edit, Menu.NONE, R.string.context_menu_session_edit);
-					menu.add(position, R.id.view, Menu.NONE, R.string.context_menu_session_view);
-					// menu.add(position, R.id.delete, Menu.NONE, R.string.context_menu_session_delete);
-				}
-			});
-		}
+//		if (includeMenu) {
+//			row.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
+//				@Override
+//				public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+//					menu.setHeaderTitle(session.getTitle());
+//					menu.add(position, R.id.edit, Menu.NONE, R.string.context_menu_session_edit);
+//					menu.add(position, R.id.view, Menu.NONE, R.string.context_menu_session_view);
+//					// menu.add(position, R.id.delete, Menu.NONE, R.string.context_menu_session_delete);
+//				}
+//			});
+//			row.setOnClickListener(new View.OnClickListener() {
+//				
+//				@Override
+//				public void onClick(View v) {
+//					Log.e("XCS", "Clicked on this item!");
+//					Toast.makeText(ctx, "Item Click", Toast.LENGTH_SHORT);
+//				}
+//			});
+//		}
 
 		TextView titleView = (TextView) row.findViewById(R.id.ses_title);
 		TextView authorView = (TextView) row.findViewById(R.id.ses_author);
@@ -109,6 +118,7 @@ public class SessionAdapter extends BaseAdapter {
 			button.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
+					Log.e("XCS", "Marking session: " + session.getTitle() + ":" + session.getConferenceId());
 					ctx.markSession(session, view, true);
 				}
 			});

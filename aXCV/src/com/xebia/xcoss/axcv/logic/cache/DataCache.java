@@ -1,6 +1,5 @@
 package com.xebia.xcoss.axcv.logic.cache;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 

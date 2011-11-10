@@ -41,6 +41,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 	private static final String CACHE_QUERY = CACHE_COL_KEY + " = ?";
 	private static final String CACHE_QUERY_TYPE = CACHE_COL_KEY + " like ? || '%'";
 	private static final String CACHE_QUERY_PRUNE = CACHE_COL_DATE + " < ?";
+	private static final String CACHE_QUERY_CLEAR = "";
 
 
 	public class Trackable {
@@ -392,5 +393,16 @@ public class ProfileManager extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase paramSQLiteDatabase, int paramInt1, int paramInt2) {
 		// Not supported for the first release.
+	}
+
+	public void removeAllCache() {
+		try {
+			checkConnection();
+			String[] whereArgs = new String[0];
+			database.delete(CACHE_TABLE, CACHE_QUERY_CLEAR, whereArgs);
+		}
+		catch (Exception e) {
+			Log.w(XCS.LOG.COMMUNICATE, "Delete failed: " + StringUtil.getExceptionMessage(e));
+		}
 	}
 }
