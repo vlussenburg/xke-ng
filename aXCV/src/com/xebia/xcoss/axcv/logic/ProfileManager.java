@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.util.DebugUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -43,7 +44,6 @@ public class ProfileManager extends SQLiteOpenHelper {
 	private static final String CACHE_QUERY_PRUNE = CACHE_COL_DATE + " < ?";
 	private static final String CACHE_QUERY_CLEAR = "";
 
-
 	public class Trackable {
 		public long hash;
 		public String sessionId;
@@ -58,21 +58,26 @@ public class ProfileManager extends SQLiteOpenHelper {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 
-	public void openConnection() {
+	public boolean openConnection() {
 		try {
 			if (database == null || !database.isOpen()) {
 				database = getWritableDatabase();
+				return true;
 			}
 		}
 		catch (Exception e) {
 			Log.w(XCS.LOG.COMMUNICATE, "Opening database failed: " + StringUtil.getExceptionMessage(e));
 			database = null;
 		}
+		return false;
 	}
 
 	public void closeConnection() {
 		try {
-			if (database != null) database.close();
+			if (database != null) {
+				database.close();
+				Log.i(XCS.LOG.COMMUNICATE, "Database closed.");
+			}
 			database = null;
 		}
 		catch (Exception e) {
@@ -83,7 +88,8 @@ public class ProfileManager extends SQLiteOpenHelper {
 
 	private void checkConnection() {
 		if (database == null) {
-			throw new SQLException("Database not started!");
+			String who = DebugUtil.whoCalledMe();
+			throw new SQLException("Database not started while doing "+who+"!");
 		}
 		if (!database.isOpen() || database.isReadOnly()) {
 			throw new SQLException("Database not open or readonly!");
@@ -130,7 +136,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 	}
 
 	public boolean markSession(String user, Session session) {
-		if ( StringUtil.isEmpty(user)) {
+		if (StringUtil.isEmpty(user)) {
 			return false;
 		}
 		Log.v(XCS.LOG.COMMUNICATE, "Marking session " + session.getId() + " for user " + user);
@@ -152,7 +158,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 	}
 
 	public boolean unmarkSession(String user, Session session) {
-		if ( StringUtil.isEmpty(user)) {
+		if (StringUtil.isEmpty(user)) {
 			return false;
 		}
 		Log.v(XCS.LOG.COMMUNICATE, "Unmarking session " + session.getId() + " for user " + user);
@@ -185,7 +191,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 	}
 
 	public boolean isMarked(String user, String sessionId) {
-		if ( StringUtil.isEmpty(user)) {
+		if (StringUtil.isEmpty(user)) {
 			return false;
 		}
 		Log.v(XCS.LOG.COMMUNICATE, "Check if marked " + sessionId + " for user " + user);
@@ -207,30 +213,30 @@ public class ProfileManager extends SQLiteOpenHelper {
 		}
 	}
 
-//	public Identifier[] getMarkedSessionIds(String user) {
-//		Log.v(XCS.LOG.COMMUNICATE, "Get all marked sessions for user " + user);
-//		try {
-//			checkConnection();
-//			String[] whereArgs = new String[1];
-//			whereArgs[0] = user;
-//			Cursor query = database.query(TRACK_TABLE, new String[] { SES_COL_SESSION, SES_COL_CONF }, SES_QUERY_NAME,
-//					new String[] { user }, null, null, SES_COL_DATE + " ASC");
-//			Identifier[] result = new Identifier[query.getCount()];
-//			int i = 0;
-//			for (query.moveToFirst(); !query.isAfterLast(); query.moveToNext()) {
-//				result[i++] = new Identifier(
-//						query.getString(query.getColumnIndex(SES_COL_CONF)
-//						query.getString(query.getColumnIndex(SES_COL_SESSION));
-//			}
-//			query.close();
-//			return result;
-//		}
-//		catch (Exception e) {
-//			Log.w(XCS.LOG.COMMUNICATE, "Retrieval failed: " + StringUtil.getExceptionMessage(e));
-//			return new String[0];
-//		}
-//	}
-//
+	// public Identifier[] getMarkedSessionIds(String user) {
+	// Log.v(XCS.LOG.COMMUNICATE, "Get all marked sessions for user " + user);
+	// try {
+	// checkConnection();
+	// String[] whereArgs = new String[1];
+	// whereArgs[0] = user;
+	// Cursor query = database.query(TRACK_TABLE, new String[] { SES_COL_SESSION, SES_COL_CONF }, SES_QUERY_NAME,
+	// new String[] { user }, null, null, SES_COL_DATE + " ASC");
+	// Identifier[] result = new Identifier[query.getCount()];
+	// int i = 0;
+	// for (query.moveToFirst(); !query.isAfterLast(); query.moveToNext()) {
+	// result[i++] = new Identifier(
+	// query.getString(query.getColumnIndex(SES_COL_CONF)
+	// query.getString(query.getColumnIndex(SES_COL_SESSION));
+	// }
+	// query.close();
+	// return result;
+	// }
+	// catch (Exception e) {
+	// Log.w(XCS.LOG.COMMUNICATE, "Retrieval failed: " + StringUtil.getExceptionMessage(e));
+	// return new String[0];
+	// }
+	// }
+	//
 	public Trackable[] getMarkedSessions(String user) {
 		return getSessions(user, TRACK_TABLE);
 	}
@@ -252,8 +258,8 @@ public class ProfileManager extends SQLiteOpenHelper {
 		try {
 			checkConnection();
 			String[] whereArgs = new String[] { user };
-			Cursor query = database.query(table, new String[] { SES_COL_SESSION, SES_COL_HASH, SES_COL_DATE, SES_COL_CONF },
-					SES_QUERY_NAME, whereArgs, null, null, SES_COL_HASH + " ASC");
+			Cursor query = database.query(table, new String[] { SES_COL_SESSION, SES_COL_HASH, SES_COL_DATE,
+					SES_COL_CONF }, SES_QUERY_NAME, whereArgs, null, null, SES_COL_HASH + " ASC");
 			Trackable[] result = new Trackable[query.getCount()];
 			int i = 0;
 			for (query.moveToFirst(); !query.isAfterLast(); query.moveToNext()) {
@@ -311,14 +317,14 @@ public class ProfileManager extends SQLiteOpenHelper {
 		}
 		return doGetCachedObjects(null, null);
 	}
-	
+
 	public String[] getCachedObjects(String key) {
 		if (!StringUtil.isEmpty(key)) {
 			return doGetCachedObjects(CACHE_QUERY, new String[] { key });
 		}
 		return doGetCachedObjects(null, null);
 	}
-	
+
 	private String[] doGetCachedObjects(String whereCause, String[] whereArgs) {
 		try {
 			checkConnection();
@@ -377,7 +383,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 			Log.w(XCS.LOG.COMMUNICATE, "Delete failed: " + StringUtil.getExceptionMessage(e));
 		}
 	}
-	
+
 	public void purgeCache() {
 		try {
 			checkConnection();

@@ -82,11 +82,11 @@
 	<PreferenceCategory android:title="About">
 		<Preference
 			android:key="ApplicationName"
-			android:title="Xebia Conference Viewer" />
+			android:title="@string/app_full_name" />
 		<Preference
 			android:key="ApplicationVersion"
 			android:title="Version"
-			android:summary="0.4" />
+			android:summary="@string/app_version" />
 		<com.xebia.xcoss.axcv.preference.LinkPreference
 			url="http://www.xebiamobile.com/"
 			android:key="ApplicationHelp"

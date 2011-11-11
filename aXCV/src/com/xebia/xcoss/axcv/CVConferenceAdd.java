@@ -16,7 +16,6 @@ import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -352,6 +351,12 @@ public class CVConferenceAdd extends AdditionActivity {
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Select locations");
 				builder.setMultiChoiceItems(items, check, new DialogHandler(this, items, R.id.conferenceLocations));
+				builder.setPositiveButton(R.string.close_button, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.CREATE_BREAK:

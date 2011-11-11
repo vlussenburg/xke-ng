@@ -1,127 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.xebia.xcoss.axcv"
-	android:versionName="0.5"
-	android:versionCode="4">
-	<uses-sdk
-		android:minSdkVersion="4" />
-	<uses-permission
-		android:name="android.permission.INTERNET"></uses-permission>
-	<uses-permission
-		android:name="android.permission.VIBRATE"></uses-permission>
-	<application
-		android:icon="@drawable/x_conference"
-		android:label="@string/app_name"
-		android:debuggable="true">
-		<!-- See https://github.com/tomquist/Android-Error-Reporter -->
-		<service
-			android:name="de.quist.app.errorreporter.ExceptionReportService"
-			android:process=":exceptionReporter" />
-		<service
-			android:enabled="true"
-			android:name=".service.NotificationService" />
-		<activity
-			android:name="CVSplashLoader"
-			android:theme="@android:style/Theme.NoTitleBar"
-			android:launchMode="singleTop"
-			android:label="@string/app_name">
-			<intent-filter>
-				<action
-					android:name="android.intent.action.MAIN" />
-				<category
-					android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
-		<activity
-			android:name="CVSettings"
-			android:label="@string/app_name"
-			android:stateNotNeeded="true">
-		</activity>
-		<activity
-			android:name="CVConferences"
-			android:label="@string/app_name"
-			android:theme="@android:style/Theme.NoTitleBar">
-		</activity>
-		<activity
-			android:name="CVSessionList"
-			android:theme="@android:style/Theme.NoTitleBar">
-		</activity>
-		<activity
-			android:name="CVSessionView"
-			android:theme="@android:style/Theme.NoTitleBar">
-		</activity>
-		<activity
-			android:name="CVConferenceAdd"
-			android:theme="@android:style/Theme.NoTitleBar">
-		</activity>
-		<activity
-			android:name="CVSessionAdd"
-			android:theme="@android:style/Theme.NoTitleBar">
-		</activity>
-		<activity
-			android:name="CVSearchAuthor"
-			android:label="@string/author_select">
-		</activity>
-		<activity
-			android:name="CVSearchLabel"
-			android:label="@string/label_select">
-		</activity>
-		<activity
-			android:name="CVSearch"
-			android:theme="@android:style/Theme.NoTitleBar">
-		</activity>
-		<activity
-			android:name="CVTrack"
-			android:theme="@android:style/Theme.NoTitleBar">
-		</activity>
-		<activity
-			android:name="CVAuthor"
-			android:theme="@android:style/Theme.NoTitleBar">
-			<intent-filter>
-				<action
-					android:name="android.intent.action.VIEW" />
-				<category
-					android:name="android.intent.category.DEFAULT" />
-				<data
-					android:scheme="author"
-					android:host="xebia" />
-			</intent-filter>
-		</activity>
-		<activity
-			android:name="CVTag"
-			android:theme="@android:style/Theme.NoTitleBar">
-			<intent-filter>
-				<action
-					android:name="android.intent.action.VIEW" />
-				<category
-					android:name="android.intent.category.DEFAULT" />
-				<data
-					android:scheme="tag"
-					android:host="xebia" />
-			</intent-filter>
-		</activity>
-		<activity
-			android:name="de.quist.app.errorreporter.ExceptionReportActivity"
-			android:process=":exceptionReporter"
-			android:theme="@android:style/Theme.NoDisplay" />
-		<meta-data
-			android:name="de.quist.app.errorreporter.reportOnFroyo"
-			android:value="true" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.xebia.xcoss.axcv"
+    android:versionCode="5"
+    android:versionName="@string/app_version" >
 
-		<meta-data
-			android:name="com.xebia.xcoss.serverUrl"
-			android:value="http://ec2-46-137-184-99.eu-west-1.compute.amazonaws.com:8080/xkeng" />
-		<meta-data
-			android:name="de.quist.app.errorreporter.targetUrl"
-			android:value="http://ec2-46-137-184-99.eu-west-1.compute.amazonaws.com:8080/xkeng/error" />
-		<!--
+    <uses-sdk android:minSdkVersion="4" />
+
+    <uses-permission android:name="android.permission.INTERNET" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.VIBRATE" >
+    </uses-permission>
+
+    <application
+        android:debuggable="true"
+        android:icon="@drawable/x_conference"
+        android:label="@string/app_name" >
+
+        <!-- See https://github.com/tomquist/Android-Error-Reporter -->
+        <service
+            android:name="de.quist.app.errorreporter.ExceptionReportService"
+            android:process=":exceptionReporter" />
+        <service
+            android:enabled="true"
+            android:name=".service.NotificationService" />
+        <activity
+            android:name="de.quist.app.errorreporter.ExceptionReportActivity"
+            android:process=":exceptionReporter"
+            android:theme="@android:style/Theme.NoDisplay" />
+        <meta-data
+            android:name="de.quist.app.errorreporter.reportOnFroyo"
+            android:value="true" />
+        <meta-data
+            android:name="de.quist.app.errorreporter.targetUrl"
+            android:value="http://ec2-46-137-184-99.eu-west-1.compute.amazonaws.com:8080/xkeng/error" />
+        
+        <meta-data
+            android:name="com.xebia.xcoss.serverUrl"
+            android:value="http://ec2-46-137-184-99.eu-west-1.compute.amazonaws.com:8080/xkeng" />
+        <!--
 		<meta-data
 			android:name="com.xebia.xcoss.serverUrl"
 			android:value="http://10.0.2.2:8080" />
 		<meta-data
 			android:name="de.quist.app.errorreporter.targetUrl"
 			android:value="http://10.0.2.2:8080/error" />
-		-->
-	</application>
+        -->
+
+        <activity
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:name="CVSplashLoader"
+            android:theme="@android:style/Theme.NoTitleBar" >
+            <intent-filter >
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:label="@string/app_name"
+            android:name="CVSettings"
+            android:stateNotNeeded="true" >
+        </activity>
+        <activity
+            android:label="@string/app_name"
+            android:name="CVConferences"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name="CVSessionList"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name="CVSessionView"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name="CVConferenceAdd"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name="CVSessionAdd"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:label="@string/author_select"
+            android:name="CVSearchAuthor" >
+        </activity>
+        <activity
+            android:label="@string/label_select"
+            android:name="CVSearchLabel" >
+        </activity>
+        <activity
+            android:name="CVSearch"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name="CVTrack"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name="CVAuthor"
+            android:theme="@android:style/Theme.NoTitleBar" >
+            <intent-filter >
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="xebia"
+                    android:scheme="author" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="CVTag"
+            android:theme="@android:style/Theme.NoTitleBar" >
+            <intent-filter >
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="xebia"
+                    android:scheme="tag" />
+            </intent-filter>
+        </activity>
+    </application>
+
 </manifest>

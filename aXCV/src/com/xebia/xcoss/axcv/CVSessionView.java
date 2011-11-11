@@ -34,7 +34,6 @@ import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
-import com.xebia.xcoss.axcv.util.XCS.LOG;
 
 public class CVSessionView extends SessionSwipeActivity {
 
@@ -52,7 +51,7 @@ public class CVSessionView extends SessionSwipeActivity {
 	protected void onResume() {
 		Conference conference = getCurrentConference();
 		currentSession = getSelectedSession(conference);
-		
+
 		if (currentSession == null) {
 			Location location = getCurrentLocation();
 			ArrayList<Session> options = new ArrayList<Session>();
@@ -63,12 +62,12 @@ public class CVSessionView extends SessionSwipeActivity {
 			}
 			int start = getIntent().getIntExtra(IA_SESSION_START, 0);
 			for (Session session : options) {
-				if ( session.getStartTime().asMinutes() == start ) {
+				if (session.getStartTime().asMinutes() == start) {
 					currentSession = session;
 					break;
 				}
 			}
-			if ( currentSession == null && options.size() > 0) {
+			if (currentSession == null && options.size() > 0) {
 				currentSession = options.get(0);
 			}
 		}
@@ -173,9 +172,9 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	private void updateSessions() {
 		Session session = getNextSession(getCurrentLocation());
-		// Log.i(XCS.LOG.NAVIGATE, "Find sessions at " + getCurrentLocation());
-		// Log.i(XCS.LOG.NAVIGATE, "Current session = " + currentSession);
-		// Log.i(XCS.LOG.NAVIGATE, "Next session = " + session);
+		Log.i(XCS.LOG.NAVIGATE, "Find sessions at " + getCurrentLocation());
+		Log.i(XCS.LOG.NAVIGATE, "Current session = " + currentSession);
+		Log.i(XCS.LOG.NAVIGATE, "Next session = " + session);
 		View viewById = findViewById(R.id.textNextSession);
 		LinearLayout layout = (LinearLayout) viewById.getParent();
 		if (session == null) {
@@ -193,7 +192,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		}
 
 		session = getPreviousSession(getCurrentLocation());
-		// Log.i(XCS.LOG.NAVIGATE, "Previous session = " + session);
+		Log.i(XCS.LOG.NAVIGATE, "Previous session = " + session);
 		viewById = findViewById(R.id.textPreviousSession);
 		layout = (LinearLayout) viewById.getParent();
 		if (session == null) {
@@ -299,7 +298,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		Intent intent = new Intent(this, CVSessionAdd.class);
 		intent.putExtra(BaseActivity.IA_CONFERENCE, getConference().getId());
 		boolean processed = false;
-		
+
 		switch (item.getItemId()) {
 			case XCS.MENU.ADD:
 				startActivity(intent);
@@ -348,16 +347,25 @@ public class CVSessionView extends SessionSwipeActivity {
 		getIntent().putExtra(IA_SESSION_START, currentSession.getStartTime().asMinutes());
 		super.onSwipeLeftToRight();
 	}
-	
+
 	@Override
 	public void onSwipeRightToLeft() {
 		getIntent().putExtra(IA_SESSION_START, currentSession.getStartTime().asMinutes());
 		super.onSwipeRightToLeft();
 	}
+
 	private Session getNextSession(Location location) {
 		Set<Session> sessionsSet = this.getConference().getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
-		int index = sessions.indexOf(currentSession);
+		int index = -1;
+		if (currentSession != null) {
+			for (int i = 0; i < sessions.size(); i++) {
+				if (currentSession.equals(sessions.get(i))) {
+					index = i;
+					break;
+				}
+			}
+		}
 		int max = sessions.size() - 1;
 		while (index < max) {
 			Session session = sessions.get(++index);
@@ -371,7 +379,15 @@ public class CVSessionView extends SessionSwipeActivity {
 	private Session getPreviousSession(Location location) {
 		Set<Session> sessionsSet = this.getConference().getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
-		int index = sessions.indexOf(currentSession);
+		int index = -1;
+		if (currentSession != null) {
+			for (int i = 0; i < sessions.size(); i++) {
+				if (currentSession.equals(sessions.get(i))) {
+					index = i;
+					break;
+				}
+			}
+		}
 		while (index > 0) {
 			Session session = sessions.get(--index);
 			if (session.isMandatory() || session.getLocation().equals(location)) {

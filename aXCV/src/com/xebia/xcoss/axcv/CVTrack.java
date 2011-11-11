@@ -1,6 +1,5 @@
 package com.xebia.xcoss.axcv;
 
-import java.util.ArrayList;
 import java.util.TreeSet;
 
 import android.content.Intent;
@@ -67,7 +66,7 @@ public class CVTrack extends BaseActivity {
 				Log.v(XCS.LOG.COMMUNICATE, "No marked session with id " + id);
 			}
 		}
-		if ( hasExpiredSession ) {
+		if (hasExpiredSession) {
 			getProfileManager().pruneMarked();
 		}
 		sessions = selectedSessions.toArray(new Session[selectedSessions.size()]);

@@ -7,7 +7,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import android.app.Dialog;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;

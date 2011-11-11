@@ -1,22 +1,14 @@
 package com.xebia.xcoss.axcv.ui;
 
 import android.content.Intent;
-import android.text.TextPaint;
-import android.text.TextUtils;
-import android.text.TextUtils.TruncateAt;
 import android.text.util.Linkify;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.View.OnCreateContextMenuListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.CVSessionAdd;

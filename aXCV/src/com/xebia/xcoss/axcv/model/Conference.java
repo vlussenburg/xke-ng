@@ -56,6 +56,7 @@ public class Conference implements Serializable {
 
 	public Conference(Conference original) {
 		this();
+		resetSessions();
 
 		this.id = original.id;
 		this.title = original.title;
@@ -66,6 +67,7 @@ public class Conference implements Serializable {
 		this.organiser = original.organiser;
 		// Location is immutable
 		this.locations.addAll(original.locations);
+		this.sessions.addAll(original.sessions);
 	}
 
 	// Getters and setters

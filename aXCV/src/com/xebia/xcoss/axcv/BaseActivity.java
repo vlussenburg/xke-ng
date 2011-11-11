@@ -29,7 +29,6 @@ import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.ProxyExceptionReporter;
-import com.xebia.xcoss.axcv.util.SecurityUtils;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;

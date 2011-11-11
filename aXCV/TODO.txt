@@ -2,23 +2,21 @@ IN PROGRESS
 -------------------------------------------------------------------
 
 -	Offline support
--	Error handling (check server, 6:55)
-- 	Fix menu popups in conference add/edit
 
 TODO
 -------------------------------------------------------------------
 client
--	Conferenties verdwijnen uit lijst...
 -	Lijst (conferenties) scrollt niet terug naar eerste item (blijft hangen) Tracklist/Sessionlist wel ok.
 -	Https connectie
 -	Timeouts on retrieving labels & authors should be handled in a notification!
 -	Uitzoeken hoe encryption werkt (want lukt nog niet bij mij...)
 -	Afhandeling 400 meldingen
--	Use cache on startup process
+-	Externalize strings
 
 later op de client
 -	Verbeteren van caching
--	Caching: refresh na conference edit/add break (reopen view...)
+	-	Caching: refresh na conference edit/add break (reopen view...)
+	-	Conferenties verdwijnen uit lijst...
 -	Conference edit alleen door organiser (?)
 -	Menu op longclick op conference en session adapter [click werkt niet meer]
 
@@ -45,4 +43,6 @@ DONE
 -	Acties vanuit Tracklist werken niet altijd (afh. current conference)
 -	Sorting in tracklist
 - 	Fix menu popups in session add/edit
+-	Error handling (check server, 6:55)
+- 	Fix menu popups in conference add/edit
 

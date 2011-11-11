@@ -9,7 +9,6 @@ import java.util.TreeSet;
 import android.util.Log;
 
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
-import com.xebia.xcoss.axcv.model.Moment.FixedMoment;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -362,4 +361,56 @@ public class Session implements Serializable {
 		setLocation(slot.location);
 		setConferenceId(conference.getId());
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((authors == null) ? 0 : authors.hashCode());
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((labels == null) ? 0 : labels.hashCode());
+		result = prime * result + ((location == null) ? 0 : location.hashCode());
+		result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		Session other = (Session) obj;
+		if (authors == null) {
+			if (other.authors != null) return false;
+		} else if (!authors.equals(other.authors)) return false;
+		if (description == null) {
+			if (other.description != null) return false;
+		} else if (!description.equals(other.description)) return false;
+		if (endTime == null) {
+			if (other.endTime != null) return false;
+		} else if (!endTime.equals(other.endTime)) return false;
+		if (id == null) {
+			if (other.id != null) return false;
+		} else if (!id.equals(other.id)) return false;
+		if (labels == null) {
+			if (other.labels != null) return false;
+		} else if (!labels.equals(other.labels)) return false;
+		if (location == null) {
+			if (other.location != null) return false;
+		} else if (!location.equals(other.location)) return false;
+		if (startTime == null) {
+			if (other.startTime != null) return false;
+		} else if (!startTime.equals(other.startTime)) return false;
+		if (title == null) {
+			if (other.title != null) return false;
+		} else if (!title.equals(other.title)) return false;
+		if (type != other.type) return false;
+		return true;
+	}
+	
+	
 }
