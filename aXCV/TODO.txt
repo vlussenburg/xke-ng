@@ -9,7 +9,6 @@ client
 -	Lijst (conferenties) scrollt niet terug naar eerste item (blijft hangen) Tracklist/Sessionlist wel ok.
 -	Https connectie
 -	Timeouts on retrieving labels & authors should be handled in a notification!
--	Uitzoeken hoe encryption werkt (want lukt nog niet bij mij...)
 -	Afhandeling 400 meldingen
 -	Externalize strings
 
@@ -18,7 +17,7 @@ later op de client
 	-	Caching: refresh na conference edit/add break (reopen view...)
 	-	Conferenties verdwijnen uit lijst...
 -	Conference edit alleen door organiser (?)
--	Menu op longclick op conference en session adapter [click werkt niet meer]
+-	Edit personal profile (?)
 
 server
 -	Https connectie
@@ -27,6 +26,8 @@ server
 -	Verwijderen van locaties (Urs; not supported now)
 -	Error handling (/error URL geeft 400 zonder verdere melding)
 -	Nieuwe datum conferentie leidt niet tot nieuwe datum sessies (wordt wel gestuurd)
+-	Uitzoeken hoe encryption werkt (want lukt nog niet bij mij...)
+    - Padding error op server...
 
 DONE
 -------------------------------------------------------------------
@@ -45,4 +46,5 @@ DONE
 - 	Fix menu popups in session add/edit
 -	Error handling (check server, 6:55)
 - 	Fix menu popups in conference add/edit
+-	Menu op longclick op conference en session adapter
 

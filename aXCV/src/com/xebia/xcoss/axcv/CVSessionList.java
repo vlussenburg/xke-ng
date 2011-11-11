@@ -4,16 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
-import com.xebia.xcoss.axcv.ui.SessionAdapter;
+import com.xebia.xcoss.axcv.ui.SessionCMAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class CVSessionList extends SessionSwipeActivity {
@@ -36,26 +33,21 @@ public class CVSessionList extends SessionSwipeActivity {
 		ScreenTimeUtil timeUtil = new ScreenTimeUtil(this);
 		String val = timeUtil.getAbsoluteDate(conference.getStartTime());
 		date.setText(val);
-
-		ListView sessionList = (ListView) findViewById(R.id.sessionList);
-		sessionList.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
-				// Adapter = listview, view = tablelayout.
-				switchTo(getCurrentConference(), paramInt);
-			}
-		});
 	}
 
 	@Override
 	protected void onResume() {
 		sessions = getCurrentConference().getSessions(getCurrentLocation()).toArray(new Session[0]);
-		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, sessions);
+		SessionCMAdapter adapter = new SessionCMAdapter(this, R.layout.session_item, R.layout.mandatory_item, sessions);
 		ListView sessionList = (ListView) findViewById(R.id.sessionList);
 		sessionList.setAdapter(adapter);
 
 		updateLocations();
 		super.onResume();
+	}
+
+	public void switchTo(int paramInt) {
+		switchTo(getCurrentConference(), paramInt);
 	}
 
 	private void switchTo(Conference conference, int sessionIndex) {

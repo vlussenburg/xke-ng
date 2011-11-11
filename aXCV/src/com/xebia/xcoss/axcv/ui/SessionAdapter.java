@@ -25,7 +25,6 @@ public class SessionAdapter extends BaseAdapter {
 	private Session[] data;
 	private ScreenTimeUtil timeUtil;
 	private boolean includeDate = false;
-	private boolean includeMenu = true;
 
 	public SessionAdapter(BaseActivity context, int viewResourceId, int altViewResourceId, Session[] data) {
 		this.ctx = context;
@@ -34,43 +33,34 @@ public class SessionAdapter extends BaseAdapter {
 		this.data = data;
 		timeUtil = new ScreenTimeUtil(context);
 	}
-
+	
 	@Override
-	public View getView(int paramInt, View paramView, ViewGroup parent) {
-		Session session = (Session) getItem(paramInt);
+	public View getView(final int paramInt, View paramView, ViewGroup parent) {
+		final Session session = (Session) getItem(paramInt);
 		int colorId = ctx.getResources().getColor(R.color.tc_itemdefault);
 		if (session.isExpired()) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemgone);
 		} else if (session.isRunning()) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemactive);
 		}
-		return session.isMandatory() ? constructMandatoryView(parent, session, colorId, paramInt)
-				: constructSessionView(parent, session, colorId, paramInt);
+		View row;
+		if (session.isMandatory()) {
+			row = constructMandatoryView(parent, session, colorId, paramInt);
+		} else {
+			row = constructSessionView(parent, session, colorId, paramInt);
+		}
+
+		registerClicks(row, paramInt, session);
+		return row;
+	}
+
+	public void registerClicks(View row, final int paramInt, final Session session) {
 	}
 
 	private View constructSessionView(ViewGroup parent, final Session session, int colorId, final int position) {
 
 		LayoutInflater inflater = ctx.getLayoutInflater();
 		View row = inflater.inflate(viewResource, parent, false);
-//		if (includeMenu) {
-//			row.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
-//				@Override
-//				public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-//					menu.setHeaderTitle(session.getTitle());
-//					menu.add(position, R.id.edit, Menu.NONE, R.string.context_menu_session_edit);
-//					menu.add(position, R.id.view, Menu.NONE, R.string.context_menu_session_view);
-//					// menu.add(position, R.id.delete, Menu.NONE, R.string.context_menu_session_delete);
-//				}
-//			});
-//			row.setOnClickListener(new View.OnClickListener() {
-//				
-//				@Override
-//				public void onClick(View v) {
-//					Log.e("XCS", "Clicked on this item!");
-//					Toast.makeText(ctx, "Item Click", Toast.LENGTH_SHORT);
-//				}
-//			});
-//		}
 
 		TextView titleView = (TextView) row.findViewById(R.id.ses_title);
 		TextView authorView = (TextView) row.findViewById(R.id.ses_author);
@@ -130,17 +120,6 @@ public class SessionAdapter extends BaseAdapter {
 
 		LayoutInflater inflater = ctx.getLayoutInflater();
 		View row = inflater.inflate(alternativeViewResource, parent, false);
-//		if (includeMenu) {
-//			row.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
-//				@Override
-//				public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-//					menu.setHeaderTitle(session.getTitle());
-//					menu.add(position, R.id.edit, Menu.NONE, R.string.context_menu_session_edit);
-//					menu.add(position, R.id.view, Menu.NONE, R.string.context_menu_session_view);
-//					// menu.add(position, R.id.delete, Menu.NONE, R.string.context_menu_session_delete);
-//				}
-//			});
-//		}
 
 		TextView titleView = (TextView) row.findViewById(R.id.ses_title);
 		TextView locDateView = (TextView) row.findViewById(R.id.ses_locdate);
@@ -194,7 +173,5 @@ public class SessionAdapter extends BaseAdapter {
 		includeDate = state;
 	}
 
-	public void setIncludeMenu(boolean includeMenu) {
-		this.includeMenu = includeMenu;
-	}
+
 }

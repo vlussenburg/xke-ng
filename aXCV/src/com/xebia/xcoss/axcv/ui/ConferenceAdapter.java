@@ -1,25 +1,28 @@
 package com.xebia.xcoss.axcv.ui;
 
-import android.app.Activity;
 import android.graphics.Typeface;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.xebia.xcoss.axcv.CVConferences;
 import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
 
 public class ConferenceAdapter extends BaseAdapter {
 
-	private Activity ctx;
+	private CVConferences ctx;
 	private int viewResource;
 	private Conference[] data;
 	private ScreenTimeUtil timeFormatter;
 
-	public ConferenceAdapter(Activity context, int viewResourceId, Conference[] conferences) {
+	public ConferenceAdapter(CVConferences context, int viewResourceId, Conference[] conferences) {
 		this.ctx = context;
 		this.viewResource = viewResourceId;
 		this.data = conferences;
@@ -27,10 +30,10 @@ public class ConferenceAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public View getView(int paramInt, View paramView, ViewGroup parent) {
+	public View getView(final int paramInt, View paramView, ViewGroup parent) {
 
+		final Conference cfr = (Conference) getItem(paramInt);
 		boolean sameDay = false;
-		Conference cfr = (Conference) getItem(paramInt);
 		int colorId = ctx.getResources().getColor(R.color.tc_itemdefault);
 		Moment dt = cfr.getStartTime();
 		if (dt.isBeforeToday()) {
@@ -42,6 +45,21 @@ public class ConferenceAdapter extends BaseAdapter {
 
 		LayoutInflater inflater = ctx.getLayoutInflater();
 		View row = inflater.inflate(viewResource, parent, false);
+
+		row.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				ctx.switchTo(paramInt);
+			}
+		});
+		row.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+			@Override
+			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+				menu.setHeaderTitle(cfr.getTitle());
+				menu.add(paramInt, R.id.edit, Menu.NONE, R.string.context_menu_session_edit);
+				menu.add(paramInt, R.id.view, Menu.NONE, R.string.context_menu_session_view);
+			}
+		});
 
 		TextView titleView = (TextView) row.findViewById(R.id.cnf_title);
 		TextView whenView = (TextView) row.findViewById(R.id.cnf_when);

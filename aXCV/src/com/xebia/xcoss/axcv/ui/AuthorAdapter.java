@@ -43,7 +43,6 @@ public class AuthorAdapter extends BaseAdapter {
 		return row;
 	}
 	
-	
 	protected void createContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo, int position, String name) {
 		menu.setHeaderTitle(name);
 		menu.add(position, R.id.view, Menu.NONE, R.string.context_menu_author_view);

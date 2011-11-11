@@ -9,9 +9,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -63,15 +60,6 @@ public class CVConferences extends SwipeActivity {
 
 		TextView title = (TextView) findViewById(R.id.conferencesTitle);
 		title.setText(title.getText() + " " + shownYear);
-
-		ListView conferencesList = (ListView) findViewById(R.id.conferencesList);
-		conferencesList.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
-				// Adapter = listview, view = tablelayout.
-				switchTo(paramInt);
-			}
-		});
 	}
 
 	@Override
@@ -95,8 +83,26 @@ public class CVConferences extends SwipeActivity {
 		super.onResume();
 	}
 
-	private void switchTo(int index) {
-		switchTo(conferences[index]);
+	@Override
+	public boolean onContextItemSelected(MenuItem menuItem) {
+		int position = menuItem.getGroupId();
+		switch (menuItem.getItemId()) {
+			case R.id.view:
+				switchTo(position);
+				return true;
+			case R.id.edit:
+				Intent intent = new Intent(this, CVConferenceAdd.class);
+				intent.putExtra(BaseActivity.IA_CONFERENCE, conferences[position].getId());
+				startActivity(intent);
+				return true;
+		}
+		return super.onContextItemSelected(menuItem);
+	}
+
+	public void switchTo(int index) {
+		if (index >= 0 && index < conferences.length) {
+			switchTo(conferences[index]);
+		}
 	}
 
 	private void switchTo(Conference conference) {

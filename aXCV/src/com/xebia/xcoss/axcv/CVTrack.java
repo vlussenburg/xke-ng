@@ -72,7 +72,6 @@ public class CVTrack extends BaseActivity {
 		sessions = selectedSessions.toArray(new Session[selectedSessions.size()]);
 		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, sessions);
 		adapter.setIncludeDate(true);
-		adapter.setIncludeMenu(false);
 		ListView sessionList = (ListView) findViewById(R.id.sessionList);
 		sessionList.setAdapter(adapter);
 		super.onResume();
