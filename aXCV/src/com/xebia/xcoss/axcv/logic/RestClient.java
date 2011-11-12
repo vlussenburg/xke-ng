@@ -21,6 +21,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -242,8 +243,11 @@ public class RestClient {
 			handleResponse(request, response);
 
 			String result = readResponse(response);
-//			Log.i(XCS.LOG.COMMUNICATE, "Read: " + result);
+			// Log.i(XCS.LOG.COMMUNICATE, "Read: " + result);
 			return new StringReader(result);
+		}
+		catch (ConnectTimeoutException e) {
+			throw new DataException(Code.TIME_OUT, request.getURI());
 		}
 		catch (SocketTimeoutException e) {
 			throw new DataException(Code.TIME_OUT, request.getURI());

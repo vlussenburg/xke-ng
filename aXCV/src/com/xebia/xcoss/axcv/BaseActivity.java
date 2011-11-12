@@ -279,13 +279,13 @@ public abstract class BaseActivity extends Activity {
 	public static void handleException(final Activity context, String activity, CommException e) {
 		if (e instanceof DataException) {
 			if (((DataException) e).missing()) {
-				Log.w(XCS.LOG.COMMUNICATE, "No result for '" + activity + "'.");
-				lastError = "Not found: " + activity;
+				lastError = "No result for '" + activity + "'.";
+				Log.w(XCS.LOG.COMMUNICATE, lastError);
+				showMessage(context, lastError);
 			} else if (((DataException) e).timedOut()) {
-				Log.w(XCS.LOG.COMMUNICATE, "Time out on '" + activity + "'.");
-				if ( context != null ) {
-					Toast.makeText(context, "Time out on "+activity+"!", Toast.LENGTH_SHORT);
-				}
+				lastError = "Time out on '" + activity + "'.";
+				Log.w(XCS.LOG.COMMUNICATE, lastError);
+				showMessage(context, lastError);
 			} else {
 				// Authentication failure
 				if (context != null) {
@@ -315,6 +315,14 @@ public abstract class BaseActivity extends Activity {
 		}
 		Log.e(XCS.LOG.COMMUNICATE, "Communication failure on " + activity + ", due to " + e.getMessage());
 		throw new CommException("Failure on activity '" + activity + "': " + StringUtil.getExceptionMessage(e), e);
+	}
+
+	private static void showMessage(Activity context, String msg) {
+		Context ctxt = context;
+		if ( context == null ) {
+			ctxt = rootActivity.getBaseContext();
+		}
+		Toast.makeText(ctxt, msg, Toast.LENGTH_SHORT);
 	}
 
 	public String getUser() {

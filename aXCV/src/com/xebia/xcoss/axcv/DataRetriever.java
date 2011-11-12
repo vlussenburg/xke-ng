@@ -70,21 +70,27 @@ public class DataRetriever extends AsyncTask<String, Void, Boolean> {
 	@Override
 	protected void onPostExecute(Boolean result) {
 
-		dialog.dismiss();
+		try {
+			dialog.dismiss();
 
-		if (result) {
-			// Note, authentication may still be invalid.
-			ctx.onSuccess();
-		} else {
-			Dialog errorDialog = ctx.createDialog("Error", "Connection to server failed.");
-			errorDialog.setOnDismissListener(new Dialog.OnDismissListener() {
-				@Override
-				public void onDismiss(DialogInterface di) {
-					ctx.onFailure();
-					di.dismiss();
-				}
-			});
-			errorDialog.show();
+			if (result) {
+				// Note, authentication may still be invalid.
+				ctx.onSuccess();
+			} else {
+				Dialog errorDialog = ctx.createDialog("Error", "Connection to server failed.");
+				errorDialog.setOnDismissListener(new Dialog.OnDismissListener() {
+					@Override
+					public void onDismiss(DialogInterface di) {
+						ctx.onFailure();
+						di.dismiss();
+					}
+				});
+				errorDialog.show();
+			}
+		}
+		catch (Exception e) {
+			Log.e(XCS.LOG.DATA, "Failure during initial load: " + StringUtil.getExceptionMessage(e));
+			ctx.onFailure();
 		}
 	}
 }
