@@ -350,7 +350,9 @@ public class CVConferenceAdd extends AdditionActivity {
 
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Select locations");
-				builder.setMultiChoiceItems(items, check, new DialogHandler(this, items, R.id.conferenceLocations));
+				DialogHandler handler = new DialogHandler(this, items, R.id.conferenceLocations);
+				handler.setCloseOnSelection(false);
+				builder.setMultiChoiceItems(items, check, handler);
 				builder.setPositiveButton(R.string.close_button, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
