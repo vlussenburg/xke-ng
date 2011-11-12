@@ -76,7 +76,8 @@ public class ProfileManager extends SQLiteOpenHelper {
 		try {
 			if (database != null) {
 				database.close();
-				Log.i(XCS.LOG.COMMUNICATE, "Database closed.");
+				String who = DebugUtil.whoCalledMe();
+				Log.i(XCS.LOG.COMMUNICATE, "Database closed by " + who);
 			}
 			database = null;
 		}
@@ -89,7 +90,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 	private void checkConnection() {
 		if (database == null) {
 			String who = DebugUtil.whoCalledMe();
-			throw new SQLException("Database not started while doing "+who+"!");
+			throw new SQLException("Database not started while doing " + who + "!");
 		}
 		if (!database.isOpen() || database.isReadOnly()) {
 			throw new SQLException("Database not open or readonly!");

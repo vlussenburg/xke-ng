@@ -2,13 +2,13 @@ IN PROGRESS
 -------------------------------------------------------------------
 
 -	Timeouts on retrieving labels & authors should be handled in a notification!
+-	Toegevoegd/gewijzigde sessie is niet direct zichtbaar
+-	Track notification opruimen + naar tracklist
+-	Author notification testen
 
 TODO
 -------------------------------------------------------------------
 client
--	Toegevoegd/gewijzigde sessie is niet direct zichtbaar
--	Track notification opruimen + naar tracklist
--	Author notification testen
 -	Https connectie
 -	Slot beschikbaarheid start altijd om start+n+n. Je wilt kunnen schuiven. 
 -	Lijst (conferenties) scrollt niet terug naar eerste item (blijft hangen) Tracklist/Sessionlist wel ok.

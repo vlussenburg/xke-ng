@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -56,6 +57,7 @@ public class NotificationService extends Service {
 	private Runnable notifyOnAuthor = new Runnable() {
 		@Override
 		public void run() {
+			Looper.prepare();
 			checkSessionsForChange(true);
 		}
 	};
@@ -63,6 +65,7 @@ public class NotificationService extends Service {
 	private Runnable notifyOnMarked = new Runnable() {
 		@Override
 		public void run() {
+			Looper.prepare();
 			checkSessionsForChange(false);
 		}
 	};

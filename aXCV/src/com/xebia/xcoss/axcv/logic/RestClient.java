@@ -202,7 +202,7 @@ public class RestClient {
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
-			Log.d(LOG.COMMUNICATE, "Post dating [" + postData + "]");
+//			Log.d(LOG.COMMUNICATE, "Post dating [" + postData + "]");
 			reader = getReader(new HttpPost(url), postData, token);
 			return getGson().fromJson(reader, rvClass);
 		}
