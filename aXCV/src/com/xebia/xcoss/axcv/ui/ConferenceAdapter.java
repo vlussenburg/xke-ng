@@ -21,8 +21,10 @@ public class ConferenceAdapter extends BaseAdapter {
 	private int viewResource;
 	private Conference[] data;
 	private ScreenTimeUtil timeFormatter;
+	private View[] views;
 
 	public ConferenceAdapter(CVConferences context, int viewResourceId, Conference[] conferences) {
+		views = new View[conferences.length];
 		this.ctx = context;
 		this.viewResource = viewResourceId;
 		this.data = conferences;
@@ -31,6 +33,8 @@ public class ConferenceAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(final int paramInt, View paramView, ViewGroup parent) {
+		if (views[paramInt] != null)
+			return views[paramInt];
 
 		final Conference cfr = (Conference) getItem(paramInt);
 		boolean sameDay = false;
@@ -80,6 +84,7 @@ public class ConferenceAdapter extends BaseAdapter {
 			titleView.setTypeface(titleView.getTypeface(), Typeface.BOLD);
 			whenView.setTypeface(whenView.getTypeface(), Typeface.BOLD);
 		}
+		views[paramInt]=row;
 		return row;
 	}
 
