@@ -106,7 +106,12 @@ public class CVSplashLoader extends BaseActivity {
 	private void navigateToStartscreen() {
 		// Use getConferenceServer to explicitly reissue the login
 		if (getConferenceServer().isLoggedIn()) {
-			startActivity(new Intent(this, CVConferences.class));
+			String type = getIntent().getStringExtra(IA_NOTIFICATION_TYPE);
+			if ( type != null && NotificationType.valueOf(type) == NotificationType.TRACKED) {
+				startActivity(new Intent(this, CVTrack.class));
+			} else {
+				startActivity(new Intent(this, CVConferences.class));
+			}
 		} else {
 			Dialog dialog = createDialog("Warning", "Authentication failed. Please set credentials.");
 			dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {

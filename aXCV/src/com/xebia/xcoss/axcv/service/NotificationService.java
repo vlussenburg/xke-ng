@@ -29,6 +29,7 @@ import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.logic.ProfileManager.Trackable;
+import com.xebia.xcoss.axcv.logic.cache.NoCache;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Search;
@@ -136,7 +137,14 @@ public class NotificationService extends Service {
 	}
 
 	protected void checkSessionsForChange(boolean owned) {
-		ArrayList<String> sessionIds = owned ? getChangesInOwnedSessions() : getChangesInTrackedSessions();
+		ConferenceServer server = getConferenceServer();
+		if ( server == null ) {
+			Log.e(XCS.LOG.COMMUNICATE, "Notification service could not get server handle");
+			Toast.makeText(this, "Notification check failed", Toast.LENGTH_SHORT).show();
+			throw new IllegalStateException("Missing server on notification! " + BaseActivity.getServerUrl(this));
+//			return;
+		}
+		ArrayList<String> sessionIds = owned ? getChangesInOwnedSessions(server) : getChangesInTrackedSessions(server);
 		if (sessionIds.size() > 0) {
 			Message message = Message.obtain(handler);
 			Bundle data = new Bundle();
@@ -146,12 +154,11 @@ public class NotificationService extends Service {
 		}
 	}
 
-	protected ArrayList<String> getChangesInOwnedSessions() {
+	protected ArrayList<String> getChangesInOwnedSessions(ConferenceServer server) {
 		ArrayList<String> modified = new ArrayList<String>();
 		ProfileManager pm = new ProfileManager(this);
 		try {
 			pm.openConnection();
-			ConferenceServer server = ConferenceServer.getInstance();
 
 			// Not all owned sessions need to be locally available.
 			String user = getUser();
@@ -206,21 +213,22 @@ public class NotificationService extends Service {
 		}
 	}
 
-	protected ArrayList<String> getChangesInTrackedSessions() {
+	protected ArrayList<String> getChangesInTrackedSessions(ConferenceServer server) {
 		ArrayList<String> modified = new ArrayList<String>();
-		ConferenceServer server = ConferenceServer.getInstance();
 		ProfileManager pm = new ProfileManager(this);
 		try {
 			pm.openConnection();
 			Trackable[] ids = pm.getMarkedSessions(getUser());
 			for (int i = 0; i < ids.length; i++) {
 				Session session = server.getSession(ids[i].sessionId, ids[i].conferenceId);
-				long modificationHash = session.getModificationHash();
-				if (!session.isExpired() && ids[i].hash != modificationHash) {
-					ids[i].hash = modificationHash;
-					ids[i].date = session.getStartTime().asLong();
-					pm.updateMarkedSession(ids[i]);
-					modified.add(session.getId());
+				if (session != null) {
+					long modificationHash = session.getModificationHash();
+					if (!session.isExpired() && ids[i].hash != modificationHash) {
+						ids[i].hash = modificationHash;
+						ids[i].date = session.getStartTime().asLong();
+						pm.updateMarkedSession(ids[i]);
+						modified.add(session.getId());
+					}
 				}
 			}
 			return modified;
@@ -230,10 +238,22 @@ public class NotificationService extends Service {
 		}
 	}
 
+	private ConferenceServer getConferenceServer() {
+		ConferenceServer instance = ConferenceServer.getInstance();
+		if (instance == null || instance.isLoggedIn() == false) {
+			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+			String user = sp.getString(XCS.PREF.USERNAME, null);
+			// TODO Encrypt/decrypt
+			String password = /* SecurityUtils.decrypt( */sp.getString(XCS.PREF.PASSWORD, "")/* ) */;
+			instance = ConferenceServer.createInstance(user, password, BaseActivity.getServerUrl(this), new NoCache(this));
+		}
+		return instance;
+	}
+
 	private void notifyChange(Bundle bundle) {
 		Context ctx = NotificationService.this;
 		long currentTimeMillis = System.currentTimeMillis();
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(NotificationService.this);
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
 
 		// This pending intent brings the current app to the front.
 		Intent intent = new Intent(ctx, CVSplashLoader.class);
@@ -255,7 +275,9 @@ public class NotificationService extends Service {
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
 				Notification noty = new Notification(R.drawable.x_stat_track, title, currentTimeMillis);
 				intent.putExtra(BaseActivity.IA_NOTIFICATION_ID, sessionId);
-				PendingIntent clickIntent = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				intent.putExtra(BaseActivity.IA_NOTIFICATION_TYPE, BaseActivity.NotificationType.TRACKED);
+				PendingIntent clickIntent = PendingIntent
+						.getActivity(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 				noty.setLatestEventInfo(ctx, title, message, clickIntent);
 				if (silent) {
 					noty.vibrate = VIBRATE_PATTERN;
@@ -277,7 +299,9 @@ public class NotificationService extends Service {
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
 				Notification noty = new Notification(R.drawable.x_stat_owned, title, currentTimeMillis);
 				intent.putExtra(BaseActivity.IA_NOTIFICATION_ID, sessionId);
-				PendingIntent clickIntent = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				intent.putExtra(BaseActivity.IA_NOTIFICATION_TYPE, BaseActivity.NotificationType.OWNED);
+				PendingIntent clickIntent = PendingIntent
+						.getActivity(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 				noty.setLatestEventInfo(ctx, title, message, clickIntent);
 				if (silent) {
 					noty.vibrate = VIBRATE_PATTERN;
@@ -292,7 +316,7 @@ public class NotificationService extends Service {
 
 	private String getSessionChange(String id) {
 		try {
-			Session session = ConferenceServer.getInstance().getSession(id, null);
+			Session session = getConferenceServer().getSession(id, null);
 			if (session == null) {
 				return "A session has been deleted";
 			}

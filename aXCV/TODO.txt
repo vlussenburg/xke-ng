@@ -2,13 +2,15 @@ IN PROGRESS
 -------------------------------------------------------------------
 
 -	Timeouts on retrieving labels & authors should be handled in a notification!
--	Toegevoegd/gewijzigde sessie is niet direct zichtbaar
+-	Crash notification door niet ingelogd te zijn.
 -	Track notification opruimen + naar tracklist
--	Author notification testen
 
 TODO
 -------------------------------------------------------------------
 client
+-	Rewrite exit / rootApplication
+-	Toegevoegd/gewijzigde sessie is niet direct zichtbaar
+-	Author notification testen
 -	Https connectie
 -	Slot beschikbaarheid start altijd om start+n+n. Je wilt kunnen schuiven. 
 -	Lijst (conferenties) scrollt niet terug naar eerste item (blijft hangen) Tracklist/Sessionlist wel ok.
@@ -34,7 +36,7 @@ server
 -	Https connectie
 -	Session scheduling
 -	Zoeken
--	403 on session expiration
+-	403 on session expiration or invalid login
 -	Verwijderen van locaties (Urs; not supported now)
 -	Error handling (/error URL geeft 400 zonder verdere melding)
 -	Nieuwe datum conferentie leidt niet tot nieuwe datum sessies (wordt wel gestuurd)

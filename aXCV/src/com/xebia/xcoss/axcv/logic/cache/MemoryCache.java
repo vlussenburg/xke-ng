@@ -18,7 +18,7 @@ public class MemoryCache extends DataCache {
 	
 	@Override
 	public void destroy() {
-		this.cachedObjects = new HashMap<String, CachedObject<?>>();
+		this.cachedObjects.clear();
 		super.destroy();
 	}
 

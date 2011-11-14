@@ -47,29 +47,16 @@ public class ConferenceServer {
 		return instance;
 	}
 
-	public static ConferenceServer createInstance(String user, String password, String url, Context ctx) {
-		ConferenceServer server = new ConferenceServerProxy(url, ctx);
+	public static ConferenceServer createInstance(String user, String password, String url, DataCache cache) {
+		ConferenceServer server = new ConferenceServerProxy(url, cache);
 		instance = server;
 		instance.login(user, password);
 		return instance;
 	}
 
-	protected ConferenceServer(String base, Context ctx) {
+	protected ConferenceServer(String base, DataCache cache) {
 		baseUrl = base;
-		String type = "?";
-		try {
-			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
-			type = sp.getString(XCS.PREF.CACHETYPE, null);
-			if ( type == null ) {
-				type = DataCache.Type.Memory.name();
-				sp.edit().putString(XCS.PREF.CACHETYPE, type).commit();
-			}
-			Log.i(XCS.LOG.PROPERTIES, "Using cache type: " + type);
-			conferenceCache = DataCache.Type.valueOf(type).newInstance(ctx);
-		} catch (Exception e) {
-			Log.w(XCS.LOG.PROPERTIES, "Cannot instantiate cache of type " + type + ": " + StringUtil.getExceptionMessage(e));
-			conferenceCache = new MemoryCache(ctx);
-		}
+		conferenceCache = cache;
 		conferenceCache.init();
 	}
 

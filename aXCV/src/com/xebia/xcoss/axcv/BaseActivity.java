@@ -26,6 +26,8 @@ import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.logic.ConferenceServerProxy;
 import com.xebia.xcoss.axcv.logic.DataException;
 import com.xebia.xcoss.axcv.logic.ProfileManager;
+import com.xebia.xcoss.axcv.logic.cache.DataCache;
+import com.xebia.xcoss.axcv.logic.cache.MemoryCache;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.ProxyExceptionReporter;
@@ -45,6 +47,11 @@ public abstract class BaseActivity extends Activity {
 	public static final String IA_LOCATION_ID = "ID-location";
 	public static final String IA_SESSION_START = "ID-sstart";
 	public static final String IA_NOTIFICATION_ID = "ID-notified";
+	public static final String IA_NOTIFICATION_TYPE = "ID-notytype";
+	
+	public enum NotificationType {
+		TRACKED, OWNED;
+	}
 
 	private MenuItem miSettings;
 	private MenuItem miSearch;
@@ -70,7 +77,7 @@ public abstract class BaseActivity extends Activity {
 		if ( notificationId != null ) {
 			NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 			Log.w("debug", "Cancel on " + notificationId);
-			mgr.cancel(notificationId.hashCode());
+			mgr.cancelAll();
 		}
 		
 		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);
@@ -204,9 +211,23 @@ public abstract class BaseActivity extends Activity {
 		if (server == null || server.isLoggedIn() == false) {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			String user = sp.getString(XCS.PREF.USERNAME, null);
+			// TODO Encrypt/decrypt
 			String password = /*SecurityUtils.decrypt(*/sp.getString(XCS.PREF.PASSWORD, "")/*)*/;
-			server = ConferenceServer.createInstance(user, password, getServerUrl(), rootActivity == null ? null
-					: rootActivity.getApplicationContext());
+			String type = "?";
+			DataCache cache;
+			try {
+				type = sp.getString(XCS.PREF.CACHETYPE, null);
+				if ( type == null ) {
+					type = DataCache.Type.Memory.name();
+					sp.edit().putString(XCS.PREF.CACHETYPE, type).commit();
+				}
+				Log.i(XCS.LOG.PROPERTIES, "Using cache type: " + type);
+				cache = DataCache.Type.valueOf(type).newInstance(this);
+			} catch (Exception e) {
+				Log.w(XCS.LOG.PROPERTIES, "Cannot instantiate cache of type " + type + ": " + StringUtil.getExceptionMessage(e));
+				cache = new MemoryCache(this);
+			}
+			server = ConferenceServer.createInstance(user, password, getServerUrl(this), cache);
 		}
 		return server;
 	}
@@ -244,10 +265,10 @@ public abstract class BaseActivity extends Activity {
 
 	protected void onFailure() {}
 
-	private String getServerUrl() {
+	public static String getServerUrl(Context ctx) {
 		try {
 			// Invoke trim to make sure the value is specified
-			ApplicationInfo ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
+			ApplicationInfo ai = ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(), PackageManager.GET_META_DATA);
 			return ai.metaData.getString("com.xebia.xcoss.serverUrl").trim();
 		}
 		catch (Exception e) {
