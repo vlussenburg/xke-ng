@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -48,7 +49,7 @@ public abstract class BaseActivity extends Activity {
 	public static final String IA_SESSION_START = "ID-sstart";
 	public static final String IA_NOTIFICATION_ID = "ID-notified";
 	public static final String IA_NOTIFICATION_TYPE = "ID-notytype";
-	
+
 	public enum NotificationType {
 		TRACKED, OWNED;
 	}
@@ -74,12 +75,12 @@ public abstract class BaseActivity extends Activity {
 		}
 
 		String notificationId = getIntent().getStringExtra(IA_NOTIFICATION_ID);
-		if ( notificationId != null ) {
+		if (notificationId != null) {
 			NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 			Log.w("debug", "Cancel on " + notificationId);
 			mgr.cancelAll();
 		}
-		
+
 		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);
 		if (conferenceButton != null) {
 			conferenceButton.setOnClickListener(new View.OnClickListener() {
@@ -212,19 +213,21 @@ public abstract class BaseActivity extends Activity {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			String user = sp.getString(XCS.PREF.USERNAME, null);
 			// TODO Encrypt/decrypt
-			String password = /*SecurityUtils.decrypt(*/sp.getString(XCS.PREF.PASSWORD, "")/*)*/;
+			String password = /* SecurityUtils.decrypt( */sp.getString(XCS.PREF.PASSWORD, "")/* ) */;
 			String type = "?";
 			DataCache cache;
 			try {
 				type = sp.getString(XCS.PREF.CACHETYPE, null);
-				if ( type == null ) {
+				if (type == null) {
 					type = DataCache.Type.Memory.name();
 					sp.edit().putString(XCS.PREF.CACHETYPE, type).commit();
 				}
 				Log.i(XCS.LOG.PROPERTIES, "Using cache type: " + type);
 				cache = DataCache.Type.valueOf(type).newInstance(this);
-			} catch (Exception e) {
-				Log.w(XCS.LOG.PROPERTIES, "Cannot instantiate cache of type " + type + ": " + StringUtil.getExceptionMessage(e));
+			}
+			catch (Exception e) {
+				Log.w(XCS.LOG.PROPERTIES,
+						"Cannot instantiate cache of type " + type + ": " + StringUtil.getExceptionMessage(e));
 				cache = new MemoryCache(this);
 			}
 			server = ConferenceServer.createInstance(user, password, getServerUrl(this), cache);
@@ -268,7 +271,8 @@ public abstract class BaseActivity extends Activity {
 	public static String getServerUrl(Context ctx) {
 		try {
 			// Invoke trim to make sure the value is specified
-			ApplicationInfo ai = ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(), PackageManager.GET_META_DATA);
+			ApplicationInfo ai = ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(),
+					PackageManager.GET_META_DATA);
 			return ai.metaData.getString("com.xebia.xcoss.serverUrl").trim();
 		}
 		catch (Exception e) {
@@ -340,10 +344,11 @@ public abstract class BaseActivity extends Activity {
 
 	private static void showMessage(Activity context, String msg) {
 		Context ctxt = context;
-		if ( context == null ) {
+		if (context == null) {
 			ctxt = rootActivity.getBaseContext();
 		}
-		Toast.makeText(ctxt, msg, Toast.LENGTH_SHORT);
+		// TODO Does this work?
+		if (Looper.myLooper() != null) Toast.makeText(ctxt, msg, Toast.LENGTH_SHORT);
 	}
 
 	public String getUser() {
@@ -351,7 +356,7 @@ public abstract class BaseActivity extends Activity {
 		String user = sp.getString(XCS.PREF.USERNAME, null);
 		return user;
 	}
-	
+
 	public static String getLastError() {
 		String error = lastError;
 		lastError = null;

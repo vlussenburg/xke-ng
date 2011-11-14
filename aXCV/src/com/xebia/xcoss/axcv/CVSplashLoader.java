@@ -106,8 +106,10 @@ public class CVSplashLoader extends BaseActivity {
 	private void navigateToStartscreen() {
 		// Use getConferenceServer to explicitly reissue the login
 		if (getConferenceServer().isLoggedIn()) {
-			String type = getIntent().getStringExtra(IA_NOTIFICATION_TYPE);
-			if ( type != null && NotificationType.valueOf(type) == NotificationType.TRACKED) {
+			NotificationType type = (NotificationType) getIntent().getSerializableExtra(IA_NOTIFICATION_TYPE);
+			// Do this only once
+			getIntent().removeExtra(IA_NOTIFICATION_TYPE);
+			if ( type != null && type == NotificationType.TRACKED) {
 				startActivity(new Intent(this, CVTrack.class));
 			} else {
 				startActivity(new Intent(this, CVConferences.class));

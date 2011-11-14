@@ -39,7 +39,7 @@ import com.xebia.xcoss.axcv.util.XCS;
 
 public class NotificationService extends Service {
 
-	private static final int NOTIFICATION_PERIOD = 15 * 60 * 1000;
+	private static final int NOTIFICATION_PERIOD = 5 * 60 * 1000;
 	private static final String TAG_OWNED = "id-owned_ses";
 	private static final String TAG_TRACKED = "id-track-ses";
 	private static final long[] VIBRATE_PATTERN = new long[] { 1000, 200, 1000 };
