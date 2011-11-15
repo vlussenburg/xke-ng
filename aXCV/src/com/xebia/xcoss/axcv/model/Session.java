@@ -1,8 +1,5 @@
 package com.xebia.xcoss.axcv.model;
 
-import hirondelle.date4j.DateTime;
-import hirondelle.date4j.DateTime.DayOverflow;
-
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
@@ -46,8 +43,8 @@ public class Session implements Serializable {
 	private Long id;
 	private String title;
 	private String description;
-	private DateTime startTime;
-	private DateTime endTime;
+	private Moment startTime;
+	private Moment endTime;
 	private String limit = "Unlimited";
 	private Type type = Type.STANDARD;
 	private Set<Author> authors;
@@ -75,8 +72,8 @@ public class Session implements Serializable {
 
 		title = original.title;
 		location = original.location;
-		startTime = original.startTime;
-		endTime = original.endTime;
+		startTime = new Moment(original.startTime);
+		endTime = new Moment(original.endTime);
 		description = original.description;
 		intendedAudience = original.intendedAudience;
 		limit = original.limit;
@@ -137,36 +134,26 @@ public class Session implements Serializable {
 		}
 	}
 
-	public DateTime getStartTime() {
+	public Moment getStartTime() {
+		return startTime == null ? null : startTime.new FixedMoment(startTime);
+	}
+
+	public Moment onStartTime() {
+		if ( startTime == null ) {
+			startTime = new Moment();
+		}
 		return startTime;
 	}
 
-	public void setStartTime(DateTime time) {
-		int duration = getDuration();
-		startTime = updateTime(startTime, time);
-		setEndTime(startTime.plus(0, 0, 0, 0, duration, 0, DayOverflow.Spillover));
+	public Moment getEndTime() {
+		return endTime == null ? null : endTime.new FixedMoment(endTime);
 	}
 
-	public DateTime getEndTime() {
+	public Moment onEndTime() {
+		if ( endTime == null ) {
+			endTime = new Moment();
+		}
 		return endTime;
-	}
-
-	public void setEndTime(DateTime time) {
-		endTime = updateTime(endTime, time);
-	}
-
-	private DateTime updateTime(final DateTime baseTime, final DateTime time) {
-		DateTime result = baseTime;
-		if ( result == null ) {
-			result = DateTime.now(XCS.TZ);
-		}
-		if (time.hasYearMonthDay()) {
-			result = new DateTime(time.getYear(), time.getMonth(), time.getDay(), result.getHour(), result.getMinute(), 0, 0);
-		}
-		if (time.hasHourMinuteSecond()) {
-			result = new DateTime(result.getYear(), result.getMonth(), result.getDay(), time.getHour(), time.getMinute(), 0, 0);
-		}
-		return result;
 	}
 
 	public String getDescription() {
@@ -223,8 +210,8 @@ public class Session implements Serializable {
 	public int getDuration() {
 		int duration = DEFAULT_DURATION;
 		if (startTime != null && endTime != null) {
-			int start = startTime.getHour() * 60 + startTime.getMinute();
-			int end = endTime.getHour() * 60 + endTime.getMinute();
+			int start = startTime.asMinutes();
+			int end = endTime.asMinutes();
 			duration = end - start;
 		}
 		return duration;
@@ -326,21 +313,38 @@ public class Session implements Serializable {
 		if (getEndTime() == null) {
 			return false;
 		}
-		return getEndTime().isInThePast(XCS.TZ);
+		return getEndTime().isBeforeNow();
 	}
 
 	public boolean isRunning() {
 		if (getStartTime() == null) {
 			return false;
 		}
-		return DateTime.now(XCS.TZ).gteq(getStartTime()) && !isExpired();
+		return getStartTime().isBeforeNow() && !isExpired();
 	}
 
+
 	public long getModificationHash() {
-		// TODO Auto-generated method stub
-		return 0;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		result = prime * result + ((location == null) ? 0 : location.getDescription().hashCode());
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((endTime == null) ? 0 : (int) endTime.asLong());
+		result = prime * result + ((startTime == null) ? 0 : (int) startTime.asLong());
+		result = prime * result + ((preparation == null) ? 0 : preparation.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((labels == null) ? 0 : labels.hashCode());
+		result = prime * result + ((intendedAudience == null) ? 0 : intendedAudience.hashCode());
+
+		if ( authors != null ) {
+			for (Author author : authors) {
+				result = prime * result + author.getUserId().hashCode();
+			}
+		}
+		return result;
 	}
-	
+
 	public void setConferenceId(String conferenceId) {
 		this.conferenceId = conferenceId;
 	}
@@ -350,10 +354,63 @@ public class Session implements Serializable {
 	}
 
 	public void reschedule(Conference conference, TimeSlot slot) {
-		setStartTime(conference.getDate());
-		setStartTime(slot.start);
-		setEndTime(slot.end);
+		startTime = new Moment(conference.getStartTime());
+		startTime.setTime(slot.start.getHour(), slot.start.getMinute());
+		endTime = new Moment(conference.getStartTime());
+		endTime.setTime(slot.end.getHour(), slot.end.getMinute());
 		setLocation(slot.location);
 		setConferenceId(conference.getId());
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((authors == null) ? 0 : authors.hashCode());
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((labels == null) ? 0 : labels.hashCode());
+		result = prime * result + ((location == null) ? 0 : location.hashCode());
+		result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		Session other = (Session) obj;
+		if (authors == null) {
+			if (other.authors != null) return false;
+		} else if (!authors.equals(other.authors)) return false;
+		if (description == null) {
+			if (other.description != null) return false;
+		} else if (!description.equals(other.description)) return false;
+		if (endTime == null) {
+			if (other.endTime != null) return false;
+		} else if (!endTime.equals(other.endTime)) return false;
+		if (id == null) {
+			if (other.id != null) return false;
+		} else if (!id.equals(other.id)) return false;
+		if (labels == null) {
+			if (other.labels != null) return false;
+		} else if (!labels.equals(other.labels)) return false;
+		if (location == null) {
+			if (other.location != null) return false;
+		} else if (!location.equals(other.location)) return false;
+		if (startTime == null) {
+			if (other.startTime != null) return false;
+		} else if (!startTime.equals(other.startTime)) return false;
+		if (title == null) {
+			if (other.title != null) return false;
+		} else if (!title.equals(other.title)) return false;
+		if (type != other.type) return false;
+		return true;
+	}
+	
+	
 }

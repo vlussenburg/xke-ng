@@ -2,6 +2,7 @@ package com.xebia.xcoss.axcv.ui;
 
 import android.content.Intent;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,24 +33,31 @@ public class SessionAdapter extends BaseAdapter {
 		this.data = data;
 		timeUtil = new ScreenTimeUtil(context);
 	}
-
+	
 	@Override
-	public View getView(int paramInt, View paramView, ViewGroup parent) {
-
-		Session session = (Session) getItem(paramInt);
-		
+	public View getView(final int paramInt, View paramView, ViewGroup parent) {
+		final Session session = (Session) getItem(paramInt);
 		int colorId = ctx.getResources().getColor(R.color.tc_itemdefault);
 		if (session.isExpired()) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemgone);
 		} else if (session.isRunning()) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemactive);
 		}
-		return session.isMandatory() ? 
-				constructMandatoryView(parent, session, colorId) : 
-				constructSessionView(parent, session, colorId);
+		View row;
+		if (session.isMandatory()) {
+			row = constructMandatoryView(parent, session, colorId, paramInt);
+		} else {
+			row = constructSessionView(parent, session, colorId, paramInt);
+		}
+
+		registerClicks(row, paramInt, session);
+		return row;
 	}
 
-	private View constructSessionView(ViewGroup parent, final Session session, int colorId) {
+	public void registerClicks(View row, final int paramInt, final Session session) {
+	}
+
+	private View constructSessionView(ViewGroup parent, final Session session, int colorId, final int position) {
 
 		LayoutInflater inflater = ctx.getLayoutInflater();
 		View row = inflater.inflate(viewResource, parent, false);
@@ -92,6 +100,7 @@ public class SessionAdapter extends BaseAdapter {
 			button.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
+					Log.e("XCS", "Marking session: " + session.getTitle() + ":" + session.getConferenceId());
 					ctx.markSession(session, view, true);
 				}
 			});
@@ -107,7 +116,7 @@ public class SessionAdapter extends BaseAdapter {
 		return row;
 	}
 
-	private View constructMandatoryView(ViewGroup parent, Session session, int colorId) {
+	private View constructMandatoryView(ViewGroup parent, final Session session, int colorId, final int position) {
 
 		LayoutInflater inflater = ctx.getLayoutInflater();
 		View row = inflater.inflate(alternativeViewResource, parent, false);
@@ -163,4 +172,6 @@ public class SessionAdapter extends BaseAdapter {
 	public void setIncludeDate(boolean state) {
 		includeDate = state;
 	}
+
+
 }

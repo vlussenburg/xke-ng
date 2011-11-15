@@ -29,22 +29,22 @@ public class AuthorAdapter extends BaseAdapter {
 	
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
-		Author author = (Author) getItem(position);
+		final Author author = (Author) getItem(position);
 		LayoutInflater inflater = ctx.getLayoutInflater();
 		View row = inflater.inflate(viewResource, parent, false);
 		TextView titleView = (TextView) row.findViewById(R.id.author_name);
-		titleView.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
+		row.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
 			@Override
 			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-				createContextMenu(menu, v, menuInfo, position);
+				createContextMenu(menu, v, menuInfo, position, author.getName());
 			}
 		});
 		titleView.setText(author.getName());
 		return row;
 	}
 	
-	
-	protected void createContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo, int position) {
+	protected void createContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo, int position, String name) {
+		menu.setHeaderTitle(name);
 		menu.add(position, R.id.view, Menu.NONE, R.string.context_menu_author_view);
 		menu.add(position, R.id.remove, Menu.NONE, R.string.context_menu_author_remove);
 	}

@@ -5,6 +5,8 @@ import java.util.Set;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
@@ -26,7 +29,6 @@ import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.ProxyExceptionReporter;
-import com.xebia.xcoss.axcv.util.SecurityUtils;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
@@ -41,6 +43,8 @@ public abstract class BaseActivity extends Activity {
 	public static final String IA_CONF_YEAR = "ID-year";
 	public static final String IA_REDIRECT = "ID-redirect";
 	public static final String IA_LOCATION_ID = "ID-location";
+	public static final String IA_SESSION_START = "ID-sstart";
+	public static final String IA_NOTIFICATION_ID = "ID-notified";
 
 	private MenuItem miSettings;
 	private MenuItem miSearch;
@@ -61,13 +65,14 @@ public abstract class BaseActivity extends Activity {
 		if (rootActivity == null) {
 			rootActivity = this;
 		}
-//		Log.e("XCS", "========== ROOT activity [" + rootActivity.getLocalClassName() + "] ========== ");
-//		if ((rootActivity instanceof CVSplashLoader) == false) {
-//			Log.e("XCS", "========== ROOT activity RESET ========== ");
-//			resetApplication(true);
-//			return;
-//		}
 
+		String notificationId = getIntent().getStringExtra(IA_NOTIFICATION_ID);
+		if ( notificationId != null ) {
+			NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			Log.w("debug", "Cancel on " + notificationId);
+			mgr.cancel(notificationId.hashCode());
+		}
+		
 		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);
 		if (conferenceButton != null) {
 			conferenceButton.setOnClickListener(new View.OnClickListener() {
@@ -199,7 +204,7 @@ public abstract class BaseActivity extends Activity {
 		if (server == null || server.isLoggedIn() == false) {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			String user = sp.getString(XCS.PREF.USERNAME, null);
-			String password = SecurityUtils.decrypt(sp.getString(XCS.PREF.PASSWORD, ""));
+			String password = /*SecurityUtils.decrypt(*/sp.getString(XCS.PREF.PASSWORD, "")/*)*/;
 			server = ConferenceServer.createInstance(user, password, getServerUrl(), rootActivity == null ? null
 					: rootActivity.getApplicationContext());
 		}
@@ -276,6 +281,11 @@ public abstract class BaseActivity extends Activity {
 			if (((DataException) e).missing()) {
 				Log.w(XCS.LOG.COMMUNICATE, "No result for '" + activity + "'.");
 				lastError = "Not found: " + activity;
+			} else if (((DataException) e).timedOut()) {
+				Log.w(XCS.LOG.COMMUNICATE, "Time out on '" + activity + "'.");
+				if ( context != null ) {
+					Toast.makeText(context, "Time out on "+activity+"!", Toast.LENGTH_SHORT);
+				}
 			} else {
 				// Authentication failure
 				if (context != null) {

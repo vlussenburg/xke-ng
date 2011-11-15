@@ -1,10 +1,8 @@
 package com.xebia.xcoss.axcv;
 
-import hirondelle.date4j.DateTime;
+import java.util.TreeSet;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -14,7 +12,9 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
+import com.xebia.xcoss.axcv.logic.ProfileManager.Trackable;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.ui.SessionAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -31,25 +31,31 @@ public class CVTrack extends BaseActivity {
 		sessionList.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
-				markSession(sessions[paramInt], view, true);
+				switchTo(paramInt);
 			}
 		});
 		super.onCreate(savedInstanceState);
 	}
 
+	private void switchTo(int sessionIndex) {
+		Session session = sessions[sessionIndex];
+		Intent intent = new Intent(this, CVSessionView.class);
+		intent.putExtra(BaseActivity.IA_CONFERENCE, session.getConferenceId());
+		intent.putExtra(BaseActivity.IA_SESSION, session.getId());
+		startActivity(intent);
+	}
+
 	@Override
 	protected void onResume() {
-		List<Session> selectedSessions = new ArrayList<Session>();
+		TreeSet<Session> selectedSessions = new TreeSet<Session>(new SessionComparator());
 		ConferenceServer server = getConferenceServer();
-		String[] markedSessions = getProfileManager().getMarkedSessionIds(getUser());
+		Trackable[] markedSessions = getProfileManager().getMarkedSessions(getUser());
 		boolean hasExpiredSession = false;
-		DateTime today = DateTime.today(XCS.TZ);
-		for (String id : markedSessions) {
+		for (Trackable id : markedSessions) {
 			try {
-				Session session = server.getSession(id);
+				Session session = server.getSession(id.sessionId, id.conferenceId);
 				if (session != null) {
-					// session.isExpired() works also on the day itself
-					if (today.gt(session.getStartTime())) {
+					if (session.isExpired()) {
 						hasExpiredSession = true;
 					} else {
 						selectedSessions.add(session);
@@ -60,8 +66,8 @@ public class CVTrack extends BaseActivity {
 				Log.v(XCS.LOG.COMMUNICATE, "No marked session with id " + id);
 			}
 		}
-		if ( hasExpiredSession ) {
-			getProfileManager().pruneMarked(today);
+		if (hasExpiredSession) {
+			getProfileManager().pruneMarked();
 		}
 		sessions = selectedSessions.toArray(new Session[selectedSessions.size()]);
 		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, sessions);

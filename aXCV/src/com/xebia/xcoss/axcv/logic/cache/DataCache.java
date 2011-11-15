@@ -1,8 +1,5 @@
 package com.xebia.xcoss.axcv.logic.cache;
 
-import hirondelle.date4j.DateTime;
-import hirondelle.date4j.DateTime.Unit;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,14 +7,28 @@ import android.content.Context;
 import android.util.Log;
 
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public abstract class DataCache {
 	protected static final long CACHETIME = 30 * 60 * 1000;
 
-	public DataCache(Context ctx) {
+	public enum Type {
+		Memory(MemoryCache.class), Database(DatabaseCache.class), None(NoCache.class);
+
+		private Class<?> clazz;
+
+		Type(Class<?> clz) {
+			this.clazz = clz;
+		}
+
+		public DataCache newInstance(Context ctx) throws Exception {
+			return (DataCache) clazz.getConstructor(Context.class).newInstance(ctx);
+		}
 	}
+
+	public DataCache(Context ctx) {}
 
 	public <T> T getObject(String key, Class<T> type) {
 		return checkValid(doGetCachedObject(key, type));
@@ -30,7 +41,7 @@ public abstract class DataCache {
 	public List<Conference> getConferences(Integer year) {
 		List<Conference> result = new ArrayList<Conference>();
 		for (CachedObject<Conference> co : doGetCachedObjects(Conference.class)) {
-			if (co.object.getDate().getYear().equals(year)) {
+			if (co.object.getStartTime().getYear().equals(year)) {
 				// Not checking on validity...
 				if (co.object != null) {
 					result.add(co.object);
@@ -40,28 +51,29 @@ public abstract class DataCache {
 		return result;
 	}
 
-	public Conference getConference(DateTime date) {
+	public Conference getConference(Moment date) {
 		for (CachedObject<Conference> co : doGetCachedObjects(Conference.class)) {
-			if (co.object.getDate().equals(date)) {
+			if (co.object.getStartTime().compare(date) == 0) {
 				return checkValid(co);
 			}
 		}
 		return null;
 	}
 
-	public List<Conference> getConferences(DateTime date) {
+	public List<Conference> getConferences(Moment date) {
 		List<Conference> list = getConferences(date.getYear());
-		if (list == null || !date.unitsAllPresent(Unit.MONTH)) {
+		if (list == null) {
 			return list;
 		}
 		List<Conference> result = new ArrayList<Conference>();
-		boolean hasDay = date.unitsAllPresent(Unit.DAY);
 		for (Conference conference : list) {
-			if (conference.getDate().getMonth() == date.getMonth()) {
-				if (hasDay && conference.getDate().getDay() != date.getDay()) {
-					continue;
-				}
+			Moment m = conference.getStartTime();
+			if (date.getMonth() == null) {
 				result.add(conference);
+			} else if (date.getMonth().equals(m.getMonth())) {
+				if (date.getDay() == null || date.getDay().equals(m.getDay())) {
+					result.add(conference);
+				}
 			}
 		}
 		return result;
@@ -74,7 +86,7 @@ public abstract class DataCache {
 	public List<Session> getSessions(String id) {
 		ArrayList<Session> sessions = new ArrayList<Session>();
 		for (CachedObject<Session> co : doGetCachedObjects(Session.class)) {
-			if (co.object.getConferenceId().equals(id)) {
+			if (co.object != null && co.object.getConferenceId() != null && co.object.getConferenceId().equals(id)) {
 				sessions.add(checkValid(co, false));
 			}
 		}
@@ -82,8 +94,13 @@ public abstract class DataCache {
 	}
 
 	public void add(String conferenceId, Session result) {
-		result.setConferenceId(conferenceId);
-		doPutCachedObject(result.getId().toString(), new CachedObject<Session>(result));
+		if ( conferenceId == null ) {
+			throw new RuntimeException("ConferenceId cannot be null!");
+		}
+		if (result != null && result.getId() != null) {
+			result.setConferenceId(conferenceId);
+			doPutCachedObject(result.getId().toString(), new CachedObject<Session>(result));
+		}
 	}
 
 	public void add(String conferenceId, Iterable<Session> result) {
@@ -91,10 +108,13 @@ public abstract class DataCache {
 			add(conferenceId, session);
 		}
 	}
+
 	public void add(Conference result) {
 		CachedObject<Conference> cachedObject = new CachedObject<Conference>(result);
-		doPutCachedObject(result.getId(), cachedObject);
-		add(result.getId(), result.getSessions());
+		if (result != null) {
+			doPutCachedObject(result.getId(), cachedObject);
+			add(result.getId(), result.getSessions());
+		}
 	}
 
 	public <T> void addObject(String key, T o) {
@@ -142,7 +162,7 @@ public abstract class DataCache {
 	protected <T> T checkValid(CachedObject<T> co) {
 		return checkValid(co, true);
 	}
-	
+
 	protected <T> T checkValid(CachedObject<T> co, boolean discard) {
 		if (co == null) {
 			return null;

@@ -1,19 +1,12 @@
 package com.xebia.xcoss.axcv.util;
 
-import java.util.TimeZone;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.text.util.Linkify.MatchFilter;
-import android.text.util.Linkify.TransformFilter;
-import android.util.Log;
 import android.view.Menu;
 
 public class XCS {
 
 	private static final int DIALOGID = 2348;
-
-	public static final TimeZone TZ = TimeZone.getDefault();
 
 	public static class TAG {
 		public static final String LINK = "tag://xebia/";
@@ -81,5 +74,6 @@ public class XCS {
 		public static final String NOTIFYOWNED = "NotifyOwned";
 		public static final String DATEFORMAT = "DateFormat";
 		public static final String TIMEFORMAT = "TimeFormat";
+		public static final String CACHETYPE = "CacheType";
 	}
 }

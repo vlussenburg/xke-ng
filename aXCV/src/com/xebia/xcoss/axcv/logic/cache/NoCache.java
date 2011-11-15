@@ -5,10 +5,16 @@ import java.util.List;
 
 import android.content.Context;
 
+import com.xebia.xcoss.axcv.logic.ProfileManager;
+
 public class NoCache extends DataCache {
 
 	public NoCache(Context ctx) {
 		super(ctx);
+		ProfileManager profileManager = new ProfileManager(ctx);
+		boolean hasOpened = profileManager.openConnection();
+		profileManager.removeAllCache();
+		if ( hasOpened ) profileManager.closeConnection();
 	}
 
 	@Override

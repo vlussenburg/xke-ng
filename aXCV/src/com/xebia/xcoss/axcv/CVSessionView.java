@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,13 +51,24 @@ public class CVSessionView extends SessionSwipeActivity {
 	protected void onResume() {
 		Conference conference = getCurrentConference();
 		currentSession = getSelectedSession(conference);
+
 		if (currentSession == null) {
 			Location location = getCurrentLocation();
+			ArrayList<Session> options = new ArrayList<Session>();
 			for (Session s : conference.getSessions()) {
-				if (s.getLocation().equals(location)) {
-					currentSession = s;
+				if (s.getLocation().equals(location) || s.isBreak()) {
+					options.add(s);
+				}
+			}
+			int start = getIntent().getIntExtra(IA_SESSION_START, 0);
+			for (Session session : options) {
+				if (session.getStartTime().asMinutes() == start) {
+					currentSession = session;
 					break;
 				}
+			}
+			if (currentSession == null && options.size() > 0) {
+				currentSession = options.get(0);
 			}
 		}
 		if (currentSession == null) {
@@ -78,7 +90,7 @@ public class CVSessionView extends SessionSwipeActivity {
 
 		TextView date = (TextView) findViewById(R.id.conferenceDate);
 		ScreenTimeUtil timeUtil = new ScreenTimeUtil(this);
-		String val = timeUtil.getAbsoluteDate(conference.getDate());
+		String val = timeUtil.getAbsoluteDate(conference.getStartTime());
 		date.setText(val);
 
 		TextView sessionDate = (TextView) findViewById(R.id.sessionTime);
@@ -160,9 +172,9 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	private void updateSessions() {
 		Session session = getNextSession(getCurrentLocation());
-		// Log.i(XCS.LOG.NAVIGATE, "Find sessions at " + getCurrentLocation());
-		// Log.i(XCS.LOG.NAVIGATE, "Current session = " + currentSession);
-		// Log.i(XCS.LOG.NAVIGATE, "Next session = " + session);
+		Log.i(XCS.LOG.NAVIGATE, "Find sessions at " + getCurrentLocation());
+		Log.i(XCS.LOG.NAVIGATE, "Current session = " + currentSession);
+		Log.i(XCS.LOG.NAVIGATE, "Next session = " + session);
 		View viewById = findViewById(R.id.textNextSession);
 		LinearLayout layout = (LinearLayout) viewById.getParent();
 		if (session == null) {
@@ -180,7 +192,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		}
 
 		session = getPreviousSession(getCurrentLocation());
-		// Log.i(XCS.LOG.NAVIGATE, "Previous session = " + session);
+		Log.i(XCS.LOG.NAVIGATE, "Previous session = " + session);
 		viewById = findViewById(R.id.textPreviousSession);
 		layout = (LinearLayout) viewById.getParent();
 		if (session == null) {
@@ -286,7 +298,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		Intent intent = new Intent(this, CVSessionAdd.class);
 		intent.putExtra(BaseActivity.IA_CONFERENCE, getConference().getId());
 		boolean processed = false;
-		
+
 		switch (item.getItemId()) {
 			case XCS.MENU.ADD:
 				startActivity(intent);
@@ -330,10 +342,30 @@ public class CVSessionView extends SessionSwipeActivity {
 		}
 	}
 
+	@Override
+	public void onSwipeLeftToRight() {
+		getIntent().putExtra(IA_SESSION_START, currentSession.getStartTime().asMinutes());
+		super.onSwipeLeftToRight();
+	}
+
+	@Override
+	public void onSwipeRightToLeft() {
+		getIntent().putExtra(IA_SESSION_START, currentSession.getStartTime().asMinutes());
+		super.onSwipeRightToLeft();
+	}
+
 	private Session getNextSession(Location location) {
 		Set<Session> sessionsSet = this.getConference().getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
-		int index = sessions.indexOf(currentSession);
+		int index = -1;
+		if (currentSession != null) {
+			for (int i = 0; i < sessions.size(); i++) {
+				if (currentSession.equals(sessions.get(i))) {
+					index = i;
+					break;
+				}
+			}
+		}
 		int max = sessions.size() - 1;
 		while (index < max) {
 			Session session = sessions.get(++index);
@@ -347,7 +379,15 @@ public class CVSessionView extends SessionSwipeActivity {
 	private Session getPreviousSession(Location location) {
 		Set<Session> sessionsSet = this.getConference().getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
-		int index = sessions.indexOf(currentSession);
+		int index = -1;
+		if (currentSession != null) {
+			for (int i = 0; i < sessions.size(); i++) {
+				if (currentSession.equals(sessions.get(i))) {
+					index = i;
+					break;
+				}
+			}
+		}
 		while (index > 0) {
 			Session session = sessions.get(--index);
 			if (session.isMandatory() || session.getLocation().equals(location)) {

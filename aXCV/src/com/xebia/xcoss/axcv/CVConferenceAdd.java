@@ -1,7 +1,5 @@
 package com.xebia.xcoss.axcv;
 
-import hirondelle.date4j.DateTime;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,6 +30,7 @@ import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.model.Location;
+import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.ui.AddBreakDialog;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
@@ -79,7 +78,7 @@ public class CVConferenceAdd extends AdditionActivity {
 			TextView view = (TextView) findViewById(R.id.conferenceName);
 			view.setText(FormatUtil.getText(conference.getTitle()));
 
-			DateTime date = conference.getDate();
+			Moment date = conference.getStartTime();
 			if (date != null) {
 				view = (TextView) findViewById(R.id.conferenceDate);
 				view.setText(timeFormatter.getAbsoluteDate(date));
@@ -164,7 +163,7 @@ public class CVConferenceAdd extends AdditionActivity {
 			}
 		});
 		button = (Button) findViewById(R.id.actionDelete);
-		if (create || conference.getDate().isInThePast(XCS.TZ)) {
+		if (create || conference.getStartTime().isBeforeNow()) {
 			button.setVisibility(View.GONE);
 		} else {
 			button.setOnClickListener(new OnClickListener() {
@@ -181,7 +180,7 @@ public class CVConferenceAdd extends AdditionActivity {
 					}
 					message.append("Are you sure to delete conference '").append(conference.getTitle()).append("'");
 					message.append(" on ");
-					message.append(timeFormatter.getAbsoluteDate(conference.getDate()));
+					message.append(timeFormatter.getAbsoluteDate(conference.getStartTime()));
 					message.append("?");
 
 					AlertDialog.Builder builder = new AlertDialog.Builder(CVConferenceAdd.this);
@@ -202,8 +201,7 @@ public class CVConferenceAdd extends AdditionActivity {
 					if (size > 0) {
 						builder.setNeutralButton("Move & delete", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								Conference nextConference = getConferenceServer().getUpcomingConference(
-										conference.getDate().plusDays(1));
+								Conference nextConference = getConferenceServer().getUpcomingConference(conference.getEndTime());
 								Set<Session> sessions = conference.getSessions();
 								for (Session s : sessions) {
 									SortedSet<TimeSlot> slots = nextConference.getAvailableTimeSlots(s.getDuration());
@@ -245,19 +243,29 @@ public class CVConferenceAdd extends AdditionActivity {
 	 */
 	public void updateField(int field, Object selection, boolean checked) {
 		String value = selection.toString();
+		Moment moment;
 		switch (field) {
 			case R.id.conferenceName:
 				conference.setTitle(value);
 			break;
 			case R.id.conferenceDate:
-				conference.updateStartTime((DateTime) selection);
-				conference.updateEndTime((DateTime) selection);
+				moment = (Moment) selection;
+				conference.onStartTime().setDate(moment);
+				conference.onEndTime().setDate(moment);
+				for (Session session : conference.getSessions()) {
+					session.onStartTime().setDate(moment);
+					session.onEndTime().setDate(moment);
+				}
 			break;
 			case R.id.conferenceStart:
-				conference.updateStartTime((DateTime) selection);
+				moment = (Moment) selection;
+				// TODO : Check if there are sessions invalid
+				conference.onStartTime().setTime(moment.getHour(), moment.getMinute());
 			break;
 			case R.id.conferenceEnd:
-				conference.updateEndTime((DateTime) selection);
+				moment = (Moment) selection;
+				// TODO : Check if there are sessions invalid
+				conference.onEndTime().setTime(moment.getHour(), moment.getMinute());
 			break;
 			case R.id.conferenceDescription:
 				conference.setDescription(value);
@@ -313,8 +321,8 @@ public class CVConferenceAdd extends AdditionActivity {
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog = null;
 		String[] items;
+		Moment time;
 		AlertDialog.Builder builder;
-		DateTime time;
 		OnTimeSetListener timeSetListener;
 
 		switch (id) {
@@ -343,10 +351,16 @@ public class CVConferenceAdd extends AdditionActivity {
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Select locations");
 				builder.setMultiChoiceItems(items, check, new DialogHandler(this, items, R.id.conferenceLocations));
+				builder.setPositiveButton(R.string.close_button, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.CREATE_BREAK:
-				if (conference.getLocations().size() == 0 || conference.getDate() == null) {
+				if (conference.getLocations().size() == 0 || conference.getStartTime() == null) {
 					createDialog("Conference detail", "No locations and/or date specified yet").show();
 				} else {
 					dialog = new AddBreakDialog(this, R.id.breakTime);
@@ -354,39 +368,38 @@ public class CVConferenceAdd extends AdditionActivity {
 			break;
 			case XCS.DIALOG.INPUT_TIME_START:
 				time = conference.getStartTime();
-				if (time == null) {
-					time = DateTime.forTimeOnly(9, 0, 0, 0);
-				}
 				timeSetListener = new OnTimeSetListener() {
 					@Override
 					public void onTimeSet(TimePicker paramTimePicker, int h, int m) {
-						updateField(R.id.conferenceStart, DateTime.forTimeOnly(h, m, 0, 0), true);
+						updateField(R.id.conferenceStart, new Moment(h, m), true);
 					}
 				};
-				dialog = new TimePickerDialog(this, timeSetListener, time.getHour(), time.getMinute(), true);
+				int hour = time == null ? 9 : time.getHour();
+				int minute = time == null ? 0 : time.getMinute();
+				dialog = new TimePickerDialog(this, timeSetListener, hour, minute, true);
 			break;
 			case XCS.DIALOG.INPUT_TIME_END:
 				time = conference.getEndTime();
 				if (time == null) {
-					time = DateTime.forTimeOnly(21, 0, 0, 0);
+					time = new Moment(21, 0);
 				}
 				timeSetListener = new OnTimeSetListener() {
 					@Override
 					public void onTimeSet(TimePicker tp, int h, int m) {
-						updateField(R.id.conferenceEnd, DateTime.forTimeOnly(h, m, 0, 0), true);
+						updateField(R.id.conferenceEnd, new Moment(h, m), true);
 					}
 				};
 				dialog = new TimePickerDialog(this, timeSetListener, time.getHour(), time.getMinute(), true);
 			break;
 			case XCS.DIALOG.INPUT_DATE:
-				time = conference.getDate();
+				time = conference.getStartTime();
 				if (time == null) {
-					time = DateTime.today(XCS.TZ);
+					time = new Moment();
 				}
 				OnDateSetListener dateSetListener = new OnDateSetListener() {
 					@Override
 					public void onDateSet(DatePicker paramDatePicker, int y, int m, int d) {
-						updateField(R.id.conferenceDate, DateTime.forDateOnly(y, m + 1, d), true);
+						updateField(R.id.conferenceDate, new Moment(y, m + 1, d), true);
 					}
 				};
 				dialog = new DatePickerDialog(this, dateSetListener, time.getYear(), time.getMonth() - 1, time.getDay());

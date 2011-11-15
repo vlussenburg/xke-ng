@@ -15,10 +15,11 @@ public class ConferenceStatus {
 	public static String getStatus(Conference cfr) {
 		try {
 			int locsize = cfr.getLocations().size();
-			int trackDuration = cfr.getEndTime().getHour() * 60 + cfr.getEndTime().getMinute()
-					- cfr.getStartTime().getHour() * 60 - cfr.getStartTime().getMinute();
-
+			int trackDuration = cfr.getEndTime().asMinutes() - cfr.getStartTime().asMinutes();
 			Set<Session> sessions = cfr.getSessions();
+			int totalDuration = locsize * trackDuration;
+			int expectedSlots = totalDuration/slotSize;
+
 			int mandatoryDuration = 0;
 			int bookedDuration = 0;
 			for (Session session : sessions) {
@@ -28,10 +29,7 @@ public class ConferenceStatus {
 					bookedDuration += session.getDuration();
 				}
 			}
-			int obsoleteCount = locsize == 1 ? 1 : locsize-1;
-			int totalDuration = locsize * trackDuration - obsoleteCount * mandatoryDuration;
-			int expectedSlots = totalDuration/slotSize;
-			int openSlots = (totalDuration-bookedDuration)/slotSize;
+			int openSlots = (totalDuration-bookedDuration-locsize*mandatoryDuration)/slotSize;
 
 			if (expectedSlots == 0) {
 				return "n/a";

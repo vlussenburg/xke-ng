@@ -1,6 +1,5 @@
 package com.xebia.xcoss.axcv.model;
 
-import com.xebia.xcoss.axcv.util.SecurityUtils;
 import com.xebia.xcoss.axcv.util.StringUtil;
 
 public class Credential {
@@ -11,15 +10,12 @@ public class Credential {
 	@SuppressWarnings("unused")
 	private String encryptedPassword;
 
-	public Credential(String name, String plain) {
-		this(name, plain, false);
-	}
-
-	public Credential(String name, String plain, boolean encryptedOnly) {
+	public Credential(String name, String password, boolean isEncrypted) {
 		this.username = StringUtil.isEmpty(name) ? "not_set" : name;
-		if (!encryptedOnly) {
-			this.password = StringUtil.isEmpty(plain) ? "not_set" : plain;
+		if (isEncrypted) {
+			this.encryptedPassword = StringUtil.isEmpty(password) ? "?" : password;
+		} else {
+			this.password = StringUtil.isEmpty(password) ? "?" : password;
 		}
-		this.encryptedPassword = SecurityUtils.encrypt(password);
 	}
 }

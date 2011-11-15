@@ -17,19 +17,15 @@ public class SessionComparator implements Comparator<Session>, Serializable {
 		int result = 0;
 		if (s1.getStartTime() == null) {
 			result = (s2.getStartTime() == null) ? 0 : -1;
-		} else if (s2.getStartTime() == null ) {
-			result = 1;
 		} else {
-			result = s1.getStartTime().compareTo(s2.getStartTime());
+			result = s1.getStartTime().compare(s2.getStartTime());
 		}
 //		Log.w("XCS", "  Starttime: " + result);
 		if ( result == 0 ) {
 			if (s1.getEndTime() == null) {
 				result = (s2.getEndTime() == null) ? 0 : -1;
-			} else if (s2.getEndTime() == null ) {
-				result = 1;
 			} else {
-				result = s1.getEndTime().compareTo(s2.getEndTime());
+				result = s1.getEndTime().compare(s2.getEndTime());
 			}
 		}
 //		Log.w("XCS", "  Endtime: " + result);

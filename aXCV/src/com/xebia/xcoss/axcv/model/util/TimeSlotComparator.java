@@ -17,7 +17,7 @@ public class TimeSlotComparator implements Comparator<TimeSlot>, Serializable {
 		} else if (s2.start == null ) {
 			result = 1;
 		} else {
-			result = s1.start.compareTo(s2.start);
+			result = s1.start.asMinutes() - s2.start.asMinutes();
 		}
 		if ( result == 0 ) {
 			if (s1.location == null) {
@@ -34,7 +34,7 @@ public class TimeSlotComparator implements Comparator<TimeSlot>, Serializable {
 			} else if (s2.end == null ) {
 				result = 1;
 			} else {
-				result = s1.end.compareTo(s2.end);
+				result = s1.end.asMinutes() - s2.end.asMinutes();
 			}
 		}
 		return result;

@@ -1,7 +1,5 @@
 package com.xebia.xcoss.axcv;
 
-import hirondelle.date4j.DateTime;
-
 import java.util.List;
 
 import android.content.Intent;
@@ -11,32 +9,34 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.ui.ConferenceAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
 
 /**
- * <p>Shows the conferences of a specific year.</p>
+ * <p>
+ * Shows the conferences of a specific year.
+ * </p>
  * <p>
  * The parameters used are:
  * <ul>
  * <li>IA_CONF_YEAR - Year to display (yyyy); defaults to the current year.
  * <li>IA_REDIRECT - Boolean indicating to progress directly to the upcoming conference. Must be enabled in preferences
- * </ul></p>
+ * </ul>
+ * </p>
  * 
  * @author Michael
  */
 public class CVConferences extends SwipeActivity {
 
 	private int shownYear;
+	private Conference[] conferences;
 
-	/** 
+	/**
 	 * Called when the activity is first created.
 	 * Builds up the screen and loads the conferences for a certain year (not refreshed until
 	 * the activity is newly created.
@@ -46,8 +46,8 @@ public class CVConferences extends SwipeActivity {
 		setContentView(R.layout.conferences);
 		super.onCreate(savedInstanceState);
 		addGestureDetection(R.id.conferencesSwipeBase);
-		
-		shownYear = getIntent().getIntExtra(IA_CONF_YEAR, DateTime.today(XCS.TZ).getYear());
+
+		shownYear = getIntent().getIntExtra(IA_CONF_YEAR, new Moment().getYear());
 
 		// Check for redirection. Not the case if menu option is used.
 		if (getIntent().getBooleanExtra(IA_REDIRECT, true)) {
@@ -68,10 +68,10 @@ public class CVConferences extends SwipeActivity {
 		Conference upcomingConference = getConferenceServer().getUpcomingConference();
 		int position = 0;
 		int idx = 0;
-		final Conference[] conferences = new Conference[list.size()];
+		conferences = new Conference[list.size()];
 		for (Conference conference : list) {
 			conferences[idx] = conference;
-			if ( conference.equals(upcomingConference)) {
+			if (conference.equals(upcomingConference)) {
 				position = idx;
 			}
 			idx++;
@@ -79,15 +79,30 @@ public class CVConferences extends SwipeActivity {
 		ConferenceAdapter adapter = new ConferenceAdapter(this, R.layout.conference_item, conferences);
 		ListView conferencesList = (ListView) findViewById(R.id.conferencesList);
 		conferencesList.setAdapter(adapter);
-		conferencesList.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
-				// Adapter = listview, view = tablelayout.
-				switchTo(conferences[paramInt]);
-			}
-		});
 		conferencesList.setSelection(position);
 		super.onResume();
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem menuItem) {
+		int position = menuItem.getGroupId();
+		switch (menuItem.getItemId()) {
+			case R.id.view:
+				switchTo(position);
+				return true;
+			case R.id.edit:
+				Intent intent = new Intent(this, CVConferenceAdd.class);
+				intent.putExtra(BaseActivity.IA_CONFERENCE, conferences[position].getId());
+				startActivity(intent);
+				return true;
+		}
+		return super.onContextItemSelected(menuItem);
+	}
+
+	public void switchTo(int index) {
+		if (index >= 0 && index < conferences.length) {
+			switchTo(conferences[index]);
+		}
 	}
 
 	private void switchTo(Conference conference) {
@@ -130,7 +145,7 @@ public class CVConferences extends SwipeActivity {
 		intent.putExtra(IA_CONF_YEAR, shownYear - 1);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
-		overridePendingTransition(R.anim.slide_right, R.anim.slide_left);
+		overridePendingTransition(R.anim.slide_right, 0);
 	}
 
 	@Override
@@ -140,7 +155,7 @@ public class CVConferences extends SwipeActivity {
 		intent.putExtra(IA_CONF_YEAR, shownYear + 1);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
-		overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
+		overridePendingTransition(R.anim.slide_left, 0);
 	}
 
 	@Override

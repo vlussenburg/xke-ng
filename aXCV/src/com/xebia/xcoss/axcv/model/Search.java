@@ -1,7 +1,5 @@
 package com.xebia.xcoss.axcv.model;
 
-import hirondelle.date4j.DateTime;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,7 +8,7 @@ import com.xebia.xcoss.axcv.util.StringUtil;
 public class Search {
 
 	public enum Field {
-		FREETEXT, NAME, AUTHOR, MAIL, FROM,
+		FREETEXT, AUTHOR, AFTER,
 	}
 
 	private Map<Field, String> searchParms;
@@ -33,11 +31,10 @@ public class Search {
 		return this;
 	}
 
-	public Search onDateStart(DateTime dt) {
-		if (dt != null) {
-			searchParms.put(Field.FROM, dt.format("YYYY-MM-DD|T|hh:mm:ss.fff|Z|"));
+	public Search after(Moment moment) {
+		if ( moment != null ) {
+			searchParms.put(Field.AFTER, String.valueOf(moment.asLong()));
 		}
 		return this;
 	}
-
 }

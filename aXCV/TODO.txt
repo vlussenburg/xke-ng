@@ -1,27 +1,33 @@
 IN PROGRESS
 -------------------------------------------------------------------
 
+-	Offline support
+
 TODO
 -------------------------------------------------------------------
 client
--	Notificaties weer werkend maken
--	Breaks inplannen over alle locaties
--	Caching: refresh na conference edit (reopen view...)
--	Bugfix menu popup labels/authors (Rogier)
+-	Lijst (conferenties) scrollt niet terug naar eerste item (blijft hangen) Tracklist/Sessionlist wel ok.
+-	Https connectie
+-	Timeouts on retrieving labels & authors should be handled in a notification!
+-	Afhandeling 400 meldingen
+-	Externalize strings
 
 later op de client
 -	Verbeteren van caching
--	Offline support
+	-	Caching: refresh na conference edit/add break (reopen view...)
+	-	Conferenties verdwijnen uit lijst...
 -	Conference edit alleen door organiser (?)
--	JodaTime (timezone related)
+-	Edit personal profile (?)
 
 server
+-	Https connectie
 -	Session scheduling
 -	403 on session expiration
 -	Verwijderen van locaties (Urs; not supported now)
--	Herziening REST API (session change; new URL does not work)
--	Error handling (/error URL does not work?)
--	Nieuwe foutmeldingen van server (nieuwe server versie)
+-	Error handling (/error URL geeft 400 zonder verdere melding)
+-	Nieuwe datum conferentie leidt niet tot nieuwe datum sessies (wordt wel gestuurd)
+-	Uitzoeken hoe encryption werkt (want lukt nog niet bij mij...)
+    - Padding error op server...
 
 DONE
 -------------------------------------------------------------------
@@ -30,3 +36,15 @@ DONE
 -	Authors
 -	Breaks verwijderen
 -	Omschakelen tussen full view/list view van sessies
+-	JodaTime (timezone related)
+-	Breaks inplannen over alle locaties
+-	Number of available slots not correct.
+-	Notificaties weer werkend maken
+-	Bugfix menu popup labels/authors (Rogier)
+-	Acties vanuit Tracklist werken niet altijd (afh. current conference)
+-	Sorting in tracklist
+- 	Fix menu popups in session add/edit
+-	Error handling (check server, 6:55)
+- 	Fix menu popups in conference add/edit
+-	Menu op longclick op conference en session adapter
+

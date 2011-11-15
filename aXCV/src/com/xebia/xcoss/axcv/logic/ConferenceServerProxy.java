@@ -1,7 +1,5 @@
 package com.xebia.xcoss.axcv.logic;
 
-import hirondelle.date4j.DateTime;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +9,7 @@ import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Location;
+import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Rate;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Search;
@@ -86,7 +85,7 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public Conference getConference(DateTime date) {
+	public Conference getConference(Moment date) {
 		try {
 			return super.getConference(date);
 		}
@@ -108,7 +107,7 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public List<Conference> getConferences(DateTime date) {
+	public List<Conference> getConferences(Moment date) {
 		try {
 			return super.getConferences(date);
 		}
@@ -185,9 +184,9 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public Session getSession(String id) {
+	public Session getSession(String id, String cid) {
 		try {
-			return super.getSession(id);
+			return super.getSession(id, cid);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "get session", e);
