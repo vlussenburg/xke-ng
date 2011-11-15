@@ -204,7 +204,7 @@ public class CVConferenceAdd extends AdditionActivity {
 								Conference nextConference = getConferenceServer().getUpcomingConference(conference.getEndTime());
 								Set<Session> sessions = conference.getSessions();
 								for (Session s : sessions) {
-									SortedSet<TimeSlot> slots = nextConference.getAvailableTimeSlots(s.getDuration());
+									SortedSet<TimeSlot> slots = nextConference.getAvailableTimeSlots(s.getDuration(), null);
 									if (slots.isEmpty()) {
 										dialog.dismiss();
 										Toast.makeText(CVConferenceAdd.this, "Failed! Session cannot be moved.",

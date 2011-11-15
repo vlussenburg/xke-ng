@@ -78,7 +78,7 @@ public abstract class BaseActivity extends Activity {
 		if (notificationId != null) {
 			NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 			Log.w("debug", "Cancel on " + notificationId);
-			mgr.cancelAll();
+			mgr.cancel(notificationId.hashCode());
 		}
 
 		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);

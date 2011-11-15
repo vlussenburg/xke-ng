@@ -165,9 +165,9 @@ public class NotificationService extends Service {
 			Trackable[] ids = pm.getOwnedSessions(user);
 			// Search active sessions on the author
 			Search search = new Search().onAuthor(new Author(user, null, null, null)).after(new Moment());
-			List<Session> sessions = server.searchSessions(search);
+			// TODO Search not implemented yet on server
+			List<Session> sessions = null; // server.searchSessions(search);
 			if (sessions == null || sessions.isEmpty()) {
-				// TODO Search not implemented yet on server
 				sessions = new ArrayList<Session>();
 				List<Session> nextSessions = server.getSessions(server.getUpcomingConference());
 				for (Session session : nextSessions) {

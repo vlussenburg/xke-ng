@@ -370,9 +370,11 @@ public class CVSessionAdd extends AdditionActivity {
 			case XCS.DIALOG.INPUT_TIME_START:
 				Set<TimeSlot> tslist = null;
 				if (session.getLocation() == null) {
-					tslist = conference.getAvailableTimeSlots(session.getDuration());
+					tslist = conference.getAvailableTimeSlots(session.getDuration(), null);
 				} else {
-					tslist = conference.getAvailableTimeSlots(session.getDuration(), session.getLocation());
+					ArrayList<Location> locs = new ArrayList<Location>();
+					locs.add(session.getLocation());
+					tslist = conference.getAvailableTimeSlots(session.getDuration(), locs);
 				}
 
 				builder = new AlertDialog.Builder(this);
