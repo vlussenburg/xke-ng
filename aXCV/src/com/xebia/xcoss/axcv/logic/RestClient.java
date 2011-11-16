@@ -22,6 +22,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -251,6 +252,10 @@ public class RestClient {
 		}
 		catch (SocketTimeoutException e) {
 			throw new DataException(Code.TIME_OUT, request.getURI());
+		}
+		catch (HttpHostConnectException e) {
+			// Connection refused
+			throw new DataException(Code.NO_NETWORK, request.getURI());
 		}
 		catch (UnknownHostException e) {
 			throw new DataException(Code.NO_NETWORK, request.getURI());

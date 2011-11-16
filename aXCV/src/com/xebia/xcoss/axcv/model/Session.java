@@ -51,7 +51,8 @@ public class Session implements Serializable {
 	private Location location;
 	private Set<String> labels;
 	
-	private transient String conferenceId;
+	// Cannot be transient ?
+	private String conferenceId;
 	
 	// TODO : Not mapped at all at the moment...
 	private String intendedAudience;
@@ -78,7 +79,8 @@ public class Session implements Serializable {
 		intendedAudience = original.intendedAudience;
 		limit = original.limit;
 		preparation = original.preparation;
-
+		conferenceId = original.conferenceId;
+		
 		authors.addAll(original.authors);
 		labels.addAll(original.labels);
 		languages.addAll(original.languages);

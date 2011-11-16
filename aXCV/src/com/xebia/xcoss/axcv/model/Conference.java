@@ -348,27 +348,6 @@ public class Conference implements Serializable {
 		return null;
 	}
 
-//	public SortedSet<TimeSlot> getAvailableTimeSlots(int duration) {
-//		TreeSet<TimeSlot> list = new TreeSet<TimeSlot>(new TimeSlotComparator());
-//		for (Location loc : locations) {
-//			list.addAll(getAvailableTimeSlots(duration, loc));
-//		}
-//		return list;
-//	}
-//
-//	public SortedSet<TimeSlot> getAvailableTimeSlots(int duration, Location loc) {
-//		TreeSet<TimeSlot> list = new TreeSet<TimeSlot>(new TimeSlotComparator());
-//		TimeSlot t;
-//		int length = duration < TimeSlot.MIN_LENGTH ? TimeSlot.LENGTH : duration;
-//		Moment start = startTime;
-//		while ((t = getNextAvailableTimeSlot(null, start, length, loc)) != null) {
-//			list.add(t);
-//			// Assume start to be on the 30 minute boundary.
-//			start = start.plusMinutes(Math.max(length, 30));
-//		}
-//		return list;
-//	}
-//
 	public SortedSet<TimeSlot> getAvailableTimeSlots(int duration, List<Location> locsIn) {
 		List<Location> locs = locsIn;
 		if ( locs == null ) {
@@ -395,7 +374,7 @@ public class Conference implements Serializable {
 			if (availableOnAllLocations) {
 				list.add(t);
 			}
-			start = start.plusMinutes(Math.max(length, 30));
+			start = start.plusMinutes(Math.min(length, 30));
 		}
 		return list;
 	}

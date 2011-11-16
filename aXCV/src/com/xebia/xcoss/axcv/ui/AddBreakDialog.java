@@ -131,14 +131,15 @@ public class AddBreakDialog extends Dialog {
 			adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 			spinner.setAdapter(adapter1);
 			spinner.setSelection(4);
-			// TODO
-//			adapter1..gsetOnClickListener(new View.OnClickListener() {
-//				@Override
-//				public void onClick(View v) {
-//					Log.e("debug", "Clicked on view " + v + " = " + spinner.getSelectedItemPosition());
-//					updateSpinners();
-//				}
-//			});
+			spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> v1, View v2, int arg1, long arg2) {
+					updateSpinners();
+				}
+				@Override
+				public void onNothingSelected(AdapterView<?> v1) {
+				}
+			});
 		}
 
 		Button submit = (Button) findViewById(R.id.seCommit);

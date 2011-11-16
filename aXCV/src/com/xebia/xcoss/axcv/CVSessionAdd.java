@@ -48,7 +48,7 @@ public class CVSessionAdd extends AdditionActivity {
 
 	/** Called when the activity is first created. */
 	@Override
-	public void onCreate(Bundle savedInstanceState) {	
+	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.add_session);
 		this.timeFormatter = new ScreenTimeUtil(this);
 
@@ -147,9 +147,9 @@ public class CVSessionAdd extends AdditionActivity {
 				iv.setImageResource(R.drawable.x_complete_1 + completeness - 1);
 				iv.invalidate();
 			}
-			
-			findViewById(R.id.detailsTitle).setVisibility( session.isBreak() ? View.GONE : View.VISIBLE);
-			findViewById(R.id.detailsLayout).setVisibility( session.isBreak() ? View.GONE : View.VISIBLE);
+
+			findViewById(R.id.detailsTitle).setVisibility(session.isBreak() ? View.GONE : View.VISIBLE);
+			findViewById(R.id.detailsLayout).setVisibility(session.isBreak() ? View.GONE : View.VISIBLE);
 		}
 	}
 
@@ -177,9 +177,10 @@ public class CVSessionAdd extends AdditionActivity {
 				}
 				if (!conference.addSession(session, create)) {
 					Log.e(LOG.ALL, "Adding session failed.");
-					createDialog("No session added", "Session could not be added.").show();
+					createDialog("No session added", "Session could not be added: ("+lastError+").").show();
+				} else {
+					CVSessionAdd.this.finish();
 				}
-				CVSessionAdd.this.finish();
 			}
 		});
 		button = (Button) findViewById(R.id.actionDelete);
@@ -215,7 +216,7 @@ public class CVSessionAdd extends AdditionActivity {
 			@Override
 			public void onClick(View paramView) {
 				View view = findViewById(R.id.sessionDuration);
-				CharSequence text = ((TextView)view).getText();
+				CharSequence text = ((TextView) view).getText();
 				int duration = StringUtil.getFirstInteger(text.toString());
 				rescheduleSession(duration);
 				showConference();
@@ -244,28 +245,24 @@ public class CVSessionAdd extends AdditionActivity {
 		Iterator<Location> iterator = locations.iterator();
 		while (slot == null && iterator.hasNext()) {
 			Location location = iterator.next();
-			Log.v("XCS", "Reschedule ["
-					+ session.getStartTime()
-					+ ", "
-					+ duration
-					+ ", "
-					+ location.getDescription()
+			Log.v("XCS", "Reschedule [" + session.getStartTime() + ", " + duration + ", " + location.getDescription()
 					+ "] => ");
 			slot = conference.getNextAvailableTimeSlot(session, session.getStartTime(), duration, location);
-			Log.v("XCS", slot == null ? "NONE" : slot.start + " till " + slot.end + " @ "
-							+ slot.location.getDescription());
+			Log.v("XCS",
+					slot == null ? "NONE" : slot.start + " till " + slot.end + " @ " + slot.location.getDescription());
 		}
-//		// Move up to the next conference and call this method recursively
-//		if (slot == null) {
-//			conference = getConferenceServer().getUpcomingConference(conference.getDate().plusDays(1));
-//			slot = rescheduleSession(duration);
-//		}
+		// // Move up to the next conference and call this method recursively
+		// if (slot == null) {
+		// conference = getConferenceServer().getUpcomingConference(conference.getDate().plusDays(1));
+		// slot = rescheduleSession(duration);
+		// }
 
 		if (slot != null) {
 			session.reschedule(conference, slot);
 		} else {
 			createDialog("Rescheduling failed",
-					"The session cannot be scheduled. Shorten session, use another location or choose another conference.").show();
+					"The session cannot be scheduled. Shorten session, use another location or choose another conference.")
+					.show();
 		}
 	}
 
@@ -358,7 +355,8 @@ public class CVSessionAdd extends AdditionActivity {
 				Identifiable[] data = new Identifiable[list.size()];
 				idx = 0;
 				for (Conference conference : list) {
-					String title = conference.getTitle() + " (" + timeFormatter.getAbsoluteShortDate(conference.getStartTime()) + ")";
+					String title = conference.getTitle() + " ("
+							+ timeFormatter.getAbsoluteShortDate(conference.getStartTime()) + ")";
 					data[idx++] = new Identifiable(title, conference.getId());
 				}
 				builder = new AlertDialog.Builder(this);

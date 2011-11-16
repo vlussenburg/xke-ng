@@ -147,11 +147,17 @@ public class CVConferenceAdd extends AdditionActivity {
 					return;
 				}
 
+				boolean ok = false;
 				if (create) {
-					conference = Conference.create(conference);
+					Conference result = Conference.create(conference);
+					if ( result != null ) {
+						conference = result;
+						ok = true;
+					}
 				} else {
-					conference.update();
+					ok = conference.update();
 				}
+				if (ok ) {
 				for (Session s : breakSessions) {
 					try {
 						conference.addSession(s, true);
@@ -160,6 +166,10 @@ public class CVConferenceAdd extends AdditionActivity {
 					}
 				}
 				CVConferenceAdd.this.finish();
+				} else {
+					Log.e(LOG.ALL, "Adding conference failed.");
+					createDialog("No conference added", "Conference could not be added: ("+lastError+").").show();
+				}
 			}
 		});
 		button = (Button) findViewById(R.id.actionDelete);

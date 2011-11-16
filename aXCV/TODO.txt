@@ -3,11 +3,12 @@ IN PROGRESS
 
 -	Author notification testen
 -	Niet alles cancellen, maar alleen de ontvangen notificatie
--	Slot beschikbaarheid start altijd om start+n+n. Je wilt kunnen schuiven. 
 
 TODO
 -------------------------------------------------------------------
 client
+-	Database close issues
+-	Store failed? Stay on page...
 -	Https connectie
 -	Lijst (conferenties) scrollt niet terug naar eerste item (blijft hangen) Tracklist/Sessionlist wel ok.
 -	Bij roteren raken de waardes kwijt
@@ -40,6 +41,7 @@ server
 -	Nieuwe datum conferentie leidt niet tot nieuwe datum sessies (wordt wel gestuurd)
 -	Uitzoeken hoe encryption werkt (want lukt nog niet bij mij...)
     - Padding error op server...
+-	Support conferenceId within session object (at least for search)
 
 DONE
 -------------------------------------------------------------------
@@ -63,3 +65,5 @@ DONE
 -	Track notification opruimen + naar tracklist
 -	Crash notification door niet ingelogd te zijn.
 -	Timeouts on retrieving labels & authors should be handled in a notification!
+-	Edit item from tracklist: No session...
+-	Slot beschikbaarheid start altijd om start+n+n. Je wilt kunnen schuiven. 

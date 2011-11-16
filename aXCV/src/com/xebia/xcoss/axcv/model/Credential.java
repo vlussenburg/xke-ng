@@ -7,15 +7,9 @@ public class Credential {
 	private String username;
 	@SuppressWarnings("unused")
 	private String password;
-	@SuppressWarnings("unused")
-	private String encryptedPassword;
 
-	public Credential(String name, String password, boolean isEncrypted) {
+	public Credential(String name, String password) {
 		this.username = StringUtil.isEmpty(name) ? "not_set" : name;
-		if (isEncrypted) {
-			this.encryptedPassword = StringUtil.isEmpty(password) ? "?" : password;
-		} else {
-			this.password = StringUtil.isEmpty(password) ? "?" : password;
-		}
+		this.password = StringUtil.isEmpty(password) ? "?" : password;
 	}
 }

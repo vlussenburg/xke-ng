@@ -63,7 +63,7 @@ public abstract class BaseActivity extends Activity {
 
 	private static Activity rootActivity;
 	private static ProfileManager profileManager;
-	private static String lastError;
+	protected static String lastError;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

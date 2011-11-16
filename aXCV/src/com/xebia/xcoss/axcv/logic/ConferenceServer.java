@@ -6,14 +6,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
 import com.xebia.xcoss.axcv.logic.cache.DataCache;
-import com.xebia.xcoss.axcv.logic.cache.MemoryCache;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Credential;
@@ -26,7 +22,6 @@ import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.util.ConferenceComparator;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
-import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class ConferenceServer {
@@ -60,12 +55,12 @@ public class ConferenceServer {
 		conferenceCache.init();
 	}
 
-	public void login(String user, String password) {
+	public void login(String user, String encrypt) {
 		 StringBuilder requestUrl = new StringBuilder();
 		 requestUrl.append(baseUrl);
 		 requestUrl.append("/login");
-		 String decrypt = SecurityUtils.decrypt(password);
-		 RestClient.postObject(requestUrl.toString(), new Credential(user, decrypt, false), void.class, null);
+		 String decrypt = SecurityUtils.decrypt(encrypt);
+		 RestClient.postObject(requestUrl.toString(), new Credential(user, decrypt), void.class, null);
 		 // RestClients holds the authentication token.
 		 this.token = "logged_in";
 	}
@@ -186,7 +181,9 @@ public class ConferenceServer {
 			if (result == null) {
 				return new ArrayList<Session>();
 			}
-
+			for (Session session : result) {
+				session.setConferenceId(conference.getId());
+			}
 			conferenceCache.add(conference.getId(), result);
 		}
 		return result;
@@ -355,6 +352,7 @@ public class ConferenceServer {
 		if (result == null) {
 			return new ArrayList<Session>();
 		}
+		// TODO : Sessions do not have a conference ID 
 		Collections.sort(result, new SessionComparator());
 		return result;
 	}
@@ -394,6 +392,7 @@ public class ConferenceServer {
 			if (result == null) {
 				return new Remark[0];
 			}
+			// TODO Do we want this?
 			conferenceCache.addObject(key, result);
 		}
 		return result.toArray(new Remark[result.size()]);

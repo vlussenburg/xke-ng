@@ -31,6 +31,7 @@ import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.logic.ProfileManager.Trackable;
 import com.xebia.xcoss.axcv.logic.cache.NoCache;
 import com.xebia.xcoss.axcv.model.Author;
+import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Search;
 import com.xebia.xcoss.axcv.model.Session;
@@ -169,7 +170,12 @@ public class NotificationService extends Service {
 			List<Session> sessions = null; // server.searchSessions(search);
 			if (sessions == null || sessions.isEmpty()) {
 				sessions = new ArrayList<Session>();
-				List<Session> nextSessions = server.getSessions(server.getUpcomingConference());
+				Conference upcomingConference = server.getUpcomingConference();
+				if ( upcomingConference == null ) {
+					Log.e(XCS.LOG.DATA, "No upcomming conference!");
+					return new ArrayList<String>();
+				}
+				List<Session> nextSessions = server.getSessions(upcomingConference);
 				for (Session session : nextSessions) {
 					for (Author author : session.getAuthors()) {
 						if (author.getUserId().equals(user)) {
