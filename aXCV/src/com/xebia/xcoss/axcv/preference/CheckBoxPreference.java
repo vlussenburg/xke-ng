@@ -39,7 +39,6 @@ public class CheckBoxPreference extends android.preference.CheckBoxPreference {
 						Class<?> srClass = Class.forName(srname);
 						Object instance = srClass.newInstance();
 						if (instance instanceof SignalRetriever) {
-							Log.v(XCS.LOG.ALL, "Signal retriever recognized");
 							this.signalRetriever = (SignalRetriever) instance;
 						}
 					}

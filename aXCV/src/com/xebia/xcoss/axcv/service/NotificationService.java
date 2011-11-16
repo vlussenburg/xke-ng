@@ -91,7 +91,7 @@ public class NotificationService extends Service {
 				notifyTimer = new Timer("ConferenceNotifier");
 				SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 				int delay = sp.getInt(XCS.PREF.NOTIFYINTERVAL, 900);
-				notifyTimer.scheduleAtFixedRate(notifyTask, 0, delay*1000);
+				notifyTimer.scheduleAtFixedRate(notifyTask, 0, delay * 1000);
 			}
 			catch (Exception e) {
 				Log.w(XCS.LOG.COMMUNICATE, "Timer start issue: " + StringUtil.getExceptionMessage(e));
@@ -139,12 +139,13 @@ public class NotificationService extends Service {
 	}
 
 	protected void checkSessionsForChange(boolean owned) {
+		Log.i(XCS.LOG.COMMUNICATE, "Checking for changes: " + (owned ? "Owner" : "Track"));
 		ConferenceServer server = getConferenceServer();
-		if ( server == null ) {
+		if (server == null) {
 			Log.e(XCS.LOG.COMMUNICATE, "Notification service could not get server handle");
 			Toast.makeText(this, "Notification check failed", Toast.LENGTH_SHORT).show();
 			throw new IllegalStateException("Missing server on notification! " + BaseActivity.getServerUrl(this));
-//			return;
+			// return;
 		}
 		ArrayList<String> sessionIds = owned ? getChangesInOwnedSessions(server) : getChangesInTrackedSessions(server);
 		if (sessionIds.size() > 0) {
@@ -168,11 +169,11 @@ public class NotificationService extends Service {
 			// Search active sessions on the author
 			Search search = new Search().onAuthor(new Author(user, null, null, null)).after(new Moment());
 			// TODO Search not implemented yet on server
-			List<Session> sessions = null; // server.searchSessions(search);
-			if (sessions == null || sessions.isEmpty()) {
-				sessions = new ArrayList<Session>();
+			List<Session> allOwnedSessions = null; // server.searchSessions(search);
+			if (allOwnedSessions == null || allOwnedSessions.isEmpty()) {
+				allOwnedSessions = new ArrayList<Session>();
 				Conference upcomingConference = server.getUpcomingConference();
-				if ( upcomingConference == null ) {
+				if (upcomingConference == null) {
 					Log.e(XCS.LOG.DATA, "No upcomming conference!");
 					return new ArrayList<String>();
 				}
@@ -180,23 +181,25 @@ public class NotificationService extends Service {
 				for (Session session : nextSessions) {
 					for (Author author : session.getAuthors()) {
 						if (author.getUserId().equals(user)) {
-							sessions.add(session);
+							allOwnedSessions.add(session);
 						}
 					}
 				}
 			}
-			for (Session session : sessions) {
+			for (Session ownedSession : allOwnedSessions) {
 				boolean sessionFoundInMarkList = false;
-				long lastNotification = session.getModificationHash();
-				String id = session.getId();
+				long lastNotification = ownedSession.getModificationHash();
+				String id = ownedSession.getId();
 				for (int i = 0; i < ids.length; i++) {
 					if (id.equals(ids[i].sessionId)) {
 						sessionFoundInMarkList = true;
 						if (ids[i].hash != lastNotification) {
+							Log.i(XCS.LOG.DATA, "Session changed: " + ownedSession.getTitle() + ", hash = "
+									+ lastNotification + ", stored = " + ids[i].hash);
 							ids[i].hash = lastNotification;
-							ids[i].date = session.getStartTime().asLong();
+							ids[i].date = ownedSession.getStartTime().asLong();
 							pm.updateOwnedSession(ids[i]);
-							modified.add(session.getId());
+							modified.add(ownedSession.getId());
 						}
 						break;
 					}
@@ -204,14 +207,16 @@ public class NotificationService extends Service {
 				// What to do with sessions added elsewhere? We notify for now...
 				// If there is a second author, she/he is notified.
 				if (!sessionFoundInMarkList) {
+					Log.i(XCS.LOG.DATA, "Session not in mark list: " + ownedSession.getTitle() + ", hash = "
+							+ lastNotification);
 					Trackable add = pm.new Trackable();
-					add.date = session.getStartTime().asLong();
-					add.sessionId = session.getId();
-					add.conferenceId = session.getConferenceId();
+					add.date = ownedSession.getStartTime().asLong();
+					add.sessionId = ownedSession.getId();
+					add.conferenceId = ownedSession.getConferenceId();
 					add.userId = user;
 					add.hash = lastNotification;
 					pm.updateOwnedSession(add);
-					modified.add(session.getId());
+					modified.add(ownedSession.getId());
 				}
 			}
 			return modified;
@@ -253,7 +258,8 @@ public class NotificationService extends Service {
 			String user = sp.getString(XCS.PREF.USERNAME, null);
 			// TODO Encrypt/decrypt
 			String password = /* SecurityUtils.decrypt( */sp.getString(XCS.PREF.PASSWORD, "")/* ) */;
-			instance = ConferenceServer.createInstance(user, password, BaseActivity.getServerUrl(this), new NoCache(this));
+			instance = ConferenceServer.createInstance(user, password, BaseActivity.getServerUrl(this), new NoCache(
+					this));
 		}
 		return instance;
 	}

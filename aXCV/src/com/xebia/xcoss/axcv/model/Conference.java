@@ -361,14 +361,14 @@ public class Conference implements Serializable {
 		int length = duration < TimeSlot.MIN_LENGTH ? TimeSlot.LENGTH : duration;
 		Moment start = startTime;
 		while ((t = getNextAvailableTimeSlot(null, start, length, firstLocation)) != null) {
-			Log.i("debug", "Available: " + t);
+//			Log.i("debug", "Available: " + t);
 			// Check the remainder of the locations for this slot
 			boolean availableOnAllLocations = true;
 			for (int i = 1; i < allLocations.length; i++) {
 				Location location = allLocations[i];
 				if (location.equals(firstLocation)) continue;
 				boolean slotAvailable = isTimeSlotAvailable(start, length, location);
-				Log.i("debug", "  On '" + location + "' : " + slotAvailable);
+//				Log.i("debug", "  On '" + location + "' : " + slotAvailable);
 				availableOnAllLocations = availableOnAllLocations && slotAvailable;
 			}
 			if (availableOnAllLocations) {

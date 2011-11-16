@@ -105,6 +105,17 @@ public class AddBreakDialog extends Dialog {
 		});
 
 		updateSpinners();
+
+		spinner = (Spinner) findViewById(R.id.bStartTime);
+		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+			public void onItemSelected(AdapterView<?> parent, View view, int selection, long arg3) {
+//				Log.v(XCS.LOG.ALL, "Start time select: " + parent + "/" + view + "/" + selection + "/" + arg3 + "/");
+			}
+
+			public void onNothingSelected(AdapterView<?> arg0) {
+//				Log.v(XCS.LOG.ALL, "Start time noting: " + arg0 + "/");
+			}
+		});
 	}
 
 	private int getDuration() {
@@ -138,9 +149,9 @@ public class AddBreakDialog extends Dialog {
 				public void onItemSelected(AdapterView<?> v1, View v2, int arg1, long arg2) {
 					updateSpinners();
 				}
+
 				@Override
-				public void onNothingSelected(AdapterView<?> v1) {
-				}
+				public void onNothingSelected(AdapterView<?> v1) {}
 			});
 		}
 
@@ -159,11 +170,11 @@ public class AddBreakDialog extends Dialog {
 	}
 
 	private boolean updateStartTimes() {
-		
+
 		if (conference == null) {
 			return false;
 		}
-		
+
 		Set<Moment> startTime = new HashSet<Moment>();
 
 		int duration = getDuration();
@@ -183,20 +194,24 @@ public class AddBreakDialog extends Dialog {
 		Spinner spinner = (Spinner) findViewById(R.id.bStartTime);
 		Object selectedItem = spinner.getSelectedItem();
 		Log.v(XCS.LOG.ALL, "Selected item = " + selectedItem);
-		ArrayAdapter<String> adapter3 = new ArrayAdapter<String>(getContext(),
-				android.R.layout.simple_spinner_item, startarray);
+		ArrayAdapter<String> adapter3 = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item,
+				startarray);
 		adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(adapter3);
 
-		int position = 0;
-		for (int i = 0; i < startarray.length; i++) {
-			Log.v(XCS.LOG.ALL, "Match item " +startarray[i] + " to  " + selectedItem);
-			if (startarray[i].equals(selectedItem)) {
-				position = i;
+		if (selectedItem != null) {
+			int position = 0;
+			for (int i = 0; i < startarray.length; i++) {
+//				Log.v(XCS.LOG.ALL, "Match item '" + startarray[i] + "' to '" + selectedItem + "'");
+				if (startarray[i].equals(selectedItem)) {
+//					Log.v(XCS.LOG.ALL, "Position to be " + i);
+					position = i;
+					break;
+				}
 			}
+			spinner.setSelection(position);
 		}
-		spinner.setSelection(position);
-		
+
 		return timeSlots.size() > 0;
 	}
 

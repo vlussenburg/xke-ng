@@ -125,10 +125,10 @@ public class RestClient {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
 			Log.d(LOG.COMMUNICATE, "POST (create) to '" + url + "': ");
-			String[] split = postData.split(",");
-			for (int i = 0; i < split.length; i++) {
-				Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
-			}
+//			String[] split = postData.split(",");
+//			for (int i = 0; i < split.length; i++) {
+//				Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
+//			}
 			reader = getReader(new HttpPost(url), postData, token);
 			return gson.fromJson(reader, rvClass);
 		}
@@ -144,10 +144,10 @@ public class RestClient {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
 			Log.d(LOG.COMMUNICATE, "PUT (update) to '" + url + "':");
-			String[] split = postData.split(",");
-			for (int i = 0; i < split.length; i++) {
-				Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
-			}
+//			String[] split = postData.split(",");
+//			for (int i = 0; i < split.length; i++) {
+//				Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
+//			}
 			reader = getReader(new HttpPut(url), postData, token);
 			T result = getGson().fromJson(reader, (Class<T>) object.getClass());
 			// TODO Is result an empty string?

@@ -26,7 +26,6 @@ public class GsonMomentAdapter implements JsonSerializer<Moment>, JsonDeserializ
 
 	@Override
 	public JsonElement serialize(Moment dt, Type type, JsonSerializationContext ctx) {
-		Log.w(XCS.LOG.COMMUNICATE, "Date serialize: " + dt.toString());
 		return new JsonPrimitive(dt.toString());
 	}
 }

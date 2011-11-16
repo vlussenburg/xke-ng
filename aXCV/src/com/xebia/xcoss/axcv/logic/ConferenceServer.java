@@ -143,8 +143,8 @@ public class ConferenceServer {
 		requestUrl.append(baseUrl);
 		requestUrl.append("/conference");
 
-		Log.w(XCS.LOG.COMMUNICATE, "Conference starts at " + conference.getStartTime());
-		Log.w(XCS.LOG.COMMUNICATE, "Conference ends   at " + conference.getEndTime());
+//		Log.w(XCS.LOG.COMMUNICATE, "Conference starts at " + conference.getStartTime());
+//		Log.w(XCS.LOG.COMMUNICATE, "Conference ends   at " + conference.getEndTime());
 		
 		conferenceCache.remove(conference);
 		if (create) {

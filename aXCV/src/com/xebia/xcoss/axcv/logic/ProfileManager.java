@@ -195,7 +195,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 		if (StringUtil.isEmpty(user)) {
 			return false;
 		}
-		Log.v(XCS.LOG.COMMUNICATE, "Check if marked " + sessionId + " for user " + user);
+//		Log.v(XCS.LOG.COMMUNICATE, "Check if marked " + sessionId + " for user " + user);
 		try {
 			checkConnection();
 			String[] whereArgs = new String[2];
