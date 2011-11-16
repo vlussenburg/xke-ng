@@ -74,13 +74,6 @@ public abstract class BaseActivity extends Activity {
 			rootActivity = this;
 		}
 
-		String notificationId = getIntent().getStringExtra(IA_NOTIFICATION_ID);
-		if (notificationId != null) {
-			NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-			Log.w("debug", "Cancel on " + notificationId);
-			mgr.cancel(notificationId.hashCode());
-		}
-
 		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);
 		if (conferenceButton != null) {
 			conferenceButton.setOnClickListener(new View.OnClickListener() {
@@ -92,6 +85,17 @@ public abstract class BaseActivity extends Activity {
 		}
 	}
 
+	@Override
+	protected void onResume() {
+		String notificationId = getIntent().getStringExtra(IA_NOTIFICATION_ID);
+		if (notificationId != null) {
+			NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			Log.w("debug", "Cancel on " + notificationId);
+			mgr.cancel(notificationId.hashCode());
+		}
+		super.onResume();
+	}
+	
 	private void resetApplication(boolean exit) {
 		Log.e(LOG.ALL, "Reset application from " + this + " : " + exit);
 		rootActivity = null;

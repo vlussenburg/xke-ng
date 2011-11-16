@@ -7,6 +7,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import android.app.Dialog;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
@@ -25,6 +26,7 @@ import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.Session.Type;
 import com.xebia.xcoss.axcv.util.StringUtil;
+import com.xebia.xcoss.axcv.util.XCS;
 
 public class AddBreakDialog extends Dialog {
 
@@ -157,40 +159,45 @@ public class AddBreakDialog extends Dialog {
 	}
 
 	private boolean updateStartTimes() {
-		boolean hasTimeSlots = false;
-		if (conference != null) {
-			Set<Moment> startTime = new HashSet<Moment>();
-
-			int duration = getDuration();
-			if (duration == 0) duration = TimeSlot.LENGTH;
-
-			Set<TimeSlot> timeSlots = conference.getAvailableTimeSlots(duration, conference.getLocations());
-
-			for (TimeSlot timeSlot : timeSlots) {
-				startTime.add(timeSlot.start);
-			}
-
-			SortedSet<String> startdata = new TreeSet<String>();
-			for (Moment dateTime : startTime) {
-				startdata.add(timeFormatter.getAbsoluteTime(dateTime));
-			}
-			String[] startarray = startdata.toArray(new String[startdata.size()]);
-			Spinner spinner = (Spinner) findViewById(R.id.bStartTime);
-			Object selectedItem = spinner.getSelectedItem();
-			ArrayAdapter<String> adapter3 = new ArrayAdapter<String>(getContext(),
-					android.R.layout.simple_spinner_item, startarray);
-			adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-			spinner.setAdapter(adapter3);
-			int position = 0;
-			for (int i = 0; i < startarray.length; i++) {
-				if (startarray[i].equals(selectedItem)) {
-					position = i;
-				}
-			}
-			spinner.setSelection(position);
-			hasTimeSlots = timeSlots.size() > 0;
+		
+		if (conference == null) {
+			return false;
 		}
-		return hasTimeSlots;
+		
+		Set<Moment> startTime = new HashSet<Moment>();
+
+		int duration = getDuration();
+		if (duration == 0) duration = TimeSlot.LENGTH;
+
+		Set<TimeSlot> timeSlots = conference.getAvailableTimeSlots(duration, conference.getLocations());
+
+		for (TimeSlot timeSlot : timeSlots) {
+			startTime.add(timeSlot.start);
+		}
+
+		SortedSet<String> startdata = new TreeSet<String>();
+		for (Moment dateTime : startTime) {
+			startdata.add(timeFormatter.getAbsoluteTime(dateTime));
+		}
+		String[] startarray = startdata.toArray(new String[startdata.size()]);
+		Spinner spinner = (Spinner) findViewById(R.id.bStartTime);
+		Object selectedItem = spinner.getSelectedItem();
+		Log.v(XCS.LOG.ALL, "Selected item = " + selectedItem);
+		ArrayAdapter<String> adapter3 = new ArrayAdapter<String>(getContext(),
+				android.R.layout.simple_spinner_item, startarray);
+		adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinner.setAdapter(adapter3);
+
+		int position = 0;
+		for (int i = 0; i < startarray.length; i++) {
+			Log.v(XCS.LOG.ALL, "Match item " +startarray[i] + " to  " + selectedItem);
+			if (startarray[i].equals(selectedItem)) {
+				position = i;
+			}
+		}
+		spinner.setSelection(position);
+		
+		return timeSlots.size() > 0;
 	}
 
 	public void setConference(Conference conf) {

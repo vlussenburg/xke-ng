@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -32,6 +33,7 @@ import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.ui.AddBreakDialog;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.LocationInputDialog;
@@ -48,7 +50,7 @@ public class CVConferenceAdd extends AdditionActivity {
 	private Conference originalConference;
 	private Conference conference;
 	private boolean create = false;
-	private List<Session> breakSessions;
+	private TreeSet<Session> breakSessions;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -58,7 +60,7 @@ public class CVConferenceAdd extends AdditionActivity {
 
 		this.timeFormatter = new ScreenTimeUtil(this);
 		this.originalConference = getConference(false);
-		this.breakSessions = new ArrayList<Session>();
+		this.breakSessions = new TreeSet<Session>(new SessionComparator());
 		
 		if (originalConference == null) {
 			create = true;

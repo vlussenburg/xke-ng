@@ -1,54 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Conference Viewer</string>
-	<string name="app_full_name">Xebia Conference Viewer</string>
-	<string name="app_version">0.5</string>
 
-	<string name="splash_conference">Xebia Knowledge Exchange</string>
-	<string name="splash_company">Xebia</string>
-	<string name="splash_version">Version %s</string>
-	<string name="splash_copyright">Copyright (c) 2011 Xebia B.V.</string>
-	<string name="splash_copyright2">Copyright (c) 2011 Xebia B.V. All rights reserved.</string>
-	
-	<string name="menu_settings">Preferences</string>
-	<string name="menu_search">Search</string>
-	<string name="menu_overview">Conferences</string>
-	<string name="menu_add">Add</string>
-	<string name="menu_edit">Edit</string>
-	<string name="menu_track">My Track</string>
-	<string name="menu_exit">Exit</string>
-	<string name="menu_list">List view</string>
-	
-	<string name="password_set">Password stored</string>
-	<string name="password_unset">No password specified</string>
-	<string name="session_title"></string>
-	<string name="modify_session">Modify session</string>
-	<string name="author_select">Select authors...</string>
-	<string name="label_select">Select labels...</string>
-	<string name="empty_value">&lt;specify value&gt;</string>
-	<string name="default_input_text">&lt;start typing&gt;</string>
-	<string name="my_track_title">My track list</string>
-	
-	<string name="context_menu_author_view">View author</string>
-	<string name="context_menu_author_remove">Remove author</string>
-	<string name="context_menu_label_remove">Remove label</string>
-	<string name="context_menu_session_edit">Edit</string>
-	<string name="context_menu_session_view">View</string>
-	
-	<string name="sizeLabel">Room size</string>
-	<string name="newLocationLabel">Location name</string>
-	<string name="breakLabel">Break</string>
-	<string name="default_break_name">Dinner break</string>
-	<string-array name="cacheNames">
-		<item>In memory</item>
-		<item>Store in database</item>
-		<item>Do not cache</item>
-	</string-array>
-	<string-array name="cacheClassNames">
-		<item>Memory</item>
-		<item>Database</item>
-		<item>None</item>
-	</string-array>
-	<string name="cancel_button">Cancel</string>
-	<string name="close_button">Close</string>
+    <string name="app_name">Conference Viewer</string>
+    <string name="app_full_name">Xebia Conference Viewer</string>
+    <string name="app_version">0.5</string>
+    <string name="splash_conference">Xebia Knowledge Exchange</string>
+    <string name="splash_company">Xebia</string>
+    <string name="splash_version">Version %s</string>
+    <string name="splash_copyright">Copyright (c) 2011 Xebia B.V.</string>
+    <string name="splash_copyright2">Copyright (c) 2011 Xebia B.V. All rights reserved.</string>
+    <string name="menu_settings">Preferences</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_overview">Conferences</string>
+    <string name="menu_add">Add</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_track">My Track</string>
+    <string name="menu_exit">Exit</string>
+    <string name="menu_list">List view</string>
+    <string name="password_set">Password stored</string>
+    <string name="password_unset">No password specified</string>
+    <string name="session_title"></string>
+    <string name="modify_session">Modify session</string>
+    <string name="author_select">Select authors...</string>
+    <string name="label_select">Select labels...</string>
+    <string name="empty_value">&lt;specify value></string>
+    <string name="default_input_text">&lt;start typing></string>
+    <string name="my_track_title">My track list</string>
+    <string name="context_menu_author_view">View author</string>
+    <string name="context_menu_author_remove">Remove author</string>
+    <string name="context_menu_label_remove">Remove label</string>
+    <string name="context_menu_session_edit">Edit</string>
+    <string name="context_menu_session_view">View</string>
+    <string name="sizeLabel">Room size</string>
+    <string name="newLocationLabel">Location name</string>
+    <string name="breakLabel">Break</string>
+    <string name="default_break_name">Dinner break</string>
+
+    <string-array name="cacheNames">
+        <item>In memory</item>
+        <item>Store in database</item>
+        <item>Do not cache</item>
+    </string-array>
+    <string-array name="cacheClassNames">
+        <item>Memory</item>
+        <item>Database</item>
+        <item>None</item>
+    </string-array>
+	<string name="notifyIntervalDefault">15 minutes</string>
+    <string-array name="notifyInterval">
+        <item>5 minutes</item>
+        <item>15 minutes</item>
+        <item>one hour</item>
+        <item>one day</item>
+    </string-array>
+    <string-array name="notifyIntervalValues">
+        <item>300</item>
+        <item>900</item>
+        <item>3600</item>
+        <item>86400</item>
+    </string-array>
+
+    <string name="cancel_button">Cancel</string>
+    <string name="close_button">Close</string>
+
 </resources>

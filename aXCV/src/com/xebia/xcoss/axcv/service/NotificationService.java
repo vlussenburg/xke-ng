@@ -40,7 +40,6 @@ import com.xebia.xcoss.axcv.util.XCS;
 
 public class NotificationService extends Service {
 
-	private static final int NOTIFICATION_PERIOD = 5 * 60 * 1000;
 	private static final String TAG_OWNED = "id-owned_ses";
 	private static final String TAG_TRACKED = "id-track-ses";
 	private static final long[] VIBRATE_PATTERN = new long[] { 1000, 200, 1000 };
@@ -90,7 +89,9 @@ public class NotificationService extends Service {
 		if (notifyTimer == null) {
 			try {
 				notifyTimer = new Timer("ConferenceNotifier");
-				notifyTimer.scheduleAtFixedRate(notifyTask, 0, NOTIFICATION_PERIOD);
+				SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+				int delay = sp.getInt(XCS.PREF.NOTIFYINTERVAL, 900);
+				notifyTimer.scheduleAtFixedRate(notifyTask, 0, delay*1000);
 			}
 			catch (Exception e) {
 				Log.w(XCS.LOG.COMMUNICATE, "Timer start issue: " + StringUtil.getExceptionMessage(e));
