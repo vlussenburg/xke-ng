@@ -90,7 +90,7 @@ public abstract class BaseActivity extends Activity {
 		String notificationId = getIntent().getStringExtra(IA_NOTIFICATION_ID);
 		if (notificationId != null) {
 			NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-			Log.w("debug", "Cancel on " + notificationId);
+			Log.w("debug", "Notification - Cancel on " + notificationId);
 			mgr.cancel(notificationId.hashCode());
 		}
 		super.onResume();
@@ -310,11 +310,9 @@ public abstract class BaseActivity extends Activity {
 			if (((DataException) e).missing()) {
 				lastError = "No result for '" + activity + "'.";
 				Log.w(XCS.LOG.COMMUNICATE, lastError);
-				showMessage(context, lastError);
 			} else if (((DataException) e).timedOut()) {
 				lastError = "Time out on '" + activity + "'.";
 				Log.w(XCS.LOG.COMMUNICATE, lastError);
-				showMessage(context, lastError);
 			} else {
 				// Authentication failure
 				if (context != null) {
@@ -344,15 +342,6 @@ public abstract class BaseActivity extends Activity {
 		}
 		Log.e(XCS.LOG.COMMUNICATE, "Communication failure on " + activity + ", due to " + e.getMessage());
 		throw new CommException("Failure on activity '" + activity + "': " + StringUtil.getExceptionMessage(e), e);
-	}
-
-	private static void showMessage(Activity context, String msg) {
-		Context ctxt = context;
-		if (context == null) {
-			ctxt = rootActivity.getBaseContext();
-		}
-		// TODO Does this work?
-		if (Looper.myLooper() != null) Toast.makeText(ctxt, msg, Toast.LENGTH_SHORT);
 	}
 
 	public String getUser() {

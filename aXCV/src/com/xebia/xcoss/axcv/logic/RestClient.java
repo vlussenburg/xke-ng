@@ -2,11 +2,12 @@ package com.xebia.xcoss.axcv.logic;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
-import java.net.SocketTimeoutException;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,8 +22,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -247,13 +246,10 @@ public class RestClient {
 			// Log.i(XCS.LOG.COMMUNICATE, "Read: " + result);
 			return new StringReader(result);
 		}
-		catch (ConnectTimeoutException e) {
+		catch (InterruptedIOException e) {
 			throw new DataException(Code.TIME_OUT, request.getURI());
 		}
-		catch (SocketTimeoutException e) {
-			throw new DataException(Code.TIME_OUT, request.getURI());
-		}
-		catch (HttpHostConnectException e) {
+		catch (SocketException e) {
 			// Connection refused
 			throw new DataException(Code.NO_NETWORK, request.getURI());
 		}

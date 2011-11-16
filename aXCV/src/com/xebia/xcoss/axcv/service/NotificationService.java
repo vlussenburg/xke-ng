@@ -207,6 +207,7 @@ public class NotificationService extends Service {
 					Trackable add = pm.new Trackable();
 					add.date = session.getStartTime().asLong();
 					add.sessionId = session.getId();
+					add.conferenceId = session.getConferenceId();
 					add.userId = user;
 					add.hash = lastNotification;
 					pm.updateOwnedSession(add);
@@ -281,6 +282,7 @@ public class NotificationService extends Service {
 				String message = getSessionChange(sessionId);
 				Toast.makeText(ctx, title, Toast.LENGTH_SHORT).show();
 				Notification noty = new Notification(R.drawable.x_stat_track, title, currentTimeMillis);
+				Log.w("debug", "Notification - Set on " + sessionId);
 				intent.putExtra(BaseActivity.IA_NOTIFICATION_ID, sessionId);
 				intent.putExtra(BaseActivity.IA_NOTIFICATION_TYPE, BaseActivity.NotificationType.TRACKED);
 				PendingIntent clickIntent = PendingIntent
