@@ -2,6 +2,7 @@ package com.xebia.xcoss.axcv.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -90,7 +91,20 @@ public class NotificationService extends Service {
 			try {
 				notifyTimer = new Timer("ConferenceNotifier");
 				SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-				int delay = sp.getInt(XCS.PREF.NOTIFYINTERVAL, 900);
+//				Map<String, ?> all = sp.getAll();
+//				for (String key : all.keySet()) {
+//					Log.w(XCS.LOG.COMMUNICATE, " -- " + key + " '" + all.get(key) + "' = " + all.get(key).getClass());
+//				}
+//				Log.w(XCS.LOG.COMMUNICATE, " == " + XCS.PREF.NOTIFYINTERVAL);
+//				Log.w(XCS.LOG.COMMUNICATE, " == " + sp.getString(XCS.PREF.NOTIFYINTERVAL, "<default>"));
+
+				int delay = 900;
+				try {
+					delay = Integer.parseInt(sp.getString(XCS.PREF.NOTIFYINTERVAL, "900"));
+				}
+				catch (Exception e) {
+					Log.w(XCS.LOG.COMMUNICATE, "Invalid notification interval: " + StringUtil.getExceptionMessage(e));
+				}
 				Log.w(XCS.LOG.COMMUNICATE, "Service started with interval: " + delay);
 				notifyTimer.scheduleAtFixedRate(notifyTask, 0, delay * 1000);
 			}

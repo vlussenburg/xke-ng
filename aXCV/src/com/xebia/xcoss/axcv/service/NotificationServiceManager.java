@@ -16,12 +16,12 @@ public class NotificationServiceManager implements SignalRetriever {
 		boolean onOwned = sp.getBoolean(XCS.PREF.NOTIFYOWNED, false);
 		boolean onMarked = sp.getBoolean(XCS.PREF.NOTIFYTRACK, false);
 
+		ctx.stopService(new Intent(ctx, NotificationService.class));
+		Log.v(XCS.LOG.ALL, "Notification service stop send");
+
 		if ( onOwned || onMarked ) {
 			ctx.startService(new Intent(ctx, NotificationService.class));
 			Log.v(XCS.LOG.ALL, "Notification service start send");
-		} else {
-			ctx.stopService(new Intent(ctx, NotificationService.class));
-			Log.v(XCS.LOG.ALL, "Notification service stop send");
 		}
 	}
 

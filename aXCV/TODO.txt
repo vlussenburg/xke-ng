@@ -9,9 +9,9 @@ client
 -	Database close issues
 -	Https connectie
 -	Bij roteren raken de waardes kwijt
--	Insert break, change duration, start time resets...
 -	Afhandeling 400 meldingen
 -	Rewrite exit / rootApplication
+-	Timeout on login afvangen
 
 later op de client
 -	Verbeteren van caching
@@ -67,3 +67,4 @@ DONE
 -	NREP: Lijst (conferenties) scrollt niet terug naar eerste item (blijft hangen) Tracklist/Sessionlist wel ok.
 -	Niet alles cancellen, maar alleen de ontvangen notificatie
 -	Inserted breaks sorteren op tijd
+-	Insert break, change duration, start time resets...
