@@ -45,8 +45,10 @@ public class ConferenceServer {
 	public static ConferenceServer createInstance(String user, String password, String url, DataCache cache) {
 		ConferenceServer server = new ConferenceServerProxy(url, cache);
 		instance = server;
-		instance.login(user, password);
-		return instance;
+		if (instance.login(user, password)) {
+			return instance;
+		}
+		return null;
 	}
 
 	protected ConferenceServer(String base, DataCache cache) {
@@ -55,14 +57,15 @@ public class ConferenceServer {
 		conferenceCache.init();
 	}
 
-	public void login(String user, String encrypt) {
-		 StringBuilder requestUrl = new StringBuilder();
-		 requestUrl.append(baseUrl);
-		 requestUrl.append("/login");
-		 String decrypt = SecurityUtils.decrypt(encrypt);
-		 RestClient.postObject(requestUrl.toString(), new Credential(user, decrypt), void.class, null);
-		 // RestClients holds the authentication token.
-		 this.token = "logged_in";
+	protected boolean login(String user, String encrypt) {
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/login");
+		String decrypt = SecurityUtils.decrypt(encrypt);
+		RestClient.postObject(requestUrl.toString(), new Credential(user, decrypt), void.class, null);
+		// RestClients holds the authentication token.
+		this.token = "logged_in";
+		return true;
 	}
 
 	public boolean isLoggedIn() {
@@ -143,9 +146,9 @@ public class ConferenceServer {
 		requestUrl.append(baseUrl);
 		requestUrl.append("/conference");
 
-//		Log.w(XCS.LOG.COMMUNICATE, "Conference starts at " + conference.getStartTime());
-//		Log.w(XCS.LOG.COMMUNICATE, "Conference ends   at " + conference.getEndTime());
-		
+		// Log.w(XCS.LOG.COMMUNICATE, "Conference starts at " + conference.getStartTime());
+		// Log.w(XCS.LOG.COMMUNICATE, "Conference ends   at " + conference.getEndTime());
+
 		conferenceCache.remove(conference);
 		if (create) {
 			conference = RestClient.createObject(requestUrl.toString(), conference, Conference.class, token);
@@ -198,7 +201,7 @@ public class ConferenceServer {
 			requestUrl.append(id);
 
 			result = RestClient.loadObject(requestUrl.toString(), Session.class, token);
-			if ( cid != null) {
+			if (cid != null) {
 				result.setConferenceId(cid);
 				conferenceCache.add(cid, result);
 			}
@@ -220,9 +223,9 @@ public class ConferenceServer {
 		} else {
 			requestUrl.append("/session/");
 			requestUrl.append(session.getId());
-//			requestUrl.append("/conference/");
-//			requestUrl.append(conferenceId);
-//			requestUrl.append("/session");
+			// requestUrl.append("/conference/");
+			// requestUrl.append(conferenceId);
+			// requestUrl.append("/session");
 			RestClient.updateObject(requestUrl.toString(), session, token);
 			sessionId = session.getId();
 		}
@@ -352,7 +355,7 @@ public class ConferenceServer {
 		if (result == null) {
 			return new ArrayList<Session>();
 		}
-		// TODO : Sessions do not have a conference ID 
+		// TODO : Sessions do not have a conference ID
 		Collections.sort(result, new SessionComparator());
 		return result;
 	}
@@ -429,7 +432,7 @@ public class ConferenceServer {
 		}
 		// No conference in this year.
 		Moment nextYear = new Moment(dt);
-		nextYear.setDate(dt.getYear()+1, 1, 1);
+		nextYear.setDate(dt.getYear() + 1, 1, 1);
 		return getNextConference(nextYear);
 	}
 
@@ -450,7 +453,7 @@ public class ConferenceServer {
 		}
 		// No conference in this year.
 		Moment prevYear = new Moment(dt);
-		prevYear.setDate(dt.getYear()-1, 1, 1);
+		prevYear.setDate(dt.getYear() - 1, 1, 1);
 		return getPreviousConference(prevYear);
 	}
 
@@ -485,7 +488,7 @@ public class ConferenceServer {
 		}
 		// No conference in this year.
 		Moment nextYear = new Moment(dt);
-		nextYear.setDate(dt.getYear()+1, 1, 1);
+		nextYear.setDate(dt.getYear() + 1, 1, 1);
 		return getUpcomingConference(nextYear);
 	}
 

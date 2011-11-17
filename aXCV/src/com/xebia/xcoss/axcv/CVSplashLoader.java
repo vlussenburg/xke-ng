@@ -59,23 +59,23 @@ public class CVSplashLoader extends BaseActivity {
 		super.onDestroy();
 	}
 
-	@Override
-	protected void onNewIntent(Intent intent) {
-		// Called upon manually creating an exit intent
-		getIntent().fillIn(intent, Intent.FILL_IN_DATA);
-		super.onNewIntent(intent);
-	}
-
-	@Override
-	protected void onRestart() {
-		// When revived, check for an exit code
-		if (getIntent().getBooleanExtra("exit", false)) {
-			ConferenceServer.close();
-			finish();
-		}
-		super.onRestart();
-	}
-
+//	@Override
+//	protected void onNewIntent(Intent intent) {
+//		// Called upon manually creating an exit intent
+//		getIntent().fillIn(intent, Intent.FILL_IN_DATA);
+//		super.onNewIntent(intent);
+//	}
+//
+//	@Override
+//	protected void onRestart() {
+//		// When revived, check for an exit code
+//		if (getIntent().getBooleanExtra("exit", false)) {
+//			ConferenceServer.close();
+//			finish();
+//		}
+//		super.onRestart();
+//	}
+//
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuItem miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);

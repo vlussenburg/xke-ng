@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -28,18 +29,29 @@ public class CVSearchLabel extends BaseActivity {
 
 	private List<String> selectedLabels;
 	private LabelAdapter labelAdapter;
-	private AutoCompleteTextView view;
+	private AutoCompleteTextView textView;
 	private Set<String> allLabels;
+	private String startText;
+	private Intent result = new Intent();
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.search_items);
-		view = (AutoCompleteTextView) findViewById(R.id.ssa_text);
-		final String startText = getResources().getString(R.string.default_input_text);
-		view.setSelection(0, startText.length());
+		startText = getResources().getString(R.string.default_input_text);
+
+		textView = (AutoCompleteTextView) findViewById(R.id.ssa_text);
+		textView.setSelection(0, startText.length());
 		initSelectedLabels();
 
+		Button closeButton = (Button) findViewById(R.id.ssa_close);
+		closeButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				updateTypedText();
+				finish();
+			}
+		});
 		// Fill the list of options
 		allLabels = new TreeSet<String>();
 		String[] labels = getConferenceServer().getLabels();
@@ -51,33 +63,37 @@ public class CVSearchLabel extends BaseActivity {
 		}
 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, data);
-		view.setAdapter(adapter);
-		view.setOnKeyListener(new View.OnKeyListener() {
+		textView.setAdapter(adapter);
+		textView.setOnKeyListener(new View.OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
-				String name = view.getText().toString();
-				if (startText.equals(name)) {
-					view.getText().clear();
-				}
-
 				if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
-				
-				if (!StringUtil.isEmpty(name)) {
-					if (view.isPopupShowing() && view.getListSelection() != ListView.INVALID_POSITION) {
-						name = (String) view.getAdapter().getItem(view.getListSelection());
-					}
-					if (!addLabel(name)) {
-						storeLabel(name);
-					}
-
-					view.getText().clear();
-				}
+				CVSearchLabel.this.updateTypedText();
 				return true;
 			}
-
 		});
 
 		super.onCreate(savedInstanceState);
+	}
+
+	protected void updateTypedText() {
+		String name = textView.getText().toString();
+		if (startText.equals(name)) {
+			textView.getText().clear();
+			name = null;
+		}
+
+		if (!StringUtil.isEmpty(name)) {
+			if (textView.isPopupShowing() && textView.getListSelection() != ListView.INVALID_POSITION) {
+				name = (String) textView.getAdapter().getItem(textView.getListSelection());
+			}
+			if (!addLabel(name)) {
+				storeLabel(name);
+			}
+			textView.getText().clear();
+			result.putExtra(IA_LABELS, (Serializable) selectedLabels);
+			setResult(RESULT_OK, result);
+		}
 	}
 
 	private boolean addLabel(String name) {
@@ -137,20 +153,17 @@ public class CVSearchLabel extends BaseActivity {
 		labelList.setAdapter(labelAdapter);
 		super.onResume();
 	}
-	
+
 	@Override
 	public void onBackPressed() {
-		addLabel(view.getText().toString());
-		Intent result = new Intent();
-		result.putExtra(IA_LABELS, (Serializable) selectedLabels);
-		setResult(RESULT_OK, result);
-		finish();
+		updateTypedText();
+		super.onBackPressed();
 	}
 
 	@Override
 	public boolean onContextItemSelected(MenuItem menuItem) {
 		int position = menuItem.getGroupId();
-		
+
 		switch (menuItem.getItemId()) {
 			case R.id.remove:
 				selectedLabels.remove(position);
@@ -159,6 +172,6 @@ public class CVSearchLabel extends BaseActivity {
 				return true;
 			default:
 				return super.onContextItemSelected(menuItem);
-		}		
+		}
 	}
 }

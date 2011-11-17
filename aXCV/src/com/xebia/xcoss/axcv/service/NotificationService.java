@@ -59,7 +59,6 @@ public class NotificationService extends Service {
 	private Runnable notifyOnAuthor = new Runnable() {
 		@Override
 		public void run() {
-			Looper.prepare();
 			checkSessionsForChange(true);
 		}
 	};
@@ -67,7 +66,6 @@ public class NotificationService extends Service {
 	private Runnable notifyOnMarked = new Runnable() {
 		@Override
 		public void run() {
-			Looper.prepare();
 			checkSessionsForChange(false);
 		}
 	};
@@ -80,23 +78,29 @@ public class NotificationService extends Service {
 
 		@Override
 		public boolean cancel() {
+			Log.w(XCS.LOG.COMMUNICATE, "Cancelling timer...");
 			endThreads();
 			return super.cancel();
 		}
 	};
 
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		Log.w(XCS.LOG.COMMUNICATE, "On start command " + flags + "/" + startId + " = " + intent);
+		return super.onStartCommand(intent, flags, startId);
+	};
+	
 	@Override
 	public void onStart(Intent intent, int startId) {
 		if (notifyTimer == null) {
 			try {
 				notifyTimer = new Timer("ConferenceNotifier");
 				SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-//				Map<String, ?> all = sp.getAll();
-//				for (String key : all.keySet()) {
-//					Log.w(XCS.LOG.COMMUNICATE, " -- " + key + " '" + all.get(key) + "' = " + all.get(key).getClass());
-//				}
-//				Log.w(XCS.LOG.COMMUNICATE, " == " + XCS.PREF.NOTIFYINTERVAL);
-//				Log.w(XCS.LOG.COMMUNICATE, " == " + sp.getString(XCS.PREF.NOTIFYINTERVAL, "<default>"));
+				// Map<String, ?> all = sp.getAll();
+				// for (String key : all.keySet()) {
+				// Log.w(XCS.LOG.COMMUNICATE, " -- " + key + " '" + all.get(key) + "' = " + all.get(key).getClass());
+				// }
+				// Log.w(XCS.LOG.COMMUNICATE, " == " + XCS.PREF.NOTIFYINTERVAL);
+				// Log.w(XCS.LOG.COMMUNICATE, " == " + sp.getString(XCS.PREF.NOTIFYINTERVAL, "<default>"));
 
 				int delay = 900;
 				try {
@@ -117,7 +121,9 @@ public class NotificationService extends Service {
 
 	@Override
 	public void onDestroy() {
-		if (notifyTimer != null) notifyTimer.cancel();
+		if (notifyTimer != null) {
+			notifyTimer.cancel();
+		}
 		Log.w(XCS.LOG.COMMUNICATE, "Service stopped.");
 		notifyTask.cancel();
 		super.onDestroy();
@@ -125,6 +131,7 @@ public class NotificationService extends Service {
 
 	@Override
 	public IBinder onBind(Intent paramIntent) {
+		Log.w(XCS.LOG.COMMUNICATE, "On bind ");
 		return null;
 	}
 
@@ -272,10 +279,10 @@ public class NotificationService extends Service {
 		if (instance == null || instance.isLoggedIn() == false) {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			String user = sp.getString(XCS.PREF.USERNAME, null);
-			// TODO Encrypt/decrypt
-			String password = /* SecurityUtils.decrypt( */sp.getString(XCS.PREF.PASSWORD, "")/* ) */;
+			String password = sp.getString(XCS.PREF.PASSWORD, "");
 			instance = ConferenceServer.createInstance(user, password, BaseActivity.getServerUrl(this), new NoCache(
 					this));
+			// TODO Cn be null if not logged in.
 		}
 		return instance;
 	}

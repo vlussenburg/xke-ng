@@ -1,7 +1,7 @@
 IN PROGRESS
 -------------------------------------------------------------------
 
--	Author notification testen
+
 
 TODO
 -------------------------------------------------------------------
@@ -10,7 +10,6 @@ client
 -	Https connectie
 -	Bij roteren raken de waardes kwijt
 -	Afhandeling 400 meldingen
--	Rewrite exit / rootApplication
 -	Timeout on login afvangen
 
 later op de client
@@ -20,7 +19,6 @@ later op de client
 	-	Database caching support
 	-	Toegevoegd/gewijzigde sessie is niet direct zichtbaar
 -	Wachtcursor bij search maken
--	Improved Select label/author screen
 -	Externalize strings
 -	Foto's gebruikers + telefoonnummer
 -	Conference edit alleen door organiser (?)
@@ -68,3 +66,6 @@ DONE
 -	Niet alles cancellen, maar alleen de ontvangen notificatie
 -	Inserted breaks sorteren op tijd
 -	Insert break, change duration, start time resets...
+-	Author notification testen
+-	Rewrite exit / rootApplication
+-	Improved Select label/author screen

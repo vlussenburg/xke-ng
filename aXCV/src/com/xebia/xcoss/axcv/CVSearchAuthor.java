@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -31,23 +32,34 @@ public class CVSearchAuthor extends BaseActivity {
 
 	private List<Author> selectedAuthors;
 	private AuthorAdapter authorAdapter;
-	private AutoCompleteTextView view;
+	private AutoCompleteTextView textView;
 	private HashMap<String, Author> allAuthors;
 	private boolean singleMode;
+	private String startText;
+	private Intent result = new Intent();
 
 	protected ConferenceServer getConferenceServer() {
 		ConferenceServer server = ConferenceServerProxy.getInstance();
 		return server;
 	}
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.search_items);
-		view = (AutoCompleteTextView) findViewById(R.id.ssa_text);
-		final String startText = getResources().getString(R.string.default_input_text);
-		view.setSelection(0, startText.length());
+		textView = (AutoCompleteTextView) findViewById(R.id.ssa_text);
+		startText = getResources().getString(R.string.default_input_text);
+		textView.setSelection(0, startText.length());
 		initSelectedAuthors();
+
+		Button closeButton = (Button) findViewById(R.id.ssa_close);
+		closeButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				updateTypedText();
+				finish();
+			}
+		});
 
 		// Fill the list of options
 		allAuthors = new HashMap<String, Author>();
@@ -59,32 +71,17 @@ public class CVSearchAuthor extends BaseActivity {
 		}
 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, data);
-		view.setAdapter(adapter);
-		view.setOnKeyListener(new View.OnKeyListener() {
+		textView.setAdapter(adapter);
+		textView.setOnKeyListener(new View.OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
-				String authorName = view.getText().toString();
-				if (startText.equals(authorName)) {
-					view.getText().clear();
-				}
-
 				if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
-				if (StringUtil.isEmpty(authorName)) return true;
-
-				if (view.isPopupShowing() && view.getListSelection() != ListView.INVALID_POSITION) {
-					authorName = (String) view.getAdapter().getItem(view.getListSelection());
-				}
-
-				if (!addAuthor(authorName)) {
-					Toast.makeText(getApplicationContext(), "Select a valid author!", Toast.LENGTH_SHORT).show();
-					return true;
-				}
-				view.getText().clear();
+				updateTypedText();
 				return true;
 			}
 
 		});
-		
+
 		super.onCreate(savedInstanceState);
 	}
 
@@ -159,17 +156,14 @@ public class CVSearchAuthor extends BaseActivity {
 
 	@Override
 	public void onBackPressed() {
-		addAuthor(view.getText().toString());
-		Intent result = new Intent();
-		result.putExtra(IA_AUTHORS, (Serializable) selectedAuthors);
-		setResult(RESULT_OK, result);
-		finish();
+		updateTypedText();
+		super.onBackPressed();
 	}
-	
+
 	@Override
 	public boolean onContextItemSelected(MenuItem menuItem) {
 		int position = menuItem.getGroupId();
-		
+
 		switch (menuItem.getItemId()) {
 			case R.id.view:
 				// TODO, Store current items
@@ -185,7 +179,29 @@ public class CVSearchAuthor extends BaseActivity {
 				return true;
 			default:
 				return super.onContextItemSelected(menuItem);
-		}		
+		}
+	}
+
+	private void updateTypedText() {
+		String authorName = textView.getText().toString();
+		if (startText.equals(authorName)) {
+			textView.getText().clear();
+			authorName = null;
+		}
+
+		if (!StringUtil.isEmpty(authorName)) {
+
+			if (textView.isPopupShowing() && textView.getListSelection() != ListView.INVALID_POSITION) {
+				authorName = (String) textView.getAdapter().getItem(textView.getListSelection());
+			}
+
+			if (!addAuthor(authorName)) {
+				Toast.makeText(getApplicationContext(), "Select a valid author!", Toast.LENGTH_SHORT).show();
+			}
+			textView.getText().clear();
+			result.putExtra(IA_AUTHORS, (Serializable) selectedAuthors);
+			setResult(RESULT_OK, result);
+		}
 	}
 
 }

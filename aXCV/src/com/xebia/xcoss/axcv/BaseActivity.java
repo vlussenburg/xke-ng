@@ -61,7 +61,7 @@ public abstract class BaseActivity extends Activity {
 	private MenuItem miTrack;
 	private MenuItem miExit;
 
-	private static Activity rootActivity;
+//	private static Activity rootActivity;
 	private static ProfileManager profileManager;
 	protected static String lastError;
 
@@ -70,10 +70,10 @@ public abstract class BaseActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		ProxyExceptionReporter.register(this);
 
-		if (rootActivity == null) {
-			rootActivity = this;
-		}
-
+//		if (rootActivity == null) {
+//			rootActivity = this;
+//		}
+//
 		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);
 		if (conferenceButton != null) {
 			conferenceButton.setOnClickListener(new View.OnClickListener() {
@@ -96,17 +96,17 @@ public abstract class BaseActivity extends Activity {
 		super.onResume();
 	}
 	
-	private void resetApplication(boolean exit) {
-		Log.e(LOG.ALL, "Reset application from " + this + " : " + exit);
-		rootActivity = null;
-		Intent intent = new Intent(BaseActivity.this, CVSplashLoader.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		if (exit) {
-			intent.putExtra("exit", true);
-		}
-		startActivity(intent);
-	}
-
+//	private void resetApplication(boolean exit) {
+//		Log.e(LOG.ALL, "Reset application from " + this + " : " + exit);
+//		rootActivity = null;
+//		Intent intent = new Intent(BaseActivity.this, CVSplashLoader.class);
+//		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//		if (exit) {
+//			intent.putExtra("exit", true);
+//		}
+//		startActivity(intent);
+//	}
+//
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
@@ -148,7 +148,7 @@ public abstract class BaseActivity extends Activity {
 				startActivity(new Intent(this, CVTrack.class));
 			break;
 			case XCS.MENU.EXIT:
-				resetApplication(true);
+				moveTaskToBack(true);
 			break;
 		}
 		return true;
@@ -182,7 +182,7 @@ public abstract class BaseActivity extends Activity {
 		}
 		if (conference == null && useDefault) {
 			conference = server.getUpcomingConference();
-			Log.w(LOG.ALL, "Conference default " + conference.getTitle());
+			Log.w(LOG.ALL, "Conference default " + (conference == null ? "<null>": conference.getTitle()));
 		}
 		// Log.i("XCS", "[GET] Conference (on '" + identifier + "') = " + conference);
 		return conference;
@@ -235,13 +235,14 @@ public abstract class BaseActivity extends Activity {
 				cache = new MemoryCache(this);
 			}
 			server = ConferenceServer.createInstance(user, password, getServerUrl(this), cache);
+			// TODO server can be null if not logged in.
 		}
 		return server;
 	}
 
 	protected ProfileManager getProfileManager() {
 		if (profileManager == null) {
-			profileManager = new ProfileManager(rootActivity);
+			profileManager = new ProfileManager(this);
 		}
 		profileManager.openConnection();
 		return profileManager;

@@ -33,13 +33,14 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public void login(String user, String password) {
+	protected boolean login(String user, String password) {
 		try {
-			super.login(user, password);
+			return super.login(user, password);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "login", e);
 		}
+		return false;
 	}
 
 	@Override
