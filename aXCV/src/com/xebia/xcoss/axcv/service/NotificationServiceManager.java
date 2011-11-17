@@ -18,10 +18,10 @@ public class NotificationServiceManager implements SignalRetriever {
 
 		if ( onOwned || onMarked ) {
 			ctx.startService(new Intent(ctx, NotificationService.class));
-			Log.v(XCS.LOG.ALL, "Notification service started");
+			Log.v(XCS.LOG.ALL, "Notification service start send");
 		} else {
 			ctx.stopService(new Intent(ctx, NotificationService.class));
-			Log.v(XCS.LOG.ALL, "Notification service stopped");
+			Log.v(XCS.LOG.ALL, "Notification service stop send");
 		}
 	}
 

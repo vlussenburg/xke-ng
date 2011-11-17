@@ -2,8 +2,6 @@ IN PROGRESS
 -------------------------------------------------------------------
 
 -	Author notification testen
--	Niet alles cancellen, maar alleen de ontvangen notificatie
--	Inserted breaks sorteren op tijd
 
 TODO
 -------------------------------------------------------------------
@@ -67,3 +65,5 @@ DONE
 -	Slot beschikbaarheid start altijd om start+n+n. Je wilt kunnen schuiven. 
 -	Store failed? Stay on page...
 -	NREP: Lijst (conferenties) scrollt niet terug naar eerste item (blijft hangen) Tracklist/Sessionlist wel ok.
+-	Niet alles cancellen, maar alleen de ontvangen notificatie
+-	Inserted breaks sorteren op tijd

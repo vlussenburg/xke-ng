@@ -91,6 +91,7 @@ public class NotificationService extends Service {
 				notifyTimer = new Timer("ConferenceNotifier");
 				SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 				int delay = sp.getInt(XCS.PREF.NOTIFYINTERVAL, 900);
+				Log.w(XCS.LOG.COMMUNICATE, "Service started with interval: " + delay);
 				notifyTimer.scheduleAtFixedRate(notifyTask, 0, delay * 1000);
 			}
 			catch (Exception e) {
@@ -103,6 +104,7 @@ public class NotificationService extends Service {
 	@Override
 	public void onDestroy() {
 		if (notifyTimer != null) notifyTimer.cancel();
+		Log.w(XCS.LOG.COMMUNICATE, "Service stopped.");
 		notifyTask.cancel();
 		super.onDestroy();
 	}
