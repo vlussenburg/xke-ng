@@ -2,7 +2,7 @@ package com.xebia.xcoss.axcv.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -18,7 +18,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -200,10 +199,12 @@ public class NotificationService extends Service {
 					Log.e(XCS.LOG.DATA, "No upcomming conference!");
 					return new ArrayList<String>();
 				}
-				Log.e(XCS.LOG.DATA, "Upcomming conference is " + upcomingConference.getTitle());
-				List<Session> nextSessions = server.getSessions(upcomingConference);
+				Set<Session> nextSessions = upcomingConference.getSessions();
+				Log.v(XCS.LOG.DATA, "Check for author: " + user + "(" + nextSessions.size() + " sessions)");
 				for (Session session : nextSessions) {
+					Log.v(XCS.LOG.DATA, "Session '"+session.getTitle()+"' ...");
 					for (Author author : session.getAuthors()) {
+						Log.v(XCS.LOG.DATA, "    has author: " + author.getUserId());
 						if (author.getUserId().equals(user)) {
 							allOwnedSessions.add(session);
 						}

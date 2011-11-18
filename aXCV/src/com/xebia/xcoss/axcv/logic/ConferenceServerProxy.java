@@ -195,17 +195,6 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public List<Session> getSessions(Conference conference) {
-		try {
-			return super.getSessions(conference);
-		}
-		catch (CommException e) {
-			BaseActivity.handleException(activity, "get sessions", e);
-		}
-		return new ArrayList<Session>();
-	}
-
-	@Override
 	public void registerRate(Session session, Rate rate) {
 		try {
 			super.registerRate(session, rate);

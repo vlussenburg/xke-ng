@@ -81,15 +81,6 @@ public class Conference implements Serializable {
 		if (sessions == null) {
 			resetSessions();
 		}
-		if (sessions.isEmpty()) {
-			try {
-				List<Session> list = ConferenceServer.getInstance().getSessions(this);
-				sessions.addAll(list);
-			}
-			catch (CommException e) {
-				BaseActivity.handleException(null, "retrieving sessions", e);
-			}
-		}
 		// Json mapping does not put it in a sorted set...
 		return sort(sessions);
 	}

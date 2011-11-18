@@ -171,27 +171,6 @@ public class ConferenceServer {
 		RestClient.deleteObject(requestUrl.toString(), token);
 	}
 
-	public List<Session> getSessions(Conference conference) {
-		List<Session> result = conferenceCache.getSessions(conference.getId());
-		if (result == null) {
-			StringBuilder requestUrl = new StringBuilder();
-			requestUrl.append(baseUrl);
-			requestUrl.append("/conference/");
-			requestUrl.append(conference.getId());
-			requestUrl.append("/sessions");
-
-			result = RestClient.loadObjects(requestUrl.toString(), Session.class, token);
-			if (result == null) {
-				return new ArrayList<Session>();
-			}
-			for (Session session : result) {
-				session.setConferenceId(conference.getId());
-			}
-			conferenceCache.add(conference.getId(), result);
-		}
-		return result;
-	}
-
 	public Session getSession(String id, String cid) {
 		Session result = conferenceCache.getSession(id);
 		if (result == null) {
@@ -223,9 +202,6 @@ public class ConferenceServer {
 		} else {
 			requestUrl.append("/session/");
 			requestUrl.append(session.getId());
-			// requestUrl.append("/conference/");
-			// requestUrl.append(conferenceId);
-			// requestUrl.append("/session");
 			RestClient.updateObject(requestUrl.toString(), session, token);
 			sessionId = session.getId();
 		}
