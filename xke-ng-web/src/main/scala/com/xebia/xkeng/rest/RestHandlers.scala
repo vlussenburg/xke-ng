@@ -12,6 +12,7 @@ import net.liftweb.util.BasicTypesHelpers._
 import com.xebia.xkeng.model._
 import com.atlassian.crowd.model.user.{ User => CrowdUser };
 import RestUtils._
+import java.net.URLDecoder
 
 trait RestHandlerComponent extends Logger {
   this: RepositoryComponent =>
@@ -195,7 +196,8 @@ trait RestHandlerComponent extends Logger {
    */
   def handleError(paramBody: String) = {
     val user = if (UserHolder.isLoggedIn) UserHolder.loggedInAuthor.userId else "unknown"
-    error("Device error of user %s. Error is %s" format (user, paramBody))
+    val body = URLDecoder.decode(paramBody, "UTF-8")
+    error("Device error of user %s. Error is %s\n" format (user, body))
     Full(OkResponse())
   }
   /**
