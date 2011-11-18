@@ -52,7 +52,7 @@ public class CheckBoxPreference extends android.preference.CheckBoxPreference {
 
 	@Override
 	protected void onClick() {
-		signalRetriever.onSignal(getContext());
 		super.onClick();
+		signalRetriever.onSignal(getContext());
 	}
 }

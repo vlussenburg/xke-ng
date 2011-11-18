@@ -43,10 +43,14 @@ public class NotificationService extends Service {
 	private static final String TAG_OWNED = "id-owned_ses";
 	private static final String TAG_TRACKED = "id-track-ses";
 	private static final long[] VIBRATE_PATTERN = new long[] { 1000, 200, 1000 };
+	private static final int SERVICE_ID = 873892;
 
 	private Timer notifyTimer;
 	private Thread authorThread;
 	private Thread markedThread;
+
+	private boolean onOwned;
+	private boolean onMarked;
 
 	private Handler handler = new Handler() {
 		@Override
@@ -83,25 +87,17 @@ public class NotificationService extends Service {
 		}
 	};
 
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.w(XCS.LOG.COMMUNICATE, "On start command " + flags + "/" + startId + " = " + intent);
-		return super.onStartCommand(intent, flags, startId);
-	};
-	
 	@Override
 	public void onStart(Intent intent, int startId) {
-		if (notifyTimer == null) {
+
+		int delay = 900;
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		onOwned = sp.getBoolean(XCS.PREF.NOTIFYOWNED, false);
+		onMarked = sp.getBoolean(XCS.PREF.NOTIFYTRACK, false);
+
+		if (notifyTimer == null && (onOwned || onMarked)) {
 			try {
 				notifyTimer = new Timer("ConferenceNotifier");
-				SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-				// Map<String, ?> all = sp.getAll();
-				// for (String key : all.keySet()) {
-				// Log.w(XCS.LOG.COMMUNICATE, " -- " + key + " '" + all.get(key) + "' = " + all.get(key).getClass());
-				// }
-				// Log.w(XCS.LOG.COMMUNICATE, " == " + XCS.PREF.NOTIFYINTERVAL);
-				// Log.w(XCS.LOG.COMMUNICATE, " == " + sp.getString(XCS.PREF.NOTIFYINTERVAL, "<default>"));
-
-				int delay = 900;
 				try {
 					delay = Integer.parseInt(sp.getString(XCS.PREF.NOTIFYINTERVAL, "900"));
 				}
@@ -114,7 +110,39 @@ public class NotificationService extends Service {
 			catch (Exception e) {
 				Log.w(XCS.LOG.COMMUNICATE, "Timer start issue: " + StringUtil.getExceptionMessage(e));
 			}
+
+			Notification notify = new Notification(R.drawable.x_stat_running, "XKE notification service",
+					System.currentTimeMillis());
+			Intent runIntent = new Intent(this, CVSplashLoader.class);
+			intent.setAction("android.intent.action.MAIN");
+			intent.addCategory("android.intent.category.LAUNCHER");
+			// intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+			PendingIntent pendIntent = PendingIntent.getActivity(this, 0, runIntent, 0);
+			StringBuilder sb = new StringBuilder();
+			sb.append("Poll every ");
+			int time = delay / 60;
+			if (time > 120) {
+				sb.append(time / 24);
+				sb.append(" hrs for ");
+			} else {
+				sb.append(time);
+				sb.append(" mins for ");
+			}
+			if (onMarked) {
+				sb.append("track");
+			}
+			if (onOwned) {
+				if ( onMarked) {
+					sb.append("/");
+				}
+				sb.append("own");
+			}
+			sb.append(".");
+			notify.setLatestEventInfo(this, "XKE notification service", sb.toString(), pendIntent);
+			notify.flags |= Notification.FLAG_NO_CLEAR;
+			startForeground(SERVICE_ID, notify);
 		}
+
 		super.onStart(intent, startId);
 	}
 
@@ -125,6 +153,7 @@ public class NotificationService extends Service {
 		}
 		Log.w(XCS.LOG.COMMUNICATE, "Service stopped.");
 		notifyTask.cancel();
+		stopForeground(true);
 		super.onDestroy();
 	}
 
@@ -135,10 +164,6 @@ public class NotificationService extends Service {
 	}
 
 	private void startThreads() {
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(NotificationService.this);
-		boolean onOwned = sp.getBoolean(XCS.PREF.NOTIFYOWNED, false);
-		boolean onMarked = sp.getBoolean(XCS.PREF.NOTIFYTRACK, false);
-
 		Log.v(XCS.LOG.ALL, "Notification processing: " + onOwned + "/" + onMarked);
 
 		if (onOwned) {
@@ -164,7 +189,7 @@ public class NotificationService extends Service {
 		Log.i(XCS.LOG.COMMUNICATE, "Checking for changes: " + (owned ? "Owner" : "Track"));
 		ConferenceServer server = getConferenceServer();
 		if (server == null) {
-			//  TODO : Happens. Just return
+			// TODO : Happens. Just return
 			Log.e(XCS.LOG.COMMUNICATE, "Notification service could not get server handle");
 			throw new IllegalStateException("Missing server on notification! " + BaseActivity.getServerUrl(this));
 			// return;
@@ -202,7 +227,7 @@ public class NotificationService extends Service {
 				Set<Session> nextSessions = upcomingConference.getSessions();
 				Log.v(XCS.LOG.DATA, "Check for author: " + user + "(" + nextSessions.size() + " sessions)");
 				for (Session session : nextSessions) {
-					Log.v(XCS.LOG.DATA, "Session '"+session.getTitle()+"' ...");
+					Log.v(XCS.LOG.DATA, "Session '" + session.getTitle() + "' ...");
 					for (Author author : session.getAuthors()) {
 						Log.v(XCS.LOG.DATA, "    has author: " + author.getUserId());
 						if (author.getUserId().equals(user)) {
@@ -220,7 +245,7 @@ public class NotificationService extends Service {
 				long lastNotification = ownedSession.getModificationHash();
 				String id = ownedSession.getId();
 				Log.v(XCS.LOG.COMMUNICATE, " Server status  : " + id + ":" + lastNotification);
-				
+
 				for (int i = 0; i < ids.length; i++) {
 					if (id.equals(ids[i].sessionId)) {
 						sessionFoundInMarkList = true;
@@ -264,12 +289,13 @@ public class NotificationService extends Service {
 			Trackable[] ids = pm.getMarkedSessions(getUser());
 
 			Log.v(XCS.LOG.COMMUNICATE, "Tracked a total of " + ids.length + " sessions.");
-			
+
 			for (int i = 0; i < ids.length; i++) {
 				Session session = server.getSession(ids[i].sessionId, ids[i].conferenceId);
 				if (session != null) {
 					long modificationHash = session.getModificationHash();
-					Log.v(XCS.LOG.COMMUNICATE, " Session status: " + session.getId() + ":" + modificationHash + (session.isExpired()?" / expired" : " / ok"));
+					Log.v(XCS.LOG.COMMUNICATE, " Session status: " + session.getId() + ":" + modificationHash
+							+ (session.isExpired() ? " / expired" : " / ok"));
 					Log.v(XCS.LOG.COMMUNICATE, " Track status  : " + ids[i].sessionId + ":" + ids[i].hash);
 					if (!session.isExpired() && ids[i].hash != modificationHash) {
 						Log.v(XCS.LOG.DATA, "Tracked session changed.");

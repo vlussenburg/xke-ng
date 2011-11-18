@@ -47,7 +47,7 @@ public class ListPreference extends android.preference.ListPreference {
 
 	@Override
 	public void setValue(String value) {
-		signalRetriever.onSignal(getContext());
 		super.setValue(value);
+		signalRetriever.onSignal(getContext());
 	}
 }

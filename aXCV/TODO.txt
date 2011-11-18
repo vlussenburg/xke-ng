@@ -66,3 +66,4 @@ DONE
 -	Rewrite exit / rootApplication
 -	Improved Select label/author screen
 -	Remove author/label
+-	Notification service stops on program kill by android -> needed icon
