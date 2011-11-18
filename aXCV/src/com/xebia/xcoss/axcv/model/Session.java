@@ -247,13 +247,13 @@ public class Session implements Serializable {
 		int value = 0;
 		// Title: Max 10
 		if (!StringUtil.isEmpty(title)) {
-			value += Math.min(10, title.length() / 2);
+			value += Math.min(10, title.length() / 1.6);
 			Log.v(XCS.LOG.ALL, "Title boosted value to " + value);
 		}
 		// Description: Max 35
 		if (!StringUtil.isEmpty(description)) {
 			value += Math.min(35, description.replaceAll("\\w", "").length() * 1.4);
-			Log.v(XCS.LOG.ALL, "Description boosted value to " + value);
+			Log.v(XCS.LOG.ALL, "Description '"+description.replaceAll("\\w", "")+"' boosted value to " + value);
 		}
 		// startTime: Max 5
 		if (startTime != null) {
@@ -287,7 +287,7 @@ public class Session implements Serializable {
 		}
 		// intendedAudience: Max 20
 		if (!StringUtil.isEmpty(intendedAudience)) {
-			value += Math.min(20, intendedAudience.length());
+			value += Math.min(20, intendedAudience.length() * 2);
 			Log.v(XCS.LOG.ALL, "Audience boosted value to " + value);
 		}
 		Log.i(XCS.LOG.ALL, "Completeness (100) = " + value);

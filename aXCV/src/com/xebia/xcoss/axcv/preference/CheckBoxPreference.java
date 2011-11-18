@@ -51,8 +51,8 @@ public class CheckBoxPreference extends android.preference.CheckBoxPreference {
 	}
 
 	@Override
-	public void setChecked(boolean checked) {
-		super.setChecked(checked);
+	protected void onClick() {
 		signalRetriever.onSignal(getContext());
+		super.onClick();
 	}
 }
