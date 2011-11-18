@@ -182,7 +182,8 @@ public class ProfileManager extends SQLiteOpenHelper {
 		try {
 			checkConnection();
 			String[] whereArgs = new String[1];
-			whereArgs[0] = String.valueOf(new Moment().asLong());
+			// 5 minutes grace period
+			whereArgs[0] = String.valueOf(new Moment().asLong() - 5*60*1000);
 			database.delete(TRACK_TABLE, SES_QUERY_PRUNE, whereArgs);
 			database.delete(OWNED_TABLE, SES_QUERY_PRUNE, whereArgs);
 		}

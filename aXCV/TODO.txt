@@ -2,7 +2,6 @@ IN PROGRESS
 -------------------------------------------------------------------
 
 
-
 TODO
 -------------------------------------------------------------------
 client
@@ -30,11 +29,8 @@ server
 -	Session scheduling
 -	Zoeken
 -	403 on session expiration or invalid login
--	Verwijderen van locaties (Urs; not supported now)
 -	Error handling (/error URL geeft 400 zonder verdere melding)
 -	Nieuwe datum conferentie leidt niet tot nieuwe datum sessies (wordt wel gestuurd)
--	Uitzoeken hoe encryption werkt (want lukt nog niet bij mij...)
-    - Padding error op server...
 -	Support conferenceId within session object (at least for search)
 
 DONE
@@ -69,3 +65,4 @@ DONE
 -	Author notification testen
 -	Rewrite exit / rootApplication
 -	Improved Select label/author screen
+-	Remove author/label

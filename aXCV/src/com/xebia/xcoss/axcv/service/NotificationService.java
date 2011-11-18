@@ -165,8 +165,8 @@ public class NotificationService extends Service {
 		Log.i(XCS.LOG.COMMUNICATE, "Checking for changes: " + (owned ? "Owner" : "Track"));
 		ConferenceServer server = getConferenceServer();
 		if (server == null) {
+			//  TODO : Happens. Just return
 			Log.e(XCS.LOG.COMMUNICATE, "Notification service could not get server handle");
-			Toast.makeText(this, "Notification check failed", Toast.LENGTH_SHORT).show();
 			throw new IllegalStateException("Missing server on notification! " + BaseActivity.getServerUrl(this));
 			// return;
 		}
@@ -200,6 +200,7 @@ public class NotificationService extends Service {
 					Log.e(XCS.LOG.DATA, "No upcomming conference!");
 					return new ArrayList<String>();
 				}
+				Log.e(XCS.LOG.DATA, "Upcomming conference is " + upcomingConference.getTitle());
 				List<Session> nextSessions = server.getSessions(upcomingConference);
 				for (Session session : nextSessions) {
 					for (Author author : session.getAuthors()) {
@@ -209,16 +210,21 @@ public class NotificationService extends Service {
 					}
 				}
 			}
+			Log.v(XCS.LOG.COMMUNICATE, "Author based: found " + allOwnedSessions.size() + " sessions to check.");
+			for (Trackable session : ids) {
+				Log.v(XCS.LOG.COMMUNICATE, " Database status: " + session.sessionId + ":" + session.hash);
+			}
 			for (Session ownedSession : allOwnedSessions) {
 				boolean sessionFoundInMarkList = false;
 				long lastNotification = ownedSession.getModificationHash();
 				String id = ownedSession.getId();
+				Log.v(XCS.LOG.COMMUNICATE, " Server status  : " + id + ":" + lastNotification);
+				
 				for (int i = 0; i < ids.length; i++) {
 					if (id.equals(ids[i].sessionId)) {
 						sessionFoundInMarkList = true;
 						if (ids[i].hash != lastNotification) {
-							Log.i(XCS.LOG.DATA, "Session changed: " + ownedSession.getTitle() + ", hash = "
-									+ lastNotification + ", stored = " + ids[i].hash);
+							Log.v(XCS.LOG.DATA, "Session changed: " + ownedSession.getTitle());
 							ids[i].hash = lastNotification;
 							ids[i].date = ownedSession.getStartTime().asLong();
 							pm.updateOwnedSession(ids[i]);
@@ -230,7 +236,7 @@ public class NotificationService extends Service {
 				// What to do with sessions added elsewhere? We notify for now...
 				// If there is a second author, she/he is notified.
 				if (!sessionFoundInMarkList) {
-					Log.i(XCS.LOG.DATA, "Session not in mark list: " + ownedSession.getTitle() + ", hash = "
+					Log.v(XCS.LOG.DATA, "Session not in mark list: " + ownedSession.getTitle() + ", hash = "
 							+ lastNotification);
 					Trackable add = pm.new Trackable();
 					add.date = ownedSession.getStartTime().asLong();
@@ -255,11 +261,17 @@ public class NotificationService extends Service {
 		try {
 			pm.openConnection();
 			Trackable[] ids = pm.getMarkedSessions(getUser());
+
+			Log.v(XCS.LOG.COMMUNICATE, "Tracked a total of " + ids.length + " sessions.");
+			
 			for (int i = 0; i < ids.length; i++) {
 				Session session = server.getSession(ids[i].sessionId, ids[i].conferenceId);
 				if (session != null) {
 					long modificationHash = session.getModificationHash();
+					Log.v(XCS.LOG.COMMUNICATE, " Session status: " + session.getId() + ":" + modificationHash + (session.isExpired()?" / expired" : " / ok"));
+					Log.v(XCS.LOG.COMMUNICATE, " Track status  : " + ids[i].sessionId + ":" + ids[i].hash);
 					if (!session.isExpired() && ids[i].hash != modificationHash) {
+						Log.v(XCS.LOG.DATA, "Tracked session changed.");
 						ids[i].hash = modificationHash;
 						ids[i].date = session.getStartTime().asLong();
 						pm.updateMarkedSession(ids[i]);

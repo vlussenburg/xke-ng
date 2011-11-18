@@ -88,12 +88,17 @@ public class CVSearchLabel extends BaseActivity {
 				name = (String) textView.getAdapter().getItem(textView.getListSelection());
 			}
 			if (!addLabel(name)) {
-				storeLabel(name);
+				// Seems the server will add the label upon updating a session
+//				storeLabel(name);
 			}
 			textView.getText().clear();
-			result.putExtra(IA_LABELS, (Serializable) selectedLabels);
-			setResult(RESULT_OK, result);
+			updateResult();
 		}
+	}
+
+	private void updateResult() {
+		result.putExtra(IA_LABELS, (Serializable) selectedLabels);
+		setResult(RESULT_OK, result);
 	}
 
 	private boolean addLabel(String name) {
@@ -167,6 +172,7 @@ public class CVSearchLabel extends BaseActivity {
 		switch (menuItem.getItemId()) {
 			case R.id.remove:
 				selectedLabels.remove(position);
+				updateResult();
 				labelAdapter.notifyDataSetChanged();
 				Toast.makeText(getApplicationContext(), "Label removed", Toast.LENGTH_SHORT).show();
 				return true;

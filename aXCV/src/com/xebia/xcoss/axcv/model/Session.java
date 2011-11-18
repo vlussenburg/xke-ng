@@ -344,7 +344,7 @@ public class Session implements Serializable {
 				result = prime * result + author.getUserId().hashCode();
 			}
 		}
-		return result;
+		return Math.abs(result);
 	}
 
 	public void setConferenceId(String conferenceId) {

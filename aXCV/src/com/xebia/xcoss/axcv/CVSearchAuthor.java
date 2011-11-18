@@ -133,15 +133,15 @@ public class CVSearchAuthor extends BaseActivity {
 	private void initSelectedAuthors() {
 		if (selectedAuthors == null) {
 			selectedAuthors = new ArrayList<Author>();
-		}
-		try {
-			Bundle extras = getIntent().getExtras();
-			selectedAuthors.clear();
-			selectedAuthors.addAll((List<Author>) extras.getSerializable(IA_AUTHORS));
-			singleMode = extras.getBoolean("singleSelectionMode", false);
-		}
-		catch (Exception e) {
-			Log.w(XCS.LOG.COMMUNICATE, "No authors loaded: " + e.getMessage());
+			try {
+				Bundle extras = getIntent().getExtras();
+				selectedAuthors.clear();
+				selectedAuthors.addAll((List<Author>) extras.getSerializable(IA_AUTHORS));
+				singleMode = extras.getBoolean("singleSelectionMode", false);
+			}
+			catch (Exception e) {
+				Log.w(XCS.LOG.COMMUNICATE, "No authors loaded: " + e.getMessage());
+			}
 		}
 	}
 
@@ -166,7 +166,6 @@ public class CVSearchAuthor extends BaseActivity {
 
 		switch (menuItem.getItemId()) {
 			case R.id.view:
-				// TODO, Store current items
 				Author author = selectedAuthors.get(position);
 				Intent intent = new Intent(this, CVAuthor.class);
 				intent.putExtra(BaseActivity.IA_AUTHOR, author.getUserId());
@@ -174,6 +173,7 @@ public class CVSearchAuthor extends BaseActivity {
 				return true;
 			case R.id.remove:
 				selectedAuthors.remove(position);
+				updateResult();
 				authorAdapter.notifyDataSetChanged();
 				Toast.makeText(getApplicationContext(), "Author removed", Toast.LENGTH_SHORT).show();
 				return true;
@@ -199,9 +199,12 @@ public class CVSearchAuthor extends BaseActivity {
 				Toast.makeText(getApplicationContext(), "Select a valid author!", Toast.LENGTH_SHORT).show();
 			}
 			textView.getText().clear();
-			result.putExtra(IA_AUTHORS, (Serializable) selectedAuthors);
-			setResult(RESULT_OK, result);
+			updateResult();
 		}
 	}
 
+	private void updateResult() {
+		result.putExtra(IA_AUTHORS, (Serializable) selectedAuthors);
+		setResult(RESULT_OK, result);
+	}
 }
