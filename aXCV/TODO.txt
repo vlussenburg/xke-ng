@@ -1,15 +1,12 @@
 IN PROGRESS
 -------------------------------------------------------------------
 
+- Notifications while app stopped
 
 TODO
 -------------------------------------------------------------------
 client
--	Database close issues
--	Https connectie
 -	Bij roteren raken de waardes kwijt
--	Afhandeling 400 meldingen
--	Timeout on login afvangen
 
 later op de client
 -	Verbeteren van caching
@@ -18,6 +15,8 @@ later op de client
 	-	Database caching support
 	-	Toegevoegd/gewijzigde sessie is niet direct zichtbaar
 -	Wachtcursor bij search maken
+-	Afhandeling 400 meldingen
+-	Timeout on login afvangen
 -	Externalize strings
 -	Foto's gebruikers + telefoonnummer
 -	Conference edit alleen door organiser (?)
@@ -67,3 +66,5 @@ DONE
 -	Improved Select label/author screen
 -	Remove author/label
 -	Notification service stops on program kill by android -> needed icon
+-	NREP: Database close issues
+-	Https connectie
