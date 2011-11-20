@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.joda.time.DateTime;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -24,6 +26,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.BaseActivity;
+import com.xebia.xcoss.axcv.CVSettings;
 import com.xebia.xcoss.axcv.CVSplashLoader;
 import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
@@ -35,22 +38,23 @@ import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Search;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class NotificationService extends Service {
 
+	private static final String XKE_NOTIFICATION_SERVICE = "XKE notification service";
 	private static final String TAG_OWNED = "id-owned_ses";
 	private static final String TAG_TRACKED = "id-track-ses";
 	private static final long[] VIBRATE_PATTERN = new long[] { 1000, 200, 1000 };
 	private static final int SERVICE_ID = 873892;
 
-	private Timer notifyTimer;
-	private Thread authorThread;
-	private Thread markedThread;
-
+	private static Timer notifyTimer;
+	private int delay = 900;
 	private boolean onOwned;
 	private boolean onMarked;
+	protected Notification notification;
 
 	private Handler handler = new Handler() {
 		@Override
@@ -59,43 +63,58 @@ public class NotificationService extends Service {
 		}
 	};
 
-	private Runnable notifyOnAuthor = new Runnable() {
+	private final Handler toastHandler = new Handler() {
 		@Override
-		public void run() {
-			checkSessionsForChange(true);
-		}
-	};
-
-	private Runnable notifyOnMarked = new Runnable() {
-		@Override
-		public void run() {
-			checkSessionsForChange(false);
+		public void handleMessage(Message msg) {
+			Toast.makeText(getApplicationContext(), "Checking sessions...", Toast.LENGTH_SHORT).show();
 		}
 	};
 
 	private TimerTask notifyTask = new TimerTask() {
 		@Override
 		public void run() {
-			startThreads();
+			try {
+				Log.w(XCS.LOG.COMMUNICATE, "Service processing...");
+				toastHandler.sendEmptyMessage(0);
+				if (onMarked) {
+					checkSessionsForChange(false);
+				}
+				if (onOwned) {
+					checkSessionsForChange(true);
+				}
+				postNotification(getNotificationText());
+			}
+			catch (Exception e) {
+				postNotification(StringUtil.getExceptionMessage(e));
+			}
 		}
 
 		@Override
 		public boolean cancel() {
-			Log.w(XCS.LOG.COMMUNICATE, "Cancelling timer...");
-			endThreads();
+			postNotification("The timer is cancelled.");
 			return super.cancel();
 		}
 	};
 
 	@Override
-	public void onStart(Intent intent, int startId) {
+	public IBinder onBind(Intent paramIntent) {
+		Log.w(XCS.LOG.COMMUNICATE, "On bind ");
+		return null;
+	}
 
-		int delay = 900;
+	@Override
+	public void onStart(Intent intent, int startId) {
+		Log.w(XCS.LOG.COMMUNICATE, "Service started...");
+		super.onStart(intent, startId);
+		startService();
+	}
+
+	private void startService() {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 		onOwned = sp.getBoolean(XCS.PREF.NOTIFYOWNED, false);
 		onMarked = sp.getBoolean(XCS.PREF.NOTIFYTRACK, false);
 
-		if (notifyTimer == null && (onOwned || onMarked)) {
+		if (onOwned || onMarked) {
 			try {
 				notifyTimer = new Timer("ConferenceNotifier");
 				try {
@@ -104,46 +123,63 @@ public class NotificationService extends Service {
 				catch (Exception e) {
 					Log.w(XCS.LOG.COMMUNICATE, "Invalid notification interval: " + StringUtil.getExceptionMessage(e));
 				}
-				Log.w(XCS.LOG.COMMUNICATE, "Service started with interval: " + delay);
-				notifyTimer.scheduleAtFixedRate(notifyTask, 0, delay * 1000);
+				if (delay > 0) {
+					Log.w(XCS.LOG.COMMUNICATE, "Service started with interval: " + delay);
+					notifyTimer.scheduleAtFixedRate(notifyTask, delay * 1000, delay * 1000);
+					createUpdateNotification(getNotificationText());
+					startForeground(SERVICE_ID, notification);
+					return;
+				}
 			}
 			catch (Exception e) {
 				Log.w(XCS.LOG.COMMUNICATE, "Timer start issue: " + StringUtil.getExceptionMessage(e));
 			}
-
-			Notification notify = new Notification(R.drawable.x_stat_running, "XKE notification service",
-					System.currentTimeMillis());
-			Intent runIntent = new Intent(this, CVSplashLoader.class);
-			intent.setAction("android.intent.action.MAIN");
-			intent.addCategory("android.intent.category.LAUNCHER");
-			// intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-			PendingIntent pendIntent = PendingIntent.getActivity(this, 0, runIntent, 0);
-			StringBuilder sb = new StringBuilder();
-			sb.append("Poll every ");
-			int time = delay / 60;
-			if (time > 120) {
-				sb.append(time / 24);
-				sb.append(" hrs for ");
-			} else {
-				sb.append(time);
-				sb.append(" mins for ");
-			}
-			if (onMarked) {
-				sb.append("track");
-			}
-			if (onOwned) {
-				if ( onMarked) {
-					sb.append("/");
-				}
-				sb.append("own");
-			}
-			sb.append(".");
-			notify.setLatestEventInfo(this, "XKE notification service", sb.toString(), pendIntent);
-			notify.flags |= Notification.FLAG_NO_CLEAR;
-			startForeground(SERVICE_ID, notify);
 		}
+		stopForeground(true);
+	}
 
-		super.onStart(intent, startId);
+	private void postNotification(String message) {
+		NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		createUpdateNotification(message);
+		notification.flags = Notification.FLAG_AUTO_CANCEL;
+		mgr.notify(SERVICE_ID, notification);
+	}
+
+	private String getNotificationText() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Next [");
+		if (onMarked) {
+			sb.append("track");
+		}
+		if (onOwned) {
+			if (onMarked) {
+				sb.append("/");
+			}
+			sb.append("own");
+		}
+		sb.append("] at ");
+		DateTime time = DateTime.now().plusSeconds(delay);
+		String timeValue = new ScreenTimeUtil(this).getAbsoluteTime(new Moment(time.getHourOfDay(), time
+				.getMinuteOfHour()));
+		sb.append(timeValue);
+		return sb.toString();
+	}
+	
+
+	private void createUpdateNotification(String inputMessage) {
+		String message = StringUtil.isEmpty(inputMessage) ? getNotificationText() : inputMessage;
+		Intent runIntent = new Intent(this, CVSettings.class);
+		runIntent.setAction("android.intent.action.MAIN");
+		runIntent.addCategory("android.intent.category.LAUNCHER");
+		PendingIntent pendIntent = PendingIntent.getActivity(this, 0, runIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		
+		if (notification == null) {
+			notification = new Notification(R.drawable.x_stat_running, XKE_NOTIFICATION_SERVICE,
+					System.currentTimeMillis());
+		}
+		notification.setLatestEventInfo(this, XKE_NOTIFICATION_SERVICE, message, pendIntent);
+		notification.flags |= Notification.FLAG_NO_CLEAR;
+		notification.flags |= Notification.FLAG_FOREGROUND_SERVICE;
 	}
 
 	@Override
@@ -155,34 +191,6 @@ public class NotificationService extends Service {
 		notifyTask.cancel();
 		stopForeground(true);
 		super.onDestroy();
-	}
-
-	@Override
-	public IBinder onBind(Intent paramIntent) {
-		Log.w(XCS.LOG.COMMUNICATE, "On bind ");
-		return null;
-	}
-
-	private void startThreads() {
-		Log.v(XCS.LOG.ALL, "Notification processing: " + onOwned + "/" + onMarked);
-
-		if (onOwned) {
-			authorThread = new Thread(null, notifyOnAuthor, "Notify Owned Sessions");
-			authorThread.start();
-		}
-		if (onMarked) {
-			markedThread = new Thread(null, notifyOnMarked, "Notify Marked Sessions");
-			markedThread.start();
-		}
-	}
-
-	private void endThreads() {
-		if (authorThread != null) {
-			authorThread.interrupt();
-		}
-		if (markedThread != null) {
-			markedThread.interrupt();
-		}
 	}
 
 	protected void checkSessionsForChange(boolean owned) {

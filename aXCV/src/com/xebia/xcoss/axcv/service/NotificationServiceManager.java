@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -15,13 +14,12 @@ public class NotificationServiceManager implements SignalRetriever {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
 		boolean onOwned = sp.getBoolean(XCS.PREF.NOTIFYOWNED, false);
 		boolean onMarked = sp.getBoolean(XCS.PREF.NOTIFYTRACK, false);
+		String delay = sp.getString(XCS.PREF.NOTIFYINTERVAL, null);
 
 		ctx.stopService(new Intent(ctx, NotificationService.class));
-		Log.v(XCS.LOG.ALL, "Notification service stop send");
 
-		if ( onOwned || onMarked ) {
+		if ( !"off".equalsIgnoreCase(delay) && (onOwned || onMarked) ) {
 			ctx.startService(new Intent(ctx, NotificationService.class));
-			Log.v(XCS.LOG.ALL, "Notification service start send: " + onOwned + "/" + onMarked);
 		}
 	}
 

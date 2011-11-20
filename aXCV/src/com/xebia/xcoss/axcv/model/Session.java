@@ -338,13 +338,16 @@ public class Session implements Serializable {
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		result = prime * result + ((labels == null) ? 0 : labels.hashCode());
 		result = prime * result + ((intendedAudience == null) ? 0 : intendedAudience.hashCode());
+		result = prime * result + ((conferenceId == null) ? 0 : conferenceId.hashCode());
 
 		if ( authors != null ) {
 			for (Author author : authors) {
 				result = prime * result + author.getUserId().hashCode();
 			}
 		}
-		return Math.abs(result);
+		// Ignored: id, limit, languages
+		
+		return result;
 	}
 
 	public void setConferenceId(String conferenceId) {

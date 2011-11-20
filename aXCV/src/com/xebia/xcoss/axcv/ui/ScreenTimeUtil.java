@@ -4,7 +4,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
@@ -17,7 +17,7 @@ public class ScreenTimeUtil {
 	private DateTimeFormatter dateFormat;
 	private DateTimeFormatter timeFormat;
 
-	public ScreenTimeUtil(Activity ctx) {
+	public ScreenTimeUtil(Context ctx) {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
 		this.dateFormat = DateTimeFormat.forPattern(sp.getString(XCS.PREF.DATEFORMAT, "d MMMM yyyy"));
 		this.dateShortFormat = DateTimeFormat.forPattern("d/MM/yy");
