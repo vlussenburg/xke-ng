@@ -1,12 +1,12 @@
 IN PROGRESS
 -------------------------------------------------------------------
 
-- Notifications while app stopped
+-	Bij roteren raken de waardes kwijt
 
 TODO
 -------------------------------------------------------------------
 client
--	Bij roteren raken de waardes kwijt
+- Settings are duplicated when clicked on notification ...
 
 later op de client
 -	Verbeteren van caching
@@ -68,3 +68,4 @@ DONE
 -	Notification service stops on program kill by android -> needed icon
 -	NREP: Database close issues
 -	Https connectie
+-	Notifications while app stopped

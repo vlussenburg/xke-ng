@@ -9,6 +9,7 @@ import android.content.DialogInterface.OnCancelListener;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.logic.DataException;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.util.StringUtil;
@@ -47,24 +48,28 @@ public class DataRetriever extends AsyncTask<String, Void, Boolean> {
 	@Override
 	protected Boolean doInBackground(String... arg0) {
 		try {
-			List<Conference> conferences = ctx.getConferenceServer().getUpcomingConferences(1);
-			for (Conference conference : conferences) {
-				conference.getSessions();
+			ConferenceServer server = ctx.getConferenceServer();
+			if ( server != null ) {
+				List<Conference> conferences = server.getUpcomingConferences(1);
+				for (Conference conference : conferences) {
+					conference.getSessions();
+				}
+				return true;
 			}
 		}
 		catch (DataException e) {
 			if (e.missing()) {
 				Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Wrong server or server not running.");
-			}
-			if (e.denied()) {
+			} else if (e.denied()) {
 				Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Invalid credentials specified.");
+			} else {
+				Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Communication error: " + e.getMessage());
 			}
 		}
 		catch (Exception e) {
 			Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Failure: " + StringUtil.getExceptionMessage(e), e);
-			return false;
 		}
-		return true;
+		return false;
 	}
 
 	@Override
@@ -77,7 +82,7 @@ public class DataRetriever extends AsyncTask<String, Void, Boolean> {
 				// Note, authentication may still be invalid.
 				ctx.onSuccess();
 			} else {
-				Dialog errorDialog = ctx.createDialog("Error", "Connection to server failed.");
+				Dialog errorDialog = ctx.createDialog("Error", "Connection to server failed ("+BaseActivity.lastError+").");
 				errorDialog.setOnDismissListener(new Dialog.OnDismissListener() {
 					@Override
 					public void onDismiss(DialogInterface di) {
@@ -90,6 +95,7 @@ public class DataRetriever extends AsyncTask<String, Void, Boolean> {
 		}
 		catch (Exception e) {
 			Log.e(XCS.LOG.DATA, "Failure during initial load: " + StringUtil.getExceptionMessage(e));
+			e.printStackTrace();
 			ctx.onFailure();
 		}
 	}

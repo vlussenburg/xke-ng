@@ -309,10 +309,13 @@ public abstract class BaseActivity extends Activity {
 	public static void handleException(final Activity context, String activity, CommException e) {
 		if (e instanceof DataException) {
 			if (((DataException) e).missing()) {
-				lastError = "No result for '" + activity + "'.";
+				lastError = "No result for '" + activity + "'";
+				Log.w(XCS.LOG.COMMUNICATE, lastError);
+			} else if (((DataException) e).networkError()) {
+				lastError = "Server unreachable";
 				Log.w(XCS.LOG.COMMUNICATE, lastError);
 			} else if (((DataException) e).timedOut()) {
-				lastError = "Time out on '" + activity + "'.";
+				lastError = "Time out on '" + activity + "'";
 				Log.w(XCS.LOG.COMMUNICATE, lastError);
 			} else {
 				// Authentication failure

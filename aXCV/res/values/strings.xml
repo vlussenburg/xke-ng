@@ -64,5 +64,8 @@
 
     <string name="cancel_button">Cancel</string>
     <string name="close_button">Close</string>
+    <string name="session_add">Add session</string>
+    <string name="session_edit">Edit session</string>
+    <string name="duration_minutes">{0} min</string>
 
 </resources>
