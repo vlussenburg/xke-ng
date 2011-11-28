@@ -169,8 +169,8 @@ public class NotificationService extends Service {
 	private void createUpdateNotification(String inputMessage) {
 		String message = StringUtil.isEmpty(inputMessage) ? getNotificationText() : inputMessage;
 		Intent runIntent = new Intent(this, CVSettings.class);
-		runIntent.setAction("android.intent.action.MAIN");
-		runIntent.addCategory("android.intent.category.LAUNCHER");
+//		runIntent.setAction("android.intent.action.MAIN");
+//		runIntent.addCategory("android.intent.category.LAUNCHER");
 		PendingIntent pendIntent = PendingIntent.getActivity(this, 0, runIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		
 		if (notification == null) {
@@ -190,6 +190,8 @@ public class NotificationService extends Service {
 		Log.w(XCS.LOG.COMMUNICATE, "Service stopped.");
 		notifyTask.cancel();
 		stopForeground(true);
+		NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		mgr.cancel(SERVICE_ID);
 		super.onDestroy();
 	}
 

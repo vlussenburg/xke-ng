@@ -1,5 +1,6 @@
 package com.xebia.xcoss.axcv;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 import android.app.Dialog;
@@ -19,7 +20,7 @@ public class DataRetriever extends AsyncTask<String, Void, Boolean> {
 
 	// http://appfulcrum.com/?p=126
 
-	private ProgressDialog dialog;
+	private ProgressDialog processDialog;
 	private BaseActivity ctx;
 
 	public DataRetriever(BaseActivity ctx) {
@@ -28,28 +29,40 @@ public class DataRetriever extends AsyncTask<String, Void, Boolean> {
 
 	@Override
 	protected void onPreExecute() {
-		this.dialog = ProgressDialog.show(ctx, null, "Loading. Please wait...", true, true);
-		this.dialog.setOnCancelListener(new OnCancelListener() {
+		processDialog = ProgressDialog.show(ctx, null, ctx.getString(R.string.loading), true, true);
+		processDialog.setOnCancelListener(new OnCancelListener() {
 			@Override
 			public void onCancel(DialogInterface dialog) {
-				Dialog errorDialog = ctx.createDialog("Cancelled",
-						"The initial loading was cancelled. The application will be closed.");
-				errorDialog.setOnDismissListener(new Dialog.OnDismissListener() {
-					@Override
-					public void onDismiss(DialogInterface di) {
-						ctx.onFailure();
-					}
-				});
-				errorDialog.show();
+				dialog.dismiss();
+				ctx.onFailure(ctx.getString(R.string.cancelled),
+						ctx.getString(R.string.cancel_during_load));
 			}
 		});
+	}
+
+	protected void stop() {
+		Log.v("debug", "Task stopping...");
+		if (processDialog.isShowing()) {
+			processDialog.dismiss();
+		}
+	}
+
+	@Override
+	protected void onCancelled() {
+		Log.v("debug", "Task cancelling...");
+		// if (processDialog != null) {
+		// processDialog.dismiss();
+		// processDialog = null;
+		// }
+		super.onCancelled();
+		Log.v("debug", "Task cancelled.");
 	}
 
 	@Override
 	protected Boolean doInBackground(String... arg0) {
 		try {
 			ConferenceServer server = ctx.getConferenceServer();
-			if ( server != null ) {
+			if (server != null) {
 				List<Conference> conferences = server.getUpcomingConferences(1);
 				for (Conference conference : conferences) {
 					conference.getSessions();
@@ -76,27 +89,18 @@ public class DataRetriever extends AsyncTask<String, Void, Boolean> {
 	protected void onPostExecute(Boolean result) {
 
 		try {
-			dialog.dismiss();
+			processDialog.dismiss();
 
 			if (result) {
 				// Note, authentication may still be invalid.
 				ctx.onSuccess();
 			} else {
-				Dialog errorDialog = ctx.createDialog("Error", "Connection to server failed ("+BaseActivity.lastError+").");
-				errorDialog.setOnDismissListener(new Dialog.OnDismissListener() {
-					@Override
-					public void onDismiss(DialogInterface di) {
-						ctx.onFailure();
-						di.dismiss();
-					}
-				});
-				errorDialog.show();
+				ctx.onFailure(ctx.getString(R.string.error), ctx.getString(R.string.connection_to_server_failed, BaseActivity.lastError));
 			}
 		}
 		catch (Exception e) {
-			Log.e(XCS.LOG.DATA, "Failure during initial load: " + StringUtil.getExceptionMessage(e));
-			e.printStackTrace();
-			ctx.onFailure();
+			Log.e(XCS.LOG.DATA, "Failure during initial load: " + StringUtil.getExceptionMessage(e), e);
+			ctx.onFailure(ctx.getString(R.string.error), ctx.getString(R.string.connection_to_server_failed, StringUtil.getExceptionMessage(e)));
 		}
 	}
 }

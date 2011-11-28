@@ -64,8 +64,15 @@
 
     <string name="cancel_button">Cancel</string>
     <string name="close_button">Close</string>
+    <string name="cancelled">Cancelled</string>
+    <string name="warning">Warning</string>
+    <string name="error">Error</string>
     <string name="session_add">Add session</string>
     <string name="session_edit">Edit session</string>
-    <string name="duration_minutes">{0} min</string>
+    <string name="duration_minutes">%d min</string>
+    <string name="cancel_during_load">The initial loading was cancelled. The application will be closed.</string>
+    <string name="loading">Loading. Please wait...</string>
+    <string name="connection_to_server_failed">Connection to server failed (%s).</string>
+    <string name="auth_failed">Authentication failed. Please set credentials.</string>
 
 </resources>

@@ -271,7 +271,7 @@ public abstract class BaseActivity extends Activity {
 
 	protected void onSuccess() {}
 
-	protected void onFailure() {}
+	protected void onFailure(String message, String detail) {}
 
 	public static String getServerUrl(Context ctx) {
 		try {
