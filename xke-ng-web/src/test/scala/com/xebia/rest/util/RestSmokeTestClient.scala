@@ -24,12 +24,12 @@ import net.liftweb.util.Helpers._
 object RestSmokeTestClient {
 
   import RestClientUtils._
-  //val host = "localhost"
-  //val contextRoot = "" 
+  val host = "localhost"
+  val contextRoot = "" 
 
-  val host = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com"
-  val contextRoot = "xkeng"
-  val port = 8080
+//  val host = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com"
+//  val contextRoot = "xkeng"
+  val port = 8443
   val http = new Http
 
   val xkeStartDate = new DateTime().plusDays(3)
@@ -129,12 +129,12 @@ object RestSmokeTestClient {
     val aUser = "716AF9A87BD5A9735C20AC8FCED05F40"
     val loggedIn = login(aPwd, aUser, true)
 
-    println("Create location")
-    val l = addLocation(l3)
-    assert(l.description == l3.description)
-    println("new location %s" format l)
-    
-    println("Create new conference...")
+//    println("Create location")
+//    val l = addLocation(l3)
+//    assert(l.description == l3.description)
+//    println("new location %s" format l)
+//    
+    println("Create new conference...") 
     val newConf = addConference(c)
     assert(newConf._id == c._id)
     println("new conference %s" format newConf)
@@ -210,7 +210,7 @@ object RestSmokeTestClient {
   }
   object RestClientUtils {
     def query[T](target: String)(callback: String => T): Option[T] = {
-      val req = new Request(:/(host, port))
+      val req = new Request(:/(host, port)).secure
       http x ((req / contextRoot / target >:> identity) {
         case (200, response, _, _) => {
           Some(callback(io.Source.fromInputStream(response.getEntity().getContent()).getLines.mkString))
@@ -221,18 +221,18 @@ object RestSmokeTestClient {
 
     //Low level http methods
     def add[T](target: String, json: JValue)(callback: String => T): T = {
-      http(:/(host, port).POST / contextRoot / target << serializeToJsonStr(json) >~ { resp => callback(resp.getLines.mkString) })
+      http(:/(host, port).POST.secure / contextRoot / target << serializeToJsonStr(json) >~ { resp => callback(resp.getLines.mkString) })
 
     }
 
     //Low level http methods
     def update[T](target: String, json: JValue, callback: String => T): T = {
-      http(:/(host, port).PUT / contextRoot / target <<< serializeToJsonStr(json) >~ { resp => callback(resp.getLines.mkString) })
+      http(:/(host, port).PUT.secure / contextRoot / target <<< serializeToJsonStr(json) >~ { resp => callback(resp.getLines.mkString) })
 
     }
 
     def update(target: String, json: JValue) = {
-      val req = new Request(:/(host, port).PUT)
+      val req = new Request(:/(host, port).PUT.secure)
       val (status, headers) = http x ((req / contextRoot / target <<< serializeToJsonStr(json) >:> identity) {
         case (status, _, _, out) => (status, out())
       })
@@ -241,7 +241,7 @@ object RestSmokeTestClient {
     }
 
     def delete(target: String)(callback: String => Unit = printResp) = {
-      http(:/(host, port).DELETE / contextRoot / target >~ { resp => callback(resp.getLines.mkString) })
+      http(:/(host, port).DELETE.secure / contextRoot / target >~ { resp => callback(resp.getLines.mkString) })
     }
   }
 }
