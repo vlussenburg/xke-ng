@@ -169,6 +169,7 @@ public class NotificationService extends Service {
 	private void createUpdateNotification(String inputMessage) {
 		String message = StringUtil.isEmpty(inputMessage) ? getNotificationText() : inputMessage;
 		Intent runIntent = new Intent(this, CVSettings.class);
+		runIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 //		runIntent.setAction("android.intent.action.MAIN");
 //		runIntent.addCategory("android.intent.category.LAUNCHER");
 		PendingIntent pendIntent = PendingIntent.getActivity(this, 0, runIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -392,6 +393,7 @@ public class NotificationService extends Service {
 				noty.setLatestEventInfo(ctx, title, message, clickIntent);
 				if (silent) {
 					noty.vibrate = VIBRATE_PATTERN;
+					noty.defaults |= Notification.DEFAULT_VIBRATE;
 				} else if (!StringUtil.isEmpty(soundUri)) {
 					noty.sound = Uri.parse(soundUri);
 				}

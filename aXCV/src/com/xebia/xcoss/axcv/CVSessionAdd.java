@@ -217,7 +217,7 @@ public class CVSessionAdd extends AdditionActivity {
 					String moment = timeFormatter.getAbsoluteDate(session.getStartTime());
 					AlertDialog.Builder builder = new AlertDialog.Builder(CVSessionAdd.this);
 					builder.setTitle(R.string.delete_session);
-					builder.setMessage(getString(R.string.confirm_delete_session, session.getTitle(), moment));
+					builder.setMessage("Are you sure to delete session '"+session.getTitle()+"' on " + moment + "?");
 					builder.setIcon(android.R.drawable.ic_dialog_alert);
 					builder.setPositiveButton(R.string.cancel, cancelClickListener);
 					builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
