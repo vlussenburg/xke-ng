@@ -6,9 +6,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import android.util.Log;
-
 import com.google.gson.reflect.TypeToken;
+import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.cache.DataCache;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
@@ -22,7 +21,6 @@ import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.util.ConferenceComparator;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
-import com.xebia.xcoss.axcv.util.XCS;
 
 public class ConferenceServer {
 

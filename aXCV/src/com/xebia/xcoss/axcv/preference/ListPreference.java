@@ -2,11 +2,10 @@ package com.xebia.xcoss.axcv.preference;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 
+import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.service.SignalRetriever;
 import com.xebia.xcoss.axcv.util.StringUtil;
-import com.xebia.xcoss.axcv.util.XCS;
 
 public class ListPreference extends android.preference.ListPreference {
 

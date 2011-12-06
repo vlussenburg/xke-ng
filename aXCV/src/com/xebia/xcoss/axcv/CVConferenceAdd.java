@@ -365,7 +365,7 @@ public class CVConferenceAdd extends AdditionActivity {
 				DialogHandler handler = new DialogHandler(this, items, R.id.conferenceLocations);
 				handler.setCloseOnSelection(false);
 				builder.setMultiChoiceItems(items, check, handler);
-				builder.setPositiveButton(R.string.close_button, new DialogInterface.OnClickListener() {
+				builder.setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						dialog.dismiss();
@@ -441,7 +441,7 @@ public class CVConferenceAdd extends AdditionActivity {
 			break;
 			case XCS.DIALOG.INPUT_DESCRIPTION:
 				tid = (TextInputDialog) dialog;
-				tid.setDescription("Description");
+				tid.setDescription(getString(R.string.description));
 				tid.setValue(conference.getDescription());
 			break;
 			case XCS.DIALOG.INPUT_LOCATION:

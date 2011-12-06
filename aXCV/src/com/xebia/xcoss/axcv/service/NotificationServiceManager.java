@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class NotificationServiceManager implements SignalRetriever {

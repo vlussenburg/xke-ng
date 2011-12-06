@@ -50,6 +50,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.util.Log;
+import com.xebia.xcoss.axcv.R;
 
 public class ExceptionReportService extends ReportingIntentService {
 

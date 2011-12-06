@@ -1,9 +1,7 @@
 package com.xebia.xcoss.axcv;
 
-import java.text.MessageFormat;
 import java.util.List;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;

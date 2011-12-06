@@ -59,18 +59,42 @@ public class CVSessionAdd extends AdditionActivity {
 			}
 		};
 
-		conference = getConference();
-		originalSession = getSelectedSession(conference);
-		if (originalSession == null) {
-			create = true;
-			session = new Session();
-			((TextView) findViewById(R.id.addModifyTitle)).setText("Add session");
-		} else {
-			session = new Session(originalSession);
-			((TextView) findViewById(R.id.addModifyTitle)).setText("Edit session");
+		if (!loadFrom(savedInstanceState)) {
+			conference = getConference();
+			originalSession = getSelectedSession(conference);
+			if (originalSession == null) {
+				create = true;
+				session = new Session();
+				((TextView) findViewById(R.id.addModifyTitle)).setText(R.string.session_add);
+			} else {
+				session = new Session(originalSession);
+				((TextView) findViewById(R.id.addModifyTitle)).setText(R.string.session_edit);
+			}
 		}
 		registerActions();
 		super.onCreate(savedInstanceState);
+	}
+
+	private boolean loadFrom(Bundle savedInstanceState) {
+		if ( savedInstanceState != null && savedInstanceState.isEmpty() == false) {
+			Log.w("debug", "Initialize from SIS");
+			conference = (Conference) savedInstanceState.getSerializable("SIS_CONFERENCE");
+			originalSession = (Session) savedInstanceState.getSerializable("SIS_ORIGINAL_SESSION");
+			create = savedInstanceState.getBoolean("SIS_CREATE");
+			session = (Session) savedInstanceState.getSerializable("SIS_SESSION");
+			Log.w("debug", "Initialized from SIS: " + session);
+			return conference != null && session != null;
+		}
+		return false;
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putSerializable("SIS_CONFERENCE", conference);
+		outState.putSerializable("SIS_ORIGINAL_SESSION", originalSession);
+		outState.putSerializable("SIS_SESSION", session);
+		outState.putBoolean("SIS_CREATE", create);
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override
@@ -114,7 +138,7 @@ public class CVSessionAdd extends AdditionActivity {
 
 			if (duration > 0) {
 				view = (TextView) findViewById(R.id.sessionDuration);
-				view.setText(String.valueOf(duration) + " min");
+				view.setText(getString(R.string.duration_minutes, String.valueOf(duration)));
 			}
 
 			view = (TextView) findViewById(R.id.sessionAudience);
@@ -171,13 +195,13 @@ public class CVSessionAdd extends AdditionActivity {
 			public void onClick(View paramView) {
 				List<String> messages = new ArrayList<String>();
 				if (!session.check(messages)) {
-					createDialog("Failed", "Please specify the following attributes: " + FormatUtil.getText(messages))
+					createDialog(getString(R.string.failed), getString(R.string.specify_attributes, FormatUtil.getText(messages)))
 							.show();
 					return;
 				}
 				if (!conference.addSession(session, create)) {
 					Log.e(LOG.ALL, "Adding session failed.");
-					createDialog("No session added", "Session could not be added: ("+lastError+").").show();
+					createDialog(getString(R.string.no_session_added), getString(R.string.session_not_added, lastError)).show();
 				} else {
 					CVSessionAdd.this.finish();
 				}
@@ -190,18 +214,13 @@ public class CVSessionAdd extends AdditionActivity {
 			button.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View paramView) {
-					StringBuilder message = new StringBuilder();
-					message.append("Are you sure to delete session '").append(session.getTitle()).append("'");
-					message.append(" on ");
-					message.append(timeFormatter.getAbsoluteDate(session.getStartTime()));
-					message.append("?");
-
+					String moment = timeFormatter.getAbsoluteDate(session.getStartTime());
 					AlertDialog.Builder builder = new AlertDialog.Builder(CVSessionAdd.this);
-					builder.setTitle("Delete session");
-					builder.setMessage(message.toString());
+					builder.setTitle(R.string.delete_session);
+					builder.setMessage(getString(R.string.confirm_delete_session, session.getTitle(), moment));
 					builder.setIcon(android.R.drawable.ic_dialog_alert);
-					builder.setPositiveButton(R.string.cancel_button, cancelClickListener);
-					builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+					builder.setPositiveButton(R.string.cancel, cancelClickListener);
+					builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
 							conference.deleteSession(originalSession);
 							CVSessionAdd.this.finish();
@@ -260,8 +279,8 @@ public class CVSessionAdd extends AdditionActivity {
 		if (slot != null) {
 			session.reschedule(conference, slot);
 		} else {
-			createDialog("Rescheduling failed",
-					"The session cannot be scheduled. Shorten session, use another location or choose another conference.")
+			createDialog(getString(R.string.rescheduling_failed),
+					getString(R.string.reschedule_failed_message))
 					.show();
 		}
 	}
@@ -360,8 +379,8 @@ public class CVSessionAdd extends AdditionActivity {
 					data[idx++] = new Identifiable(title, conference.getId());
 				}
 				builder = new AlertDialog.Builder(this);
-				builder.setTitle("Pick a conference");
-				builder.setNegativeButton(R.string.cancel_button, cancelClickListener);
+				builder.setTitle(R.string.pick_conference);
+				builder.setNegativeButton(R.string.cancel, cancelClickListener);
 				builder.setItems(Identifiable.stringValue(data), new DialogHandler(this, data, R.id.conferenceName));
 				dialog = builder.create();
 			break;
@@ -376,9 +395,9 @@ public class CVSessionAdd extends AdditionActivity {
 				}
 
 				builder = new AlertDialog.Builder(this);
-				builder.setTitle("Pick a start time");
+				builder.setTitle(R.string.pick_start);
 				if (tslist.size() == 0) {
-					builder.setMessage("This conference is fully booked!");
+					builder.setMessage(R.string.conference_fully_booked);
 					builder.setIcon(android.R.drawable.ic_dialog_alert);
 				} else {
 					TimeSlot[] slots = tslist.toArray(new TimeSlot[0]);
@@ -388,34 +407,35 @@ public class CVSessionAdd extends AdditionActivity {
 					}
 					builder.setItems(items, new DialogHandler(this, slots, R.id.sessionStart));
 				}
-				builder.setNegativeButton(R.string.cancel_button, cancelClickListener);
+				builder.setNegativeButton(R.string.cancel, cancelClickListener);
 				dialog = builder.create();
 				dialog.setOnCancelListener(this);
 				dialog.setOnDismissListener(this);
 			break;
 			case XCS.DIALOG.INPUT_DURATION:
+				// TODO array handling
 				items = new String[] { "5 min", "10 min", "15 min", "30 min", "60 min", "90 min", "120 min" };
 				builder = new AlertDialog.Builder(this);
-				builder.setTitle("Pick a duration");
+				builder.setTitle(R.string.pick_duration);
 				builder.setItems(items, new DialogHandler(this, items, R.id.sessionDuration));
-				builder.setNegativeButton(R.string.cancel_button, cancelClickListener);
+				builder.setNegativeButton(R.string.cancel, cancelClickListener);
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.INPUT_LANGUAGE:
 				items = new String[] { "Dutch", "English", "French", "Hindi" };
 				builder = new AlertDialog.Builder(this);
-				builder.setTitle("Select languages");
+				builder.setTitle(R.string.select_languages);
 				DialogHandler msdhandler = new DialogHandler(this, items, R.id.sessionLanguage);
 				msdhandler.setCloseOnSelection(false);
 				builder.setMultiChoiceItems(items, new boolean[items.length], msdhandler);
-				builder.setPositiveButton(R.string.close_button, cancelClickListener);
+				builder.setPositiveButton(R.string.close, cancelClickListener);
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.INPUT_LOCATION:
 				Location[] locations = conference.getLocations().toArray(new Location[0]);
 
 				builder = new AlertDialog.Builder(this);
-				builder.setTitle("Select location");
+				builder.setTitle(R.string.select_location);
 				ListAdapter la = new ArrayAdapter<Location>(this, R.layout.simple_list_item_single_choice, locations);
 				builder.setSingleChoiceItems(la, -1, new DialogHandler(this, locations, R.id.sessionLocation));
 				dialog = builder.create();
@@ -438,10 +458,10 @@ public class CVSessionAdd extends AdditionActivity {
 			case XCS.DIALOG.INPUT_TYPE:
 				Type[] values = Session.Type.values();
 				builder = new AlertDialog.Builder(this);
-				builder.setTitle("Pick a type");
+				builder.setTitle(R.string.pick_type);
 				ListAdapter ta = new ArrayAdapter<Type>(this, R.layout.simple_list_item_single_choice, values);
 				builder.setSingleChoiceItems(ta, -1, new DialogHandler(this, values, R.id.sessionType));
-				builder.setNegativeButton(R.string.cancel_button, cancelClickListener);
+				builder.setNegativeButton(R.string.cancel, cancelClickListener);
 				dialog = builder.create();
 			break;
 		}
@@ -459,27 +479,27 @@ public class CVSessionAdd extends AdditionActivity {
 		switch (id) {
 			case XCS.DIALOG.INPUT_AUDIENCE:
 				tid = (TextInputDialog) dialog;
-				tid.setDescription("Intended audience");
+				tid.setDescription(getString(R.string.intended_audience));
 				tid.setValue(session.getIntendedAudience());
 			break;
 			case XCS.DIALOG.INPUT_LIMIT:
 				tid = (TextInputDialog) dialog;
-				tid.setDescription("Number of people");
+				tid.setDescription(getString(R.string.number_of_people));
 				tid.setValue(session.getLimit());
 			break;
 			case XCS.DIALOG.INPUT_DESCRIPTION:
 				tid = (TextInputDialog) dialog;
-				tid.setDescription("Description");
+				tid.setDescription(getString(R.string.description));
 				tid.setValue(session.getDescription());
 			break;
 			case XCS.DIALOG.INPUT_PREPARATION:
 				tid = (TextInputDialog) dialog;
-				tid.setDescription("Preparation");
+				tid.setDescription(getString(R.string.preparation));
 				tid.setValue(session.getPreparation());
 			break;
 			case XCS.DIALOG.INPUT_TITLE:
 				tid = (TextInputDialog) dialog;
-				tid.setDescription("Session title");
+				tid.setDescription(getString(R.string.session_title));
 				tid.setValue(session.getTitle());
 			break;
 			case XCS.DIALOG.INPUT_LOCATION:

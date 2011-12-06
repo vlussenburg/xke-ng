@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.util.XCS;
 

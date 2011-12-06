@@ -1,5 +1,6 @@
 package com.xebia.xcoss.axcv.model;
 
+import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.util.StringUtil;
 
 public class Credential {

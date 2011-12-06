@@ -1,5 +1,6 @@
 package com.xebia.xcoss.axcv.logic;
 
+import com.xebia.xcoss.axcv.R;
 import java.net.URI;
 
 public class DataException extends CommException {

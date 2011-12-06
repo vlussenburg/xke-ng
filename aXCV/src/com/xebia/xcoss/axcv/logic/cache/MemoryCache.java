@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
+import com.xebia.xcoss.axcv.R;
 
 
 public class MemoryCache extends DataCache {

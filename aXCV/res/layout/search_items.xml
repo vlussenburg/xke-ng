@@ -24,7 +24,7 @@
             android:id="@+id/ssa_close"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/close_button" />
+            android:text="@string/close" />
 
     </LinearLayout>
 

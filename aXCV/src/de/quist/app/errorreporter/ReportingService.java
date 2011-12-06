@@ -21,6 +21,7 @@
 package de.quist.app.errorreporter;
 
 import android.app.Service;
+import com.xebia.xcoss.axcv.R;
 
 public abstract class ReportingService extends Service {
 

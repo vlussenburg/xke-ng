@@ -13,14 +13,12 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
@@ -61,7 +59,6 @@ public abstract class BaseActivity extends Activity {
 	private MenuItem miTrack;
 	private MenuItem miExit;
 
-//	private static Activity rootActivity;
 	private static ProfileManager profileManager;
 	protected static String lastError;
 
@@ -70,10 +67,6 @@ public abstract class BaseActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		ProxyExceptionReporter.register(this);
 
-//		if (rootActivity == null) {
-//			rootActivity = this;
-//		}
-//
 		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);
 		if (conferenceButton != null) {
 			conferenceButton.setOnClickListener(new View.OnClickListener() {
@@ -96,17 +89,6 @@ public abstract class BaseActivity extends Activity {
 		super.onResume();
 	}
 	
-//	private void resetApplication(boolean exit) {
-//		Log.e(LOG.ALL, "Reset application from " + this + " : " + exit);
-//		rootActivity = null;
-//		Intent intent = new Intent(BaseActivity.this, CVSplashLoader.class);
-//		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//		if (exit) {
-//			intent.putExtra("exit", true);
-//		}
-//		startActivity(intent);
-//	}
-//
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
@@ -216,8 +198,7 @@ public abstract class BaseActivity extends Activity {
 		if (server == null || server.isLoggedIn() == false) {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			String user = sp.getString(XCS.PREF.USERNAME, null);
-			// TODO Encrypt/decrypt
-			String password = /* SecurityUtils.decrypt( */sp.getString(XCS.PREF.PASSWORD, "")/* ) */;
+			String password = sp.getString(XCS.PREF.PASSWORD, "");
 			String type = "?";
 			DataCache cache;
 			try {
@@ -261,7 +242,7 @@ public abstract class BaseActivity extends Activity {
 	protected static Dialog createDialog(Activity ctx, String title, String message) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 		builder.setTitle(title).setMessage(message).setIcon(android.R.drawable.ic_dialog_alert)
-				.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+				.setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
 					}
@@ -309,13 +290,13 @@ public abstract class BaseActivity extends Activity {
 	public static void handleException(final Activity context, String activity, CommException e) {
 		if (e instanceof DataException) {
 			if (((DataException) e).missing()) {
-				lastError = "No result for '" + activity + "'";
+				lastError = context.getString(R.string.server_missing_url, activity);
 				Log.w(XCS.LOG.COMMUNICATE, lastError);
 			} else if (((DataException) e).networkError()) {
-				lastError = "Server unreachable";
+				lastError = context.getString(R.string.server_unreachable);
 				Log.w(XCS.LOG.COMMUNICATE, lastError);
 			} else if (((DataException) e).timedOut()) {
-				lastError = "Time out on '" + activity + "'";
+				lastError = context.getString(R.string.server_timeout, activity);
 				Log.w(XCS.LOG.COMMUNICATE, lastError);
 			} else {
 				// Authentication failure

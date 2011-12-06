@@ -9,17 +9,9 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -51,6 +43,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.DataException.Code;
 import com.xebia.xcoss.axcv.logic.gson.GsonMomentAdapter;
 import com.xebia.xcoss.axcv.model.Moment;

@@ -21,6 +21,7 @@
 package de.quist.app.errorreporter;
 
 import android.app.IntentService;
+import com.xebia.xcoss.axcv.R;
 
 public abstract class ReportingIntentService extends IntentService {
 
