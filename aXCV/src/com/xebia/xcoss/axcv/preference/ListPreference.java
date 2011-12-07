@@ -7,21 +7,16 @@ import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.service.SignalRetriever;
 import com.xebia.xcoss.axcv.util.StringUtil;
 
-public class CheckBoxPreference extends android.preference.CheckBoxPreference {
+public class ListPreference extends android.preference.ListPreference {
 
 	private SignalRetriever signalRetriever;
 
-	public CheckBoxPreference(Context context) {
+	public ListPreference(Context context) {
 		super(context);
 	}
 
-	public CheckBoxPreference(Context context, AttributeSet attrs) {
+	public ListPreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		init(attrs);
-	}
-
-	public CheckBoxPreference(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
 		init(attrs);
 	}
 
@@ -50,8 +45,8 @@ public class CheckBoxPreference extends android.preference.CheckBoxPreference {
 	}
 
 	@Override
-	protected void onClick() {
-		super.onClick();
+	public void setValue(String value) {
+		super.setValue(value);
 		signalRetriever.onSignal(getContext());
 	}
 }

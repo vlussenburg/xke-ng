@@ -16,6 +16,9 @@
 
 package biz.source_code.base64Coder;
 
+import com.xebia.xcoss.axcv.R;
+
+
 /**
 * A Base64 encoder/decoder.
 *

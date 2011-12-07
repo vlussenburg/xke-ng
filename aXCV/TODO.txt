@@ -1,33 +1,40 @@
 IN PROGRESS
 -------------------------------------------------------------------
 
--	Offline support
+-	Bij roteren raken de waardes kwijt
+-	Externalize strings
 
 TODO
 -------------------------------------------------------------------
 client
--	Lijst (conferenties) scrollt niet terug naar eerste item (blijft hangen) Tracklist/Sessionlist wel ok.
--	Https connectie
--	Timeouts on retrieving labels & authors should be handled in a notification!
--	Afhandeling 400 meldingen
--	Externalize strings
+-	ASyncTask server communication
+-	Wachtcursor bij search maken
+- 	Vertical scrolling / paging, 
+-	Caching
+-	Certificate check
 
 later op de client
 -	Verbeteren van caching
 	-	Caching: refresh na conference edit/add break (reopen view...)
 	-	Conferenties verdwijnen uit lijst...
+	-	Database caching support
+	-	Toegevoegd/gewijzigde sessie is niet direct zichtbaar
+-	Afhandeling 400 meldingen
+-	Timeout on login afvangen
+
+Veel later op de client
+-	Foto's gebruikers + telefoonnummer
 -	Conference edit alleen door organiser (?)
 -	Edit personal profile (?)
 
 server
--	Https connectie
+-	Unimplemented fields of conference (organiser, description) and session (...)
 -	Session scheduling
--	403 on session expiration
--	Verwijderen van locaties (Urs; not supported now)
+-	Zoeken
+-	403 on session expiration or invalid login
 -	Error handling (/error URL geeft 400 zonder verdere melding)
 -	Nieuwe datum conferentie leidt niet tot nieuwe datum sessies (wordt wel gestuurd)
--	Uitzoeken hoe encryption werkt (want lukt nog niet bij mij...)
-    - Padding error op server...
+-	Support conferenceId within session object (at least for search)
 
 DONE
 -------------------------------------------------------------------
@@ -47,4 +54,24 @@ DONE
 -	Error handling (check server, 6:55)
 - 	Fix menu popups in conference add/edit
 -	Menu op longclick op conference en session adapter
-
+-	ConferenceAdd add location closes directly
+-	Track notification opruimen + naar tracklist
+-	Crash notification door niet ingelogd te zijn.
+-	Timeouts on retrieving labels & authors should be handled in a notification!
+-	Edit item from tracklist: No session...
+-	Slot beschikbaarheid start altijd om start+n+n. Je wilt kunnen schuiven. 
+-	Store failed? Stay on page...
+-	NREP: Lijst (conferenties) scrollt niet terug naar eerste item (blijft hangen) Tracklist/Sessionlist wel ok.
+-	Niet alles cancellen, maar alleen de ontvangen notificatie
+-	Inserted breaks sorteren op tijd
+-	Insert break, change duration, start time resets...
+-	Author notification testen
+-	Rewrite exit / rootApplication
+-	Improved Select label/author screen
+-	Remove author/label
+-	Notification service stops on program kill by android -> needed icon
+-	NREP: Database close issues
+-	Https connectie
+-	Notifications while app stopped
+-	Settings are duplicated when clicked on notification ...
+-	Https connectie

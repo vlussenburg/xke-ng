@@ -4,17 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-
-import com.xebia.xcoss.axcv.logic.ProfileManager;
+import com.xebia.xcoss.axcv.R;
 
 public class NoCache extends DataCache {
 
 	public NoCache(Context ctx) {
 		super(ctx);
-		ProfileManager profileManager = new ProfileManager(ctx);
-		boolean hasOpened = profileManager.openConnection();
-		profileManager.removeAllCache();
-		if ( hasOpened ) profileManager.closeConnection();
 	}
 
 	@Override

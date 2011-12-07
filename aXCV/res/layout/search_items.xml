@@ -1,19 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/linearLayout1"
-	android:layout_height="fill_parent"
-	android:layout_width="fill_parent"
-	android:orientation="vertical">
-	<AutoCompleteTextView
-		android:layout_height="wrap_content"
-		android:layout_width="fill_parent"
-		android:completionThreshold="1"
-		android:maxLines="7"
-		android:minLines="1"
-		android:id="@+id/ssa_text" android:text="@string/default_input_text"></AutoCompleteTextView>
-	<ListView
-		android:layout_width="fill_parent"
-		android:layout_height="fill_parent"
-		android:id="@+id/ssa_list"></ListView>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/actionBarLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <AutoCompleteTextView
+            android:id="@+id/ssa_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:completionThreshold="1"
+            android:maxLines="7"
+            android:minLines="1"
+            android:text="@string/default_input_text" android:layout_weight="1">
+        </AutoCompleteTextView>
+
+        <Button
+            android:id="@+id/ssa_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/close" />
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/ssa_list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+    </ListView>
+
 </LinearLayout>

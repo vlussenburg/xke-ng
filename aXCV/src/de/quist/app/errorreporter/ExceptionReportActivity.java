@@ -15,6 +15,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.xebia.xcoss.axcv.R;
 
 public class ExceptionReportActivity extends Activity {
 

@@ -3,6 +3,7 @@ package com.xebia.xcoss.axcv.util;
 import java.util.regex.Pattern;
 
 import android.view.Menu;
+import com.xebia.xcoss.axcv.R;
 
 public class XCS {
 
@@ -75,5 +76,6 @@ public class XCS {
 		public static final String DATEFORMAT = "DateFormat";
 		public static final String TIMEFORMAT = "TimeFormat";
 		public static final String CACHETYPE = "CacheType";
+		public static final String NOTIFYINTERVAL = "NotifyInterval";
 	}
 }

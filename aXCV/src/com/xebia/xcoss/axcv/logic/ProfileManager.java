@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.DebugUtil;
@@ -76,7 +77,8 @@ public class ProfileManager extends SQLiteOpenHelper {
 		try {
 			if (database != null) {
 				database.close();
-				Log.i(XCS.LOG.COMMUNICATE, "Database closed.");
+				String who = DebugUtil.whoCalledMe();
+				Log.i(XCS.LOG.COMMUNICATE, "Database closed by " + who);
 			}
 			database = null;
 		}
@@ -89,7 +91,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 	private void checkConnection() {
 		if (database == null) {
 			String who = DebugUtil.whoCalledMe();
-			throw new SQLException("Database not started while doing "+who+"!");
+			throw new SQLException("Database not started while doing " + who + "!");
 		}
 		if (!database.isOpen() || database.isReadOnly()) {
 			throw new SQLException("Database not open or readonly!");
@@ -98,28 +100,26 @@ public class ProfileManager extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		StringBuilder notifyTableBuilder = new StringBuilder();
+		notifyTableBuilder.append(" (");
+		notifyTableBuilder.append(SES_COL_ID).append(" integer primary key autoincrement, ");
+		notifyTableBuilder.append(SES_COL_USER).append(" text not null, ");
+		notifyTableBuilder.append(SES_COL_SESSION).append(" text not null, ");
+		notifyTableBuilder.append(SES_COL_CONF).append(" text not null, ");
+		notifyTableBuilder.append(SES_COL_HASH).append(" text not null, ");
+		notifyTableBuilder.append(SES_COL_DATE).append(" datetime);");
+		String notifyTable = notifyTableBuilder.toString();
+		
 		StringBuilder create = new StringBuilder();
 		create.append("create table ");
 		create.append(TRACK_TABLE);
-		create.append(" (");
-		create.append(SES_COL_ID).append(" integer primary key autoincrement, ");
-		create.append(SES_COL_USER).append(" text not null, ");
-		create.append(SES_COL_SESSION).append(" text not null, ");
-		create.append(SES_COL_CONF).append(" text not null, ");
-		create.append(SES_COL_HASH).append(" text not null, ");
-		create.append(SES_COL_DATE).append(" datetime);");
+		create.append(notifyTable);
 		db.execSQL(create.toString());
 
 		create = new StringBuilder();
 		create.append("create table ");
 		create.append(OWNED_TABLE);
-		create.append(" (");
-		create.append(SES_COL_ID).append(" integer primary key autoincrement, ");
-		create.append(SES_COL_USER).append(" text not null, ");
-		create.append(SES_COL_SESSION).append(" text not null, ");
-		create.append(SES_COL_CONF).append(" text not null, ");
-		create.append(SES_COL_HASH).append(" text not null, ");
-		create.append(SES_COL_DATE).append(" datetime);");
+		create.append(notifyTable);
 		db.execSQL(create.toString());
 
 		create = new StringBuilder();
@@ -181,7 +181,8 @@ public class ProfileManager extends SQLiteOpenHelper {
 		try {
 			checkConnection();
 			String[] whereArgs = new String[1];
-			whereArgs[0] = String.valueOf(new Moment().asLong());
+			// 5 minutes grace period
+			whereArgs[0] = String.valueOf(new Moment().asLong() - 5*60*1000);
 			database.delete(TRACK_TABLE, SES_QUERY_PRUNE, whereArgs);
 			database.delete(OWNED_TABLE, SES_QUERY_PRUNE, whereArgs);
 		}
@@ -194,7 +195,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 		if (StringUtil.isEmpty(user)) {
 			return false;
 		}
-		Log.v(XCS.LOG.COMMUNICATE, "Check if marked " + sessionId + " for user " + user);
+//		Log.v(XCS.LOG.COMMUNICATE, "Check if marked " + sessionId + " for user " + user);
 		try {
 			checkConnection();
 			String[] whereArgs = new String[2];
@@ -213,30 +214,6 @@ public class ProfileManager extends SQLiteOpenHelper {
 		}
 	}
 
-	// public Identifier[] getMarkedSessionIds(String user) {
-	// Log.v(XCS.LOG.COMMUNICATE, "Get all marked sessions for user " + user);
-	// try {
-	// checkConnection();
-	// String[] whereArgs = new String[1];
-	// whereArgs[0] = user;
-	// Cursor query = database.query(TRACK_TABLE, new String[] { SES_COL_SESSION, SES_COL_CONF }, SES_QUERY_NAME,
-	// new String[] { user }, null, null, SES_COL_DATE + " ASC");
-	// Identifier[] result = new Identifier[query.getCount()];
-	// int i = 0;
-	// for (query.moveToFirst(); !query.isAfterLast(); query.moveToNext()) {
-	// result[i++] = new Identifier(
-	// query.getString(query.getColumnIndex(SES_COL_CONF)
-	// query.getString(query.getColumnIndex(SES_COL_SESSION));
-	// }
-	// query.close();
-	// return result;
-	// }
-	// catch (Exception e) {
-	// Log.w(XCS.LOG.COMMUNICATE, "Retrieval failed: " + StringUtil.getExceptionMessage(e));
-	// return new String[0];
-	// }
-	// }
-	//
 	public Trackable[] getMarkedSessions(String user) {
 		return getSessions(user, TRACK_TABLE);
 	}
@@ -301,8 +278,8 @@ public class ProfileManager extends SQLiteOpenHelper {
 				values.put(SES_COL_USER, trackable.userId);
 				values.put(SES_COL_SESSION, trackable.sessionId);
 				values.put(SES_COL_CONF, trackable.conferenceId);
-				values.put(SES_COL_DATE, trackable.hash);
-				values.put(SES_COL_HASH, trackable.date);
+				values.put(SES_COL_DATE, trackable.date);
+				values.put(SES_COL_HASH, trackable.hash);
 				database.insert(table, null, values);
 			}
 			catch (Exception e) {

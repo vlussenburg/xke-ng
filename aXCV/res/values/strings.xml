@@ -1,54 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Conference Viewer</string>
-	<string name="app_full_name">Xebia Conference Viewer</string>
-	<string name="app_version">0.5</string>
 
-	<string name="splash_conference">Xebia Knowledge Exchange</string>
-	<string name="splash_company">Xebia</string>
-	<string name="splash_version">Version %s</string>
-	<string name="splash_copyright">Copyright (c) 2011 Xebia B.V.</string>
-	<string name="splash_copyright2">Copyright (c) 2011 Xebia B.V. All rights reserved.</string>
-	
-	<string name="menu_settings">Preferences</string>
-	<string name="menu_search">Search</string>
-	<string name="menu_overview">Conferences</string>
-	<string name="menu_add">Add</string>
-	<string name="menu_edit">Edit</string>
-	<string name="menu_track">My Track</string>
-	<string name="menu_exit">Exit</string>
-	<string name="menu_list">List view</string>
-	
-	<string name="password_set">Password stored</string>
-	<string name="password_unset">No password specified</string>
-	<string name="session_title"></string>
-	<string name="modify_session">Modify session</string>
-	<string name="author_select">Select authors...</string>
-	<string name="label_select">Select labels...</string>
-	<string name="empty_value">&lt;specify value&gt;</string>
-	<string name="default_input_text">&lt;start typing&gt;</string>
-	<string name="my_track_title">My track list</string>
-	
-	<string name="context_menu_author_view">View author</string>
-	<string name="context_menu_author_remove">Remove author</string>
-	<string name="context_menu_label_remove">Remove label</string>
-	<string name="context_menu_session_edit">Edit</string>
-	<string name="context_menu_session_view">View</string>
-	
-	<string name="sizeLabel">Room size</string>
-	<string name="newLocationLabel">Location name</string>
-	<string name="breakLabel">Break</string>
-	<string name="default_break_name">Dinner break</string>
-	<string-array name="cacheNames">
-		<item>In memory</item>
-		<item>Store in database</item>
-		<item>Do not cache (purge)</item>
-	</string-array>
-	<string-array name="cacheClassNames">
-		<item>Memory</item>
-		<item>Database</item>
-		<item>None</item>
-	</string-array>
-	<string name="cancel_button">Cancel</string>
-	<string name="close_button">Close</string>
+    <string name="app_name">Conference Viewer</string>
+    <string name="app_full_name">Xebia Conference Viewer</string>
+    <string name="app_version">0.5</string>
+    <string name="splash_conference">Xebia Knowledge Exchange</string>
+    <string name="splash_company">Xebia</string>
+    <string name="splash_version">Version %s</string>
+    <string name="splash_copyright">Copyright (c) 2011 Xebia B.V.</string>
+    <string name="splash_copyright2">Copyright (c) 2011 Xebia B.V. All rights reserved.</string>
+    <string name="menu_settings">Preferences</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_overview">Conferences</string>
+    <string name="menu_add">Add</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_track">My Track</string>
+    <string name="menu_exit">Exit</string>
+    <string name="menu_list">List view</string>
+    <string name="password_set">Password stored</string>
+    <string name="password_unset">No password specified</string>
+    <string name="session_title">Session title</string>
+    <string name="modify_session">Modify session</string>
+    <string name="author_select">Select authors...</string>
+    <string name="label_select">Select labels...</string>
+    <string name="empty_value">&lt;specify value></string>
+    <string name="default_input_text">&lt;start typing></string>
+    <string name="my_track_title">My track list</string>
+    <string name="context_menu_author_view">View author</string>
+    <string name="context_menu_author_remove">Remove author</string>
+    <string name="context_menu_label_remove">Remove label</string>
+    <string name="context_menu_session_edit">Edit</string>
+    <string name="context_menu_session_view">View</string>
+    <string name="sizeLabel">Room size</string>
+    <string name="newLocationLabel">Location name</string>
+    <string name="breakLabel">Break</string>
+    <string name="default_break_name">Dinner break</string>
+
+    <string-array name="cacheNames">
+        <item>In memory</item>
+        <item>Store in database</item>
+        <item>Do not cache</item>
+    </string-array>
+    <string-array name="cacheClassNames">
+        <item>Memory</item>
+        <item>Database</item>
+        <item>None</item>
+    </string-array>
+	<string name="notifyIntervalDefault">15 minutes</string>
+    <string-array name="notifyInterval">
+        <item>5 minutes</item>
+        <item>15 minutes</item>
+        <item>one hour</item>
+        <item>one day</item>
+        <item>switched off</item>
+    </string-array>
+    <string-array name="notifyIntervalValues">
+        <item>300</item>
+        <item>900</item>
+        <item>3600</item>
+        <item>86400</item>
+        <item>off</item>
+    </string-array>
+
+    <string name="close">Close</string>
+    <string name="cancel">Cancel</string>
+    <string name="cancelled">Cancelled</string>
+    <string name="delete">Delete</string>
+    <string name="error">Error</string>
+    <string name="failed">Failed</string>
+    <string name="warning">Warning</string>
+
+    <string name="session_add">Add session</string>
+    <string name="session_edit">Edit session</string>
+    <string name="duration_minutes">%d min</string>
+    <string name="cancel_during_load">The initial loading was cancelled. The application will be closed.</string>
+    <string name="loading">Loading. Please wait...</string>
+    <string name="connection_to_server_failed">Connection to server failed (%s).</string>
+    <string name="auth_failed">Authentication failed. Please set credentials.</string>
+    <string name="server_unreachable">Server unreachable</string>
+    <string name="server_missing_url">No result for \'%s\'</string>
+    <string name="server_timeout">Time out on \'%s\'</string>
+    <string name="specify_attributes">Please specify the following attributes: %s</string>
+    <string name="no_session_added">No session added</string>
+    <string name="session_not_added">Session could not be added (%s).</string>
+    <string name="delete_session">Delete session</string>
+<!--     <string name="confirm_delete_session">Are you sure to delete session \'%s\' on %s?</string> -->
+    <string name="rescheduling_failed">Rescheduling failed</string>
+    <string name="reschedule_failed_message">The session cannot be scheduled. Shorten session, use another location or choose another conference.</string>
+    <string name="pick_conference">Pick a conference</string>
+    <string name="pick_start">Pick a start time</string>
+    <string name="conference_fully_booked">This conference is fully booked!</string>
+    <string name="pick_duration">Pick a duration</string>
+    <string name="select_languages">Select languages</string>
+    <string name="select_location">Select location</string>
+    <string name="pick_type">Pick a type</string>
+    <string name="preparation">Preparation</string>
+    <string name="description">Description</string>
+    <string name="number_of_people">Number of people</string>
+    <string name="intended_audience">Intended audience</string>
+
 </resources>

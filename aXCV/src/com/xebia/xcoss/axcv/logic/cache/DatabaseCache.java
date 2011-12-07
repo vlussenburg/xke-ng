@@ -13,6 +13,7 @@ import android.content.Context;
 import android.util.Log;
 import biz.source_code.base64Coder.Base64Coder;
 
+import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -28,16 +29,24 @@ public class DatabaseCache extends DataCache {
 	@Override
 	public void init() {
 		profileManager.openConnection();
+		profileManager.purgeCache();
 		super.init();
 	}
 	
 	@Override
 	public void destroy() {
-		profileManager.purgeCache();
 		profileManager.closeConnection();
 		super.destroy();
 	}
 	
+	// TODO Call this method ...
+	public static void drop(Context ctx) {
+		ProfileManager profileManager = new ProfileManager(ctx);
+		boolean hasOpened = profileManager.openConnection();
+		profileManager.removeAllCache();
+		if ( hasOpened ) profileManager.closeConnection();
+	}
+
 	@Override
 	public <T> CachedObject<T> doGetCachedObject(String key, Class<T> type) {
 		String ck = createCacheKey(key, type);

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
+import com.xebia.xcoss.axcv.R;
 
 
 public class MemoryCache extends DataCache {
@@ -18,7 +19,7 @@ public class MemoryCache extends DataCache {
 	
 	@Override
 	public void destroy() {
-		this.cachedObjects = new HashMap<String, CachedObject<?>>();
+		this.cachedObjects.clear();
 		super.destroy();
 	}
 

@@ -1,5 +1,8 @@
 package com.xebia.xcoss.axcv.util;
 
+import com.xebia.xcoss.axcv.R;
+
+
 public class StringUtil {
 
 	public static boolean isEmpty(String value) {

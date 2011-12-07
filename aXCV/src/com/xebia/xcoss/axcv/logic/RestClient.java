@@ -2,11 +2,12 @@ package com.xebia.xcoss.axcv.logic;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
-import java.net.SocketTimeoutException;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -33,6 +34,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.protocol.HTTP;
 
 import android.util.Log;
 
@@ -41,6 +43,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.DataException.Code;
 import com.xebia.xcoss.axcv.logic.gson.GsonMomentAdapter;
 import com.xebia.xcoss.axcv.model.Moment;
@@ -124,10 +127,10 @@ public class RestClient {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
 			Log.d(LOG.COMMUNICATE, "POST (create) to '" + url + "': ");
-			String[] split = postData.split(",");
-			for (int i = 0; i < split.length; i++) {
-				Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
-			}
+			// String[] split = postData.split(",");
+			// for (int i = 0; i < split.length; i++) {
+			// Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
+			// }
 			reader = getReader(new HttpPost(url), postData, token);
 			return gson.fromJson(reader, rvClass);
 		}
@@ -143,10 +146,10 @@ public class RestClient {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
 			Log.d(LOG.COMMUNICATE, "PUT (update) to '" + url + "':");
-			String[] split = postData.split(",");
-			for (int i = 0; i < split.length; i++) {
-				Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
-			}
+			// String[] split = postData.split(",");
+			// for (int i = 0; i < split.length; i++) {
+			// Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
+			// }
 			reader = getReader(new HttpPut(url), postData, token);
 			T result = getGson().fromJson(reader, (Class<T>) object.getClass());
 			// TODO Is result an empty string?
@@ -201,7 +204,7 @@ public class RestClient {
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
-			Log.d(LOG.COMMUNICATE, "Post dating [" + postData + "]");
+			// Log.d(LOG.COMMUNICATE, "Post dating [" + postData + "]");
 			reader = getReader(new HttpPost(url), postData, token);
 			return getGson().fromJson(reader, rvClass);
 		}
@@ -242,11 +245,15 @@ public class RestClient {
 			handleResponse(request, response);
 
 			String result = readResponse(response);
-//			Log.i(XCS.LOG.COMMUNICATE, "Read: " + result);
+			// Log.i(XCS.LOG.COMMUNICATE, "Read: " + result);
 			return new StringReader(result);
 		}
-		catch (SocketTimeoutException e) {
+		catch (InterruptedIOException e) {
 			throw new DataException(Code.TIME_OUT, request.getURI());
+		}
+		catch (SocketException e) {
+			// Connection refused
+			throw new DataException(Code.NO_NETWORK, request.getURI());
 		}
 		catch (UnknownHostException e) {
 			throw new DataException(Code.NO_NETWORK, request.getURI());
@@ -287,43 +294,21 @@ public class RestClient {
 	private static DefaultHttpClient getHttpClient() {
 		HttpParams params = new BasicHttpParams();
 		HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-		HttpProtocolParams.setContentCharset(params, "utf-8");
+		HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
 		HttpConnectionParams.setConnectionTimeout(params, HTTP_TIMEOUT);
 		HttpConnectionParams.setSoTimeout(params, HTTP_TIMEOUT);
 		params.setBooleanParameter("http.protocol.expect-continue", false);
-
-		// registers schemes for both http and https
 		SchemeRegistry registry = new SchemeRegistry();
 		registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-		final SSLSocketFactory sslSocketFactory = SSLSocketFactory.getSocketFactory();
-		// sslSocketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-		sslSocketFactory.setHostnameVerifier(SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
-		// sslSocketFactory.setHostnameVerifier(new X509HostnameVerifier() {
-		//
-		// @Override
-		// public void verify(String host, String[] cns, String[] subjectAlts) throws SSLException {
-		// Log.e("debug", "Validating [1] " + host + ": " + Arrays.toString(cns) + " * " +
-		// Arrays.toString(subjectAlts));
-		// }
-		//
-		// @Override
-		// public void verify(String host, X509Certificate cert) throws SSLException {
-		// Log.e("debug", "Validating [2] " + host + ": " + cert.toString());
-		// }
-		//
-		// @Override
-		// public void verify(String host, SSLSocket ssl) throws IOException {
-		// Log.e("debug", "Validating [3] " + host + ": " + ssl.toString());
-		// }
-		//
-		// @Override
-		// public boolean verify(String host, SSLSession session) {
-		// Log.e("debug", "Validating [4] " + host + ": " + session.toString());
-		// return true;
-		// }
-		// });
-		registry.register(new Scheme("https", sslSocketFactory, 443));
-
+		registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 8080));
+		try {
+			SSLSocketFactory sslSocketFactory = new EC2TrustedSocketFactory();
+			registry.register(new Scheme("https", sslSocketFactory, 443));
+			registry.register(new Scheme("https", sslSocketFactory, 8443));
+		}
+		catch (Exception e) {
+			Log.e(XCS.LOG.COMMUNICATE, "Could not use secure connection: " + StringUtil.getExceptionMessage(e));
+		}
 		ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager(params, registry);
 		return new DefaultHttpClient(manager, params);
 	}

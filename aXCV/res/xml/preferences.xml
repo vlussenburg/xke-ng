@@ -78,7 +78,15 @@
 			android:defaultValue="false"
 			android:summaryOff="Do notify me if my selected track changes"
 			android:summaryOn="Notify me if my selected track changes" />
-	</PreferenceCategory>
+		<com.xebia.xcoss.axcv.preference.ListPreference
+			signalRetriever=".service.NotificationServiceManager"
+			android:title="Interval"
+			android:summary="Minutes to check for changes"
+			android:key="NotifyInterval"
+			android:defaultValue="@string/notifyIntervalDefault"
+			android:entries="@array/notifyInterval"
+			android:entryValues="@array/notifyIntervalValues" />
+			</PreferenceCategory>
 	<PreferenceCategory android:title="About">
 		<Preference
 			android:key="ApplicationName"

@@ -8,6 +8,7 @@ import java.util.TreeSet;
 
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -51,7 +52,8 @@ public class Session implements Serializable {
 	private Location location;
 	private Set<String> labels;
 	
-	private transient String conferenceId;
+	// Cannot be transient ?
+	private String conferenceId;
 	
 	// TODO : Not mapped at all at the moment...
 	private String intendedAudience;
@@ -78,7 +80,8 @@ public class Session implements Serializable {
 		intendedAudience = original.intendedAudience;
 		limit = original.limit;
 		preparation = original.preparation;
-
+		conferenceId = original.conferenceId;
+		
 		authors.addAll(original.authors);
 		labels.addAll(original.labels);
 		languages.addAll(original.languages);
@@ -245,13 +248,13 @@ public class Session implements Serializable {
 		int value = 0;
 		// Title: Max 10
 		if (!StringUtil.isEmpty(title)) {
-			value += Math.min(10, title.length() / 2);
+			value += Math.min(10, title.length() / 1.6);
 			Log.v(XCS.LOG.ALL, "Title boosted value to " + value);
 		}
 		// Description: Max 35
 		if (!StringUtil.isEmpty(description)) {
 			value += Math.min(35, description.replaceAll("\\w", "").length() * 1.4);
-			Log.v(XCS.LOG.ALL, "Description boosted value to " + value);
+			Log.v(XCS.LOG.ALL, "Description '"+description.replaceAll("\\w", "")+"' boosted value to " + value);
 		}
 		// startTime: Max 5
 		if (startTime != null) {
@@ -285,7 +288,7 @@ public class Session implements Serializable {
 		}
 		// intendedAudience: Max 20
 		if (!StringUtil.isEmpty(intendedAudience)) {
-			value += Math.min(20, intendedAudience.length());
+			value += Math.min(20, intendedAudience.length() * 2);
 			Log.v(XCS.LOG.ALL, "Audience boosted value to " + value);
 		}
 		Log.i(XCS.LOG.ALL, "Completeness (100) = " + value);
@@ -336,12 +339,15 @@ public class Session implements Serializable {
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		result = prime * result + ((labels == null) ? 0 : labels.hashCode());
 		result = prime * result + ((intendedAudience == null) ? 0 : intendedAudience.hashCode());
+		result = prime * result + ((conferenceId == null) ? 0 : conferenceId.hashCode());
 
 		if ( authors != null ) {
 			for (Author author : authors) {
 				result = prime * result + author.getUserId().hashCode();
 			}
 		}
+		// Ignored: id, limit, languages
+		
 		return result;
 	}
 

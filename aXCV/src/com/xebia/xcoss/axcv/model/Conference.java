@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.google.gson.annotations.SerializedName;
 import com.xebia.xcoss.axcv.BaseActivity;
+import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
@@ -30,10 +31,11 @@ public class Conference implements Serializable {
 		public Moment start;
 		public Moment end;
 		public Location location;
-		
+
 		@Override
 		public String toString() {
-			return "TS ["+location+" "+ (start==null?"?":start.getHour()+":"+start.getMinute()) + " -> " + (end==null?"?":end.getHour()+":"+end.getMinute()) +"]";
+			return "TS [" + location + " " + (start == null ? "?" : start.getHour() + ":" + start.getMinute()) + " -> "
+					+ (end == null ? "?" : end.getHour() + ":" + end.getMinute()) + "]";
 		}
 	}
 
@@ -79,15 +81,6 @@ public class Conference implements Serializable {
 	public Set<Session> getSessions() {
 		if (sessions == null) {
 			resetSessions();
-		}
-		if (sessions.isEmpty()) {
-			try {
-				List<Session> list = ConferenceServer.getInstance().getSessions(this);
-				sessions.addAll(list);
-			}
-			catch (CommException e) {
-				BaseActivity.handleException(null, "retrieving sessions", e);
-			}
 		}
 		// Json mapping does not put it in a sorted set...
 		return sort(sessions);
@@ -347,29 +340,11 @@ public class Conference implements Serializable {
 		return null;
 	}
 
-	public SortedSet<TimeSlot> getAvailableTimeSlots(int duration) {
-		TreeSet<TimeSlot> list = new TreeSet<TimeSlot>(new TimeSlotComparator());
-		for (Location loc : locations) {
-			list.addAll(getAvailableTimeSlots(duration, loc));
-		}
-		return list;
-	}
-
-	public SortedSet<TimeSlot> getAvailableTimeSlots(int duration, Location loc) {
-		TreeSet<TimeSlot> list = new TreeSet<TimeSlot>(new TimeSlotComparator());
-		TimeSlot t;
-		int length = duration < TimeSlot.MIN_LENGTH ? TimeSlot.LENGTH : duration;
-		Moment start = startTime;
-		while ((t = getNextAvailableTimeSlot(null, start, length, loc)) != null) {
-			list.add(t);
-			start = start.plusMinutes(length);
-		}
-		return list;
-	}
-
-	public SortedSet<TimeSlot> getAvailableTimeSlots(int duration, List<Location> locs) {
-		if (locs == null || locs.isEmpty()) {
-			return getAvailableTimeSlots(duration);
+	public SortedSet<TimeSlot> getAvailableTimeSlots(int duration, List<Location> locsIn) {
+		List<Location> locs = locsIn;
+		if ( locs == null ) {
+			locs = new ArrayList<Location>();
+			locs.addAll(locations);
 		}
 		Location[] allLocations = locs.toArray(new Location[locs.size()]);
 		Location firstLocation = allLocations[0];
@@ -378,18 +353,20 @@ public class Conference implements Serializable {
 		int length = duration < TimeSlot.MIN_LENGTH ? TimeSlot.LENGTH : duration;
 		Moment start = startTime;
 		while ((t = getNextAvailableTimeSlot(null, start, length, firstLocation)) != null) {
-			Log.i("debug", "Available: " + t);
+//			Log.i("debug", "Available: " + t);
 			// Check the remainder of the locations for this slot
 			boolean availableOnAllLocations = true;
 			for (int i = 1; i < allLocations.length; i++) {
-				boolean slotAvailable = isTimeSlotAvailable(start, length, allLocations[i]);
-				Log.i("debug", "  On '"+allLocations[i]+"' : " + slotAvailable);
+				Location location = allLocations[i];
+				if (location.equals(firstLocation)) continue;
+				boolean slotAvailable = isTimeSlotAvailable(start, length, location);
+//				Log.i("debug", "  On '" + location + "' : " + slotAvailable);
 				availableOnAllLocations = availableOnAllLocations && slotAvailable;
 			}
 			if (availableOnAllLocations) {
 				list.add(t);
 			}
-			start = start.plusMinutes(length);
+			start = start.plusMinutes(Math.min(length, 30));
 		}
 		return list;
 	}

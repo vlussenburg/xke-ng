@@ -19,13 +19,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.logic.ConferenceServerProxy;
 import com.xebia.xcoss.axcv.logic.DataException;
 import com.xebia.xcoss.axcv.logic.ProfileManager;
+import com.xebia.xcoss.axcv.logic.cache.DataCache;
+import com.xebia.xcoss.axcv.logic.cache.MemoryCache;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.ProxyExceptionReporter;
@@ -45,6 +46,11 @@ public abstract class BaseActivity extends Activity {
 	public static final String IA_LOCATION_ID = "ID-location";
 	public static final String IA_SESSION_START = "ID-sstart";
 	public static final String IA_NOTIFICATION_ID = "ID-notified";
+	public static final String IA_NOTIFICATION_TYPE = "ID-notytype";
+
+	public enum NotificationType {
+		TRACKED, OWNED;
+	}
 
 	private MenuItem miSettings;
 	private MenuItem miSearch;
@@ -53,26 +59,14 @@ public abstract class BaseActivity extends Activity {
 	private MenuItem miTrack;
 	private MenuItem miExit;
 
-	private static Activity rootActivity;
 	private static ProfileManager profileManager;
-	private static String lastError;
+	protected static String lastError;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		ProxyExceptionReporter.register(this);
 
-		if (rootActivity == null) {
-			rootActivity = this;
-		}
-
-		String notificationId = getIntent().getStringExtra(IA_NOTIFICATION_ID);
-		if ( notificationId != null ) {
-			NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-			Log.w("debug", "Cancel on " + notificationId);
-			mgr.cancel(notificationId.hashCode());
-		}
-		
 		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);
 		if (conferenceButton != null) {
 			conferenceButton.setOnClickListener(new View.OnClickListener() {
@@ -84,17 +78,17 @@ public abstract class BaseActivity extends Activity {
 		}
 	}
 
-	private void resetApplication(boolean exit) {
-		Log.e(LOG.ALL, "Reset application from " + this + " : " + exit);
-		rootActivity = null;
-		Intent intent = new Intent(BaseActivity.this, CVSplashLoader.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		if (exit) {
-			intent.putExtra("exit", true);
+	@Override
+	protected void onResume() {
+		String notificationId = getIntent().getStringExtra(IA_NOTIFICATION_ID);
+		if (notificationId != null) {
+			NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			Log.w("debug", "Notification - Cancel on " + notificationId);
+			mgr.cancel(notificationId.hashCode());
 		}
-		startActivity(intent);
+		super.onResume();
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
@@ -136,7 +130,7 @@ public abstract class BaseActivity extends Activity {
 				startActivity(new Intent(this, CVTrack.class));
 			break;
 			case XCS.MENU.EXIT:
-				resetApplication(true);
+				moveTaskToBack(true);
 			break;
 		}
 		return true;
@@ -170,7 +164,7 @@ public abstract class BaseActivity extends Activity {
 		}
 		if (conference == null && useDefault) {
 			conference = server.getUpcomingConference();
-			Log.w(LOG.ALL, "Conference default " + conference.getTitle());
+			Log.w(LOG.ALL, "Conference default " + (conference == null ? "<null>": conference.getTitle()));
 		}
 		// Log.i("XCS", "[GET] Conference (on '" + identifier + "') = " + conference);
 		return conference;
@@ -204,16 +198,32 @@ public abstract class BaseActivity extends Activity {
 		if (server == null || server.isLoggedIn() == false) {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			String user = sp.getString(XCS.PREF.USERNAME, null);
-			String password = /*SecurityUtils.decrypt(*/sp.getString(XCS.PREF.PASSWORD, "")/*)*/;
-			server = ConferenceServer.createInstance(user, password, getServerUrl(), rootActivity == null ? null
-					: rootActivity.getApplicationContext());
+			String password = sp.getString(XCS.PREF.PASSWORD, "");
+			String type = "?";
+			DataCache cache;
+			try {
+				type = sp.getString(XCS.PREF.CACHETYPE, null);
+				if (type == null) {
+					type = DataCache.Type.Memory.name();
+					sp.edit().putString(XCS.PREF.CACHETYPE, type).commit();
+				}
+				Log.i(XCS.LOG.PROPERTIES, "Using cache type: " + type);
+				cache = DataCache.Type.valueOf(type).newInstance(this);
+			}
+			catch (Exception e) {
+				Log.w(XCS.LOG.PROPERTIES,
+						"Cannot instantiate cache of type " + type + ": " + StringUtil.getExceptionMessage(e));
+				cache = new MemoryCache(this);
+			}
+			server = ConferenceServer.createInstance(user, password, getServerUrl(this), cache);
+			// TODO server can be null if not logged in.
 		}
 		return server;
 	}
 
 	protected ProfileManager getProfileManager() {
 		if (profileManager == null) {
-			profileManager = new ProfileManager(rootActivity);
+			profileManager = new ProfileManager(this);
 		}
 		profileManager.openConnection();
 		return profileManager;
@@ -232,7 +242,7 @@ public abstract class BaseActivity extends Activity {
 	protected static Dialog createDialog(Activity ctx, String title, String message) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 		builder.setTitle(title).setMessage(message).setIcon(android.R.drawable.ic_dialog_alert)
-				.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+				.setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
 					}
@@ -242,12 +252,13 @@ public abstract class BaseActivity extends Activity {
 
 	protected void onSuccess() {}
 
-	protected void onFailure() {}
+	protected void onFailure(String message, String detail) {}
 
-	private String getServerUrl() {
+	public static String getServerUrl(Context ctx) {
 		try {
 			// Invoke trim to make sure the value is specified
-			ApplicationInfo ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
+			ApplicationInfo ai = ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(),
+					PackageManager.GET_META_DATA);
 			return ai.metaData.getString("com.xebia.xcoss.serverUrl").trim();
 		}
 		catch (Exception e) {
@@ -279,13 +290,14 @@ public abstract class BaseActivity extends Activity {
 	public static void handleException(final Activity context, String activity, CommException e) {
 		if (e instanceof DataException) {
 			if (((DataException) e).missing()) {
-				Log.w(XCS.LOG.COMMUNICATE, "No result for '" + activity + "'.");
-				lastError = "Not found: " + activity;
+				lastError = context.getString(R.string.server_missing_url, activity);
+				Log.w(XCS.LOG.COMMUNICATE, lastError);
+			} else if (((DataException) e).networkError()) {
+				lastError = context.getString(R.string.server_unreachable);
+				Log.w(XCS.LOG.COMMUNICATE, lastError);
 			} else if (((DataException) e).timedOut()) {
-				Log.w(XCS.LOG.COMMUNICATE, "Time out on '" + activity + "'.");
-				if ( context != null ) {
-					Toast.makeText(context, "Time out on "+activity+"!", Toast.LENGTH_SHORT);
-				}
+				lastError = context.getString(R.string.server_timeout, activity);
+				Log.w(XCS.LOG.COMMUNICATE, lastError);
 			} else {
 				// Authentication failure
 				if (context != null) {
@@ -322,7 +334,7 @@ public abstract class BaseActivity extends Activity {
 		String user = sp.getString(XCS.PREF.USERNAME, null);
 		return user;
 	}
-	
+
 	public static String getLastError() {
 		String error = lastError;
 		lastError = null;

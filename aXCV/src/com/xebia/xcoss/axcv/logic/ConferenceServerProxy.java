@@ -3,9 +3,9 @@ package com.xebia.xcoss.axcv.logic;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Context;
-
 import com.xebia.xcoss.axcv.BaseActivity;
+import com.xebia.xcoss.axcv.R;
+import com.xebia.xcoss.axcv.logic.cache.DataCache;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Location;
@@ -19,8 +19,8 @@ public class ConferenceServerProxy extends ConferenceServer {
 
 	private BaseActivity activity;
 
-	protected ConferenceServerProxy(String base, Context ctx) {
-		super(base, ctx);
+	protected ConferenceServerProxy(String base, DataCache cache) {
+		super(base, cache);
 	}
 
 	public static ConferenceServerProxy getInstance(BaseActivity act) {
@@ -34,13 +34,14 @@ public class ConferenceServerProxy extends ConferenceServer {
 	}
 
 	@Override
-	public void login(String user, String password) {
+	protected boolean login(String user, String password) {
 		try {
-			super.login(user, password);
+			return super.login(user, password);
 		}
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "login", e);
 		}
+		return false;
 	}
 
 	@Override
@@ -192,17 +193,6 @@ public class ConferenceServerProxy extends ConferenceServer {
 			BaseActivity.handleException(activity, "get session", e);
 		}
 		return null;
-	}
-
-	@Override
-	public List<Session> getSessions(Conference conference) {
-		try {
-			return super.getSessions(conference);
-		}
-		catch (CommException e) {
-			BaseActivity.handleException(activity, "get sessions", e);
-		}
-		return new ArrayList<Session>();
 	}
 
 	@Override

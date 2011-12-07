@@ -6,14 +6,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.util.Log;
-
 import com.google.gson.reflect.TypeToken;
+import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.cache.DataCache;
-import com.xebia.xcoss.axcv.logic.cache.MemoryCache;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Credential;
@@ -26,8 +21,6 @@ import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.util.ConferenceComparator;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
-import com.xebia.xcoss.axcv.util.StringUtil;
-import com.xebia.xcoss.axcv.util.XCS;
 
 public class ConferenceServer {
 
@@ -47,40 +40,30 @@ public class ConferenceServer {
 		return instance;
 	}
 
-	public static ConferenceServer createInstance(String user, String password, String url, Context ctx) {
-		ConferenceServer server = new ConferenceServerProxy(url, ctx);
+	public static ConferenceServer createInstance(String user, String password, String url, DataCache cache) {
+		ConferenceServer server = new ConferenceServerProxy(url, cache);
 		instance = server;
-		instance.login(user, password);
-		return instance;
+		if (instance.login(user, password)) {
+			return instance;
+		}
+		return null;
 	}
 
-	protected ConferenceServer(String base, Context ctx) {
+	protected ConferenceServer(String base, DataCache cache) {
 		baseUrl = base;
-		String type = "?";
-		try {
-			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
-			type = sp.getString(XCS.PREF.CACHETYPE, null);
-			if ( type == null ) {
-				type = DataCache.Type.Memory.name();
-				sp.edit().putString(XCS.PREF.CACHETYPE, type).commit();
-			}
-			Log.i(XCS.LOG.PROPERTIES, "Using cache type: " + type);
-			conferenceCache = DataCache.Type.valueOf(type).newInstance(ctx);
-		} catch (Exception e) {
-			Log.w(XCS.LOG.PROPERTIES, "Cannot instantiate cache of type " + type + ": " + StringUtil.getExceptionMessage(e));
-			conferenceCache = new MemoryCache(ctx);
-		}
+		conferenceCache = cache;
 		conferenceCache.init();
 	}
 
-	public void login(String user, String password) {
-		 StringBuilder requestUrl = new StringBuilder();
-		 requestUrl.append(baseUrl);
-		 requestUrl.append("/login");
-		 String decrypt = SecurityUtils.decrypt(password);
-		 RestClient.postObject(requestUrl.toString(), new Credential(user, decrypt, false), void.class, null);
-		 // RestClients holds the authentication token.
-		 this.token = "logged_in";
+	protected boolean login(String user, String encrypt) {
+		StringBuilder requestUrl = new StringBuilder();
+		requestUrl.append(baseUrl);
+		requestUrl.append("/login");
+		String decrypt = SecurityUtils.decrypt(encrypt);
+		RestClient.postObject(requestUrl.toString(), new Credential(user, decrypt), void.class, null);
+		// RestClients holds the authentication token.
+		this.token = "logged_in";
+		return true;
 	}
 
 	public boolean isLoggedIn() {
@@ -161,9 +144,9 @@ public class ConferenceServer {
 		requestUrl.append(baseUrl);
 		requestUrl.append("/conference");
 
-		Log.w(XCS.LOG.COMMUNICATE, "Conference starts at " + conference.getStartTime());
-		Log.w(XCS.LOG.COMMUNICATE, "Conference ends   at " + conference.getEndTime());
-		
+		// Log.w(XCS.LOG.COMMUNICATE, "Conference starts at " + conference.getStartTime());
+		// Log.w(XCS.LOG.COMMUNICATE, "Conference ends   at " + conference.getEndTime());
+
 		conferenceCache.remove(conference);
 		if (create) {
 			conference = RestClient.createObject(requestUrl.toString(), conference, Conference.class, token);
@@ -186,25 +169,6 @@ public class ConferenceServer {
 		RestClient.deleteObject(requestUrl.toString(), token);
 	}
 
-	public List<Session> getSessions(Conference conference) {
-		List<Session> result = conferenceCache.getSessions(conference.getId());
-		if (result == null) {
-			StringBuilder requestUrl = new StringBuilder();
-			requestUrl.append(baseUrl);
-			requestUrl.append("/conference/");
-			requestUrl.append(conference.getId());
-			requestUrl.append("/sessions");
-
-			result = RestClient.loadObjects(requestUrl.toString(), Session.class, token);
-			if (result == null) {
-				return new ArrayList<Session>();
-			}
-
-			conferenceCache.add(conference.getId(), result);
-		}
-		return result;
-	}
-
 	public Session getSession(String id, String cid) {
 		Session result = conferenceCache.getSession(id);
 		if (result == null) {
@@ -214,7 +178,7 @@ public class ConferenceServer {
 			requestUrl.append(id);
 
 			result = RestClient.loadObject(requestUrl.toString(), Session.class, token);
-			if ( cid != null) {
+			if (cid != null) {
 				result.setConferenceId(cid);
 				conferenceCache.add(cid, result);
 			}
@@ -236,9 +200,6 @@ public class ConferenceServer {
 		} else {
 			requestUrl.append("/session/");
 			requestUrl.append(session.getId());
-//			requestUrl.append("/conference/");
-//			requestUrl.append(conferenceId);
-//			requestUrl.append("/session");
 			RestClient.updateObject(requestUrl.toString(), session, token);
 			sessionId = session.getId();
 		}
@@ -368,6 +329,7 @@ public class ConferenceServer {
 		if (result == null) {
 			return new ArrayList<Session>();
 		}
+		// TODO : Sessions do not have a conference ID
 		Collections.sort(result, new SessionComparator());
 		return result;
 	}
@@ -407,6 +369,7 @@ public class ConferenceServer {
 			if (result == null) {
 				return new Remark[0];
 			}
+			// TODO Do we want this?
 			conferenceCache.addObject(key, result);
 		}
 		return result.toArray(new Remark[result.size()]);
@@ -443,7 +406,7 @@ public class ConferenceServer {
 		}
 		// No conference in this year.
 		Moment nextYear = new Moment(dt);
-		nextYear.setDate(dt.getYear()+1, 1, 1);
+		nextYear.setDate(dt.getYear() + 1, 1, 1);
 		return getNextConference(nextYear);
 	}
 
@@ -464,7 +427,7 @@ public class ConferenceServer {
 		}
 		// No conference in this year.
 		Moment prevYear = new Moment(dt);
-		prevYear.setDate(dt.getYear()-1, 1, 1);
+		prevYear.setDate(dt.getYear() - 1, 1, 1);
 		return getPreviousConference(prevYear);
 	}
 
@@ -499,7 +462,7 @@ public class ConferenceServer {
 		}
 		// No conference in this year.
 		Moment nextYear = new Moment(dt);
-		nextYear.setDate(dt.getYear()+1, 1, 1);
+		nextYear.setDate(dt.getYear() + 1, 1, 1);
 		return getUpcomingConference(nextYear);
 	}
 

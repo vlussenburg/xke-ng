@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -32,6 +33,7 @@ import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.ui.AddBreakDialog;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
 import com.xebia.xcoss.axcv.ui.LocationInputDialog;
@@ -48,7 +50,7 @@ public class CVConferenceAdd extends AdditionActivity {
 	private Conference originalConference;
 	private Conference conference;
 	private boolean create = false;
-	private List<Session> breakSessions;
+	private TreeSet<Session> breakSessions;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -58,7 +60,7 @@ public class CVConferenceAdd extends AdditionActivity {
 
 		this.timeFormatter = new ScreenTimeUtil(this);
 		this.originalConference = getConference(false);
-		this.breakSessions = new ArrayList<Session>();
+		this.breakSessions = new TreeSet<Session>(new SessionComparator());
 		
 		if (originalConference == null) {
 			create = true;
@@ -147,11 +149,17 @@ public class CVConferenceAdd extends AdditionActivity {
 					return;
 				}
 
+				boolean ok = false;
 				if (create) {
-					conference = Conference.create(conference);
+					Conference result = Conference.create(conference);
+					if ( result != null ) {
+						conference = result;
+						ok = true;
+					}
 				} else {
-					conference.update();
+					ok = conference.update();
 				}
+				if (ok ) {
 				for (Session s : breakSessions) {
 					try {
 						conference.addSession(s, true);
@@ -160,6 +168,10 @@ public class CVConferenceAdd extends AdditionActivity {
 					}
 				}
 				CVConferenceAdd.this.finish();
+				} else {
+					Log.e(LOG.ALL, "Adding conference failed.");
+					createDialog("No conference added", "Conference could not be added: ("+lastError+").").show();
+				}
 			}
 		});
 		button = (Button) findViewById(R.id.actionDelete);
@@ -204,7 +216,7 @@ public class CVConferenceAdd extends AdditionActivity {
 								Conference nextConference = getConferenceServer().getUpcomingConference(conference.getEndTime());
 								Set<Session> sessions = conference.getSessions();
 								for (Session s : sessions) {
-									SortedSet<TimeSlot> slots = nextConference.getAvailableTimeSlots(s.getDuration());
+									SortedSet<TimeSlot> slots = nextConference.getAvailableTimeSlots(s.getDuration(), null);
 									if (slots.isEmpty()) {
 										dialog.dismiss();
 										Toast.makeText(CVConferenceAdd.this, "Failed! Session cannot be moved.",
@@ -350,8 +362,10 @@ public class CVConferenceAdd extends AdditionActivity {
 
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle("Select locations");
-				builder.setMultiChoiceItems(items, check, new DialogHandler(this, items, R.id.conferenceLocations));
-				builder.setPositiveButton(R.string.close_button, new DialogInterface.OnClickListener() {
+				DialogHandler handler = new DialogHandler(this, items, R.id.conferenceLocations);
+				handler.setCloseOnSelection(false);
+				builder.setMultiChoiceItems(items, check, handler);
+				builder.setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						dialog.dismiss();
@@ -427,7 +441,7 @@ public class CVConferenceAdd extends AdditionActivity {
 			break;
 			case XCS.DIALOG.INPUT_DESCRIPTION:
 				tid = (TextInputDialog) dialog;
-				tid.setDescription("Description");
+				tid.setDescription(getString(R.string.description));
 				tid.setValue(conference.getDescription());
 			break;
 			case XCS.DIALOG.INPUT_LOCATION:

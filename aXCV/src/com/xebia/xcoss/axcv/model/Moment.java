@@ -9,6 +9,7 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class Moment implements Serializable {

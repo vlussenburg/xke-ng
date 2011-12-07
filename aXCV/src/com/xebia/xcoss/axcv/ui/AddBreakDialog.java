@@ -7,6 +7,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import android.app.Dialog;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
@@ -25,6 +26,7 @@ import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.Session.Type;
 import com.xebia.xcoss.axcv.util.StringUtil;
+import com.xebia.xcoss.axcv.util.XCS;
 
 public class AddBreakDialog extends Dialog {
 
@@ -103,6 +105,17 @@ public class AddBreakDialog extends Dialog {
 		});
 
 		updateSpinners();
+
+		spinner = (Spinner) findViewById(R.id.bStartTime);
+		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+			public void onItemSelected(AdapterView<?> parent, View view, int selection, long arg3) {
+//				Log.v(XCS.LOG.ALL, "Start time select: " + parent + "/" + view + "/" + selection + "/" + arg3 + "/");
+			}
+
+			public void onNothingSelected(AdapterView<?> arg0) {
+//				Log.v(XCS.LOG.ALL, "Start time noting: " + arg0 + "/");
+			}
+		});
 	}
 
 	private int getDuration() {
@@ -131,14 +144,15 @@ public class AddBreakDialog extends Dialog {
 			adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 			spinner.setAdapter(adapter1);
 			spinner.setSelection(4);
-			// TODO
-//			adapter1..gsetOnClickListener(new View.OnClickListener() {
-//				@Override
-//				public void onClick(View v) {
-//					Log.e("debug", "Clicked on view " + v + " = " + spinner.getSelectedItemPosition());
-//					updateSpinners();
-//				}
-//			});
+			spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> v1, View v2, int arg1, long arg2) {
+					updateSpinners();
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> v1) {}
+			});
 		}
 
 		Button submit = (Button) findViewById(R.id.seCommit);
@@ -156,40 +170,49 @@ public class AddBreakDialog extends Dialog {
 	}
 
 	private boolean updateStartTimes() {
-		boolean hasTimeSlots = false;
-		if (conference != null) {
-			Set<Moment> startTime = new HashSet<Moment>();
 
-			int duration = getDuration();
-			if (duration == 0) duration = TimeSlot.LENGTH;
+		if (conference == null) {
+			return false;
+		}
 
-			Set<TimeSlot> timeSlots = conference.getAvailableTimeSlots(duration, conference.getLocations());
+		Set<Moment> startTime = new HashSet<Moment>();
 
-			for (TimeSlot timeSlot : timeSlots) {
-				startTime.add(timeSlot.start);
-			}
+		int duration = getDuration();
+		if (duration == 0) duration = TimeSlot.LENGTH;
 
-			SortedSet<String> startdata = new TreeSet<String>();
-			for (Moment dateTime : startTime) {
-				startdata.add(timeFormatter.getAbsoluteTime(dateTime));
-			}
-			String[] startarray = startdata.toArray(new String[startdata.size()]);
-			Spinner spinner = (Spinner) findViewById(R.id.bStartTime);
-			Object selectedItem = spinner.getSelectedItem();
-			ArrayAdapter<String> adapter3 = new ArrayAdapter<String>(getContext(),
-					android.R.layout.simple_spinner_item, startarray);
-			adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-			spinner.setAdapter(adapter3);
+		Set<TimeSlot> timeSlots = conference.getAvailableTimeSlots(duration, conference.getLocations());
+
+		for (TimeSlot timeSlot : timeSlots) {
+			startTime.add(timeSlot.start);
+		}
+
+		SortedSet<String> startdata = new TreeSet<String>();
+		for (Moment dateTime : startTime) {
+			startdata.add(timeFormatter.getAbsoluteTime(dateTime));
+		}
+		String[] startarray = startdata.toArray(new String[startdata.size()]);
+		Spinner spinner = (Spinner) findViewById(R.id.bStartTime);
+		Object selectedItem = spinner.getSelectedItem();
+		Log.v(XCS.LOG.ALL, "Selected item = " + selectedItem);
+		ArrayAdapter<String> adapter3 = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item,
+				startarray);
+		adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinner.setAdapter(adapter3);
+
+		if (selectedItem != null) {
 			int position = 0;
 			for (int i = 0; i < startarray.length; i++) {
+//				Log.v(XCS.LOG.ALL, "Match item '" + startarray[i] + "' to '" + selectedItem + "'");
 				if (startarray[i].equals(selectedItem)) {
+//					Log.v(XCS.LOG.ALL, "Position to be " + i);
 					position = i;
+					break;
 				}
 			}
 			spinner.setSelection(position);
-			hasTimeSlots = timeSlots.size() > 0;
 		}
-		return hasTimeSlots;
+
+		return timeSlots.size() > 0;
 	}
 
 	public void setConference(Conference conf) {

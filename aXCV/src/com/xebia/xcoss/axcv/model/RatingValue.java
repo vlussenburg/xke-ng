@@ -1,5 +1,8 @@
 package com.xebia.xcoss.axcv.model;
 
+import com.xebia.xcoss.axcv.R;
+
+
 public class RatingValue {
 
 	private static final String[] VALUES = {

@@ -6,6 +6,7 @@ import java.util.List;
 import android.content.Context;
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
