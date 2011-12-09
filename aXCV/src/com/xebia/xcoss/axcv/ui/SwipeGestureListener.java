@@ -4,7 +4,6 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 
-import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.SwipeActivity;
 
 public class SwipeGestureListener extends SimpleOnGestureListener {

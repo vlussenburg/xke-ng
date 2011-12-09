@@ -14,7 +14,6 @@ import android.util.Log;
 
 import com.google.gson.annotations.SerializedName;
 import com.xebia.xcoss.axcv.BaseActivity;
-import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;

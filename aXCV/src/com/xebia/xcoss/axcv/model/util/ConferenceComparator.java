@@ -2,7 +2,6 @@ package com.xebia.xcoss.axcv.model.util;
 
 import java.util.Comparator;
 
-import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
 

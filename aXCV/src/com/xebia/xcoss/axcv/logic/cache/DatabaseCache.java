@@ -13,7 +13,6 @@ import android.content.Context;
 import android.util.Log;
 import biz.source_code.base64Coder.Base64Coder;
 
-import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.util.XCS;
 

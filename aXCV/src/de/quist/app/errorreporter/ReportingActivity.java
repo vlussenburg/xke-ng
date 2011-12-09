@@ -22,7 +22,6 @@ package de.quist.app.errorreporter;
 
 import android.app.Activity;
 import android.os.Bundle;
-import com.xebia.xcoss.axcv.R;
 
 public class ReportingActivity extends Activity {
 

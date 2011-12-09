@@ -1,6 +1,5 @@
 package com.xebia.xcoss.axcv.logic.cache;
 
-import com.xebia.xcoss.axcv.R;
 import java.io.Serializable;
 
 class CachedObject<T> implements Serializable {

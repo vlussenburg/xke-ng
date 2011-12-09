@@ -7,13 +7,21 @@ IN PROGRESS
 TODO
 -------------------------------------------------------------------
 client
--	ASyncTask server communication
--	Wachtcursor bij search maken
-- 	Vertical scrolling / paging, 
+-	ASyncTask server communication (Arno)
+-	Wachtcursor bij search maken (Arno)
+- 	Viewpaging voor locaties: CVSessionList (Arno)
 -	Caching
--	Certificate check
+-	Certificate check (Michael)
+-	Rating bar
+-	Transparant overlay for gestures (session view)
+-	Search framework
+-	Exit knop verwijderen (Michael)
+-	Timer naar AlarmManager (Michael)
+
 
 later op de client
+-	Content providers
+-	Multitouch in view mode - show small matrix.
 -	Verbeteren van caching
 	-	Caching: refresh na conference edit/add break (reopen view...)
 	-	Conferenties verdwijnen uit lijst...

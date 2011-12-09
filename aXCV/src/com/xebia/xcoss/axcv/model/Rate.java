@@ -1,18 +1,32 @@
 package com.xebia.xcoss.axcv.model;
 
-import com.xebia.xcoss.axcv.R;
 import java.util.List;
+
+import android.widget.RatingBar;
 
 public class Rate {
 	
-	@SuppressWarnings("unused")
+	private static final String[] VALUES = {
+		/*0*/ "No rating",
+		/*1*/ "Very poor",
+		/*2*/ "Poor",
+		/*3*/ "Less than moderate",
+		/*4*/ "Moderate",
+		/*5*/ "Fair",
+		/*6*/ "Adequate",
+		/*7*/ "Good",
+		/*8*/ "Very good",
+		/*9*/ "Excellent",
+		/*10*/ "Outstanding",
+	};
+	
 	private int rate;
 	// This value is not included in the JSON
 	private transient String value;
 
-	public Rate(int rate) {
-		this.rate = rate;
-		this.value = String.valueOf(rate);
+	public Rate(RatingBar ratingBar) {
+		this.rate = (int)(10 * ratingBar.getRating())/ratingBar.getNumStars();
+		this.value = String.valueOf(ratingBar);
 	}
 
 	public Rate(List<Integer> list) {
@@ -29,5 +43,11 @@ public class Rate {
 
 	public String toString() {
 		return value;
+	}
+
+	public String getMessage() {
+		if ( rate >= 0 && rate < VALUES.length ) 
+			return VALUES[rate];
+		return "?";
 	}
 }

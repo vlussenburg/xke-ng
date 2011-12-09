@@ -39,7 +39,7 @@ public class CVSearchAuthor extends BaseActivity {
 	private Intent result = new Intent();
 
 	protected ConferenceServer getConferenceServer() {
-		ConferenceServer server = ConferenceServerProxy.getInstance();
+		ConferenceServer server = ConferenceServerProxy.getInstance(this);
 		return server;
 	}
 

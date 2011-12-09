@@ -3,7 +3,6 @@ package com.xebia.xcoss.axcv.util;
 import java.util.regex.Pattern;
 
 import android.view.Menu;
-import com.xebia.xcoss.axcv.R;
 
 public class XCS {
 

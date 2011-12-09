@@ -2,7 +2,6 @@ package de.quist.app.errorreporter;
 
 import android.app.ListActivity;
 import android.os.Bundle;
-import com.xebia.xcoss.axcv.R;
 
 public class ReportingListActivity extends ListActivity {
 

@@ -2,7 +2,6 @@ package de.quist.app.errorreporter;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import com.xebia.xcoss.axcv.R;
 
 public class ReportingPreferenceActivity extends PreferenceActivity {
 

@@ -9,7 +9,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Moment;
 
 public class GsonMomentAdapter implements JsonSerializer<Moment>, JsonDeserializer<Moment> {

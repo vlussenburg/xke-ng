@@ -1,6 +1,5 @@
 package com.xebia.xcoss.axcv.ui;
 
-import com.xebia.xcoss.axcv.R;
 
 
 public class Identifiable {
