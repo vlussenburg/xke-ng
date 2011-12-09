@@ -15,7 +15,6 @@
     <string name="menu_add">Add</string>
     <string name="menu_edit">Edit</string>
     <string name="menu_track">My Track</string>
-    <string name="menu_exit">Exit</string>
     <string name="menu_list">List view</string>
     <string name="password_set">Password stored</string>
     <string name="password_unset">No password specified</string>

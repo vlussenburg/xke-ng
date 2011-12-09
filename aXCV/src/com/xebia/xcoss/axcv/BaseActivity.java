@@ -57,7 +57,6 @@ public abstract class BaseActivity extends Activity {
 	private MenuItem miAdd;
 	private MenuItem miEdit;
 	private MenuItem miTrack;
-	private MenuItem miExit;
 
 	private static ProfileManager profileManager;
 	protected static String lastError;
@@ -97,13 +96,11 @@ public abstract class BaseActivity extends Activity {
 		miEdit = menu.add(0, XCS.MENU.EDIT, Menu.NONE, R.string.menu_edit);
 		miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
 		miSearch = menu.add(0, XCS.MENU.SEARCH, Menu.NONE, R.string.menu_search);
-		miExit = menu.add(0, XCS.MENU.EXIT, Menu.NONE, R.string.menu_exit);
 
 		miAdd.setIcon(android.R.drawable.ic_menu_add);
 		miEdit.setIcon(android.R.drawable.ic_menu_edit);
 		miSettings.setIcon(android.R.drawable.ic_menu_preferences);
 		miSearch.setIcon(android.R.drawable.ic_menu_search);
-		miExit.setIcon(R.drawable.ic_menu_exit);
 
 		if (!StringUtil.isEmpty(getUser())) {
 			miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
@@ -128,9 +125,6 @@ public abstract class BaseActivity extends Activity {
 			break;
 			case XCS.MENU.TRACK:
 				startActivity(new Intent(this, CVTrack.class));
-			break;
-			case XCS.MENU.EXIT:
-				moveTaskToBack(true);
 			break;
 		}
 		return true;
