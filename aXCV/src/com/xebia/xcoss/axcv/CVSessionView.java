@@ -230,14 +230,16 @@ public class CVSessionView extends SessionSwipeActivity {
 					@Override
 					public void onClick(View paramView) {
 						Rate rate = new Rate(ratingBar);
-						getConferenceServer().registerRate(currentSession, rate);
+						if (rate.isRated()) {
+							getConferenceServer().registerRate(currentSession, rate);
+						}
 						dismissDialog(XCS.DIALOG.ADD_RATING);
 						updateRateAndReview();
 					}
 				});
 
 				ratingBar.setOnRatingBarChangeListener(new OnRatingBarChangeListener() {
-					
+
 					@Override
 					public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
 						rateText.setText(new Rate(ratingBar).getMessage());

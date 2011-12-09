@@ -50,4 +50,8 @@ public class Rate {
 			return VALUES[rate];
 		return "?";
 	}
+	
+	public boolean isRated() {
+		return rate > 0 && rate < VALUES.length;
+	}
 }
