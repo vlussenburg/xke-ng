@@ -1,7 +1,6 @@
 IN PROGRESS
 -------------------------------------------------------------------
 
--	Bij roteren raken de waardes kwijt
 -	Externalize strings
 
 TODO
@@ -12,12 +11,12 @@ client
 - 	Viewpaging voor locaties: CVSessionList (Arno)
 -	Caching
 -	Certificate check (Michael)
--	Rating bar
 -	Transparant overlay for gestures (session view)
 -	Search framework
--	Exit knop verwijderen (Michael)
 -	Timer naar AlarmManager (Michael)
-
+-	Start when no network: Should mention this.
+-	Removal of network: crashes.....
+-	Long click on location - show menu.
 
 later op de client
 -	Content providers
@@ -83,3 +82,7 @@ DONE
 -	Notifications while app stopped
 -	Settings are duplicated when clicked on notification ...
 -	Https connectie
+-	Rating bar
+-	Exit knop verwijderen (Michael)
+-	Error reporting via https
+-	Bij roteren raken de waardes kwijt

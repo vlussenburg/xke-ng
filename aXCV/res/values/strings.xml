@@ -79,11 +79,11 @@
     <string name="server_unreachable">Server unreachable</string>
     <string name="server_missing_url">No result for \'%s\'</string>
     <string name="server_timeout">Time out on \'%s\'</string>
-    <string name="specify_attributes">Please specify the following attributes: %s</string>
+    <string name="specify_attributes">"Please specify the following attributes: "%s</string>
     <string name="no_session_added">No session added</string>
     <string name="session_not_added">Session could not be added (%s).</string>
     <string name="delete_session">Delete session</string>
-<!--     <string name="confirm_delete_session">Are you sure to delete session \'%s\' on %s?</string> -->
+    <string name="confirm_delete_session">Are you sure to delete session \'%1$s\' on %1$s?</string>
     <string name="rescheduling_failed">Rescheduling failed</string>
     <string name="reschedule_failed_message">The session cannot be scheduled. Shorten session, use another location or choose another conference.</string>
     <string name="pick_conference">Pick a conference</string>
@@ -97,5 +97,17 @@
     <string name="description">Description</string>
     <string name="number_of_people">Number of people</string>
     <string name="intended_audience">Intended audience</string>
-
+    <string name="add_conference">Add conference</string>
+    <string name="edit_conference">Edit conference</string>
+    <string name="no_conference_added">No conference added</string>
+    <string name="conference_could_not_be_added">Conference could not be added (%s.)</string>
+    <string name="conference_with_sessions">This conference has %d sessions(s).</string>
+    <string name="confirm_delete_conference">Are you sure to delete conference \'%1$s\' on %2$s?</string>
+    <string name="delete_conference">Delete conference</string>
+    <string name="move_delete">Move &amp; delete</string>
+    <string name="failure_move_session">Failed! Session cannot be moved.</string>
+    <string name="add_location">Add new...</string>
+    <string name="conference_detail">Conference detail</string>
+    <string name="no_location_date">No locations and/or date specified yet</string>
+    <string name="conference_title">Conference title</string>
 </resources>
