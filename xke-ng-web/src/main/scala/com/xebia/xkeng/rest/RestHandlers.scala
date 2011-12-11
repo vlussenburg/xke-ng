@@ -197,7 +197,7 @@ trait RestHandlerComponent extends Logger {
   def handleError(paramBody: String) = {
     val user = if (UserHolder.isLoggedIn) UserHolder.loggedInAuthor.userId else "unknown"
     val body = URLDecoder.decode(paramBody, "UTF-8")
-    error("Device error of user %s. Error is %s\n" format (user, body))
+    error("Device error of user %s. Error is: %s\n" format (user, body))
     Full(OkResponse())
   }
   /**

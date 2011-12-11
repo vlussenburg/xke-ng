@@ -20,20 +20,18 @@
         <service
             android:name="de.quist.app.errorreporter.ExceptionReportService"
             android:process=":exceptionReporter" />
-        <service
-            android:enabled="true"
-            android:name=".service.NotificationService" />
+
         <activity
             android:name="de.quist.app.errorreporter.ExceptionReportActivity"
             android:process=":exceptionReporter"
             android:theme="@android:style/Theme.NoDisplay" />
+
         <meta-data
             android:name="de.quist.app.errorreporter.reportOnFroyo"
             android:value="true" />
         <meta-data
             android:name="de.quist.app.errorreporter.targetUrl"
             android:value="https://ec2-46-137-184-99.eu-west-1.compute.amazonaws.com:8443/xkeng/error" />
-        
         <meta-data
             android:name="com.xebia.xcoss.serverUrl"
             android:value="https://ec2-46-137-184-99.eu-west-1.compute.amazonaws.com:8443/xkeng" />
@@ -104,7 +102,9 @@
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter >
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data
                     android:host="xebia"
                     android:scheme="author" />
@@ -115,12 +115,19 @@
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter >
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data
                     android:host="xebia"
                     android:scheme="tag" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".service.CheckNotificationSignalRetriever"
+            android:process=":remote" >
+        </receiver>
     </application>
 
 </manifest>

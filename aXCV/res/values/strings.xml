@@ -50,6 +50,7 @@
         <item>5 minutes</item>
         <item>15 minutes</item>
         <item>one hour</item>
+        <item>half a day</item>
         <item>one day</item>
         <item>switched off</item>
     </string-array>
@@ -57,6 +58,7 @@
         <item>300</item>
         <item>900</item>
         <item>3600</item>
+        <item>43200</item>
         <item>86400</item>
         <item>off</item>
     </string-array>
@@ -110,4 +112,7 @@
     <string name="conference_detail">Conference detail</string>
     <string name="no_location_date">No locations and/or date specified yet</string>
     <string name="conference_title">Conference title</string>
+    <string name="error_signal">Check failed: %s</string>
+    <string name="notification_on">Update check enabled.</string>
+    <string name="notification_off">Update check disabled.</string>
 </resources>

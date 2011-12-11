@@ -13,7 +13,6 @@ client
 -	Certificate check (Michael)
 -	Transparant overlay for gestures (session view)
 -	Search framework
--	Timer naar AlarmManager (Michael)
 -	Start when no network: Should mention this.
 -	Removal of network: crashes.....
 -	Long click on location - show menu.
@@ -86,3 +85,4 @@ DONE
 -	Exit knop verwijderen (Michael)
 -	Error reporting via https
 -	Bij roteren raken de waardes kwijt
+-	Timer naar AlarmManager (Michael)
