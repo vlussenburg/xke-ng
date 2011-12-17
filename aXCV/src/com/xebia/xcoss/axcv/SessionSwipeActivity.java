@@ -11,7 +11,7 @@ import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Session;
 
-public abstract class SessionSwipeActivity extends SwipeActivity {
+public abstract class SessionSwipeActivity extends BaseActivity implements SwipeActivity {
 
 	private Conference currentConference;
 	private Location[] locations;

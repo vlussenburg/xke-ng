@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.TextView.BufferType;
 import android.widget.Toast;
 
+import com.xebia.xcoss.axcv.layout.SwipeLayout;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Location;
@@ -43,7 +44,7 @@ public class CVSessionView extends SessionSwipeActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.sessionview);
 		super.onCreate(savedInstanceState);
-		addGestureDetection(R.id.relativeLayoutLowest);
+		((SwipeLayout) findViewById(R.id.swipeLayout)).setGestureListener(this);
 	}
 
 	@Override

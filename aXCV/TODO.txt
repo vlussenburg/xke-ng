@@ -2,6 +2,7 @@ IN PROGRESS
 -------------------------------------------------------------------
 
 -	Externalize strings
+-	Transparant overlay for gestures (session view)
 
 TODO
 -------------------------------------------------------------------
@@ -11,7 +12,6 @@ client
 - 	Viewpaging voor locaties: CVSessionList (Arno)
 -	Caching
 -	Certificate check (Michael)
--	Transparant overlay for gestures (session view)
 -	Search framework
 -	Start when no network: Should mention this.
 -	Removal of network: crashes.....

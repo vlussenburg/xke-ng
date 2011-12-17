@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.xebia.xcoss.axcv.layout.SwipeLayout;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.ui.ConferenceAdapter;
@@ -31,7 +32,7 @@ import com.xebia.xcoss.axcv.util.XCS;
  * 
  * @author Michael
  */
-public class CVConferences extends SwipeActivity {
+public class CVConferences extends BaseActivity implements SwipeActivity {
 
 	private int shownYear;
 	private Conference[] conferences;
@@ -45,7 +46,7 @@ public class CVConferences extends SwipeActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.conferences);
 		super.onCreate(savedInstanceState);
-		addGestureDetection(R.id.conferencesSwipeBase);
+		((SwipeLayout) findViewById(R.id.swipeLayout)).setGestureListener(this);
 
 		shownYear = getIntent().getIntExtra(IA_CONF_YEAR, new Moment().getYear());
 
