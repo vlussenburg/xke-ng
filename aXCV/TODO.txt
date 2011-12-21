@@ -3,6 +3,7 @@ IN PROGRESS
 
 -	Externalize strings
 -	Transparant overlay for gestures (session view)
+- 	Hide mark/edit button for expired sessions in session view
 
 TODO
 -------------------------------------------------------------------
