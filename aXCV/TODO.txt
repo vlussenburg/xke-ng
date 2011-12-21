@@ -2,22 +2,22 @@ IN PROGRESS
 -------------------------------------------------------------------
 
 -	Externalize strings
--	Transparant overlay for gestures (session view)
+- 	Hide mark/edit button for expired sessions in session view
 
 TODO
 -------------------------------------------------------------------
 client
 -	ASyncTask server communication (Arno)
--	Wachtcursor bij search maken (Arno)
-- 	Viewpaging voor locaties: CVSessionList (Arno)
+	-	Removal of network: crashes.....
 -	Caching
 -	Certificate check (Michael)
--	Search framework
 -	Start when no network: Should mention this.
--	Removal of network: crashes.....
 -	Long click on location - show menu.
 
 later op de client
+-	Wachtcursor bij search maken (Arno)
+- 	Viewpaging voor locaties: CVSessionList (Arno)
+-	Search framework
 -	Content providers
 -	Multitouch in view mode - show small matrix.
 -	Verbeteren van caching
@@ -86,3 +86,4 @@ DONE
 -	Error reporting via https
 -	Bij roteren raken de waardes kwijt
 -	Timer naar AlarmManager (Michael)
+-	Transparant overlay for gestures (session view)

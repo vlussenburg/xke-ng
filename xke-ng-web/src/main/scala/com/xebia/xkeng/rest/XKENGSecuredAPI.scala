@@ -54,9 +54,11 @@ trait XKENGSecuredAPI extends RestHelper with Logger {
      * *******************
      */
 
+	// Obsolete. Conference returns all sessions already.
     // GET /conference/<id>/sessions
-    case Req("conference" :: id :: "sessions" :: Nil, _, GetRequest) =>
-      handleSessionsList(id)
+	//    case Req("conference" :: id :: "sessions" :: Nil, _, GetRequest) =>
+	//      handleSessionsList(id)
+
     // POST /conference/<id>/session
     case req @ Req("conference" :: id :: "session" :: Nil, _, PostRequest) =>
       doWithRequestBody(req.body) {
@@ -64,10 +66,10 @@ trait XKENGSecuredAPI extends RestHelper with Logger {
       }
     // PUT /conference/<id>/session OBSOLETE
     //-> PUT session/<id>
-    case req @ Req("conference" :: id :: "session" :: Nil, _, PutRequest) =>
-      doWithRequestBody(req.body) {
-        handleSessionUpdate(id, _)
-      }
+	//    case req @ Req("conference" :: id :: "session" :: Nil, _, PutRequest) =>
+	//      doWithRequestBody(req.body) {
+	//        handleSessionUpdate(id, _)
+	//      }
     case req @ Req("session" :: AsLong(id) :: Nil, _, PutRequest) =>
       doWithRequestBody(req.body) {
         handleSessionUpdate(id, _)
