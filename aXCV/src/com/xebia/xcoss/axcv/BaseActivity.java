@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.github.droidfu.activities.BetterDefaultActivity;
 import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.logic.ConferenceServerProxy;
@@ -34,7 +35,7 @@ import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 
-public abstract class BaseActivity extends Activity {
+public abstract class BaseActivity extends BetterDefaultActivity {
 
 	public static final String IA_CONFERENCE = "ID-conference";
 	public static final String IA_SESSION = "ID-session";
@@ -300,7 +301,7 @@ public abstract class BaseActivity extends Activity {
 		}
 	}
 
-	public static void handleException(final BaseActivity context, String activity, CommException e) {
+	public static void handleException(final Context context, String activity, Exception e) {
 		if (e instanceof DataException) {
 			if (((DataException) e).missing()) {
 				lastError = context == null ? "404" : context.getString(R.string.server_missing_url, activity);
@@ -313,8 +314,8 @@ public abstract class BaseActivity extends Activity {
 				Log.w(XCS.LOG.COMMUNICATE, lastError);
 			} else {
 				// Authentication failure
-				if (context != null) {
-					context.onAuthenticationFailed(activity);
+				if (context != null && context instanceof BaseActivity) {
+					((BaseActivity) context).onAuthenticationFailed(activity);
 				} else {
 					Log.e(XCS.LOG.COMMUNICATE, "Resource not found while " + activity + ".");
 					lastError = "Not allowed: " + activity;
@@ -326,6 +327,10 @@ public abstract class BaseActivity extends Activity {
 		throw new CommException("Failure on activity '" + activity + "': " + StringUtil.getExceptionMessage(e), e);
 	}
 
+	public void notifyTaskFinished() {
+		// TODO
+	}
+	
 	public String getUser() {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 		String user = sp.getString(XCS.PREF.USERNAME, null);

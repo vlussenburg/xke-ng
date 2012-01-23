@@ -66,6 +66,10 @@ public class RestClient {
 		return gsonBuilder.create();
 	}
 
+	public static boolean isAuthenticated() {
+		return sessionCookie != null;
+	}
+	
 	public static <T> T loadObject(String url, Class<T> rvClass, String token) {
 		Log.d(LOG.COMMUNICATE, "Loading [" + rvClass.getSimpleName() + "] " + url);
 		Reader reader = null;

@@ -4,6 +4,7 @@ import java.util.List;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import com.xebia.xcoss.axcv.layout.SwipeLayout;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
+import com.xebia.xcoss.axcv.tasks.ConferencesPerYearTask;
 import com.xebia.xcoss.axcv.ui.ConferenceAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -36,6 +38,7 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 
 	private int shownYear;
 	private Conference[] conferences;
+	private ConferencesPerYearTask cpyTask;
 
 	/**
 	 * Called when the activity is first created.
@@ -65,7 +68,14 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 
 	@Override
 	protected void onResume() {
-		List<Conference> list = getConferenceServer().getConferences(shownYear);
+		cpyTask = new ConferencesPerYearTask(R.string.action_list_conferences, this);
+		cpyTask.execute(shownYear);
+		super.onResume();
+	}
+	
+	@Override
+	public void notifyTaskFinished() {
+		List<Conference> list = cpyTask.getResult();
 		Conference upcomingConference = getConferenceServer().getUpcomingConference();
 		int position = 0;
 		int idx = 0;
@@ -81,7 +91,6 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 		ListView conferencesList = (ListView) findViewById(R.id.conferencesList);
 		conferencesList.setAdapter(adapter);
 		conferencesList.setSelection(position);
-		super.onResume();
 	}
 
 	@Override

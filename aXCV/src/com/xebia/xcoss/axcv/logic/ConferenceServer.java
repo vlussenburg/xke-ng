@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
@@ -21,6 +22,7 @@ import com.xebia.xcoss.axcv.model.Search;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.util.ConferenceComparator;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
+import com.xebia.xcoss.axcv.tasks.ConferencesPerYearTask;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -97,7 +99,7 @@ public class ConferenceServer {
 		return result;
 	}
 
-	public List<Conference> getConferences(Integer year) {
+	private List<Conference> getConferences(Integer year) {
 		List<Conference> result = conferenceCache.getConferences(year);
 		if (result == null || result.isEmpty()) {
 			StringBuilder requestUrl = new StringBuilder();

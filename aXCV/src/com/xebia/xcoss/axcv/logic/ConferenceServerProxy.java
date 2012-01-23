@@ -106,17 +106,17 @@ public class ConferenceServerProxy extends ConferenceServer {
 		return new ArrayList<Conference>();
 	}
 
-	@Override
-	public List<Conference> getConferences(Integer year) {
-		try {
-			return super.getConferences(year);
-		}
-		catch (CommException e) {
-			BaseActivity.handleException(activity, "get conferences", e);
-		}
-		return new ArrayList<Conference>();
-	}
-
+//	@Override
+//	public List<Conference> getConferences(Integer year) {
+//		try {
+//			return super.getConferences(year);
+//		}
+//		catch (CommException e) {
+//			BaseActivity.handleException(activity, "get conferences", e);
+//		}
+//		return new ArrayList<Conference>();
+//	}
+//
 	@Override
 	public String[] getLabels() {
 		try {
