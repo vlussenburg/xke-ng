@@ -9,6 +9,7 @@ import com.xebia.xcoss.axcv.logic.RestClient;
 import com.xebia.xcoss.axcv.logic.cache.DataCache;
 import com.xebia.xcoss.axcv.model.Credential;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
+import com.xebia.xcoss.axcv.util.XCS;
 
 public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsyncTask<ParameterT, ProgressT, ReturnT> {
 
@@ -20,9 +21,7 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 		super(ctx);
 		this.application = (ConferenceViewerApplication) ctx.getApplication();
 		this.action = ctx.getString(action);
-		// TODO Use custom dialog
-		disableDialog();
-//		useCustomDialog(id);
+		useCustomDialog(XCS.DIALOG.WAITING);
 	}
 
 	@Override

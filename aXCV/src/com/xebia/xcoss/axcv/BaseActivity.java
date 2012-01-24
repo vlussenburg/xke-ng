@@ -90,8 +90,18 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 		super.onResume();
 	}
 
-	protected /*abstract*/ void populateMenuOptions(ArrayList<Integer> list) {
-	};
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		if (id == XCS.DIALOG.WAITING) {
+			Dialog dialog = new Dialog(this, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+			dialog.setContentView(R.layout.waiting);
+			dialog.setCancelable(false);
+			return dialog;
+		}
+		return super.onCreateDialog(id);
+	}
+
+	protected void populateMenuOptions(ArrayList<Integer> list) {};
 
 	@Override
 	public final boolean onCreateOptionsMenu(Menu menu) {
@@ -99,7 +109,7 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 
 		ArrayList<Integer> list = new ArrayList<Integer>();
 		populateMenuOptions(list);
-		
+
 		if (list.contains(XCS.MENU.ADD)) {
 			miAdd = menu.add(0, XCS.MENU.ADD, Menu.NONE, R.string.menu_add);
 			miAdd.setIcon(android.R.drawable.ic_menu_add);
