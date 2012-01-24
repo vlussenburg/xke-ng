@@ -1,5 +1,6 @@
 package com.xebia.xcoss.axcv;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Intent;
@@ -130,19 +131,18 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		menu.removeItem(XCS.MENU.OVERVIEW);
-		menu.removeItem(XCS.MENU.EDIT);
-		return true;
+	protected void populateMenuOptions(ArrayList<Integer> list) {
+		list.add(XCS.MENU.ADD);
+		list.add(XCS.MENU.SETTINGS);
+		list.add(XCS.MENU.SEARCH);
+		list.add(XCS.MENU.TRACK);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Add a conference
 		if (item.getItemId() == XCS.MENU.ADD) {
-			Intent intent = new Intent(this, CVConferenceAdd.class);
-			startActivity(intent);
+			startActivity(new Intent(this, CVConferenceAdd.class));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

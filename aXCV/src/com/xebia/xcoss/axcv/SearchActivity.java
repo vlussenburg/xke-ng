@@ -122,11 +122,6 @@ public abstract class SearchActivity extends BaseActivity implements SwipeActivi
 		}
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		return true;
-	}
-
 	protected abstract List<Author> searchAuthors(String text);
 
 	protected abstract List<Session> searchSessions(String text);

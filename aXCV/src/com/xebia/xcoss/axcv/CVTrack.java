@@ -76,13 +76,4 @@ public class CVTrack extends BaseActivity {
 		sessionList.setAdapter(adapter);
 		super.onResume();
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		menu.removeItem(XCS.MENU.ADD);
-		menu.removeItem(XCS.MENU.EDIT);
-		menu.removeItem(XCS.MENU.TRACK);
-		return true;
-	}
 }

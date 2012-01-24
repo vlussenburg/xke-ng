@@ -1,5 +1,7 @@
 package com.xebia.xcoss.axcv;
 
+import java.util.ArrayList;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -60,9 +62,12 @@ public class CVSessionList extends SessionSwipeActivity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		return true;
+	protected void populateMenuOptions(ArrayList<Integer> list) {
+		list.add(XCS.MENU.ADD);
+		list.add(XCS.MENU.EDIT);
+		list.add(XCS.MENU.SETTINGS);
+		list.add(XCS.MENU.SEARCH);
+		list.add(XCS.MENU.TRACK);
 	}
 
 	@Override

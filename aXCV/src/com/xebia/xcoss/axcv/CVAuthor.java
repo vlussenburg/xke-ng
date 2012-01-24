@@ -109,10 +109,4 @@ public class CVAuthor extends BaseActivity {
 			startActivity(intent);
 		}
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		return true;
-	}
-
 }

@@ -90,4 +90,15 @@ public class ConferenceViewerApplication extends DroidFuApplication {
 		}
 		return storage;
 	}
+	
+	@Override
+	public void onClose() {
+		if (profileManager != null) {
+			profileManager.closeConnection();
+		}
+		if ( storage != null ) {
+			storage.destroy();
+		}
+		super.onClose();
+	}
 }

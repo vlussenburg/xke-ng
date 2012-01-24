@@ -58,11 +58,6 @@ public abstract class AdditionActivity extends BaseActivity implements OnCancelL
 		view.setBackgroundDrawable(drawable);
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		return true;
-	}
-
 	protected class DialogHandler implements DialogInterface.OnClickListener,
 			DialogInterface.OnMultiChoiceClickListener {
 		private int field;

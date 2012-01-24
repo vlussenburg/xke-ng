@@ -282,39 +282,37 @@ public class CVSessionView extends SessionSwipeActivity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		MenuItem menuItem = menu.add(0, XCS.MENU.LIST, Menu.NONE, R.string.menu_list);
-		menuItem.setIcon(R.drawable.ic_menu_list);
-		return true;
+	protected void populateMenuOptions(ArrayList<Integer> list) {
+		list.add(XCS.MENU.ADD);
+		list.add(XCS.MENU.LIST);
+		list.add(XCS.MENU.EDIT);
+		list.add(XCS.MENU.SETTINGS);
+		list.add(XCS.MENU.SEARCH);
+		list.add(XCS.MENU.TRACK);
 	}
-
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Add or edit a session
 		Intent intent = new Intent(this, CVSessionAdd.class);
 		intent.putExtra(BaseActivity.IA_CONFERENCE, getConference().getId());
-		boolean processed = false;
 
 		switch (item.getItemId()) {
 			case XCS.MENU.ADD:
 				startActivity(intent);
-				processed = true;
-			break;
+				return true;
 			case XCS.MENU.EDIT:
 				intent.putExtra(BaseActivity.IA_SESSION, currentSession.getId());
 				startActivity(intent);
-				processed = true;
-			break;
+				return true;
 			case XCS.MENU.LIST:
 				intent = new Intent(this, CVSessionList.class);
 				intent.putExtra(IA_LOCATION_ID, currentLocation);
 				intent.putExtra(IA_CONFERENCE, currentSession.getConferenceId());
 				startActivity(intent);
-				processed = true;
-			break;
+				return true;
 		}
-		return processed ? true : super.onOptionsItemSelected(item);
+		return super.onOptionsItemSelected(item);
 	}
 
 	public void onSwipeBottomToTop() {

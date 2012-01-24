@@ -1,5 +1,6 @@
 package com.xebia.xcoss.axcv;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 import android.app.Activity;
@@ -88,25 +89,42 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 		}
 		super.onResume();
 	}
-	
+
+	protected /*abstract*/ void populateMenuOptions(ArrayList<Integer> list) {
+	};
+
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public final boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 
-		miAdd = menu.add(0, XCS.MENU.ADD, Menu.NONE, R.string.menu_add);
-		miEdit = menu.add(0, XCS.MENU.EDIT, Menu.NONE, R.string.menu_edit);
-		miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
-		miSearch = menu.add(0, XCS.MENU.SEARCH, Menu.NONE, R.string.menu_search);
-
-		miAdd.setIcon(android.R.drawable.ic_menu_add);
-		miEdit.setIcon(android.R.drawable.ic_menu_edit);
-		miSettings.setIcon(android.R.drawable.ic_menu_preferences);
-		miSearch.setIcon(android.R.drawable.ic_menu_search);
-
-		if (!StringUtil.isEmpty(getUser())) {
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		populateMenuOptions(list);
+		
+		if (list.contains(XCS.MENU.ADD)) {
+			miAdd = menu.add(0, XCS.MENU.ADD, Menu.NONE, R.string.menu_add);
+			miAdd.setIcon(android.R.drawable.ic_menu_add);
+		}
+		if (list.contains(XCS.MENU.EDIT)) {
+			miEdit = menu.add(0, XCS.MENU.EDIT, Menu.NONE, R.string.menu_edit);
+			miEdit.setIcon(android.R.drawable.ic_menu_edit);
+		}
+		if (list.contains(XCS.MENU.SETTINGS)) {
+			miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
+			miSettings.setIcon(android.R.drawable.ic_menu_preferences);
+		}
+		if (list.contains(XCS.MENU.SEARCH)) {
+			miSearch = menu.add(0, XCS.MENU.SEARCH, Menu.NONE, R.string.menu_search);
+			miSearch.setIcon(android.R.drawable.ic_menu_search);
+		}
+		if (list.contains(XCS.MENU.LIST)) {
+			MenuItem menuItem = menu.add(0, XCS.MENU.LIST, Menu.NONE, R.string.menu_list);
+			menuItem.setIcon(R.drawable.ic_menu_list);
+		}
+		if (list.contains(XCS.MENU.TRACK) && !StringUtil.isEmpty(getUser())) {
 			miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
 			miTrack.setIcon(android.R.drawable.ic_menu_agenda);
 		}
+
 		return true;
 	}
 
@@ -159,7 +177,7 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 		}
 		if (conference == null && useDefault) {
 			conference = server.getUpcomingConference();
-			Log.w(LOG.ALL, "Conference default " + (conference == null ? "<null>": conference.getTitle()));
+			Log.w(LOG.ALL, "Conference default " + (conference == null ? "<null>" : conference.getTitle()));
 		}
 		// Log.i("XCS", "[GET] Conference (on '" + identifier + "') = " + conference);
 		return conference;
@@ -250,8 +268,7 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 
 	protected void onAuthenticationFailed(String activity) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Not allowed!")
-				.setMessage("Access for " + activity + " is denied. Specify credentials?")
+		builder.setTitle("Not allowed!").setMessage("Access for " + activity + " is denied. Specify credentials?")
 				.setIcon(android.R.drawable.ic_dialog_alert)
 				.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
@@ -330,7 +347,7 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 	public void notifyTaskFinished() {
 		// TODO
 	}
-	
+
 	public String getUser() {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 		String user = sp.getString(XCS.PREF.USERNAME, null);
