@@ -29,10 +29,15 @@ import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.Session.Type;
-import com.xebia.xcoss.axcv.ui.FormatUtil;
+import com.xebia.xcoss.axcv.tasks.DeleteSessionTask;
+import com.xebia.xcoss.axcv.tasks.RegisterSessionTask;
+import com.xebia.xcoss.axcv.tasks.RetrieveConferenceTask;
+import com.xebia.xcoss.axcv.tasks.RetrieveConferencesFromDateTask;
+import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.Identifiable;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.TextInputDialog;
+import com.xebia.xcoss.axcv.util.FormatUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
@@ -40,6 +45,7 @@ import com.xebia.xcoss.axcv.util.XCS.LOG;
 public class CVSessionAdd extends AdditionActivity {
 
 	private ScreenTimeUtil timeFormatter;
+	private List<Conference> nextConferences;
 	private Conference conference;
 	private Session session;
 	private Session originalSession;
@@ -60,24 +66,39 @@ public class CVSessionAdd extends AdditionActivity {
 			}
 		};
 
+		new RetrieveConferencesFromDateTask(R.string.action_retrieve_conferences, this,
+				new TaskCallBack<List<Conference>>() {
+					@Override
+					public void onCalled(List<Conference> result) {
+						nextConferences = result;
+					}
+				}).execute(6);
+
 		if (!loadFrom(savedInstanceState)) {
-			conference = getConference();
-			originalSession = getSelectedSession(conference);
-			if (originalSession == null) {
-				create = true;
-				session = new Session();
-			} else {
-				session = new Session(originalSession);
-			}
+			new RetrieveConferenceTask(R.string.action_retrieve_conference, this, new TaskCallBack<Conference>() {
+				@Override
+				public void onCalled(Conference result) {
+					conference = result;
+					originalSession = getSelectedSession(result);
+					if (originalSession == null) {
+						create = true;
+						session = new Session();
+					} else {
+						session = new Session(originalSession);
+					}
+					TextView tv = (TextView) findViewById(R.id.addModifyTitle);
+					tv.setText(originalSession == null ? R.string.session_add : R.string.session_edit);
+
+					showConference();
+					showSession();
+				}
+			}).execute(getSelectedConferenceId());
 		}
-		TextView tv = (TextView) findViewById(R.id.addModifyTitle);
-		tv.setText(originalSession == null ? R.string.session_add : R.string.session_edit);
-		
 		registerActions();
 	}
 
 	private boolean loadFrom(Bundle savedInstanceState) {
-		if ( savedInstanceState != null && savedInstanceState.isEmpty() == false) {
+		if (savedInstanceState != null && savedInstanceState.isEmpty() == false) {
 			Log.w("debug", "Initialize from SIS");
 			conference = (Conference) savedInstanceState.getSerializable("SIS_CONFERENCE");
 			originalSession = (Session) savedInstanceState.getSerializable("SIS_ORIGINAL_SESSION");
@@ -88,7 +109,7 @@ public class CVSessionAdd extends AdditionActivity {
 		}
 		return false;
 	}
-	
+
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		outState.putSerializable("SIS_CONFERENCE", conference);
@@ -116,9 +137,6 @@ public class CVSessionAdd extends AdditionActivity {
 	}
 
 	private void showSession() {
-		if (session == null) {
-			session = getSelectedSession(conference);
-		}
 		if (session != null) {
 			Moment startTime = session.getStartTime();
 			int duration = session.getDuration();
@@ -196,16 +214,17 @@ public class CVSessionAdd extends AdditionActivity {
 			public void onClick(View paramView) {
 				List<String> messages = new ArrayList<String>();
 				if (!session.check(messages)) {
-					createDialog(getString(R.string.failed), getString(R.string.specify_attributes, FormatUtil.getText(messages)))
-							.show();
+					createDialog(getString(R.string.failed),
+							getString(R.string.specify_attributes, FormatUtil.getText(messages))).show();
 					return;
 				}
-				if (!conference.addSession(session, create)) {
-					Log.e(LOG.ALL, "Adding session failed.");
-					createDialog(getString(R.string.no_session_added), getString(R.string.session_not_added, lastError)).show();
-				} else {
-					CVSessionAdd.this.finish();
-				}
+				new RegisterSessionTask(R.string.action_register_session, CVSessionAdd.this,
+						new TaskCallBack<Boolean>() {
+							@Override
+							public void onCalled(Boolean result) {
+								CVSessionAdd.this.finish();
+							}
+						}).execute(session);
 			}
 		});
 		button = (Button) findViewById(R.id.actionDelete);
@@ -223,7 +242,8 @@ public class CVSessionAdd extends AdditionActivity {
 					builder.setPositiveButton(R.string.cancel, cancelClickListener);
 					builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
-							conference.deleteSession(originalSession);
+							new DeleteSessionTask(R.string.action_delete_session, CVSessionAdd.this, null)
+									.execute(originalSession);
 							CVSessionAdd.this.finish();
 						}
 					});
@@ -238,19 +258,16 @@ public class CVSessionAdd extends AdditionActivity {
 				View view = findViewById(R.id.sessionDuration);
 				CharSequence text = ((TextView) view).getText();
 				int duration = StringUtil.getFirstInteger(text.toString());
-				rescheduleSession(duration);
+				rescheduleSession(duration == 0 ? session.getDuration() : duration);
 				showConference();
 				showSession();
 			}
 		});
 	}
 
-	private void rescheduleSession(int duration) {
+	private void rescheduleSession(final int duration) {
 		if (conference == null) {
 			return;
-		}
-		if (duration == 0) {
-			duration = session.getDuration();
 		}
 		List<Location> locations = null;
 		Location sessionLocation = session.getLocation();
@@ -271,18 +288,26 @@ public class CVSessionAdd extends AdditionActivity {
 			Log.v("XCS",
 					slot == null ? "NONE" : slot.start + " till " + slot.end + " @ " + slot.location.getDescription());
 		}
-		// // Move up to the next conference and call this method recursively
-		// if (slot == null) {
-		// conference = getConferenceServer().getUpcomingConference(conference.getDate().plusDays(1));
-		// slot = rescheduleSession(duration);
-		// }
+		// Move up to the next conference and call this method recursively
+		if (slot == null) {
+			RetrieveConferencesFromDateTask rcTask = new RetrieveConferencesFromDateTask(
+					R.string.action_retrieve_conference, CVSessionAdd.this, new TaskCallBack<List<Conference>>() {
+						@Override
+						public void onCalled(List<Conference> result) {
+							if (result.size() > 0) {
+								conference = result.get(0);
+								rescheduleSession(duration);
+							}
+						}
+					});
+			rcTask.setMoment(conference.getEndTime());
+			rcTask.execute();
+		}
 
 		if (slot != null) {
 			session.reschedule(conference, slot);
 		} else {
-			createDialog(getString(R.string.rescheduling_failed),
-					getString(R.string.reschedule_failed_message))
-					.show();
+			createDialog(getString(R.string.rescheduling_failed), getString(R.string.reschedule_failed_message)).show();
 		}
 	}
 
@@ -301,11 +326,15 @@ public class CVSessionAdd extends AdditionActivity {
 		int duration;
 		switch (field) {
 			case R.id.conferenceName:
-				Identifiable ident = (Identifiable) selection;
-				conference = getConferenceServer().getConference(ident.getIdentifier());
-				Moment m = conference.getStartTime();
-				session.onStartTime().setDate(m.getYear(), m.getMonth(), m.getDay());
-				rescheduleSession(session.getDuration());
+				String id = ((Identifiable) selection).getIdentifier();
+				for (Conference conf : nextConferences) {
+					if (id.equals(conf.getId())) {
+						conference = conf;
+						Moment m = conference.getStartTime();
+						session.onStartTime().setDate(m.getYear(), m.getMonth(), m.getDay());
+						rescheduleSession(session.getDuration());
+					}
+				}
 			break;
 			case R.id.sessionStart:
 				TimeSlot t = (TimeSlot) selection;
@@ -371,10 +400,9 @@ public class CVSessionAdd extends AdditionActivity {
 
 		switch (id) {
 			case XCS.DIALOG.SELECT_CONFERENCE:
-				List<Conference> list = getConferenceServer().getUpcomingConferences(6);
-				Identifiable[] data = new Identifiable[list.size()];
+				Identifiable[] data = new Identifiable[nextConferences.size()];
 				idx = 0;
-				for (Conference conference : list) {
+				for (Conference conference : nextConferences) {
 					String title = conference.getTitle() + " ("
 							+ timeFormatter.getAbsoluteShortDate(conference.getStartTime()) + ")";
 					data[idx++] = new Identifiable(title, conference.getId());

@@ -26,6 +26,7 @@ public class ProxyExceptionReporter implements UncaughtExceptionHandler {
 	public void uncaughtException(Thread t, Throwable throwable) {
 		Log.e(XCS.LOG.ALL, "[FATAL] Fault in application ("+t+"): ", throwable);
 		try {
+			throwable.printStackTrace();
 			exceptionReporter.reportException(t, throwable);
 		} catch (Throwable ignored) {
 			Log.w(XCS.LOG.ALL, "[FATAL] Fault not reported: " + StringUtil.getExceptionMessage(throwable));
@@ -35,6 +36,6 @@ public class ProxyExceptionReporter implements UncaughtExceptionHandler {
 		// This causes the exit strategy not to work (there is no CVSplashLoader)
 		// Also, if the server is down, it keeps on crashing...
         // Since other mechanisms cause hangs, still using this, but correcting it...
-		System.exit(-1);
+//		System.exit(-1);
 	}
 }

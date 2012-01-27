@@ -76,7 +76,7 @@
 			android:key="NotifyTrack"
 			android:title="My track"
 			android:defaultValue="false"
-			android:summaryOff="Do notify me if my selected track changes"
+			android:summaryOff="Do not notify me if my selected track changes"
 			android:summaryOn="Notify me if my selected track changes" />
 		<com.xebia.xcoss.axcv.preference.ListPreference
 			signalRetriever=".service.NotificationServiceManager"

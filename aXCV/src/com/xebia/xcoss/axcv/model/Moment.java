@@ -222,5 +222,4 @@ public class Moment implements Serializable {
 		} else if (!year.equals(other.year)) return false;
 		return true;
 	}
-
 }

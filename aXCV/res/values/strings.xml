@@ -116,9 +116,24 @@
     <string name="notification_on">Update check enabled.</string>
     <string name="notification_off">Update check disabled.</string>
     
-    <string name="droidfu_progress_dialog_title">Loading...</string>
-    <string name="droidfu_progress_dialog_message">Contacting server to load
-	data.</string>
+    <string name="droidfu_progress_dialog_title">Loading&#8230;</string>
+    <string name="droidfu_progress_dialog_message">Contacting server to load data.</string>
     
-    <string name="action_list_conferences">Listing conferences</string>
+    <string name="action_search_sessions">Search sessions</string>
+    <string name="action_search_authors">Search authors</string>
+    <string name="action_delete_session">Delete session</string>
+    <string name="action_delete_conference">Delete conference</string>
+    <string name="action_register_conference">Register conference</string>
+    <string name="action_register_location">Register location</string>
+    <string name="action_register_rate">Register rate</string>
+    <string name="action_register_remark">Register comment</string>
+    <string name="action_register_session">Register session</string>
+    <string name="action_retrieve_authors">Load authors</string>
+    <string name="action_retrieve_conference">Load conference</string>
+    <string name="action_retrieve_conferences">Load conferences</string>
+    <string name="action_retrieve_remarks">Load comments</string>
+    <string name="action_retrieve_labels">Load labels</string>
+    <string name="action_retrieve_locations">Load locations</string>
+    <string name="action_retrieve_rate">Load rate</string>
+    <string name="action_retrieve_session">Load session</string>
 </resources>

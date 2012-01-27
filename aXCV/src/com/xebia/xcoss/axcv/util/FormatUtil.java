@@ -1,25 +1,24 @@
-package com.xebia.xcoss.axcv.ui;
+package com.xebia.xcoss.axcv.util;
 
 import java.util.List;
 
 import com.xebia.xcoss.axcv.model.Remark;
-import com.xebia.xcoss.axcv.util.StringUtil;
 
 public class FormatUtil {
 
 	public static final String NONE_FOUND = "<None>";
 	private static final String LINE = System.getProperty("line.separator");
-	
+
 	public static String getText(double rate) {
 		return getText(rate, 1);
 	}
 
 	public static String getText(double rate, int precision) {
 		double pow = Math.pow(10, 2);
-		return String.valueOf(Math.round(rate*pow)/pow);
+		return String.valueOf(Math.round(rate * pow) / pow);
 	}
 
-	public static String getHtml(Remark[] remarks) {
+	public static String getHtml(List<Remark> remarks) {
 		StringBuilder sb = new StringBuilder();
 		for (Remark remark : remarks) {
 			sb.append("<b>");
@@ -36,22 +35,21 @@ public class FormatUtil {
 	}
 
 	public static <T> String getList(Iterable<T> data, boolean emptyIndication) {
-		if ( data == null ) {
-			return null;
-		}
-		StringBuilder sb = new StringBuilder();
-		for (T value: data) {
-			sb.append(value.toString());
-			sb.append(", ");
-		}
-		if ( sb.length() > 0 ) {
-			return sb.substring(0, sb.length()-2);
+		if (data != null) {
+			StringBuilder sb = new StringBuilder();
+			for (T value : data) {
+				sb.append(value.toString());
+				sb.append(", ");
+			}
+			if (sb.length() > 0) {
+				return sb.substring(0, sb.length() - 2);
+			}
 		}
 		return emptyIndication ? NONE_FOUND : "";
 	}
 
 	public static CharSequence getText(String value) {
-		if ( StringUtil.isEmpty(value) ) {
+		if (StringUtil.isEmpty(value)) {
 			return "<Specify value>";
 		}
 		return value;
@@ -68,7 +66,7 @@ public class FormatUtil {
 	}
 
 	public static String getText(Object object) {
-		if ( object == null ) {
+		if (object == null) {
 			return "<Specify value>";
 		}
 		return object.toString();

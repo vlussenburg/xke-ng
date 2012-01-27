@@ -5,7 +5,6 @@ import java.util.List;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -16,16 +15,19 @@ import android.widget.ViewFlipper;
 
 import com.xebia.xcoss.axcv.layout.SwipeLayout;
 import com.xebia.xcoss.axcv.model.Author;
-import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Search;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.tasks.SearchAuthorsTask;
+import com.xebia.xcoss.axcv.tasks.SearchSessionsTask;
+import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.SearchResultAdapter;
 
 public abstract class SearchActivity extends BaseActivity implements SwipeActivity {
 
-	private List<Author> authorResults;
 	private SearchResultAdapter authorAdapter;
-	private List<Session> sessionResults;
 	private SearchResultAdapter sessionAdapter;
+	private List<Author> authorResults;
+	private List<Session> sessionResults;
 	private ViewFlipper flipper;
 	private ImageView flipButton;
 	private ListView peopleView;
@@ -46,27 +48,8 @@ public abstract class SearchActivity extends BaseActivity implements SwipeActivi
 			}
 		});
 
-		authorResults = searchAuthors(null);
-		authorAdapter = new SearchResultAdapter(this, authorResults);
-		ListView sessionList = (ListView) findViewById(R.id.searchResultsPeople);
-		sessionList.setAdapter(authorAdapter);
-		sessionList.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
-				showAuthor(paramInt);
-			}
-		});
-
-		sessionResults = searchSessions(null);
-		sessionAdapter = new SearchResultAdapter(this, sessionResults);
-		sessionList = (ListView) findViewById(R.id.searchResultsSessions);
-		sessionList.setAdapter(sessionAdapter);
-		sessionList.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
-				showSession(paramInt);
-			}
-		});
+		searchSessions(null);
+		searchAuthors(null);
 
 		final TextView input = (TextView) findViewById(R.id.searchTerm);
 		final ImageView searchButton = (ImageView) findViewById(R.id.searchAction);
@@ -76,13 +59,8 @@ public abstract class SearchActivity extends BaseActivity implements SwipeActivi
 			public void onClick(View paramView) {
 				String text = input.getText().toString();
 				input.setText("");
-				authorResults.clear();
-				authorResults.addAll(searchAuthors(text));
-				authorAdapter.notifyDataSetChanged();
-
-				sessionResults.clear();
-				sessionResults.addAll(searchSessions(text));
-				sessionAdapter.notifyDataSetChanged();
+				searchSessions(text);
+				searchAuthors(text);
 			}
 		});
 
@@ -100,13 +78,41 @@ public abstract class SearchActivity extends BaseActivity implements SwipeActivi
 		super.onCreate(savedInstanceState);
 	}
 
+	private void updateAuthors(List<Author> results) {
+		this.authorResults = results;
+		authorAdapter = new SearchResultAdapter(this, results);
+		ListView sessionList = (ListView) findViewById(R.id.searchResultsPeople);
+		sessionList.setAdapter(authorAdapter);
+		sessionList.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
+				showAuthor(paramInt);
+			}
+		});
+		authorAdapter.notifyDataSetChanged();
+	}
+
+	private void updateSessions(List<Session> results) {
+		this.sessionResults = results;
+		sessionAdapter = new SearchResultAdapter(this, results);
+		ListView sessionList = (ListView) findViewById(R.id.searchResultsSessions);
+		sessionList.setAdapter(sessionAdapter);
+		sessionList.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapter, View view, int paramInt, long paramLong) {
+				showSession(paramInt);
+			}
+		});
+		sessionAdapter.notifyDataSetChanged();
+	}
+
 	private void showSession(int index) {
 		if (index < sessionResults.size()) {
 			Session session = sessionResults.get(index);
 			if (session.getStartTime() != null) {
 				Intent intent = new Intent(this, CVSessionView.class);
-				Conference conference = getConferenceServer().getConference(session.getStartTime());
-				intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
+//				Conference conference = getConferenceServer().getConference(session.getStartTime());
+//				intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
 				intent.putExtra(BaseActivity.IA_SESSION, session.getId());
 				startActivity(intent);
 			}
@@ -122,9 +128,23 @@ public abstract class SearchActivity extends BaseActivity implements SwipeActivi
 		}
 	}
 
-	protected abstract List<Author> searchAuthors(String text);
+	protected void searchAuthors(String text) {
+		new SearchAuthorsTask(R.string.action_search_authors, this, new TaskCallBack<List<Author>>() {
+			@Override
+			public void onCalled(List<Author> result) {
+				updateAuthors(result);
+			}
+		}).execute(new Search().onFreeText(text));
+	}
 
-	protected abstract List<Session> searchSessions(String text);
+	protected void searchSessions(String text) {
+		new SearchSessionsTask(R.string.action_search_sessions, this, new TaskCallBack<List<Session>>() {
+			@Override
+			public void onCalled(List<Session> result) {
+				updateSessions(result);
+			}
+		}).execute(new Search().onFreeText(text));
+	}
 
 	private void flip() {
 		if (flipper.getCurrentView() == peopleView) {

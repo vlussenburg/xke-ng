@@ -8,7 +8,7 @@ import com.xebia.xcoss.axcv.util.StringUtil;
 public class Search {
 
 	public enum Field {
-		FREETEXT, AUTHOR, AFTER,
+		FREETEXT, AUTHOR_ID, AUTHOR_NAME, AFTER,
 	}
 
 	private Map<Field, String> searchParms;
@@ -26,13 +26,14 @@ public class Search {
 
 	public Search onAuthor(Author author) {
 		if (author != null) {
-			searchParms.put(Field.AUTHOR, author.getUserId());
+			if (!StringUtil.isEmpty(author.getUserId())) searchParms.put(Field.AUTHOR_ID, author.getUserId());
+			if (!StringUtil.isEmpty(author.getName())) searchParms.put(Field.AUTHOR_NAME, author.getName());
 		}
 		return this;
 	}
 
 	public Search after(Moment moment) {
-		if ( moment != null ) {
+		if (moment != null) {
 			searchParms.put(Field.AFTER, String.valueOf(moment.asLong()));
 		}
 		return this;

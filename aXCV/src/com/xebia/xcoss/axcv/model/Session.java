@@ -50,10 +50,10 @@ public class Session implements Serializable {
 	private Set<Author> authors;
 	private Location location;
 	private Set<String> labels;
-	
+
 	// Cannot be transient ?
 	private String conferenceId;
-	
+
 	// TODO : Not mapped at all at the moment...
 	private String intendedAudience;
 	private String preparation;
@@ -67,10 +67,8 @@ public class Session implements Serializable {
 
 	public Session(Session original) {
 		this();
-
-		id = original.id;
+		// Do not copy the id
 		type = original.type;
-
 		title = original.title;
 		location = original.location;
 		startTime = new Moment(original.startTime);
@@ -80,14 +78,15 @@ public class Session implements Serializable {
 		limit = original.limit;
 		preparation = original.preparation;
 		conferenceId = original.conferenceId;
-		
+
 		authors.addAll(original.authors);
 		labels.addAll(original.labels);
 		languages.addAll(original.languages);
 	}
 
 	public String getId() {
-		return id.toString();
+		if (id != null) return id.toString();
+		return null;
 	}
 
 	public String getTitle() {
@@ -141,7 +140,7 @@ public class Session implements Serializable {
 	}
 
 	public Moment onStartTime() {
-		if ( startTime == null ) {
+		if (startTime == null) {
 			startTime = new Moment();
 		}
 		return startTime;
@@ -152,7 +151,7 @@ public class Session implements Serializable {
 	}
 
 	public Moment onEndTime() {
-		if ( endTime == null ) {
+		if (endTime == null) {
 			endTime = new Moment();
 		}
 		return endTime;
@@ -229,7 +228,7 @@ public class Session implements Serializable {
 		if (StringUtil.isEmpty(description)) {
 			messages.add("Description");
 		}
-		if ( type != Type.BREAK ) {
+		if (type != Type.BREAK) {
 			if (authors.isEmpty()) {
 				messages.add("Author");
 			}
@@ -253,7 +252,7 @@ public class Session implements Serializable {
 		// Description: Max 35
 		if (!StringUtil.isEmpty(description)) {
 			value += Math.min(35, description.replaceAll("\\w", "").length() * 1.4);
-			Log.v(XCS.LOG.ALL, "Description '"+description.replaceAll("\\w", "")+"' boosted value to " + value);
+			Log.v(XCS.LOG.ALL, "Description '" + description.replaceAll("\\w", "") + "' boosted value to " + value);
 		}
 		// startTime: Max 5
 		if (startTime != null) {
@@ -325,7 +324,6 @@ public class Session implements Serializable {
 		return getStartTime().isBeforeNow() && !isExpired();
 	}
 
-
 	public long getModificationHash() {
 		final int prime = 31;
 		int result = 1;
@@ -340,20 +338,20 @@ public class Session implements Serializable {
 		result = prime * result + ((intendedAudience == null) ? 0 : intendedAudience.hashCode());
 		result = prime * result + ((conferenceId == null) ? 0 : conferenceId.hashCode());
 
-		if ( authors != null ) {
+		if (authors != null) {
 			for (Author author : authors) {
 				result = prime * result + author.getUserId().hashCode();
 			}
 		}
 		// Ignored: id, limit, languages
-		
+
 		return result;
 	}
 
 	public void setConferenceId(String conferenceId) {
 		this.conferenceId = conferenceId;
 	}
-	
+
 	public String getConferenceId() {
 		return conferenceId;
 	}
@@ -416,6 +414,5 @@ public class Session implements Serializable {
 		if (type != other.type) return false;
 		return true;
 	}
-	
-	
+
 }

@@ -3,6 +3,8 @@ package com.xebia.xcoss.axcv.logic.cache;
 import java.io.Serializable;
 
 class CachedObject<T> implements Serializable {
+	private static final long serialVersionUID = 1068624565635384607L;
+
 	public T object;
 	public long moment;
 	public boolean dirty;

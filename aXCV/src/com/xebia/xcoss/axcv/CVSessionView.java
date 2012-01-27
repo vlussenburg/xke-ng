@@ -1,6 +1,7 @@
 package com.xebia.xcoss.axcv;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import android.app.Dialog;
@@ -10,7 +11,6 @@ import android.text.Html;
 import android.text.Spanned;
 import android.text.util.Linkify;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,20 +24,26 @@ import android.widget.TextView.BufferType;
 import android.widget.Toast;
 
 import com.xebia.xcoss.axcv.layout.SwipeLayout;
-import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Rate;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Session;
-import com.xebia.xcoss.axcv.ui.FormatUtil;
+import com.xebia.xcoss.axcv.tasks.RegisterRateTask;
+import com.xebia.xcoss.axcv.tasks.RegisterRemarkTask;
+import com.xebia.xcoss.axcv.tasks.RetrieveConferenceTask;
+import com.xebia.xcoss.axcv.tasks.RetrieveRateTask;
+import com.xebia.xcoss.axcv.tasks.RetrieveRemarksTask;
+import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
+import com.xebia.xcoss.axcv.util.FormatUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class CVSessionView extends SessionSwipeActivity {
 
 	private Session currentSession;
+	private Conference currentConference;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -49,38 +55,43 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	@Override
 	protected void onResume() {
-		Conference conference = getCurrentConference();
-		currentSession = getSelectedSession(conference);
+		new RetrieveConferenceTask(R.string.action_retrieve_conference, this, new TaskCallBack<Conference>() {
+			@Override
+			public void onCalled(Conference conference) {
+				currentConference = conference;
+				currentSession = getSelectedSession(conference);
 
-		if (currentSession == null) {
-			Location location = getCurrentLocation();
-			ArrayList<Session> options = new ArrayList<Session>();
-			for (Session s : conference.getSessions()) {
-				if (s.getLocation().equals(location) || s.isBreak()) {
-					options.add(s);
+				if (currentSession == null) {
+					Location location = getCurrentLocation();
+					ArrayList<Session> options = new ArrayList<Session>();
+					for (Session s : conference.getSessions()) {
+						if (s.getLocation().equals(location) || s.isBreak()) {
+							options.add(s);
+						}
+					}
+					int start = getIntent().getIntExtra(IA_SESSION_START, 0);
+					for (Session session : options) {
+						if (session.getStartTime().asMinutes() == start) {
+							currentSession = session;
+							break;
+						}
+					}
+					if (currentSession == null && options.size() > 0) {
+						currentSession = options.get(0);
+					}
+				}
+				if (currentSession == null) {
+					currentSession = getDefaultSession(conference);
+				}
+				if (currentSession != null) {
+					updateLocation(currentSession);
+					fill(conference);
+					updateLocations();
+					updateSessions();
+					updateRateAndReview();
 				}
 			}
-			int start = getIntent().getIntExtra(IA_SESSION_START, 0);
-			for (Session session : options) {
-				if (session.getStartTime().asMinutes() == start) {
-					currentSession = session;
-					break;
-				}
-			}
-			if (currentSession == null && options.size() > 0) {
-				currentSession = options.get(0);
-			}
-		}
-		if (currentSession == null) {
-			currentSession = getDefaultSession(conference);
-		}
-		if (currentSession != null) {
-			updateLocation(currentSession);
-			fill(conference);
-			updateLocations();
-			updateSessions();
-			updateRateAndReview();
-		}
+		}).execute(getConferenceId());
 		super.onResume();
 	}
 
@@ -159,15 +170,22 @@ public class CVSessionView extends SessionSwipeActivity {
 	}
 
 	private void updateRateAndReview() {
-		ConferenceServer server = getConferenceServer();
+		new RetrieveRateTask(R.string.action_retrieve_rate, this, new TaskCallBack<Rate>() {
+			@Override
+			public void onCalled(Rate result) {
+				TextView view = (TextView) findViewById(R.id.scRating);
+				view.setText(FormatUtil.getText(result));
+			}
+		}).execute(currentSession.getId());
 
-		TextView view = (TextView) findViewById(R.id.scRating);
-		view.setText(FormatUtil.getText(server.getRate(currentSession)));
-
-		view = (TextView) findViewById(R.id.scComments);
-		Spanned spannedContent = Html.fromHtml(FormatUtil.getHtml(server.getRemarks(currentSession)));
-		view.setText(spannedContent, BufferType.SPANNABLE);
-
+		new RetrieveRemarksTask(R.string.action_retrieve_remarks, this, new TaskCallBack<List<Remark>>() {
+			@Override
+			public void onCalled(List<Remark> result) {
+				TextView view = (TextView) findViewById(R.id.scComments);
+				Spanned spannedContent = Html.fromHtml(FormatUtil.getHtml(result));
+				view.setText(spannedContent, BufferType.SPANNABLE);
+			}
+		}).execute(currentSession.getId());
 	}
 
 	private void updateSessions() {
@@ -224,15 +242,15 @@ public class CVSessionView extends SessionSwipeActivity {
 				Button submit = (Button) dialog.findViewById(R.id.drSubmit);
 				final RatingBar ratingBar = (RatingBar) dialog.findViewById(R.id.drSessionRate);
 				final TextView rateText = (TextView) dialog.findViewById(R.id.drRateText);
-				rateText.setText(new Rate(ratingBar).getMessage());
+				rateText.setText(new Rate(ratingBar, null).getMessage());
 
 				// Or use a DialogInterface.OnClickListener to directly access the dialog
 				submit.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View paramView) {
-						Rate rate = new Rate(ratingBar);
+						Rate rate = new Rate(ratingBar, currentSession.getId());
 						if (rate.isRated()) {
-							getConferenceServer().registerRate(currentSession, rate);
+							new RegisterRateTask(R.string.action_register_rate, CVSessionView.this).execute(rate);
 						}
 						dismissDialog(XCS.DIALOG.ADD_RATING);
 						updateRateAndReview();
@@ -243,7 +261,7 @@ public class CVSessionView extends SessionSwipeActivity {
 
 					@Override
 					public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-						rateText.setText(new Rate(ratingBar).getMessage());
+						rateText.setText(new Rate(ratingBar, null).getMessage());
 					}
 				});
 				return dialog;
@@ -261,8 +279,8 @@ public class CVSessionView extends SessionSwipeActivity {
 				submit.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View paramView) {
-						String remark = edit.getText().toString();
-						getConferenceServer().registerRemark(currentSession, new Remark(getUser(), remark));
+						Remark remark = new Remark(getUser(), edit.getText().toString(), currentSession.getId());
+						new RegisterRemarkTask(R.string.action_register_remark, CVSessionView.this).execute(remark);
 						dismissDialog(XCS.DIALOG.CREATE_REVIEW);
 						updateRateAndReview();
 					}
@@ -290,12 +308,12 @@ public class CVSessionView extends SessionSwipeActivity {
 		list.add(XCS.MENU.SEARCH);
 		list.add(XCS.MENU.TRACK);
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Add or edit a session
 		Intent intent = new Intent(this, CVSessionAdd.class);
-		intent.putExtra(BaseActivity.IA_CONFERENCE, getConference().getId());
+		intent.putExtra(BaseActivity.IA_CONFERENCE, getConferenceId());
 
 		switch (item.getItemId()) {
 			case XCS.MENU.ADD:
@@ -350,7 +368,7 @@ public class CVSessionView extends SessionSwipeActivity {
 	}
 
 	private Session getNextSession(Location location) {
-		Set<Session> sessionsSet = this.getConference().getSessions();
+		Set<Session> sessionsSet = currentConference.getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
 		int index = -1;
 		if (currentSession != null) {
@@ -372,7 +390,7 @@ public class CVSessionView extends SessionSwipeActivity {
 	}
 
 	private Session getPreviousSession(Location location) {
-		Set<Session> sessionsSet = this.getConference().getSessions();
+		Set<Session> sessionsSet = currentConference.getSessions();
 		ArrayList<Session> sessions = new ArrayList<Session>(sessionsSet);
 		int index = -1;
 		if (currentSession != null) {
@@ -394,7 +412,7 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	private void startActivityCurrentSession() {
 		Intent intent = getIntent();
-		intent.putExtra(BaseActivity.IA_CONFERENCE, getConference().getId());
+		intent.putExtra(BaseActivity.IA_CONFERENCE, getConferenceId());
 		intent.putExtra(BaseActivity.IA_SESSION, currentSession.getId());
 		startActivity(intent);
 		// Finish this activity to let the back button go directly to the overview page

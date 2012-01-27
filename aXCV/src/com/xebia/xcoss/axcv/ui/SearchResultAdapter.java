@@ -11,11 +11,12 @@ import android.widget.TextView;
 
 import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.R;
-import com.xebia.xcoss.axcv.logic.CommException;
-import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Rate;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.tasks.RetrieveRateTask;
+import com.xebia.xcoss.axcv.tasks.TaskCallBack;
+import com.xebia.xcoss.axcv.util.FormatUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -58,7 +59,7 @@ public class SearchResultAdapter extends BaseAdapter {
 		TextView titleView = (TextView) row.findViewById(R.id.ses_title);
 		TextView dateView = (TextView) row.findViewById(R.id.ses_date);
 		TextView labelView = (TextView) row.findViewById(R.id.ses_labels);
-		TextView ratingView = (TextView) row.findViewById(R.id.ses_rating);
+		final TextView ratingView = (TextView) row.findViewById(R.id.ses_rating);
 
 		titleView.setText(session.getTitle());
 		titleView.setTextColor(colorId);
@@ -80,13 +81,14 @@ public class SearchResultAdapter extends BaseAdapter {
 			dateView.setText(timeUtil.getAbsoluteDate(session.getStartTime()));
 		}
 
-		try {
-			Rate rate = ConferenceServer.getInstance().getRate(session);
-			ratingView.setText(rate.toString());
-		}
-		catch (CommException e) {
-			BaseActivity.handleException(ctx, "retrieving rate", e);
-		}
+		TaskCallBack<Rate> callback = new TaskCallBack<Rate>() {
+			@Override
+			public void onCalled(Rate result) {
+				ratingView.setText(result.toString());
+			}
+		};
+		RetrieveRateTask rrTask = new RetrieveRateTask(R.string.action_retrieve_rate, ctx, callback);
+		rrTask.execute(session.getId());
 	}
 
 	// TODO Move to helper class
@@ -117,15 +119,13 @@ public class SearchResultAdapter extends BaseAdapter {
 
 	@Override
 	public int getCount() {
-		if ( data.size() == 0 )
-			return 1;
+		if (data.size() == 0) return 1;
 		return data.size();
 	}
 
 	@Override
 	public Object getItem(int paramInt) {
-		if ( data.size() == 0 )
-			return "No results.";
+		if (data.size() == 0) return "No results.";
 		return data.get(paramInt);
 	}
 

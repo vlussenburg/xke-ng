@@ -10,26 +10,38 @@ import android.widget.TextView;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.tasks.RetrieveConferenceTask;
+import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 
 public abstract class SessionSwipeActivity extends BaseActivity implements SwipeActivity {
 
-	private Conference currentConference;
+	private String currentConferenceId;
 	private Location[] locations;
 	protected int currentLocation;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		currentConference = getConference();
+		currentConferenceId = (String) getIntent().getExtras().get(IA_CONFERENCE);
 		currentLocation = getIntent().getExtras().getInt(IA_LOCATION_ID);
-		locations = currentConference.getLocations().toArray(new Location[0]);
-		if (currentLocation < 0 || currentLocation > (locations.length - 1)) {
-			currentLocation = 0;
-		}
+		locations = new Location[0];
+		
+		new RetrieveConferenceTask(R.string.action_retrieve_conference, this, new TaskCallBack<Conference>() {
+			@Override
+			public void onCalled(Conference cc) {
+				locations = cc.getLocations().toArray(new Location[0]);
+				if (currentLocation < 0 || currentLocation > (locations.length - 1)) {
+					currentLocation = 0;
+				}
+			}
+		}).execute(getConferenceId());
 	}
 
 	protected Location getCurrentLocation() {
-		return locations.length > 0 ? locations[currentLocation] : null;
+		if ( locations != null && locations.length > currentLocation) {
+			return locations[currentLocation];
+		}
+		return null;
 	}
 
 	protected void updateLocation(Session session) {
@@ -45,16 +57,22 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 
 	protected Location getNextLocation() {
 		int next = currentLocation + 1;
-		return (next < locations.length ? locations[next] : null);
+		if ( next < locations.length ) {
+			return locations[next];
+		}
+		return null;
 	}
 
 	protected Location getPreviousLocation() {
 		int prev = currentLocation - 1;
-		return (prev >= 0 ? locations[prev] : null);
+		if ( prev >= 0 && prev < locations.length ) {
+			return locations[prev];
+		}
+		return null;
 	}
 
-	public Conference getCurrentConference() {
-		return currentConference;
+	public String getConferenceId() {
+		return currentConferenceId;
 	}
 
 	@Override

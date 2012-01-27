@@ -1,47 +1,97 @@
 package com.xebia.xcoss.axcv.tasks;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.util.Log;
 
 import com.github.droidfu.concurrent.BetterAsyncTask;
 import com.xebia.xcoss.axcv.BaseActivity;
+import com.xebia.xcoss.axcv.CVSettings;
 import com.xebia.xcoss.axcv.ConferenceViewerApplication;
+import com.xebia.xcoss.axcv.R;
+import com.xebia.xcoss.axcv.logic.CommException;
+import com.xebia.xcoss.axcv.logic.DataException;
 import com.xebia.xcoss.axcv.logic.RestClient;
 import com.xebia.xcoss.axcv.logic.cache.DataCache;
 import com.xebia.xcoss.axcv.model.Credential;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
+import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsyncTask<ParameterT, ProgressT, ReturnT> {
 
 	private String action;
-	private ReturnT result;
 	private ConferenceViewerApplication application;
+	private TaskCallBack<ReturnT> callback;
 
-	public CVTask(int action, BaseActivity ctx) {
+	public CVTask(int action, BaseActivity ctx, TaskCallBack<ReturnT> callback) {
 		super(ctx);
 		this.application = (ConferenceViewerApplication) ctx.getApplication();
 		this.action = ctx.getString(action);
-		useCustomDialog(XCS.DIALOG.WAITING);
+		this.callback = callback;
+		disableDialog();
 	}
 
 	@Override
 	protected ReturnT doCheckedInBackground(Context ctx, ParameterT... params) throws Exception {
 		validateLogin();
-		return background(ctx, params);
+		ReturnT t = background(ctx, params);
+		return t;
 	};
-	
+
 	protected abstract ReturnT background(Context ctx, ParameterT... params) throws Exception;
 
 	@Override
 	protected void after(Context ctx, ReturnT result) {
-		this.result = result;
-		((BaseActivity) ctx).notifyTaskFinished();
+		if (callback != null) {
+			callback.onCalled(result);
+		}
 	}
 
 	@Override
-	protected void handleError(Context ctx, Exception e) {
-		// TODO Move from BaseActivity to this class
-		BaseActivity.handleException(ctx, action, e);
+	protected void handleError(final Context ctx, Exception e) {
+		if (callback != null) {
+			callback.onCalled(null);
+		}
+		if (e instanceof DataException) {
+			if (((DataException) e).missing()) {
+				String msg = ctx.getString(R.string.server_missing_url, action);
+				Log.w(XCS.LOG.COMMUNICATE, msg);
+				BaseActivity.createDialog(ctx, "Action failed", msg).show();
+			} else if (((DataException) e).networkError()) {
+				String msg = ctx.getString(R.string.server_unreachable, action);
+				Log.w(XCS.LOG.COMMUNICATE, msg);
+				BaseActivity.createDialog(ctx, "Action failed", msg).show();
+			} else if (((DataException) e).timedOut()) {
+				String msg = ctx.getString(R.string.server_timeout, action);
+				Log.w(XCS.LOG.COMMUNICATE, msg);
+				BaseActivity.createDialog(ctx, "Action failed", msg).show();
+			} else {
+				AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+				builder.setTitle("Not allowed!")
+						.setMessage("Access for " + action + " is denied. Specify credentials?")
+						.setIcon(android.R.drawable.ic_dialog_alert)
+						.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.dismiss();
+								ctx.startActivity(new Intent(ctx, CVSettings.class));
+							}
+						}).setNegativeButton("Continue", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.dismiss();
+								RestClient.logout();
+							}
+						});
+				builder.create().show();
+			}
+			return;
+		}
+		String msg = "Communication failure on '" + action + "' due to " + StringUtil.getExceptionMessage(e);
+		BaseActivity.createDialog(ctx, "Action failed", msg);
+		Log.e(XCS.LOG.COMMUNICATE, msg);
+		throw new CommException(msg, e);
 	}
 
 	private void validateLogin() {
@@ -49,7 +99,7 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 			String requestUrl = getRequestUrl("/login");
 			String decrypt = SecurityUtils.decrypt(application.getPassword());
 			Credential credential = new Credential(application.getUser(), decrypt);
-			RestClient.postObject(requestUrl.toString(), credential, void.class, null);
+			RestClient.postObject(requestUrl, credential, void.class);
 		}
 	}
 
@@ -60,10 +110,6 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 			requestUrl.append(elem);
 		}
 		return requestUrl.toString();
-	}
-
-	public ReturnT getResult() {
-		return result;
 	}
 
 	public DataCache getStorage() {

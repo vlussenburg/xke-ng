@@ -5,11 +5,9 @@ import java.util.List;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -17,7 +15,9 @@ import android.widget.TextView;
 import com.xebia.xcoss.axcv.layout.SwipeLayout;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
-import com.xebia.xcoss.axcv.tasks.ConferencesPerYearTask;
+import com.xebia.xcoss.axcv.tasks.RetrieveConferencesFromDateTask;
+import com.xebia.xcoss.axcv.tasks.RetrieveConferencesPerYearTask;
+import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.ConferenceAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -39,7 +39,7 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 
 	private int shownYear;
 	private Conference[] conferences;
-	private ConferencesPerYearTask cpyTask;
+	private boolean redirect = false;
 
 	/**
 	 * Called when the activity is first created.
@@ -58,8 +58,7 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 		if (getIntent().getBooleanExtra(IA_REDIRECT, true)) {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			if (sp.getBoolean(XCS.PREF.JUMPTOFIRST, true)) {
-				Log.i(XCS.LOG.NAVIGATE, "Jumping to first upcomming conference.");
-				switchTo(getConferenceServer().getUpcomingConference());
+				redirect = true;
 			}
 		}
 
@@ -69,15 +68,25 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 
 	@Override
 	protected void onResume() {
-		cpyTask = new ConferencesPerYearTask(R.string.action_list_conferences, this);
-		cpyTask.execute(shownYear);
+		new RetrieveConferencesPerYearTask(R.string.action_retrieve_conferences, this,
+				new TaskCallBack<List<Conference>>() {
+					@Override
+					public void onCalled(List<Conference> result) {
+						if (result != null) {
+							updateConferences(result);
+							if (redirect) {
+								Log.i(XCS.LOG.NAVIGATE, "Jumping to first upcomming conference.");
+								redirect = false;
+								switchTo(result.get(0));
+							}
+						}
+					}
+				}).execute(shownYear);
 		super.onResume();
 	}
-	
-	@Override
-	public void notifyTaskFinished() {
-		List<Conference> list = cpyTask.getResult();
-		Conference upcomingConference = getConferenceServer().getUpcomingConference();
+
+	public void updateConferences(List<Conference> list) {
+		Conference upcomingConference = findUpcomming(list);
 		int position = 0;
 		int idx = 0;
 		conferences = new Conference[list.size()];
