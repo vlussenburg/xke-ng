@@ -31,14 +31,28 @@ import java.util.StringTokenizer;
 
 import javax.net.ssl.SSLException;
 
+import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
+
+import com.xebia.xcoss.axcv.logic.EC2TrustedSocketFactory;
+import com.xebia.xcoss.axcv.util.StringUtil;
+import com.xebia.xcoss.axcv.util.XCS;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -50,7 +64,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.util.Log;
-import com.xebia.xcoss.axcv.R;
 
 public class ExceptionReportService extends ReportingIntentService {
 
@@ -159,7 +172,24 @@ public class ExceptionReportService extends ReportingIntentService {
 		addNameValuePair(params, fieldsToSend, "devSdk", android.os.Build.VERSION.SDK);
 		addNameValuePair(params, fieldsToSend, "devReleaseVersion", android.os.Build.VERSION.RELEASE);
 
-		HttpClient httpClient = new DefaultHttpClient();
+//		HttpClient httpClient = new DefaultHttpClient();
+		HttpParams httpParam = new BasicHttpParams();
+		HttpProtocolParams.setVersion(httpParam, HttpVersion.HTTP_1_1);
+		HttpProtocolParams.setContentCharset(httpParam, HTTP.UTF_8);
+		SchemeRegistry registry = new SchemeRegistry();
+		registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+		registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 8080));
+		try {
+			SSLSocketFactory sslSocketFactory = new EC2TrustedSocketFactory();
+			registry.register(new Scheme("https", sslSocketFactory, 443));
+			registry.register(new Scheme("https", sslSocketFactory, 8443));
+		}
+		catch (Exception e) {
+			Log.e(XCS.LOG.COMMUNICATE, "Could not use secure connection: " + StringUtil.getExceptionMessage(e));
+		}
+		ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager(httpParam, registry);
+		HttpClient httpClient = new DefaultHttpClient(manager, httpParam);
+		
 		HttpPost post = new HttpPost(server.toString());
 		post.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
 		post.setHeader("Content-Type", "text/plain");

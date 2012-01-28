@@ -1,19 +1,25 @@
 IN PROGRESS
 -------------------------------------------------------------------
 
--	Bij roteren raken de waardes kwijt
 -	Externalize strings
+- 	Hide mark/edit button for expired sessions in session view
 
 TODO
 -------------------------------------------------------------------
 client
--	ASyncTask server communication
--	Wachtcursor bij search maken
-- 	Vertical scrolling / paging, 
+-	ASyncTask server communication (Arno)
+	-	Removal of network: crashes.....
 -	Caching
--	Certificate check
+-	Certificate check (Michael)
+-	Start when no network: Should mention this.
+-	Long click on location - show menu.
 
 later op de client
+-	Wachtcursor bij search maken (Arno)
+- 	Viewpaging voor locaties: CVSessionList (Arno)
+-	Search framework
+-	Content providers
+-	Multitouch in view mode - show small matrix.
 -	Verbeteren van caching
 	-	Caching: refresh na conference edit/add break (reopen view...)
 	-	Conferenties verdwijnen uit lijst...
@@ -75,3 +81,9 @@ DONE
 -	Notifications while app stopped
 -	Settings are duplicated when clicked on notification ...
 -	Https connectie
+-	Rating bar
+-	Exit knop verwijderen (Michael)
+-	Error reporting via https
+-	Bij roteren raken de waardes kwijt
+-	Timer naar AlarmManager (Michael)
+-	Transparant overlay for gestures (session view)

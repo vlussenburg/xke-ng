@@ -1,70 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical"
-	android:id="@+id/searchBaseLayout"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
-	<RelativeLayout
-		android:layout_height="wrap_content"
-		android:layout_width="fill_parent"
-		android:id="@+id/relativeLayout1">
-		<ImageView
-			android:layout_height="wrap_content"
-			android:layout_width="wrap_content"
-			android:src="@drawable/x_conference"
-			android:id="@+id/conferenceButton"
-			android:layout_alignParentLeft="true"></ImageView>
-		<TextView
-			android:paddingLeft="7sp"
-			android:layout_height="fill_parent"
-			android:layout_width="wrap_content"
-			android:layout_alignWithParentIfMissing="true"
-			android:gravity="center_vertical"
-			android:layout_toRightOf="@+id/conferenceButton"
-			android:layout_alignTop="@+id/conferenceButton"
-			android:layout_alignBottom="@+id/conferenceButton"
-			android:textSize="@dimen/textsize_title"
-			android:id="@+id/searchTitle"
-			android:text="Search"></TextView>
-		<ImageView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:src="@drawable/ic_menu_people"
-			android:layout_alignParentRight="true"
-			android:id="@+id/flipSearchResult"></ImageView>
-	</RelativeLayout>
-	<View
-		android:id="@+id/firstDivider"
-		android:layout_height="2dp"
-		android:layout_width="fill_parent"
-		android:background="@color/linebreak" />
-	<LinearLayout
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:id="@+id/searchBlock">
-		<AutoCompleteTextView
-			android:layout_weight="1"
-			android:layout_width="wrap_content"
-			android:id="@+id/searchTerm"
-			android:layout_height="wrap_content"></AutoCompleteTextView>
-		<ImageView
-			android:src="@android:drawable/ic_menu_search"
-			android:layout_height="wrap_content"
-			android:id="@+id/searchAction"
-			android:layout_width="wrap_content"></ImageView>
-	</LinearLayout>
-	<ViewFlipper
-		android:id="@+id/viewFlipper"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content">
-		<ListView
-			android:layout_height="fill_parent"
-			android:layout_width="fill_parent"
-			android:id="@+id/searchResultsSessions"></ListView>
-		<ListView
-			android:layout_height="fill_parent"
-			android:layout_width="fill_parent"
-			android:id="@+id/searchResultsPeople"></ListView>
-	</ViewFlipper>
-</LinearLayout>
+<com.xebia.xcoss.axcv.layout.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swipeLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:visibility="visible" >
+
+    <LinearLayout
+        android:id="@+id/searchBaseLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <ImageView
+                android:id="@+id/conferenceButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:src="@drawable/x_conference" >
+            </ImageView>
+
+            <TextView
+                android:id="@+id/searchTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_alignBottom="@+id/conferenceButton"
+                android:layout_alignTop="@+id/conferenceButton"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_toRightOf="@+id/conferenceButton"
+                android:gravity="center_vertical"
+                android:paddingLeft="7sp"
+                android:text="Search"
+                android:textSize="@dimen/textsize_title" >
+            </TextView>
+
+            <ImageView
+                android:id="@+id/flipSearchResult"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/ic_menu_people" >
+            </ImageView>
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/firstDivider"
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="@color/linebreak" />
+
+        <LinearLayout
+            android:id="@+id/searchBlock"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <AutoCompleteTextView
+                android:id="@+id/searchTerm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" >
+            </AutoCompleteTextView>
+
+            <ImageView
+                android:id="@+id/searchAction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_search" >
+            </ImageView>
+        </LinearLayout>
+
+        <ViewFlipper
+            android:id="@+id/viewFlipper"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <ListView
+                android:id="@+id/searchResultsSessions"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent" >
+            </ListView>
+
+            <ListView
+                android:id="@+id/searchResultsPeople"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent" >
+            </ListView>
+        </ViewFlipper>
+    </LinearLayout>
+
+</com.xebia.xcoss.axcv.layout.SwipeLayout>

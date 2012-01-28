@@ -8,7 +8,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import android.util.Log;
-import com.xebia.xcoss.axcv.R;
 
 /**
  * Usage:

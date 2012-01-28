@@ -7,6 +7,7 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.xebia.xcoss.axcv.layout.SwipeLayout;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
@@ -22,7 +23,7 @@ public class CVSessionList extends SessionSwipeActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.schedule);
 		super.onCreate(savedInstanceState);
-		addGestureDetection(R.id.scheduleSwipeBase);
+		((SwipeLayout) findViewById(R.id.swipeLayout)).setGestureListener(this);
 
 		Conference conference = getCurrentConference();
 

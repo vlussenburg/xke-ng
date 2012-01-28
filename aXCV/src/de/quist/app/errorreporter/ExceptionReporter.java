@@ -45,7 +45,6 @@ import android.os.StatFs;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
-import com.xebia.xcoss.axcv.R;
 
 public final class ExceptionReporter {
 

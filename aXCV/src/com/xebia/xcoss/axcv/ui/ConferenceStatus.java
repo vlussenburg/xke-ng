@@ -4,7 +4,6 @@ import java.util.Set;
 
 import android.util.Log;
 
-import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.XCS.LOG;

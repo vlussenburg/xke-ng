@@ -17,17 +17,17 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.RatingBar;
+import android.widget.RatingBar.OnRatingBarChangeListener;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 import android.widget.Toast;
 
+import com.xebia.xcoss.axcv.layout.SwipeLayout;
 import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Rate;
-import com.xebia.xcoss.axcv.model.RatingValue;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.ui.FormatUtil;
@@ -44,7 +44,7 @@ public class CVSessionView extends SessionSwipeActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.sessionview);
 		super.onCreate(savedInstanceState);
-		addGestureDetection(R.id.relativeLayoutLowest);
+		((SwipeLayout) findViewById(R.id.swipeLayout)).setGestureListener(this);
 	}
 
 	@Override
@@ -222,31 +222,28 @@ public class CVSessionView extends SessionSwipeActivity {
 				text.setText(currentSession.getTitle());
 
 				Button submit = (Button) dialog.findViewById(R.id.drSubmit);
-				final SeekBar seekbar = (SeekBar) dialog.findViewById(R.id.drSessionRate);
+				final RatingBar ratingBar = (RatingBar) dialog.findViewById(R.id.drSessionRate);
 				final TextView rateText = (TextView) dialog.findViewById(R.id.drRateText);
-				rateText.setText(RatingValue.message(seekbar.getProgress()));
+				rateText.setText(new Rate(ratingBar).getMessage());
 
 				// Or use a DialogInterface.OnClickListener to directly access the dialog
 				submit.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View paramView) {
-						Rate rate = new Rate(1 + seekbar.getProgress());
-						getConferenceServer().registerRate(currentSession, rate);
+						Rate rate = new Rate(ratingBar);
+						if (rate.isRated()) {
+							getConferenceServer().registerRate(currentSession, rate);
+						}
 						dismissDialog(XCS.DIALOG.ADD_RATING);
 						updateRateAndReview();
 					}
 				});
 
-				seekbar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-					@Override
-					public void onStopTrackingTouch(SeekBar paramSeekBar) {}
+				ratingBar.setOnRatingBarChangeListener(new OnRatingBarChangeListener() {
 
 					@Override
-					public void onStartTrackingTouch(SeekBar paramSeekBar) {}
-
-					@Override
-					public void onProgressChanged(SeekBar paramSeekBar, int paramInt, boolean paramBoolean) {
-						rateText.setText(RatingValue.message(paramInt));
+					public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+						rateText.setText(new Rate(ratingBar).getMessage());
 					}
 				});
 				return dialog;

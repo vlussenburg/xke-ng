@@ -43,7 +43,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.DataException.Code;
 import com.xebia.xcoss.axcv.logic.gson.GsonMomentAdapter;
 import com.xebia.xcoss.axcv.model.Moment;

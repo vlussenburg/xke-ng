@@ -39,7 +39,7 @@ public class CVSearchAuthor extends BaseActivity {
 	private Intent result = new Intent();
 
 	protected ConferenceServer getConferenceServer() {
-		ConferenceServer server = ConferenceServerProxy.getInstance();
+		ConferenceServer server = ConferenceServerProxy.getInstance(this);
 		return server;
 	}
 
@@ -49,7 +49,7 @@ public class CVSearchAuthor extends BaseActivity {
 		setContentView(R.layout.search_items);
 		textView = (AutoCompleteTextView) findViewById(R.id.ssa_text);
 		startText = getResources().getString(R.string.default_input_text);
-		textView.setSelection(0, startText.length());
+		textView.setSelection(0, startText.length()-1);
 		initSelectedAuthors();
 
 		Button closeButton = (Button) findViewById(R.id.ssa_close);

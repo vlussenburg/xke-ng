@@ -50,8 +50,9 @@ public class CVSessionAdd extends AdditionActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.add_session);
-		this.timeFormatter = new ScreenTimeUtil(this);
+		super.onCreate(savedInstanceState);
 
+		timeFormatter = new ScreenTimeUtil(this);
 		cancelClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -65,14 +66,14 @@ public class CVSessionAdd extends AdditionActivity {
 			if (originalSession == null) {
 				create = true;
 				session = new Session();
-				((TextView) findViewById(R.id.addModifyTitle)).setText(R.string.session_add);
 			} else {
 				session = new Session(originalSession);
-				((TextView) findViewById(R.id.addModifyTitle)).setText(R.string.session_edit);
 			}
 		}
+		TextView tv = (TextView) findViewById(R.id.addModifyTitle);
+		tv.setText(originalSession == null ? R.string.session_add : R.string.session_edit);
+		
 		registerActions();
-		super.onCreate(savedInstanceState);
 	}
 
 	private boolean loadFrom(Bundle savedInstanceState) {
@@ -138,7 +139,7 @@ public class CVSessionAdd extends AdditionActivity {
 
 			if (duration > 0) {
 				view = (TextView) findViewById(R.id.sessionDuration);
-				view.setText(getString(R.string.duration_minutes, String.valueOf(duration)));
+				view.setText(getString(R.string.duration_minutes, duration));
 			}
 
 			view = (TextView) findViewById(R.id.sessionAudience);
@@ -217,7 +218,7 @@ public class CVSessionAdd extends AdditionActivity {
 					String moment = timeFormatter.getAbsoluteDate(session.getStartTime());
 					AlertDialog.Builder builder = new AlertDialog.Builder(CVSessionAdd.this);
 					builder.setTitle(R.string.delete_session);
-					builder.setMessage("Are you sure to delete session '"+session.getTitle()+"' on " + moment + "?");
+					builder.setMessage(getString(R.string.confirm_delete_session, session.getTitle(), moment));
 					builder.setIcon(android.R.drawable.ic_dialog_alert);
 					builder.setPositiveButton(R.string.cancel, cancelClickListener);
 					builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {

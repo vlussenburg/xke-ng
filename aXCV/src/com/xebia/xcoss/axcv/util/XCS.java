@@ -3,7 +3,6 @@ package com.xebia.xcoss.axcv.util;
 import java.util.regex.Pattern;
 
 import android.view.Menu;
-import com.xebia.xcoss.axcv.R;
 
 public class XCS {
 
@@ -58,8 +57,7 @@ public class XCS {
 		public static final int ADD = Menu.FIRST + 3;
 		public static final int EDIT = Menu.FIRST + 4;
 		public static final int TRACK = Menu.FIRST + 5;
-		public static final int EXIT = Menu.FIRST + 6;
-		public static final int LIST = Menu.FIRST + 7;
+		public static final int LIST = Menu.FIRST + 6;
 	}
 
 	public class PREF {

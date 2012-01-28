@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.AttributeSet;
-import com.xebia.xcoss.axcv.R;
 
 public class LinkPreference extends android.preference.Preference {
 

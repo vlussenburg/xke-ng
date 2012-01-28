@@ -2,7 +2,6 @@ package com.xebia.xcoss.axcv.ui;
 
 import java.util.List;
 
-import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Remark;
 import com.xebia.xcoss.axcv.util.StringUtil;
 

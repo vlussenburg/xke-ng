@@ -14,12 +14,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
+import com.xebia.xcoss.axcv.layout.SwipeLayout;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.ui.SearchResultAdapter;
 
-public abstract class SearchActivity extends SwipeActivity {
+public abstract class SearchActivity extends BaseActivity implements SwipeActivity {
 
 	private List<Author> authorResults;
 	private SearchResultAdapter authorAdapter;
@@ -32,8 +33,7 @@ public abstract class SearchActivity extends SwipeActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.search);
-
-		addGestureDetection(R.id.searchBaseLayout);
+		((SwipeLayout) findViewById(R.id.swipeLayout)).setGestureListener(this);
 
 		flipper = (ViewFlipper) findViewById(R.id.viewFlipper);
 		peopleView = (ListView) findViewById(R.id.searchResultsPeople);

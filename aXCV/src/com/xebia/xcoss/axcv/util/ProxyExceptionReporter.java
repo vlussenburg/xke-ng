@@ -5,7 +5,6 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import android.util.Log;
 
 import com.xebia.xcoss.axcv.BaseActivity;
-import com.xebia.xcoss.axcv.R;
 
 import de.quist.app.errorreporter.ExceptionReporter;
 

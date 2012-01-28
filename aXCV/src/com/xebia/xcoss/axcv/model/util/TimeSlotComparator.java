@@ -3,7 +3,6 @@ package com.xebia.xcoss.axcv.model.util;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 
 public class TimeSlotComparator implements Comparator<TimeSlot>, Serializable {

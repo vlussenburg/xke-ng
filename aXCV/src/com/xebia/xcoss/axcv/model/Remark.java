@@ -1,6 +1,5 @@
 package com.xebia.xcoss.axcv.model;
 
-import com.xebia.xcoss.axcv.R;
 import java.io.Serializable;
 
 public class Remark implements Serializable {

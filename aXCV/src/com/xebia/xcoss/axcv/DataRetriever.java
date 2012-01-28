@@ -20,7 +20,8 @@ public class DataRetriever extends AsyncTask<String, Void, Boolean> {
 
 	private ProgressDialog processDialog;
 	private BaseActivity ctx;
-
+	private volatile ConferenceServer server;
+	
 	public DataRetriever(BaseActivity ctx) {
 		this.ctx = ctx;
 	}
@@ -39,27 +40,15 @@ public class DataRetriever extends AsyncTask<String, Void, Boolean> {
 	}
 
 	protected void stop() {
-		Log.v("debug", "Task stopping...");
 		if (processDialog.isShowing()) {
 			processDialog.dismiss();
 		}
 	}
 
 	@Override
-	protected void onCancelled() {
-		Log.v("debug", "Task cancelling...");
-		// if (processDialog != null) {
-		// processDialog.dismiss();
-		// processDialog = null;
-		// }
-		super.onCancelled();
-		Log.v("debug", "Task cancelled.");
-	}
-
-	@Override
 	protected Boolean doInBackground(String... arg0) {
 		try {
-			ConferenceServer server = ctx.getConferenceServer();
+			server = ctx.getConferenceServer();
 			if (server != null) {
 				List<Conference> conferences = server.getUpcomingConferences(1);
 				for (Conference conference : conferences) {
@@ -69,10 +58,10 @@ public class DataRetriever extends AsyncTask<String, Void, Boolean> {
 			}
 		}
 		catch (DataException e) {
-			if (e.missing()) {
-				Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Wrong server or server not running.");
-			} else if (e.denied()) {
+			if (e.denied()) {
 				Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Invalid credentials specified.");
+			} else  if (e.missing()) {
+				Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Wrong server or server not running.");
 			} else {
 				Log.e(XCS.LOG.COMMUNICATE, "[Initial load] Communication error: " + e.getMessage());
 			}
@@ -90,10 +79,15 @@ public class DataRetriever extends AsyncTask<String, Void, Boolean> {
 			processDialog.dismiss();
 
 			if (result) {
-				// Note, authentication may still be invalid.
 				ctx.onSuccess();
+				return;
+			}
+			
+			String error = BaseActivity.lastError;
+			if ( ctx.getConferenceServer().isLoggedIn() ) {
+				ctx.onFailure(ctx.getString(R.string.error), ctx.getString(R.string.connection_to_server_failed, error));
 			} else {
-				ctx.onFailure(ctx.getString(R.string.error), ctx.getString(R.string.connection_to_server_failed, BaseActivity.lastError));
+				ctx.onAuthenticationFailed("startup");
 			}
 		}
 		catch (Exception e) {

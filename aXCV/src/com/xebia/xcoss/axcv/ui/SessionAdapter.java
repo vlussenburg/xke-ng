@@ -33,7 +33,7 @@ public class SessionAdapter extends BaseAdapter {
 		this.data = data;
 		timeUtil = new ScreenTimeUtil(context);
 	}
-	
+
 	@Override
 	public View getView(final int paramInt, View paramView, ViewGroup parent) {
 		final Session session = (Session) getItem(paramInt);
@@ -54,8 +54,7 @@ public class SessionAdapter extends BaseAdapter {
 		return row;
 	}
 
-	public void registerClicks(View row, final int paramInt, final Session session) {
-	}
+	public void registerClicks(View row, final int paramInt, final Session session) {}
 
 	private View constructSessionView(ViewGroup parent, final Session session, int colorId, final int position) {
 
@@ -90,9 +89,10 @@ public class SessionAdapter extends BaseAdapter {
 
 		locDateView.setText(getLocationAndDate(session));
 
+		boolean expired = session.isExpired();
 		ImageView button;
 		button = (ImageView) row.findViewById(R.id.markButton);
-		if (StringUtil.isEmpty(ctx.getUser())) {
+		if (expired || StringUtil.isEmpty(ctx.getUser())) {
 			button.setVisibility(View.GONE);
 		} else {
 			button.setVisibility(View.VISIBLE);
@@ -106,12 +106,16 @@ public class SessionAdapter extends BaseAdapter {
 			});
 		}
 		button = (ImageView) row.findViewById(R.id.editButton);
-		button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				editSession(session);
-			}
-		});
+		if (expired) {
+			button.setVisibility(View.GONE);
+		} else {
+			button.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					editSession(session);
+				}
+			});
+		}
 
 		return row;
 	}
@@ -172,6 +176,5 @@ public class SessionAdapter extends BaseAdapter {
 	public void setIncludeDate(boolean state) {
 		includeDate = state;
 	}
-
 
 }

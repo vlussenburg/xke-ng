@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import com.xebia.xcoss.axcv.R;
 
 public class NoCache extends DataCache {
 

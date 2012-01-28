@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.xebia.xcoss.axcv.BaseActivity;
-import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.cache.DataCache;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
@@ -31,17 +30,6 @@ public class ConferenceServerProxy extends ConferenceServer {
 			return proxy;
 		}
 		return null;
-	}
-
-	@Override
-	protected boolean login(String user, String password) {
-		try {
-			return super.login(user, password);
-		}
-		catch (CommException e) {
-			BaseActivity.handleException(activity, "login", e);
-		}
-		return false;
 	}
 
 	@Override
@@ -170,7 +158,7 @@ public class ConferenceServerProxy extends ConferenceServer {
 		catch (CommException e) {
 			BaseActivity.handleException(activity, "get rate", e);
 		}
-		return new Rate(null);
+		return new Rate(new ArrayList<Integer>());
 	}
 
 	@Override

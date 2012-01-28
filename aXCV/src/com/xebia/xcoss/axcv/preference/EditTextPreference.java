@@ -2,7 +2,6 @@ package com.xebia.xcoss.axcv.preference;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import com.xebia.xcoss.axcv.R;
 
 public class EditTextPreference extends android.preference.EditTextPreference {
 

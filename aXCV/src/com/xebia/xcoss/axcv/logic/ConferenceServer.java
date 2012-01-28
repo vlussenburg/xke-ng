@@ -6,8 +6,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import android.util.Log;
+
 import com.google.gson.reflect.TypeToken;
-import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.cache.DataCache;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
@@ -21,6 +22,8 @@ import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.util.ConferenceComparator;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
+import com.xebia.xcoss.axcv.util.StringUtil;
+import com.xebia.xcoss.axcv.util.XCS;
 
 public class ConferenceServer {
 
@@ -43,10 +46,12 @@ public class ConferenceServer {
 	public static ConferenceServer createInstance(String user, String password, String url, DataCache cache) {
 		ConferenceServer server = new ConferenceServerProxy(url, cache);
 		instance = server;
-		if (instance.login(user, password)) {
-			return instance;
+		try {
+			instance.login(user, password);
+		} catch (Exception e) {
+			Log.e(XCS.LOG.COMMUNICATE, "Failed to login: " + StringUtil.getExceptionMessage(e));
 		}
-		return null;
+		return instance;
 	}
 
 	protected ConferenceServer(String base, DataCache cache) {

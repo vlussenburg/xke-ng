@@ -57,7 +57,6 @@ public abstract class BaseActivity extends Activity {
 	private MenuItem miAdd;
 	private MenuItem miEdit;
 	private MenuItem miTrack;
-	private MenuItem miExit;
 
 	private static ProfileManager profileManager;
 	protected static String lastError;
@@ -97,13 +96,11 @@ public abstract class BaseActivity extends Activity {
 		miEdit = menu.add(0, XCS.MENU.EDIT, Menu.NONE, R.string.menu_edit);
 		miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
 		miSearch = menu.add(0, XCS.MENU.SEARCH, Menu.NONE, R.string.menu_search);
-		miExit = menu.add(0, XCS.MENU.EXIT, Menu.NONE, R.string.menu_exit);
 
 		miAdd.setIcon(android.R.drawable.ic_menu_add);
 		miEdit.setIcon(android.R.drawable.ic_menu_edit);
 		miSettings.setIcon(android.R.drawable.ic_menu_preferences);
 		miSearch.setIcon(android.R.drawable.ic_menu_search);
-		miExit.setIcon(R.drawable.ic_menu_exit);
 
 		if (!StringUtil.isEmpty(getUser())) {
 			miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
@@ -128,9 +125,6 @@ public abstract class BaseActivity extends Activity {
 			break;
 			case XCS.MENU.TRACK:
 				startActivity(new Intent(this, CVTrack.class));
-			break;
-			case XCS.MENU.EXIT:
-				moveTaskToBack(true);
 			break;
 		}
 		return true;
@@ -216,7 +210,6 @@ public abstract class BaseActivity extends Activity {
 				cache = new MemoryCache(this);
 			}
 			server = ConferenceServer.createInstance(user, password, getServerUrl(this), cache);
-			// TODO server can be null if not logged in.
 		}
 		return server;
 	}
@@ -254,6 +247,26 @@ public abstract class BaseActivity extends Activity {
 
 	protected void onFailure(String message, String detail) {}
 
+	protected void onAuthenticationFailed(String activity) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Not allowed!")
+				.setMessage("Access for " + activity + " is denied. Specify credentials?")
+				.setIcon(android.R.drawable.ic_dialog_alert)
+				.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+						startActivity(new Intent(BaseActivity.this, CVSettings.class));
+					}
+				}).setNegativeButton("Continue", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+						// The next request will do the login again
+						ConferenceServer.close();
+					}
+				});
+		builder.create().show();
+	}
+
 	public static String getServerUrl(Context ctx) {
 		try {
 			// Invoke trim to make sure the value is specified
@@ -287,37 +300,21 @@ public abstract class BaseActivity extends Activity {
 		}
 	}
 
-	public static void handleException(final Activity context, String activity, CommException e) {
+	public static void handleException(final BaseActivity context, String activity, CommException e) {
 		if (e instanceof DataException) {
 			if (((DataException) e).missing()) {
-				lastError = context.getString(R.string.server_missing_url, activity);
+				lastError = context == null ? "404" : context.getString(R.string.server_missing_url, activity);
 				Log.w(XCS.LOG.COMMUNICATE, lastError);
 			} else if (((DataException) e).networkError()) {
-				lastError = context.getString(R.string.server_unreachable);
+				lastError = context == null ? "500" : context.getString(R.string.server_unreachable);
 				Log.w(XCS.LOG.COMMUNICATE, lastError);
 			} else if (((DataException) e).timedOut()) {
-				lastError = context.getString(R.string.server_timeout, activity);
+				lastError = context == null ? "400" : context.getString(R.string.server_timeout, activity);
 				Log.w(XCS.LOG.COMMUNICATE, lastError);
 			} else {
 				// Authentication failure
 				if (context != null) {
-					AlertDialog.Builder builder = new AlertDialog.Builder(context);
-					builder.setTitle("Not allowed!")
-							.setMessage("Access for " + activity + " is denied. Specify credentials?")
-							.setIcon(android.R.drawable.ic_dialog_alert)
-							.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {
-									dialog.dismiss();
-									context.startActivity(new Intent(context, CVSettings.class));
-								}
-							}).setNegativeButton("Continue", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {
-									dialog.dismiss();
-									// The next request will do the login again
-									ConferenceServer.close();
-								}
-							});
-					builder.create().show();
+					context.onAuthenticationFailed(activity);
 				} else {
 					Log.e(XCS.LOG.COMMUNICATE, "Resource not found while " + activity + ".");
 					lastError = "Not allowed: " + activity;
