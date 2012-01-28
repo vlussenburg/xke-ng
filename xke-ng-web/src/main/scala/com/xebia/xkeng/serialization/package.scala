@@ -102,7 +102,9 @@ package object util {
     JArray(ints.toList.map(JInt(_)))
   }
   def serializeToJsonStr(t: AnyRef): String = {
-    Serialization.write(t)
+    val r = Serialization.write(t)
+    println(r)
+    r
   }
 
   implicit def pimpJValueWithInformativeFailingSelector[T <: JValue](values: List[T]): { def \\!(query: String): JValue; def \!(query: String): JValue } = new {

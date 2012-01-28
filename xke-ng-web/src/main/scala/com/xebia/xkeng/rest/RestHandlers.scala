@@ -103,7 +103,12 @@ trait RestHandlerComponent extends Logger {
    * =============================
    */
 
-  def getSession(id: Long) = asJsonResp(Some(sessionRepository.findSessionById(id).map(_._2)))
+  def getSession(id: Long) = {
+    sessionRepository.findSessionById(id).map(_._2) match {
+      case s @ Some(_) => asJsonResp(s)
+       case _ => Full(NotFoundResponse())
+    } 
+  }
 
   def handleSessionsList(conferenceId: String): Box[LiftResponse] = {
     //should return the sessions of a single conference.
