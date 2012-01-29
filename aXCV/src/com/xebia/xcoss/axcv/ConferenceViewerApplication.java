@@ -5,11 +5,14 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.github.droidfu.DroidFuApplication;
 import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.logic.cache.DataCache;
 import com.xebia.xcoss.axcv.logic.cache.MemoryCache;
+import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -101,4 +104,25 @@ public class ConferenceViewerApplication extends DroidFuApplication {
 		}
 		super.onClose();
 	}
+
+	public void markSession(Session session, View view, boolean update) {
+		// Breaks are not supported for marking
+		if (session.getType() == Session.Type.BREAK) return;
+
+		ProfileManager pm = getProfileManager();
+		boolean hasMarked = pm.isMarked(getUser(), session.getId());
+		if (update) {
+			if (hasMarked) {
+				if (pm.unmarkSession(getUser(), session)) hasMarked = false;
+			} else {
+				if (pm.markSession(getUser(), session)) hasMarked = true;
+			}
+		}
+
+		if (view instanceof ImageView) {
+			((ImageView) view).setImageResource(hasMarked ? android.R.drawable.btn_star_big_on
+					: android.R.drawable.btn_star_big_off);
+		}
+	}
+
 }

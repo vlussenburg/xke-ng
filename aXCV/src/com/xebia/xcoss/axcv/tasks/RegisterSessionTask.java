@@ -20,16 +20,18 @@ public class RegisterSessionTask extends CVTask<Session, Void, Boolean> {
 		return createUpdateSessions(this, sessions);
 	}
 
-	protected static Boolean createUpdateSessions(CVTask task, Session... sessions) {
+	protected static Boolean createUpdateSessions(CVTask<?,?,?> task, Session... sessions) {
 		for (Session session : sessions) {
+			String conferenceId = session.getConferenceId();
 			if ( StringUtil.isEmpty(session.getId()) ) {
 				String requestUrl = task.getRequestUrl("/conference/", session.getConferenceId(), "/session");
 				session = RestClient.createObject(requestUrl, session, Session.class);
+				// Server does not return conferenceId, so extracted before creation.
 			} else {
 				String requestUrl = task.getRequestUrl("/session/", session.getId());
 				RestClient.updateObject(requestUrl, session);
 			}
-			task.getStorage().add(session.getConferenceId(), session);
+			task.getStorage().add(conferenceId, session);
 		}
 		return true;
 	}

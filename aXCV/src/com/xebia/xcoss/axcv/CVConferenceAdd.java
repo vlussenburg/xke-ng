@@ -62,10 +62,18 @@ public class CVConferenceAdd extends AdditionActivity {
 		setContentView(R.layout.add_conference);
 		super.onCreate(savedInstanceState);
 
+		new RetrieveLocationsTask(R.string.action_retrieve_locations, this, new TaskCallBack<List<Location>>() {
+			@Override
+			public void onCalled(List<Location> result) {
+				locations = result;
+			}
+		}).execute();
+
 		ADD_NEW_LOCATION = getString(R.string.add_location);
 		timeFormatter = new ScreenTimeUtil(this);
 		breakSessions = new TreeSet<Session>(new SessionComparator());
 		conference = new Conference();
+		locations = new ArrayList<Location>();
 
 		if (!loadFrom(savedInstanceState)) {
 			new RetrieveConferenceTask(R.string.action_retrieve_conference, this, new TaskCallBack<Conference>() {
@@ -78,22 +86,14 @@ public class CVConferenceAdd extends AdditionActivity {
 					}
 					TextView tv = (TextView) findViewById(R.id.addModifyTitle);
 					tv.setText(originalConference == null ? R.string.add_conference : R.string.edit_conference);
-					if (create || conference.getStartTime().isBeforeNow()) {
+					if (create) { // TODO || conference.getStartTime().isBeforeNow()) {
 						((Button) findViewById(R.id.actionDelete)).setVisibility(View.GONE);
 					}
 					showConference();
+					registerActions();
 				}
 			}).execute(getSelectedConferenceId());
 		}
-
-		new RetrieveLocationsTask(R.string.action_retrieve_locations, this, new TaskCallBack<List<Location>>() {
-			@Override
-			public void onCalled(List<Location> result) {
-				locations = result;
-			}
-		}).execute();
-
-		registerActions();
 	}
 
 	private boolean loadFrom(Bundle savedInstanceState) {
@@ -229,12 +229,12 @@ public class CVConferenceAdd extends AdditionActivity {
 				builder.setTitle(R.string.delete_conference);
 				builder.setMessage(message.toString());
 				builder.setIcon(android.R.drawable.ic_dialog_alert);
-				builder.setPositiveButton(R.string.cancel, new DialogInterface.OnClickListener() {
+				builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
 					}
 				});
-				builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
+				builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						DeleteConferenceTask dcTask = new DeleteConferenceTask(R.string.action_delete_conference,
 								CVConferenceAdd.this, null);
@@ -388,11 +388,7 @@ public class CVConferenceAdd extends AdditionActivity {
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.CREATE_BREAK:
-				if (conference.getLocations().size() == 0 || conference.getStartTime() == null) {
-					createDialog(getString(R.string.conference_detail), getString(R.string.no_location_date)).show();
-				} else {
-					dialog = new AddBreakDialog(this, R.id.breakTime);
-				}
+				dialog = new AddBreakDialog(this, R.id.breakTime);
 			break;
 			case XCS.DIALOG.INPUT_TIME_START:
 				time = conference.getStartTime();
@@ -450,8 +446,10 @@ public class CVConferenceAdd extends AdditionActivity {
 				tid.setValue(conference.getTitle());
 			break;
 			case XCS.DIALOG.CREATE_BREAK:
-				AddBreakDialog abd = (AddBreakDialog) dialog;
-				abd.setConference(conference);
+				if (dialog instanceof AddBreakDialog) {
+					AddBreakDialog abd = (AddBreakDialog) dialog;
+					abd.setConference(conference);
+				}
 			break;
 			case XCS.DIALOG.INPUT_DESCRIPTION:
 				tid = (TextInputDialog) dialog;
@@ -499,7 +497,11 @@ public class CVConferenceAdd extends AdditionActivity {
 				showDialog(XCS.DIALOG.INPUT_DATE);
 			break;
 			case R.id.breakTime:
-				showDialog(XCS.DIALOG.CREATE_BREAK);
+				if (conference.getLocations().size() == 0 || conference.getStartTime() == null) {
+					createDialog(getString(R.string.conference_detail), getString(R.string.no_location_date)).show();
+				} else {
+					showDialog(XCS.DIALOG.CREATE_BREAK);
+				}
 			break;
 			default:
 				Log.w(XCS.LOG.NAVIGATE, "Click on text not handled: " + id);

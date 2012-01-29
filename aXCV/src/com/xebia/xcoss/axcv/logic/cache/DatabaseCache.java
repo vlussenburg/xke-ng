@@ -39,7 +39,7 @@ public class DatabaseCache extends DataCache {
 	}
 	
 	// TODO Call this method ...
-	public static void drop(Context ctx) {
+	private static void drop(Context ctx) {
 		ProfileManager profileManager = new ProfileManager(ctx);
 		boolean hasOpened = profileManager.openConnection();
 		profileManager.removeAllCache();

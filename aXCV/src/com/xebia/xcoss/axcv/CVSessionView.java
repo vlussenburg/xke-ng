@@ -158,12 +158,12 @@ public class CVSessionView extends SessionSwipeActivity {
 		if (currentSession.getType() == Session.Type.BREAK || StringUtil.isEmpty(getUser())) {
 			button.setVisibility(View.GONE);
 		} else {
-			markSession(currentSession, button, false);
+			getMyApplication().markSession(currentSession, button, false);
 			button.setVisibility(View.VISIBLE);
 			button.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					markSession(currentSession, view, true);
+					getMyApplication().markSession(currentSession, view, true);
 				}
 			});
 		}

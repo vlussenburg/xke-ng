@@ -32,6 +32,7 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 		this.action = ctx.getString(action);
 		this.callback = callback;
 		disableDialog();
+		Log.w(XCS.LOG.COMMUNICATE, "Task created: " + getClass().getSimpleName());
 	}
 
 	@Override
@@ -89,9 +90,9 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 			return;
 		}
 		String msg = "Communication failure on '" + action + "' due to " + StringUtil.getExceptionMessage(e);
-		BaseActivity.createDialog(ctx, "Action failed", msg);
+		BaseActivity.createDialog(ctx, "Action failed", msg).show();
 		Log.e(XCS.LOG.COMMUNICATE, msg);
-		throw new CommException(msg, e);
+		// Do not throw exception here. It will block the async task waiting dialog.
 	}
 
 	private void validateLogin() {

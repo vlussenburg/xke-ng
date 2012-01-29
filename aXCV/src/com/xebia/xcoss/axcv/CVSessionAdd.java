@@ -49,7 +49,7 @@ public class CVSessionAdd extends AdditionActivity {
 	private Conference conference;
 	private Session session;
 	private Session originalSession;
-	private boolean create = false;
+	private boolean create = true;
 	private DialogInterface.OnClickListener cancelClickListener;
 
 	/** Called when the activity is first created. */
@@ -58,6 +58,7 @@ public class CVSessionAdd extends AdditionActivity {
 		setContentView(R.layout.add_session);
 		super.onCreate(savedInstanceState);
 
+		session = new Session();
 		timeFormatter = new ScreenTimeUtil(this);
 		cancelClickListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -80,10 +81,8 @@ public class CVSessionAdd extends AdditionActivity {
 				public void onCalled(Conference result) {
 					conference = result;
 					originalSession = getSelectedSession(result);
-					if (originalSession == null) {
-						create = true;
-						session = new Session();
-					} else {
+					if (originalSession != null) {
+						create = false;
 						session = new Session(originalSession);
 					}
 					TextView tv = (TextView) findViewById(R.id.addModifyTitle);

@@ -99,7 +99,6 @@ public class Moment implements Serializable {
 	}
 
 	private DateTime getDate() {
-		// TODO
 		return new DateTime(year, month, day, hour, minute);
 	}
 

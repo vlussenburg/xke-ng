@@ -199,17 +199,19 @@ public class AddBreakDialog extends Dialog {
 		adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(adapter3);
 
+		// TODO The GUI does not show the correct item when switching duration
 		if (selectedItem != null) {
 			int position = 0;
 			for (int i = 0; i < startarray.length; i++) {
-//				Log.v(XCS.LOG.ALL, "Match item '" + startarray[i] + "' to '" + selectedItem + "'");
+				Log.v(XCS.LOG.ALL, "Match item '" + startarray[i] + "' to '" + selectedItem + "'");
 				if (startarray[i].equals(selectedItem)) {
-//					Log.v(XCS.LOG.ALL, "Position to be " + i);
+					Log.v(XCS.LOG.ALL, "Position to be " + i);
 					position = i;
 					break;
 				}
 			}
-			spinner.setSelection(position);
+			spinner.setSelection(0, true);
+			spinner.setSelection(position, true);
 		}
 
 		return timeSlots.size() > 0;

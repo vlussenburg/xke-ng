@@ -15,6 +15,7 @@ import com.xebia.xcoss.axcv.tasks.RetrieveConferenceTask;
 import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.SessionCMAdapter;
+import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class CVSessionList extends SessionSwipeActivity {
@@ -34,24 +35,28 @@ public class CVSessionList extends SessionSwipeActivity {
 		new RetrieveConferenceTask(R.string.action_retrieve_conference, this, new TaskCallBack<Conference>() {
 			@Override
 			public void onCalled(Conference cc) {
-				TextView title = (TextView) findViewById(R.id.conferenceTitle);
-				title.setText(cc.getTitle());
+				if (cc != null) {
+					TextView title = (TextView) findViewById(R.id.conferenceTitle);
+					title.setText(cc.getTitle());
 
-				TextView date = (TextView) findViewById(R.id.conferenceDate);
-				ScreenTimeUtil timeUtil = new ScreenTimeUtil(CVSessionList.this);
-				String val = timeUtil.getAbsoluteDate(cc.getStartTime());
-				date.setText(val);
+					TextView date = (TextView) findViewById(R.id.conferenceDate);
+					ScreenTimeUtil timeUtil = new ScreenTimeUtil(CVSessionList.this);
+					String val = timeUtil.getAbsoluteDate(cc.getStartTime());
+					date.setText(val);
 
-				sessions = cc.getSessions(getCurrentLocation()).toArray(new Session[0]);
-				SessionCMAdapter adapter = new SessionCMAdapter(CVSessionList.this, R.layout.session_item,
-						R.layout.mandatory_item, sessions);
-				ListView sessionList = (ListView) findViewById(R.id.sessionList);
-				sessionList.setAdapter(adapter);
+					sessions = cc.getSessions(getCurrentLocation()).toArray(new Session[0]);
+					SessionCMAdapter adapter = new SessionCMAdapter(CVSessionList.this, R.layout.session_item,
+							R.layout.mandatory_item, sessions);
+					ListView sessionList = (ListView) findViewById(R.id.sessionList);
+					sessionList.setAdapter(adapter);
 
-				updateLocations();
+					updateLocations();
+				} else {
+					// TODO The CVTask currently shows a dialog, which will leak when finishing...
+					finish();
+				}
 			}
 		}).execute(getConferenceId());
-
 		super.onResume();
 	}
 

@@ -57,6 +57,7 @@ public class RestClient {
 	private static final int HTTP_TIMEOUT = 15 * 1000;
 	private static GsonBuilder gsonBuilder = null;
 	private static Cookie sessionCookie = null;
+	private static boolean showDataStreams = true;
 
 	private static Gson getGson() {
 		if (gsonBuilder == null) {
@@ -69,7 +70,7 @@ public class RestClient {
 	public static boolean isAuthenticated() {
 		return sessionCookie != null;
 	}
-	
+
 	public static void logout() {
 		sessionCookie = null;
 	}
@@ -134,10 +135,7 @@ public class RestClient {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
 			Log.d(LOG.COMMUNICATE, "POST (create) to '" + url + "': ");
-			// String[] split = postData.split(",");
-			// for (int i = 0; i < split.length; i++) {
-			// Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
-			// }
+			logCommunicationData(postData);
 			reader = getReader(new HttpPost(url), postData);
 			return gson.fromJson(reader, rvClass);
 		}
@@ -153,13 +151,9 @@ public class RestClient {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
 			Log.d(LOG.COMMUNICATE, "PUT (update) to '" + url + "':");
-			// String[] split = postData.split(",");
-			// for (int i = 0; i < split.length; i++) {
-			// Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
-			// }
+			logCommunicationData(postData);
 			reader = getReader(new HttpPut(url), postData);
 			T result = getGson().fromJson(reader, (Class<T>) object.getClass());
-			// TODO Is result an empty string?
 			return result;
 		}
 		finally {
@@ -184,6 +178,7 @@ public class RestClient {
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(searchParms);
+			logCommunicationData(postData);
 			reader = getReader(new HttpPost(url), postData);
 			JsonParser parser = new JsonParser();
 			JsonElement parse = parser.parse(reader);
@@ -205,13 +200,22 @@ public class RestClient {
 		}
 	}
 
+	private static void logCommunicationData(String postData) {
+		if (showDataStreams) {
+			String[] split = postData.split(",");
+			for (int i = 0; i < split.length; i++) {
+				Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
+			}
+		}
+	}
+
 	public static <T, V> V postObject(String url, T object, Class<V> rvClass) {
 		Log.d(LOG.COMMUNICATE, "Posting [" + object.getClass().getSimpleName() + "] " + url);
 		Reader reader = null;
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
-			// Log.d(LOG.COMMUNICATE, "Post dating [" + postData + "]");
+			logCommunicationData(postData);
 			reader = getReader(new HttpPost(url), postData);
 			return getGson().fromJson(reader, rvClass);
 		}
@@ -252,7 +256,9 @@ public class RestClient {
 			handleResponse(request, response);
 
 			String result = readResponse(response);
-			// Log.i(XCS.LOG.COMMUNICATE, "Read: " + result);
+			if (showDataStreams) {
+				Log.i(XCS.LOG.COMMUNICATE, "Read: " + result);
+			}
 			return new StringReader(result);
 		}
 		catch (InterruptedIOException e) {

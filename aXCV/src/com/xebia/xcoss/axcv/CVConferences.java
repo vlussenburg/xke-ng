@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.xebia.xcoss.axcv.layout.SwipeLayout;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
-import com.xebia.xcoss.axcv.tasks.RetrieveConferencesFromDateTask;
 import com.xebia.xcoss.axcv.tasks.RetrieveConferencesPerYearTask;
 import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.ConferenceAdapter;

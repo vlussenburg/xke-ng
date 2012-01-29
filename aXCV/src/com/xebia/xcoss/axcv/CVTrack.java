@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.logic.ProfileManager.Trackable;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
@@ -47,7 +48,8 @@ public class CVTrack extends BaseActivity {
 
 	@Override
 	protected void onResume() {
-		Trackable[] markedSessions = getProfileManager().getMarkedSessions(getUser());
+		ProfileManager pm = getMyApplication().getProfileManager();
+		Trackable[] markedSessions = pm.getMarkedSessions(getUser());
 		for (Trackable id : markedSessions) {
 			new RetrieveSessionTask(R.string.action_retrieve_session, this, new TaskCallBack<Session>() {
 				@Override
@@ -58,7 +60,7 @@ public class CVTrack extends BaseActivity {
 				}
 			}).execute(id.sessionId, id.conferenceId);
 		}
-		getProfileManager().pruneMarked();
+		pm.pruneMarked();
 		super.onResume();
 	}
 	

@@ -52,7 +52,7 @@ public class Conference implements Serializable {
 	public Conference(Conference original) {
 		this();
 		resetSessions();
-		// Do not copy the id
+		this.id = original.id;
 		this.title = original.title;
 		this.description = original.description;
 		this.startTime = new Moment(original.startTime);
@@ -78,6 +78,10 @@ public class Conference implements Serializable {
 		return sort(sessions);
 	}
 
+	public void setSessions(Set<Session> sessions) {
+		this.sessions = sessions;
+	}
+	
 	private Set<Session> sort(Set<Session> org) {
 		try {
 			if (((TreeSet<Session>) org).comparator() instanceof SessionComparator) {

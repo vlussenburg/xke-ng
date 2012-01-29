@@ -91,7 +91,6 @@ public class SearchResultAdapter extends BaseAdapter {
 		rrTask.execute(session.getId());
 	}
 
-	// TODO Move to helper class
 	public static void createAuthorView(View row, Author author) {
 
 		TextView nameView = (TextView) row.findViewById(R.id.author_name);

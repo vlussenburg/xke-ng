@@ -67,7 +67,7 @@ public class Session implements Serializable {
 
 	public Session(Session original) {
 		this();
-		// Do not copy the id
+		id = original.id;
 		type = original.type;
 		title = original.title;
 		location = original.location;

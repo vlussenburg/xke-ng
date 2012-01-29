@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
@@ -23,7 +22,6 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.github.droidfu.activities.BetterDefaultActivity;
-import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
@@ -56,8 +54,6 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 	private MenuItem miEdit;
 	private MenuItem miTrack;
 
-	// private static ProfileManager profileManager;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -88,7 +84,7 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		if (id == XCS.DIALOG.WAITING) {
-			Dialog dialog = new Dialog(this, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+			Dialog dialog = new Dialog(this, android.R.style.Theme_Translucent_NoTitleBar);
 			dialog.setContentView(R.layout.waiting);
 			dialog.setCancelable(false);
 			return dialog;
@@ -96,6 +92,13 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 		return super.onCreateDialog(id);
 	}
 
+	@Override
+	public void finish() {
+		removeDialog(XCS.DIALOG.WAITING);
+		// TODO Remove any warning dialog created by createDialog. This leaks...
+		super.finish();
+	}
+	
 	protected void populateMenuOptions(ArrayList<Integer> list) {};
 
 	@Override
@@ -162,30 +165,6 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 		finish();
 	}
 
-	// public Conference getConference() {
-	// return getConference(true);
-	// }
-	//
-	// protected Conference getConference(boolean useDefault) {
-	// Conference conference = null;
-	// ConferenceServer server = getConferenceServer();
-	//
-	// String identifier = null;
-	// try {
-	// identifier = getIntent().getExtras().getString(IA_CONFERENCE);
-	// conference = server.getConference(identifier);
-	// }
-	// catch (Exception e) {
-	// Log.w(LOG.ALL, "No conference with ID " + identifier);
-	// }
-	// if (conference == null && useDefault) {
-	// conference = server.getUpcomingConference();
-	// Log.w(LOG.ALL, "Conference default " + (conference == null ? "<null>" : conference.getTitle()));
-	// }
-	// // Log.i("XCS", "[GET] Conference (on '" + identifier + "') = " + conference);
-	// return conference;
-	// }
-
 	protected String getSelectedConferenceId() {
 		try {
 			return getIntent().getExtras().getString(IA_CONFERENCE);
@@ -219,47 +198,6 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 		return sessions.isEmpty() ? null : sessions.iterator().next();
 	}
 
-	// protected ConferenceServer getConferenceServer() {
-	// ConferenceServer server = ConferenceServer.getInstance();
-	// if (server == null || server.isLoggedIn() == false) {
-	// SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-	// String user = sp.getString(XCS.PREF.USERNAME, null);
-	// String password = sp.getString(XCS.PREF.PASSWORD, "");
-	// String type = "?";
-	// DataCache cache;
-	// try {
-	// type = sp.getString(XCS.PREF.CACHETYPE, null);
-	// if (type == null) {
-	// type = DataCache.Type.Memory.name();
-	// sp.edit().putString(XCS.PREF.CACHETYPE, type).commit();
-	// }
-	// Log.i(XCS.LOG.PROPERTIES, "Using cache type: " + type);
-	// cache = DataCache.Type.valueOf(type).newInstance(this);
-	// }
-	// catch (Exception e) {
-	// Log.w(XCS.LOG.PROPERTIES,
-	// "Cannot instantiate cache of type " + type + ": " + StringUtil.getExceptionMessage(e));
-	// cache = new MemoryCache(this);
-	// }
-	// server = ConferenceServer.createInstance(user, password, getServerUrl(this), cache);
-	// }
-	// return server;
-	// }
-	//
-	// protected ProfileManager getProfileManager() {
-	// if (profileManager == null) {
-	// profileManager = new ProfileManager(this);
-	// }
-	// profileManager.openConnection();
-	// return profileManager;
-	// }
-	//
-	// protected void closeProfileManager() {
-	// if (profileManager != null) {
-	// profileManager.closeConnection();
-	// }
-	// }
-	//
 	protected Dialog createDialog(String title, String message) {
 		return createDialog(this, title, message);
 	}
@@ -275,29 +213,6 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 		return builder.create();
 	}
 
-	// protected void onSuccess() {}
-	//
-	// protected void onFailure(String message, String detail) {}
-	//
-	// protected void onAuthenticationFailed(String activity) {
-	// AlertDialog.Builder builder = new AlertDialog.Builder(this);
-	// builder.setTitle("Not allowed!").setMessage("Access for " + activity + " is denied. Specify credentials?")
-	// .setIcon(android.R.drawable.ic_dialog_alert)
-	// .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
-	// public void onClick(DialogInterface dialog, int id) {
-	// dialog.dismiss();
-	// startActivity(new Intent(BaseActivity.this, CVSettings.class));
-	// }
-	// }).setNegativeButton("Continue", new DialogInterface.OnClickListener() {
-	// public void onClick(DialogInterface dialog, int id) {
-	// dialog.dismiss();
-	// // The next request will do the login again
-	// ConferenceServer.close();
-	// }
-	// });
-	// builder.create().show();
-	// }
-	//
 	public static String getServerUrl(Context ctx) {
 		try {
 			// Invoke trim to make sure the value is specified
@@ -308,27 +223,6 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 		catch (Exception e) {
 			e.printStackTrace();
 			throw new IllegalArgumentException("serverUrl is undefined");
-		}
-	}
-
-	// TODO Move to application
-	public void markSession(Session session, View view, boolean update) {
-		// Breaks are not supported for marking
-		if (session.getType() == Session.Type.BREAK) return;
-
-		ProfileManager pm = getProfileManager();
-		boolean hasMarked = pm.isMarked(getUser(), session.getId());
-		if (update) {
-			if (hasMarked) {
-				if (pm.unmarkSession(getUser(), session)) hasMarked = false;
-			} else {
-				if (pm.markSession(getUser(), session)) hasMarked = true;
-			}
-		}
-
-		if (view instanceof ImageView) {
-			((ImageView) view).setImageResource(hasMarked ? android.R.drawable.btn_star_big_on
-					: android.R.drawable.btn_star_big_off);
 		}
 	}
 
@@ -349,7 +243,7 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 		return null;
 	}
 
-	public ProfileManager getProfileManager() {
-		return ((ConferenceViewerApplication) getApplication()).getProfileManager();
+	public ConferenceViewerApplication getMyApplication() {
+		return (ConferenceViewerApplication) getApplication();
 	}
 }
