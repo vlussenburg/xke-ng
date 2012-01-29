@@ -53,8 +53,13 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 
 	@Override
 	protected void handleError(final Context ctx, Exception e) {
+		// Do not throw exception here. It will block the async task waiting dialog.
 		if (callback != null) {
-			callback.onCalled(null);
+			try {
+				callback.onCalled(null);
+			} catch (Exception ex) {
+				Log.w(XCS.LOG.COMMUNICATE, "Processing error callback failed: " + StringUtil.getExceptionMessage(ex));
+			}
 		}
 		if (e instanceof DataException) {
 			if (((DataException) e).missing()) {
@@ -92,7 +97,6 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 		String msg = "Communication failure on '" + action + "' due to " + StringUtil.getExceptionMessage(e);
 		BaseActivity.createDialog(ctx, "Action failed", msg).show();
 		Log.e(XCS.LOG.COMMUNICATE, msg);
-		// Do not throw exception here. It will block the async task waiting dialog.
 	}
 
 	private void validateLogin() {

@@ -9,7 +9,8 @@ import com.xebia.xcoss.axcv.model.Session;
 
 public class DeleteConferenceTask extends CVTask<Conference, Void, Boolean> {
 
-	private boolean moveSessions = true;
+	// TODO Should be on true
+	private boolean moveSessions = false;
 	
 	public DeleteConferenceTask(int action, BaseActivity ctx, TaskCallBack<Boolean> callback) {
 		super(action, ctx, callback);

@@ -20,12 +20,14 @@ public class FormatUtil {
 
 	public static String getHtml(List<Remark> remarks) {
 		StringBuilder sb = new StringBuilder();
-		for (Remark remark : remarks) {
-			sb.append("<b>");
-			sb.append(remark.getUser());
-			sb.append("</b> - ");
-			sb.append(remark.getComment());
-			sb.append("<br/>");
+		if (remarks != null) {
+			for (Remark remark : remarks) {
+				sb.append("<b>");
+				sb.append(remark.getUser());
+				sb.append("</b> - ");
+				sb.append(remark.getComment());
+				sb.append("<br/>");
+			}
 		}
 		return sb.toString();
 	}

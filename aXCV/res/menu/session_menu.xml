@@ -12,4 +12,10 @@
 		android:title="@string/context_menu_session_edit"
 		android:id="@+id/edit">
 	</item>
+	<item
+		android:enabled="true"
+		android:visible="true"
+		android:title="@string/context_menu_session_delete"
+		android:id="@+id/delete">
+	</item>
 </menu>

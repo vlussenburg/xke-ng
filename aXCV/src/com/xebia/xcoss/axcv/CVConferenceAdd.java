@@ -35,6 +35,7 @@ import com.xebia.xcoss.axcv.tasks.RegisterConferenceTask;
 import com.xebia.xcoss.axcv.tasks.RegisterLocationTask;
 import com.xebia.xcoss.axcv.tasks.RetrieveConferenceTask;
 import com.xebia.xcoss.axcv.tasks.RetrieveLocationsTask;
+import com.xebia.xcoss.axcv.tasks.SimpleCallBack;
 import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.AddBreakDialog;
 import com.xebia.xcoss.axcv.ui.LocationInputDialog;
@@ -213,49 +214,10 @@ public class CVConferenceAdd extends AdditionActivity {
 		button.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
-				int size = conference.getSessions().size();
-				StringBuilder message = new StringBuilder();
-				String NEWLINE = System.getProperty("line.separator");
-				if (size > 0) {
-					message.append(getString(R.string.warning));
-					message.append(NEWLINE);
-					message.append(getString(R.string.conference_with_sessions, size));
-					message.append(NEWLINE);
-				}
-				String time = timeFormatter.getAbsoluteDate(conference.getStartTime());
-				message.append(getString(R.string.confirm_delete_conference, conference.getTitle(), time));
-
-				AlertDialog.Builder builder = new AlertDialog.Builder(CVConferenceAdd.this);
-				builder.setTitle(R.string.delete_conference);
-				builder.setMessage(message.toString());
-				builder.setIcon(android.R.drawable.ic_dialog_alert);
-				builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
-					}
-				});
-				builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						DeleteConferenceTask dcTask = new DeleteConferenceTask(R.string.action_delete_conference,
-								CVConferenceAdd.this, null);
-						dcTask.setMoveSessions(false);
-						dcTask.execute(conference);
-						dialog.dismiss();
-						CVConferenceAdd.this.finish();
-					}
-				});
-				if (size > 0) {
-					builder.setNeutralButton(R.string.move_delete, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							new DeleteConferenceTask(R.string.action_delete_conference, CVConferenceAdd.this, null)
-									.execute(conference);
-							dialog.dismiss();
-							CVConferenceAdd.this.finish();
-						}
-					});
-				}
-				AlertDialog alertDialog = builder.create();
-				alertDialog.show();
+				createDeleteDialog(CVConferenceAdd.this, conference, new SimpleCallBack() {@Override
+				public void onCalled(Boolean result) {
+					finish();
+				}}).show();
 			}
 		});
 	}
@@ -541,4 +503,48 @@ public class CVConferenceAdd extends AdditionActivity {
 
 	@Override
 	public void onCancel(DialogInterface di) {}
+
+	protected static AlertDialog createDeleteDialog(final BaseActivity ctx, final Conference conference, final SimpleCallBack scb) {
+		int size = conference.getSessions().size();
+		StringBuilder message = new StringBuilder();
+		String NEWLINE = System.getProperty("line.separator");
+		if (size > 0) {
+			message.append(ctx.getString(R.string.warning));
+			message.append(NEWLINE);
+			message.append(ctx.getString(R.string.conference_with_sessions, size));
+			message.append(NEWLINE);
+		}
+		String time = new ScreenTimeUtil(ctx).getAbsoluteDate(conference.getStartTime());
+		message.append(ctx.getString(R.string.confirm_delete_conference, conference.getTitle(), time));
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+		builder.setTitle(R.string.delete_conference);
+		builder.setMessage(message.toString());
+		builder.setIcon(android.R.drawable.ic_dialog_alert);
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.dismiss();
+			}
+		});
+		builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				DeleteConferenceTask dcTask = new DeleteConferenceTask(R.string.action_delete_conference, ctx, null);
+				dcTask.setMoveSessions(false);
+				dcTask.execute(conference);
+				dialog.dismiss();
+				scb.onCalled(true);
+			}
+		});
+		if (size > 0) {
+			builder.setNeutralButton(R.string.move_delete, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					new DeleteConferenceTask(R.string.action_delete_conference, ctx, null).execute(conference);
+					dialog.dismiss();
+					scb.onCalled(true);
+				}
+			});
+		}
+		AlertDialog alertDialog = builder.create();
+		return alertDialog;
+	}
 }

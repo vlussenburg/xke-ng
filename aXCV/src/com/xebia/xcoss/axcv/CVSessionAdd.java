@@ -221,6 +221,8 @@ public class CVSessionAdd extends AdditionActivity {
 						new TaskCallBack<Boolean>() {
 							@Override
 							public void onCalled(Boolean result) {
+								// A session has been added, so the cache is invalid.
+								getMyApplication().getStorage().remove(conference);
 								CVSessionAdd.this.finish();
 							}
 						}).execute(session);

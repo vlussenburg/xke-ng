@@ -62,6 +62,7 @@ public class ConferenceAdapter extends BaseAdapter {
 				menu.setHeaderTitle(cfr.getTitle());
 				menu.add(paramInt, R.id.edit, Menu.NONE, R.string.context_menu_session_edit);
 				menu.add(paramInt, R.id.view, Menu.NONE, R.string.context_menu_session_view);
+				menu.add(paramInt, R.id.delete, Menu.NONE, R.string.context_menu_session_delete);
 			}
 		});
 

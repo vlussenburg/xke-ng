@@ -145,6 +145,9 @@ public class ExceptionReportService extends ReportingIntentService {
 		String stacktrace = intent.getStringExtra(EXTRA_STACK_TRACE);
 		String exception = intent.getStringExtra(EXTRA_EXCEPTION_CLASS);
 		String message = intent.getStringExtra(EXTRA_MESSAGE);
+		Log.e(TAG, "Stacktrace : " + stacktrace);
+		Log.e(TAG, "Exception  : " + exception);
+		Log.e(TAG, "Message    : " + message);
 		long availableMemory = intent.getLongExtra(EXTRA_AVAILABLE_MEMORY, -1l);
 		long totalMemory = intent.getLongExtra(EXTRA_TOTAL_MEMORY, -1l);
 		String dateTime = intent.getStringExtra(EXTRA_EXCEPTION_TIME);

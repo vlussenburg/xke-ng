@@ -25,20 +25,22 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 		currentConferenceId = (String) getIntent().getExtras().get(IA_CONFERENCE);
 		currentLocation = getIntent().getExtras().getInt(IA_LOCATION_ID);
 		locations = new Location[0];
-		
+
 		new RetrieveConferenceTask(R.string.action_retrieve_conference, this, new TaskCallBack<Conference>() {
 			@Override
 			public void onCalled(Conference cc) {
-				locations = cc.getLocations().toArray(new Location[0]);
-				if (currentLocation < 0 || currentLocation > (locations.length - 1)) {
-					currentLocation = 0;
+				if (cc != null) {
+					locations = cc.getLocations().toArray(new Location[0]);
+					if (currentLocation < 0 || currentLocation > (locations.length - 1)) {
+						currentLocation = 0;
+					}
 				}
 			}
 		}).execute(getConferenceId());
 	}
 
 	protected Location getCurrentLocation() {
-		if ( locations != null && locations.length > currentLocation) {
+		if (locations != null && locations.length > currentLocation) {
 			return locations[currentLocation];
 		}
 		return null;
@@ -57,7 +59,7 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 
 	protected Location getNextLocation() {
 		int next = currentLocation + 1;
-		if ( next < locations.length ) {
+		if (next < locations.length) {
 			return locations[next];
 		}
 		return null;
@@ -65,7 +67,7 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 
 	protected Location getPreviousLocation() {
 		int prev = currentLocation - 1;
-		if ( prev >= 0 && prev < locations.length ) {
+		if (prev >= 0 && prev < locations.length) {
 			return locations[prev];
 		}
 		return null;

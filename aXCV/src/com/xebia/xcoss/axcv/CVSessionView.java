@@ -3,6 +3,8 @@ package com.xebia.xcoss.axcv;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -44,6 +46,7 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	private Session currentSession;
 	private Conference currentConference;
+	private Timer timer;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -54,10 +57,25 @@ public class CVSessionView extends SessionSwipeActivity {
 	}
 
 	@Override
+	protected void onPause() {
+		if (timer != null) {
+			timer.purge();
+			timer.cancel();
+		}
+		timer = null;
+		super.onPause();
+	}
+
+	@Override
 	protected void onResume() {
+		scheduleRateAndReviewRefresh();
 		new RetrieveConferenceTask(R.string.action_retrieve_conference, this, new TaskCallBack<Conference>() {
 			@Override
 			public void onCalled(Conference conference) {
+				if ( conference == null ) {
+					CVSessionView.this.finish();
+					return;
+				}
 				currentConference = conference;
 				currentSession = getSelectedSession(conference);
 
@@ -88,11 +106,22 @@ public class CVSessionView extends SessionSwipeActivity {
 					fill(conference);
 					updateLocations();
 					updateSessions();
-					updateRateAndReview();
+					if ( timer != null )
+					scheduleRateAndReviewRefresh();
 				}
 			}
 		}).execute(getConferenceId());
 		super.onResume();
+	}
+
+	private void scheduleRateAndReviewRefresh() {
+		timer = new Timer();
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				updateRateAndReview();
+			}
+		}, 1500, 30000);
 	}
 
 	private void fill(Conference conference) {
@@ -170,6 +199,10 @@ public class CVSessionView extends SessionSwipeActivity {
 	}
 
 	private void updateRateAndReview() {
+		if (currentSession == null || StringUtil.isEmpty(currentSession.getId())) {
+			return;
+		}
+		Log.i(XCS.LOG.COMMUNICATE, "Updating rate and reviews");
 		new RetrieveRateTask(R.string.action_retrieve_rate, this, new TaskCallBack<Rate>() {
 			@Override
 			public void onCalled(Rate result) {
@@ -251,9 +284,9 @@ public class CVSessionView extends SessionSwipeActivity {
 						Rate rate = new Rate(ratingBar, currentSession.getId());
 						if (rate.isRated()) {
 							new RegisterRateTask(R.string.action_register_rate, CVSessionView.this).execute(rate);
+							if (timer != null) scheduleRateAndReviewRefresh();
 						}
 						dismissDialog(XCS.DIALOG.ADD_RATING);
-						updateRateAndReview();
 					}
 				});
 
@@ -282,7 +315,7 @@ public class CVSessionView extends SessionSwipeActivity {
 						Remark remark = new Remark(getUser(), edit.getText().toString(), currentSession.getId());
 						new RegisterRemarkTask(R.string.action_register_remark, CVSessionView.this).execute(remark);
 						dismissDialog(XCS.DIALOG.CREATE_REVIEW);
-						updateRateAndReview();
+						if (timer != null) scheduleRateAndReviewRefresh();
 					}
 				});
 				return dialog;

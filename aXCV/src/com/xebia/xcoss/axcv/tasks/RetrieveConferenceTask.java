@@ -6,11 +6,13 @@ import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.logic.RestClient;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.util.StringUtil;
+import com.xebia.xcoss.axcv.util.XCS;
 
 public class RetrieveConferenceTask extends CVTask<String, Void, Conference> {
 
 	public RetrieveConferenceTask(int action, BaseActivity ctx, TaskCallBack<Conference> callback) {
 		super(action, ctx, callback);
+		useCustomDialog(XCS.DIALOG.WAITING);
 	}
 
 	@Override

@@ -3,6 +3,8 @@ package com.xebia.xcoss.axcv;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,7 +17,9 @@ import android.widget.TextView;
 import com.xebia.xcoss.axcv.layout.SwipeLayout;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
+import com.xebia.xcoss.axcv.tasks.DeleteConferenceTask;
 import com.xebia.xcoss.axcv.tasks.RetrieveConferencesPerYearTask;
+import com.xebia.xcoss.axcv.tasks.SimpleCallBack;
 import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.ConferenceAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -67,6 +71,11 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 
 	@Override
 	protected void onResume() {
+		refreshScreen();
+		super.onResume();
+	}
+
+	private void refreshScreen() {
 		new RetrieveConferencesPerYearTask(R.string.action_retrieve_conferences, this,
 				new TaskCallBack<List<Conference>>() {
 					@Override
@@ -81,7 +90,6 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 						}
 					}
 				}).execute(shownYear);
-		super.onResume();
 	}
 
 	public void updateConferences(List<Conference> list) {
@@ -113,6 +121,14 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 				Intent intent = new Intent(this, CVConferenceAdd.class);
 				intent.putExtra(BaseActivity.IA_CONFERENCE, conferences[position].getId());
 				startActivity(intent);
+				return true;
+			case R.id.delete:
+				CVConferenceAdd.createDeleteDialog(this, conferences[position], new SimpleCallBack() {
+					@Override
+					public void onCalled(Boolean result) {
+						refreshScreen();
+					}
+				}).show();
 				return true;
 		}
 		return super.onContextItemSelected(menuItem);

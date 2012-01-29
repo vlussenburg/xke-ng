@@ -8,6 +8,7 @@ import android.content.Context;
 import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
+import com.xebia.xcoss.axcv.util.XCS;
 
 public class RetrieveConferencesFromDateTask extends CVTask<Integer, Void, List<Conference>> {
 
@@ -15,6 +16,7 @@ public class RetrieveConferencesFromDateTask extends CVTask<Integer, Void, List<
 
 	public RetrieveConferencesFromDateTask(int action, BaseActivity ctx, TaskCallBack<List<Conference>> callback) {
 		super(action, ctx, callback);
+		useCustomDialog(XCS.DIALOG.WAITING);
 	}
 
 	public void setMoment(Moment moment) {

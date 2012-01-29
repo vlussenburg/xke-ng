@@ -9,6 +9,7 @@ import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -86,7 +87,13 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 		if (id == XCS.DIALOG.WAITING) {
 			Dialog dialog = new Dialog(this, android.R.style.Theme_Translucent_NoTitleBar);
 			dialog.setContentView(R.layout.waiting);
-			dialog.setCancelable(false);
+			dialog.setCancelable(true);
+			dialog.setOnCancelListener(new OnCancelListener() {
+				@Override
+				public void onCancel(DialogInterface arg0) {
+					BaseActivity.this.finish();
+				}
+			});
 			return dialog;
 		}
 		return super.onCreateDialog(id);

@@ -32,7 +32,7 @@
         <!-- Was: https://ssl-lb-xkeng-1607107363.eu-west-1.elb.amazonaws.com/xkeng -->
         <meta-data
             android:name="de.quist.app.errorreporter.targetUrl"
-            android:value="https://ec2-46-137-184-99.eu-west-1.compute.amazonaws.com:8443/xkeng/error" />
+            android:value="http://10.0.2.2:9000/error" />
         <meta-data
             android:name="com.xebia.xcoss.serverUrl"
             android:value="https://ec2-46-137-184-99.eu-west-1.compute.amazonaws.com:8443/xkeng" />
