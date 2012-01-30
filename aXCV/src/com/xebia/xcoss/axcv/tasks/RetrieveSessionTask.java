@@ -27,8 +27,7 @@ public class RetrieveSessionTask extends CVTask<String, Void, Session> {
 				session.setConferenceId(ids[1]);
 				getStorage().add(ids[1], session);
 			}
-			return session;
 		}
-		return null;
+		return session;
 	}
 }

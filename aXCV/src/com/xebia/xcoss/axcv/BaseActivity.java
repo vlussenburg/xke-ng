@@ -31,9 +31,15 @@ import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 
+/**
+ * IA_NOTIFICATION_ID - ID of notification (optional). Clears the notification flag.
+ * 
+ * @author Michael
+ *
+ */
 public abstract class BaseActivity extends BetterDefaultActivity {
 
-	public static final String IA_CONFERENCE = "ID-conference";
+	public static final String IA_CONFERENCE_ID = "ID-conference";
 	public static final String IA_SESSION = "ID-session";
 	public static final String IA_AUTHORS = "ID-authors";
 	public static final String IA_AUTHOR = "ID-author";
@@ -174,7 +180,7 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 
 	protected String getSelectedConferenceId() {
 		try {
-			return getIntent().getExtras().getString(IA_CONFERENCE);
+			return getIntent().getExtras().getString(IA_CONFERENCE_ID);
 		}
 		catch (Exception e) {
 			Log.w(LOG.ALL, "No conference in intent.");

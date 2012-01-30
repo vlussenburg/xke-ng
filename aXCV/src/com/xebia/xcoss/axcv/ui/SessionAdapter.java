@@ -141,7 +141,7 @@ public class SessionAdapter extends BaseAdapter {
 
 	private void editSession(Session session) {
 		Intent intent = new Intent(ctx, CVSessionAdd.class);
-		intent.putExtra(BaseActivity.IA_CONFERENCE, session.getConferenceId());
+		intent.putExtra(BaseActivity.IA_CONFERENCE_ID, session.getConferenceId());
 		intent.putExtra(BaseActivity.IA_SESSION, session.getId());
 		ctx.startActivity(intent);
 	}

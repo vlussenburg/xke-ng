@@ -26,7 +26,6 @@ public class CVTrack extends BaseActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.my_track);
-		sessions = new ArrayList<Session>();
 
 		ListView sessionList = (ListView) findViewById(R.id.sessionList);
 		sessionList.setOnItemClickListener(new OnItemClickListener() {
@@ -41,7 +40,7 @@ public class CVTrack extends BaseActivity {
 	private void switchTo(int sessionIndex) {
 		Session session = sessions.get(sessionIndex);
 		Intent intent = new Intent(this, CVSessionView.class);
-		intent.putExtra(BaseActivity.IA_CONFERENCE, session.getConferenceId());
+		intent.putExtra(BaseActivity.IA_CONFERENCE_ID, session.getConferenceId());
 		intent.putExtra(BaseActivity.IA_SESSION, session.getId());
 		startActivity(intent);
 	}
@@ -50,15 +49,19 @@ public class CVTrack extends BaseActivity {
 	protected void onResume() {
 		ProfileManager pm = getMyApplication().getProfileManager();
 		Trackable[] markedSessions = pm.getMarkedSessions(getUser());
+		sessions = new ArrayList<Session>();
 		for (Trackable id : markedSessions) {
-			new RetrieveSessionTask(R.string.action_retrieve_session, this, new TaskCallBack<Session>() {
+			RetrieveSessionTask task = 
+					new RetrieveSessionTask(R.string.action_retrieve_session, this, new TaskCallBack<Session>() {
 				@Override
 				public void onCalled(Session result) {
 					if (result != null) {
 						updateSessions(result);
 					}
 				}
-			}).execute(id.sessionId, id.conferenceId);
+			});
+			task.setSilent(true);
+			task.execute(id.sessionId, id.conferenceId);
 		}
 		pm.pruneMarked();
 		super.onResume();

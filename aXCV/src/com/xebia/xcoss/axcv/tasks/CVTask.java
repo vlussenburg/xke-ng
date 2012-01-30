@@ -1,6 +1,7 @@
 package com.xebia.xcoss.axcv.tasks;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,11 +12,11 @@ import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.CVSettings;
 import com.xebia.xcoss.axcv.ConferenceViewerApplication;
 import com.xebia.xcoss.axcv.R;
-import com.xebia.xcoss.axcv.logic.CommException;
 import com.xebia.xcoss.axcv.logic.DataException;
 import com.xebia.xcoss.axcv.logic.RestClient;
 import com.xebia.xcoss.axcv.logic.cache.DataCache;
 import com.xebia.xcoss.axcv.model.Credential;
+import com.xebia.xcoss.axcv.util.DebugUtil;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -25,6 +26,7 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 	private String action;
 	private ConferenceViewerApplication application;
 	private TaskCallBack<ReturnT> callback;
+	private boolean silent = false;
 
 	public CVTask(int action, BaseActivity ctx, TaskCallBack<ReturnT> callback) {
 		super(ctx);
@@ -33,6 +35,7 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 		this.callback = callback;
 		disableDialog();
 		Log.w(XCS.LOG.COMMUNICATE, "Task created: " + getClass().getSimpleName());
+		DebugUtil.showCallStack();
 	}
 
 	@Override
@@ -51,29 +54,29 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 		}
 	}
 
+	public void setSilent(boolean silent) {
+		this.silent = silent;
+	}
+	
 	@Override
 	protected void handleError(final Context ctx, Exception e) {
 		// Do not throw exception here. It will block the async task waiting dialog.
 		if (callback != null) {
 			try {
 				callback.onCalled(null);
-			} catch (Exception ex) {
+			}
+			catch (Exception ex) {
 				Log.w(XCS.LOG.COMMUNICATE, "Processing error callback failed: " + StringUtil.getExceptionMessage(ex));
 			}
 		}
+		String msg = null;
 		if (e instanceof DataException) {
 			if (((DataException) e).missing()) {
-				String msg = ctx.getString(R.string.server_missing_url, action);
-				Log.w(XCS.LOG.COMMUNICATE, msg);
-				BaseActivity.createDialog(ctx, "Action failed", msg).show();
+				msg = ctx.getString(R.string.server_missing_url, action);
 			} else if (((DataException) e).networkError()) {
-				String msg = ctx.getString(R.string.server_unreachable, action);
-				Log.w(XCS.LOG.COMMUNICATE, msg);
-				BaseActivity.createDialog(ctx, "Action failed", msg).show();
+				msg = ctx.getString(R.string.server_unreachable, action);
 			} else if (((DataException) e).timedOut()) {
-				String msg = ctx.getString(R.string.server_timeout, action);
-				Log.w(XCS.LOG.COMMUNICATE, msg);
-				BaseActivity.createDialog(ctx, "Action failed", msg).show();
+				msg = ctx.getString(R.string.server_timeout, action);
 			} else {
 				AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 				builder.setTitle("Not allowed!")
@@ -90,13 +93,20 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 								RestClient.logout();
 							}
 						});
-				builder.create().show();
+				AlertDialog alertDialog = builder.create();
+				alertDialog.show();
+			}
+			if (!silent && msg != null) {
+				Log.w(XCS.LOG.COMMUNICATE, msg);
+				BaseActivity.createDialog(ctx, "Action failed", msg).show();
 			}
 			return;
 		}
-		String msg = "Communication failure on '" + action + "' due to " + StringUtil.getExceptionMessage(e);
-		BaseActivity.createDialog(ctx, "Action failed", msg).show();
-		Log.e(XCS.LOG.COMMUNICATE, msg);
+		if (!silent) {
+			msg = "Communication failure on '" + action + "' due to " + StringUtil.getExceptionMessage(e);
+			Log.w(XCS.LOG.COMMUNICATE, msg);
+			BaseActivity.createDialog(ctx, "Action failed", msg).show();
+		}
 	}
 
 	private void validateLogin() {
@@ -118,6 +128,6 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 	}
 
 	public DataCache getStorage() {
-		return application.getStorage();
+		return application.getCache();
 	}
 }

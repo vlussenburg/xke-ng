@@ -72,7 +72,7 @@ public class ConferenceViewerApplication extends DroidFuApplication {
 		return password;
 	}
 
-	public DataCache getStorage() {
+	public DataCache getCache() {
 		if (storage == null) {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			String type = null;

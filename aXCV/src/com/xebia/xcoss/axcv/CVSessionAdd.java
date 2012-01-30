@@ -33,6 +33,7 @@ import com.xebia.xcoss.axcv.tasks.DeleteSessionTask;
 import com.xebia.xcoss.axcv.tasks.RegisterSessionTask;
 import com.xebia.xcoss.axcv.tasks.RetrieveConferenceTask;
 import com.xebia.xcoss.axcv.tasks.RetrieveConferencesFromDateTask;
+import com.xebia.xcoss.axcv.tasks.SimpleCallBack;
 import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.Identifiable;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
@@ -222,7 +223,7 @@ public class CVSessionAdd extends AdditionActivity {
 							@Override
 							public void onCalled(Boolean result) {
 								// A session has been added, so the cache is invalid.
-								getMyApplication().getStorage().remove(conference);
+								getMyApplication().getCache().remove(conference);
 								CVSessionAdd.this.finish();
 							}
 						}).execute(session);
@@ -235,21 +236,15 @@ public class CVSessionAdd extends AdditionActivity {
 			button.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View paramView) {
-					String moment = timeFormatter.getAbsoluteDate(session.getStartTime());
-					AlertDialog.Builder builder = new AlertDialog.Builder(CVSessionAdd.this);
-					builder.setTitle(R.string.delete_session);
-					builder.setMessage(getString(R.string.confirm_delete_session, session.getTitle(), moment));
-					builder.setIcon(android.R.drawable.ic_dialog_alert);
-					builder.setPositiveButton(R.string.cancel, cancelClickListener);
-					builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							new DeleteSessionTask(R.string.action_delete_session, CVSessionAdd.this, null)
-									.execute(originalSession);
-							CVSessionAdd.this.finish();
+					createDeleteDialog(CVSessionAdd.this, originalSession, new SimpleCallBack() {
+						@Override
+						public void onCalled(Boolean result) {
+							getMyApplication().getCache().remove(conference);
+							finish();
 						}
-					});
-					builder.show();
+					}).show();
 				}
+
 			});
 		}
 		button = (Button) findViewById(R.id.actionReschedule);
@@ -264,6 +259,29 @@ public class CVSessionAdd extends AdditionActivity {
 				showSession();
 			}
 		});
+	}
+
+	public static AlertDialog.Builder createDeleteDialog(final BaseActivity ctx, final Session session,
+			final SimpleCallBack scb) {
+		String moment = new ScreenTimeUtil(ctx).getAbsoluteDate(session.getStartTime());
+		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+		builder.setTitle(R.string.delete_session);
+		builder.setMessage(ctx.getString(R.string.confirm_delete_session, session.getTitle(), moment));
+		builder.setIcon(android.R.drawable.ic_dialog_alert);
+		builder.setPositiveButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				new DeleteSessionTask(R.string.action_delete_session, ctx, null).execute(session);
+				// A session has been added, so the cache is invalid.
+				scb.onCalled(true);
+			}
+		});
+		return builder;
 	}
 
 	private void rescheduleSession(final int duration) {
@@ -466,7 +484,7 @@ public class CVSessionAdd extends AdditionActivity {
 
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.select_location);
-				ListAdapter la = new ArrayAdapter<Location>(this, R.layout.simple_list_item_single_choice, locations);
+				ListAdapter la = new ArrayAdapter<Location>(this, android.R.layout.simple_spinner_item, locations);
 				builder.setSingleChoiceItems(la, -1, new DialogHandler(this, locations, R.id.sessionLocation));
 				dialog = builder.create();
 			break;

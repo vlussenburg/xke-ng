@@ -119,7 +119,7 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 				return true;
 			case R.id.edit:
 				Intent intent = new Intent(this, CVConferenceAdd.class);
-				intent.putExtra(BaseActivity.IA_CONFERENCE, conferences[position].getId());
+				intent.putExtra(BaseActivity.IA_CONFERENCE_ID, conferences[position].getId());
 				startActivity(intent);
 				return true;
 			case R.id.delete:
@@ -149,7 +149,7 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 			} else {
 				intent = new Intent(this, CVSessionView.class);
 			}
-			intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
+			intent.putExtra(BaseActivity.IA_CONFERENCE_ID, conference.getId());
 			startActivity(intent);
 		}
 	}

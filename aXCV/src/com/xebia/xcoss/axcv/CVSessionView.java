@@ -42,11 +42,21 @@ import com.xebia.xcoss.axcv.util.FormatUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
+/**
+ * IA_CONFERENCE_ID - ID of selected conference (required by parent).
+ * IA_SESSION_ID - ID of selected conference (optional).
+ * IA_LOCATION_ID - ID of selected location (optional by parent).
+ * IA_SESSION_START - ID of selected session (optional).
+ * 
+ * @author Michael
+ */
+
 public class CVSessionView extends SessionSwipeActivity {
 
 	private Session currentSession;
 	private Conference currentConference;
-	private Timer timer;
+	private Timer timer = new Timer();
+	private TimerTask timerTask;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -58,12 +68,19 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	@Override
 	protected void onPause() {
-		if (timer != null) {
-			timer.purge();
-			timer.cancel();
-		}
-		timer = null;
+		cancelTasks();
 		super.onPause();
+	}
+
+	private void cancelTasks() {
+		if (timerTask != null) {
+			timerTask.cancel();
+		}
+		if ( timer != null ) {
+//			timer.cancel();
+			timer.purge();
+		}
+//		timer = new Timer();
 	}
 
 	@Override
@@ -72,42 +89,21 @@ public class CVSessionView extends SessionSwipeActivity {
 		new RetrieveConferenceTask(R.string.action_retrieve_conference, this, new TaskCallBack<Conference>() {
 			@Override
 			public void onCalled(Conference conference) {
-				if ( conference == null ) {
-					CVSessionView.this.finish();
-					return;
-				}
-				currentConference = conference;
-				currentSession = getSelectedSession(conference);
+				if (conference != null) {
+					currentConference = conference;
+					currentSession = determineSelectedSession(conference);
 
-				if (currentSession == null) {
-					Location location = getCurrentLocation();
-					ArrayList<Session> options = new ArrayList<Session>();
-					for (Session s : conference.getSessions()) {
-						if (s.getLocation().equals(location) || s.isBreak()) {
-							options.add(s);
+					if (currentSession != null) {
+						updateLocations(currentConference, currentSession);
+						fill(conference);
+						updateSessions();
+						if (timer != null) {
+							scheduleRateAndReviewRefresh();
 						}
 					}
-					int start = getIntent().getIntExtra(IA_SESSION_START, 0);
-					for (Session session : options) {
-						if (session.getStartTime().asMinutes() == start) {
-							currentSession = session;
-							break;
-						}
-					}
-					if (currentSession == null && options.size() > 0) {
-						currentSession = options.get(0);
-					}
-				}
-				if (currentSession == null) {
-					currentSession = getDefaultSession(conference);
-				}
-				if (currentSession != null) {
-					updateLocation(currentSession);
-					fill(conference);
-					updateLocations();
-					updateSessions();
-					if ( timer != null )
-					scheduleRateAndReviewRefresh();
+				} else {
+					// TODO The CVTask currently shows a dialog, which will leak when finishing...
+					finish();
 				}
 			}
 		}).execute(getConferenceId());
@@ -115,13 +111,14 @@ public class CVSessionView extends SessionSwipeActivity {
 	}
 
 	private void scheduleRateAndReviewRefresh() {
-		timer = new Timer();
-		timer.schedule(new TimerTask() {
+		cancelTasks();
+		timerTask = new TimerTask() {
 			@Override
 			public void run() {
 				updateRateAndReview();
 			}
-		}, 1500, 30000);
+		};
+		timer.schedule(timerTask, 1500, 30000);
 	}
 
 	private void fill(Conference conference) {
@@ -346,7 +343,7 @@ public class CVSessionView extends SessionSwipeActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Add or edit a session
 		Intent intent = new Intent(this, CVSessionAdd.class);
-		intent.putExtra(BaseActivity.IA_CONFERENCE, getConferenceId());
+		intent.putExtra(BaseActivity.IA_CONFERENCE_ID, getConferenceId());
 
 		switch (item.getItemId()) {
 			case XCS.MENU.ADD:
@@ -359,7 +356,7 @@ public class CVSessionView extends SessionSwipeActivity {
 			case XCS.MENU.LIST:
 				intent = new Intent(this, CVSessionList.class);
 				intent.putExtra(IA_LOCATION_ID, currentLocation);
-				intent.putExtra(IA_CONFERENCE, currentSession.getConferenceId());
+				intent.putExtra(IA_CONFERENCE_ID, currentSession.getConferenceId());
 				startActivity(intent);
 				return true;
 		}
@@ -445,10 +442,41 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	private void startActivityCurrentSession() {
 		Intent intent = getIntent();
-		intent.putExtra(BaseActivity.IA_CONFERENCE, getConferenceId());
+		intent.putExtra(BaseActivity.IA_CONFERENCE_ID, getConferenceId());
 		intent.putExtra(BaseActivity.IA_SESSION, currentSession.getId());
 		startActivity(intent);
 		// Finish this activity to let the back button go directly to the overview page
 		finish();
+	}
+
+	public Session determineSelectedSession(Conference conference) {
+		Session session = getSelectedSession(conference);
+
+		if (session == null && getCurrentLocation() != null) {
+			// Find all sessions on this particular location
+			ArrayList<Session> options = new ArrayList<Session>();
+			for (Session s : conference.getSessions()) {
+				if (s.isMandatory() || s.getLocation().equals(getCurrentLocation())) {
+					options.add(s);
+				}
+			}
+			// Now find the first session starting from this time
+			int delta = Integer.MAX_VALUE;
+			int start = getIntent().getIntExtra(IA_SESSION_START, 0);
+			for (Session option : options) {
+				int td = option.getStartTime().asMinutes() - start;
+				if (td > 0 && td < delta) {
+					session = option;
+					delta = td;
+				}
+			}
+			if (session == null && options.size() > 0) {
+				session = options.get(options.size() - 1);
+			}
+		}
+		if (session == null) {
+			session = getDefaultSession(conference);
+		}
+		return session;
 	}
 }
