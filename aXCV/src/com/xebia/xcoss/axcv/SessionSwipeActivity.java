@@ -64,7 +64,7 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 		if (id == XCS.DIALOG.INPUT_LOCATION) {
 			Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle(R.string.select_location);
-			ListAdapter la = new ArrayAdapter<Location>(this, android.R.layout.simple_spinner_item, locations);
+			ListAdapter la = new ArrayAdapter<Location>(this, R.layout.simple_list_item, locations);
 			builder.setSingleChoiceItems(la, -1, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int i) {

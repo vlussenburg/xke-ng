@@ -53,6 +53,7 @@ public class CVSessionList extends SessionSwipeActivity {
 			public void onCalled(Conference cc) {
 				if (cc != null) {
 					conference = cc;
+					updateLocations(conference);
 					TextView title = (TextView) findViewById(R.id.conferenceTitle);
 					title.setText(cc.getTitle());
 
@@ -67,7 +68,6 @@ public class CVSessionList extends SessionSwipeActivity {
 					ListView sessionList = (ListView) findViewById(R.id.sessionList);
 					sessionList.setAdapter(adapter);
 
-					updateLocations(conference);
 					updateLocationNavigation();
 
 					TextView sessionLocation = ((TextView) findViewById(R.id.sessionLocation));
