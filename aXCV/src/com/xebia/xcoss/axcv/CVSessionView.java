@@ -64,6 +64,8 @@ public class CVSessionView extends SessionSwipeActivity {
 		setContentView(R.layout.sessionview);
 		super.onCreate(savedInstanceState);
 		((SwipeLayout) findViewById(R.id.swipeLayout)).setGestureListener(this);
+		LinearLayout layout = (LinearLayout) findViewById(R.id.sc_content_layout);
+		layout.setVisibility(View.INVISIBLE);
 	}
 
 	@Override
@@ -76,16 +78,15 @@ public class CVSessionView extends SessionSwipeActivity {
 		if (timerTask != null) {
 			timerTask.cancel();
 		}
-		if ( timer != null ) {
-//			timer.cancel();
+		if (timer != null) {
+			// timer.cancel();
 			timer.purge();
 		}
-//		timer = new Timer();
+		// timer = new Timer();
 	}
 
 	@Override
 	protected void onResume() {
-		scheduleRateAndReviewRefresh();
 		new RetrieveConferenceTask(R.string.action_retrieve_conference, this, new TaskCallBack<Conference>() {
 			@Override
 			public void onCalled(Conference conference) {
@@ -94,13 +95,11 @@ public class CVSessionView extends SessionSwipeActivity {
 					currentSession = determineSelectedSession(conference);
 
 					if (currentSession != null) {
-						updateLocations(currentConference, currentSession);
-						fill(conference);
-						updateSessions();
-						if (timer != null) {
-							scheduleRateAndReviewRefresh();
-						}
+						fill();
+						scheduleRateAndReviewRefresh();
 					}
+					updateLocations(currentConference, currentSession);
+					updatePreviousAndNextSessionButtons();
 				} else {
 					// TODO The CVTask currently shows a dialog, which will leak when finishing...
 					finish();
@@ -121,77 +120,81 @@ public class CVSessionView extends SessionSwipeActivity {
 		timer.schedule(timerTask, 1500, 30000);
 	}
 
-	private void fill(Conference conference) {
+	private void fill() {
 		TextView title = (TextView) findViewById(R.id.conferenceTitle);
-		title.setText(conference.getTitle());
+		title.setText(currentConference.getTitle());
 
 		TextView date = (TextView) findViewById(R.id.conferenceDate);
 		ScreenTimeUtil timeUtil = new ScreenTimeUtil(this);
-		String val = timeUtil.getAbsoluteDate(conference.getStartTime());
+		String val = timeUtil.getAbsoluteDate(currentConference.getStartTime());
 		date.setText(val);
 
-		TextView sessionDate = (TextView) findViewById(R.id.sessionTime);
-		StringBuilder sb = new StringBuilder();
-		sb.append(timeUtil.getAbsoluteTime(currentSession.getStartTime()));
-		sb.append(" - ");
-		sb.append(timeUtil.getAbsoluteTime(currentSession.getEndTime()));
-		sessionDate.setText(sb.toString());
+		if (currentSession != null) {
+			LinearLayout layout = (LinearLayout) findViewById(R.id.sc_content_layout);
+			layout.setVisibility(View.VISIBLE);
+			TextView sessionDate = (TextView) findViewById(R.id.sessionTime);
+			StringBuilder sb = new StringBuilder();
+			sb.append(timeUtil.getAbsoluteTime(currentSession.getStartTime()));
+			sb.append(" - ");
+			sb.append(timeUtil.getAbsoluteTime(currentSession.getEndTime()));
+			sessionDate.setText(sb.toString());
 
-		TextView sessionLocation = ((TextView) findViewById(R.id.sessionLocation));
-		TextView sessionTitle = (TextView) findViewById(R.id.scTitle);
-		TextView sessionDescription = (TextView) findViewById(R.id.scDescription);
-		TextView sessionAuthor = (TextView) findViewById(R.id.scAuthor);
+			TextView sessionLocation = ((TextView) findViewById(R.id.sessionLocation));
+			TextView sessionTitle = (TextView) findViewById(R.id.scTitle);
+			TextView sessionDescription = (TextView) findViewById(R.id.scDescription);
+			TextView sessionAuthor = (TextView) findViewById(R.id.scAuthor);
 
-		sessionLocation.setText(currentSession.getLocation().getDescription());
-		sessionTitle.setText(currentSession.getTitle());
-		sessionDescription.setText(currentSession.getDescription());
-		sessionAuthor.setText(FormatUtil.getList(currentSession.getAuthors()));
+			sessionLocation.setText(currentSession.getLocation().getDescription());
+			sessionTitle.setText(currentSession.getTitle());
+			sessionDescription.setText(currentSession.getDescription());
+			sessionAuthor.setText(FormatUtil.getList(currentSession.getAuthors()));
 
-		// Optional fields (hide when not available)
-		updateTextField(R.id.scAudience, R.id.scAudienceLabel, currentSession.getIntendedAudience());
-		updateTextField(R.id.scLabels, R.id.scLabelsLabel, FormatUtil.getList(currentSession.getLabels(), false));
-		updateTextField(R.id.scLanguage, R.id.scLanguageLabel, FormatUtil.getList(currentSession.getLanguages(), false));
-		updateTextField(R.id.scLimit, R.id.scLimitLabel, currentSession.getLimit());
-		updateTextField(R.id.scPreparation, R.id.scPreparationLabel, currentSession.getPreparation());
+			// Optional fields (hide when not available)
+			updateTextField(R.id.scAudience, R.id.scAudienceLabel, currentSession.getIntendedAudience());
+			updateTextField(R.id.scLabels, R.id.scLabelsLabel, FormatUtil.getList(currentSession.getLabels(), false));
+			updateTextField(R.id.scLanguage, R.id.scLanguageLabel,
+					FormatUtil.getList(currentSession.getLanguages(), false));
+			updateTextField(R.id.scLimit, R.id.scLimitLabel, currentSession.getLimit());
+			updateTextField(R.id.scPreparation, R.id.scPreparationLabel, currentSession.getPreparation());
 
-		TextView labelView = (TextView) findViewById(R.id.scLabels);
-		Linkify.addLinks(labelView, XCS.TAG.PATTERN, XCS.TAG.LINK);
-		if (currentSession.getAuthors().size() > 0) {
-			Linkify.addLinks(sessionAuthor, XCS.AUTHOR.PATTERN, XCS.AUTHOR.LINK);
-		}
-
-		OnClickListener lRate = new OnClickListener() {
-			@Override
-			public void onClick(View paramView) {
-				showDialog(XCS.DIALOG.ADD_RATING);
+			TextView labelView = (TextView) findViewById(R.id.scLabels);
+			Linkify.addLinks(labelView, XCS.TAG.PATTERN, XCS.TAG.LINK);
+			if (currentSession.getAuthors().size() > 0) {
+				Linkify.addLinks(sessionAuthor, XCS.AUTHOR.PATTERN, XCS.AUTHOR.LINK);
 			}
-		};
-		OnClickListener lReview = new OnClickListener() {
-			@Override
-			public void onClick(View paramView) {
-				showDialog(XCS.DIALOG.CREATE_REVIEW);
-			}
-		};
-
-		TextView view = (TextView) findViewById(R.id.scRating);
-		view.setOnClickListener(lRate);
-		findViewById(R.id.scRatingLayout).setOnClickListener(lRate);
-
-		view = (TextView) findViewById(R.id.scComments);
-		view.setOnClickListener(lReview);
-
-		ImageView button = (ImageView) findViewById(R.id.sessionMarkButton);
-		if (currentSession.getType() == Session.Type.BREAK || StringUtil.isEmpty(getUser())) {
-			button.setVisibility(View.GONE);
-		} else {
-			getMyApplication().markSession(currentSession, button, false);
-			button.setVisibility(View.VISIBLE);
-			button.setOnClickListener(new View.OnClickListener() {
+			OnClickListener lRate = new OnClickListener() {
 				@Override
-				public void onClick(View view) {
-					getMyApplication().markSession(currentSession, view, true);
+				public void onClick(View paramView) {
+					showDialog(XCS.DIALOG.ADD_RATING);
 				}
-			});
+			};
+			OnClickListener lReview = new OnClickListener() {
+				@Override
+				public void onClick(View paramView) {
+					showDialog(XCS.DIALOG.CREATE_REVIEW);
+				}
+			};
+
+			TextView view = (TextView) findViewById(R.id.scRating);
+			view.setOnClickListener(lRate);
+			findViewById(R.id.scRatingLayout).setOnClickListener(lRate);
+
+			view = (TextView) findViewById(R.id.scComments);
+			view.setOnClickListener(lReview);
+
+			ImageView button = (ImageView) findViewById(R.id.sessionMarkButton);
+			if (currentSession.getType() == Session.Type.BREAK || StringUtil.isEmpty(getUser())) {
+				button.setVisibility(View.GONE);
+			} else {
+				getMyApplication().markSession(currentSession, button, false);
+				button.setVisibility(View.VISIBLE);
+				button.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View view) {
+						getMyApplication().markSession(currentSession, view, true);
+					}
+				});
+			}
 		}
 	}
 
@@ -218,7 +221,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		}).execute(currentSession.getId());
 	}
 
-	private void updateSessions() {
+	private void updatePreviousAndNextSessionButtons() {
 		Session session = getNextSession(getCurrentLocation());
 		Log.i(XCS.LOG.NAVIGATE, "Find sessions at " + getCurrentLocation());
 		Log.i(XCS.LOG.NAVIGATE, "Current session = " + currentSession);
@@ -387,13 +390,17 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	@Override
 	public void onSwipeLeftToRight() {
-		getIntent().putExtra(IA_SESSION_START, currentSession.getStartTime().asMinutes());
+		if (currentSession != null) {
+			getIntent().putExtra(IA_SESSION_START, currentSession.getStartTime().asMinutes());
+		}
 		super.onSwipeLeftToRight();
 	}
 
 	@Override
 	public void onSwipeRightToLeft() {
-		getIntent().putExtra(IA_SESSION_START, currentSession.getStartTime().asMinutes());
+		if (currentSession != null) {
+			getIntent().putExtra(IA_SESSION_START, currentSession.getStartTime().asMinutes());
+		}
 		super.onSwipeRightToLeft();
 	}
 
@@ -474,9 +481,9 @@ public class CVSessionView extends SessionSwipeActivity {
 				session = options.get(options.size() - 1);
 			}
 		}
-		if (session == null) {
-			session = getDefaultSession(conference);
-		}
+		// if (session == null) {
+		// session = getDefaultSession(conference);
+		// }
 		return session;
 	}
 }
