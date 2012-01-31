@@ -35,6 +35,7 @@
     <string name="newLocationLabel">Location name</string>
     <string name="breakLabel">Break</string>
     <string name="default_break_name">Dinner break</string>
+    <string name="default_break_description">Dinner break @ %s</string>
 
     <string-array name="cacheNames">
         <item>In memory</item>

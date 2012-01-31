@@ -81,7 +81,7 @@ public class AddBreakDialog extends Dialog {
 					Session session = new Session();
 					session.setType(Type.BREAK);
 					session.setTitle(title);
-					session.setDescription(title);
+					session.setDescription(activity.getString(R.string.default_break_description, location.getDescription()));
 					session.setLocation(location);
 					Moment s = conference.getStartTime();
 					session.onStartTime().setDate(s.getYear(), s.getMonth(), s.getDay());

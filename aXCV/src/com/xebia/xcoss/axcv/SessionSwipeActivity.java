@@ -146,11 +146,12 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 	@Override
 	public void onSwipeBottomToTop() {}
 
-	protected void updateLocations(Conference cc, Session session) {
-
+	protected void updateLocations(Conference cc) {
 		List<Location> list = cc.getLocations();
 		locations = list.toArray(new Location[list.size()]);
-
+	}
+	
+	protected void updateCurrentLocation(Session session) {
 		if (session != null && !session.isMandatory()) {
 			for (int i = 0; i < locations.length; i++) {
 				if (locations[i].equals(session.getLocation())) {
@@ -159,18 +160,20 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 				}
 			}
 		}
-
+	}
+	
+	protected void updateLocationNavigation() {
 		Location previous = getPreviousLocation();
 		Location next = getNextLocation();
 
-		StringBuilder sb = new StringBuilder();
-		if (locations != null) for (Location loc : locations)
-			sb.append(loc);
-
-		Log.i(XCS.LOG.NAVIGATE, "Update locations: 1. " + sb.toString());
-		Log.i(XCS.LOG.NAVIGATE, "Update locations: 2. " + getCurrentLocation());
-		Log.i(XCS.LOG.NAVIGATE, "Update locations: 3. " + previous);
-		Log.i(XCS.LOG.NAVIGATE, "Update locations: 4. " + next);
+//		StringBuilder sb = new StringBuilder();
+//		if (locations != null) for (Location loc : locations)
+//			sb.append(loc);
+//
+//		Log.i(XCS.LOG.NAVIGATE, "Update locations: 1. " + sb.toString());
+//		Log.i(XCS.LOG.NAVIGATE, "Update locations: 2. " + getCurrentLocation());
+//		Log.i(XCS.LOG.NAVIGATE, "Update locations: 3. " + previous);
+//		Log.i(XCS.LOG.NAVIGATE, "Update locations: 4. " + next);
 
 		TextView location = (TextView) findViewById(R.id.rightText);
 		ViewGroup group = ((ViewGroup) findViewById(R.id.nextLocationLayout));

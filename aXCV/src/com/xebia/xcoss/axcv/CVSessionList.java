@@ -1,6 +1,7 @@
 package com.xebia.xcoss.axcv;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import com.xebia.xcoss.axcv.layout.SwipeLayout;
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.tasks.RetrieveConferenceTask;
 import com.xebia.xcoss.axcv.tasks.SimpleCallBack;
@@ -64,7 +66,8 @@ public class CVSessionList extends SessionSwipeActivity {
 					ListView sessionList = (ListView) findViewById(R.id.sessionList);
 					sessionList.setAdapter(adapter);
 
-					updateLocations(conference, null);
+					updateLocations(conference);
+					updateLocationNavigation();
 				} else {
 					// TODO The CVTask currently shows a dialog, which will leak when finishing...
 					finish();

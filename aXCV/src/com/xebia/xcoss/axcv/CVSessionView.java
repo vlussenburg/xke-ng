@@ -92,13 +92,15 @@ public class CVSessionView extends SessionSwipeActivity {
 			public void onCalled(Conference conference) {
 				if (conference != null) {
 					currentConference = conference;
-					currentSession = determineSelectedSession(conference);
+					updateLocations(conference);
 
+					currentSession = determineSelectedSession(conference);
 					if (currentSession != null) {
+						updateCurrentLocation(currentSession);
 						fill();
 						scheduleRateAndReviewRefresh();
 					}
-					updateLocations(currentConference, currentSession);
+					updateLocationNavigation();
 					updatePreviousAndNextSessionButtons();
 				} else {
 					// TODO The CVTask currently shows a dialog, which will leak when finishing...
@@ -144,7 +146,8 @@ public class CVSessionView extends SessionSwipeActivity {
 			TextView sessionDescription = (TextView) findViewById(R.id.scDescription);
 			TextView sessionAuthor = (TextView) findViewById(R.id.scAuthor);
 
-			sessionLocation.setText(currentSession.getLocation().getDescription());
+//			sessionLocation.setText(currentSession.getLocation().getDescription());
+			sessionLocation.setText(getCurrentLocation().getDescription());
 			sessionTitle.setText(currentSession.getTitle());
 			sessionDescription.setText(currentSession.getDescription());
 			sessionAuthor.setText(FormatUtil.getList(currentSession.getAuthors()));
@@ -223,9 +226,6 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	private void updatePreviousAndNextSessionButtons() {
 		Session session = getNextSession(getCurrentLocation());
-		Log.i(XCS.LOG.NAVIGATE, "Find sessions at " + getCurrentLocation());
-		Log.i(XCS.LOG.NAVIGATE, "Current session = " + currentSession);
-		Log.i(XCS.LOG.NAVIGATE, "Next session = " + session);
 		View viewById = findViewById(R.id.textNextSession);
 		LinearLayout layout = (LinearLayout) viewById.getParent();
 		if (session == null) {
@@ -449,8 +449,9 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	private void startActivityCurrentSession() {
 		Intent intent = getIntent();
-		intent.putExtra(BaseActivity.IA_CONFERENCE_ID, getConferenceId());
-		intent.putExtra(BaseActivity.IA_SESSION, currentSession.getId());
+		intent.putExtra(IA_CONFERENCE_ID, getConferenceId());
+		intent.putExtra(IA_SESSION, currentSession.getId());
+		intent.putExtra(IA_LOCATION_ID, currentLocation);
 		startActivity(intent);
 		// Finish this activity to let the back button go directly to the overview page
 		finish();
