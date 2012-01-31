@@ -40,7 +40,7 @@ object Assembly extends Logger {
 
   }
 
-  object ExceptionHandlerAssembly extends ExceptionHandler {}
+  class ExceptionHandlerAssembly extends ExceptionHandler {}
 
   def init() = {
     initMongoDB()

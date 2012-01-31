@@ -23,14 +23,28 @@ import net.liftweb.util.Helpers._
 
 object RestSmokeTestClient {
 
-  import RestClientUtils._
-  //val host = "localhost"
-  //val contextRoot = "" 
+  trait Config {
+    val host: String
+    val contextRoot: String
+    val port: Int
+    val secure: Boolean
 
-  val host = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com"
-  val contextRoot = "xkeng"
-  val port = 8080
-  val http = new Http
+  }
+  case class LocalhostSecureCfg(host: String = "localhost", contextRoot: String = "", port: Int = 8443, secure: Boolean = true) extends Config
+  case class LocalhostCfg(host: String = "localhost", contextRoot: String = "", port: Int = 8080, secure: Boolean = false) extends Config
+  case class AwsSecureCfg(host: String = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com", contextRoot: String = "xkeng", port: Int = 8443, secure: Boolean = true) extends Config
+  case class AwsCfg(host: String = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com", contextRoot: String = "xkeng", port: Int = 8080, secure: Boolean = false) extends Config
+  case class AwsApacheSecureCfg(host: String = "ssl-lb-xkeng-1607107363.eu-west-1.elb.amazonaws.com", contextRoot: String = "xkeng", port: Int = 443, secure: Boolean = true) extends Config
+  //define configuration to use:
+  val cfg = LocalhostCfg()
+  object RestClientHelperImpl extends RestClientHelper {
+    val host = cfg.host
+    val contextRoot = cfg.contextRoot
+    val port = cfg.port
+    val secure = cfg.secure
+  }
+
+  import RestClientHelperImpl._
 
   val xkeStartDate = new DateTime().plusDays(3)
   val l1 = Location("Maup", 20)
@@ -99,13 +113,13 @@ object RestSmokeTestClient {
     }
   }
 
-  def addLocation(location:Location):Location = {
-    add("location" , locationToJValue(location)) {
+  def addLocation(location: Location): Location = {
+    add("location", locationToJValue(location)) {
       Location(_)
     }
-    
+
   }
-  
+
   def rateSession(sessionId: Long, rate: Rating): List[Int] = {
     add("feedback/" + sessionId + "/rating", ("rate" -> rate.rate))(r => deserializeIntList(serializeToJson(r)))
   }
@@ -116,24 +130,24 @@ object RestSmokeTestClient {
   def login(username: String, password: String): Unit = {
     login(username, password, false)
   }
-  
-   def login(username: String, password: String, encrypted:Boolean): Unit = {
-    add("login", if(encrypted) ("username" -> username) ~ ("encryptedPassword" -> password) else Credential(username, password, encrypted).serializeToJson)(a => Unit)
+
+  def login(username: String, password: String, encrypted: Boolean): Unit = {
+    add("login", if (encrypted) ("username" -> username) ~ ("encryptedPassword" -> password) else Credential(username, password, encrypted).serializeToJson)(a => Unit)
   }
 
   val printResp = (resp: String) => println(resp)
- 
+
   def main(args: Array[String]) {
     println("Login...")
     val aPwd = new String(hexDecode("757065746572"))
     val aUser = "716AF9A87BD5A9735C20AC8FCED05F40"
-    val loggedIn = login(aPwd, aUser, true)
+    val loggedIn = login(aPwd, aUser, false)
 
-    println("Create location")
-    val l = addLocation(l3)
-    assert(l.description == l3.description)
-    println("new location %s" format l)
-    
+    //    println("Create location")
+    //    val l = addLocation(l3)
+    //    assert(l.description == l3.description)
+    //    println("new location %s" format l)
+    //    
     println("Create new conference...")
     val newConf = addConference(c)
     assert(newConf._id == c._id)
@@ -208,10 +222,21 @@ object RestSmokeTestClient {
     println("found conference %s" format found)
 
   }
-  object RestClientUtils {
+
+  trait RestClientHelper {
+    val host: String
+    val port: Int
+    val contextRoot: String
+    protected val secure: Boolean
+    protected val executer = new Http
+    private def req = {
+      val req = :/(host, port) / contextRoot
+      if (secure) req.secure else req
+    }
+
     def query[T](target: String)(callback: String => T): Option[T] = {
-      val req = new Request(:/(host, port))
-      http x ((req / contextRoot / target >:> identity) {
+      //val req = new Request(:/(host, port)).secure
+      executer x ((req / target >:> identity) {
         case (200, response, _, _) => {
           Some(callback(io.Source.fromInputStream(response.getEntity().getContent()).getLines.mkString))
         }
@@ -221,19 +246,19 @@ object RestSmokeTestClient {
 
     //Low level http methods
     def add[T](target: String, json: JValue)(callback: String => T): T = {
-      http(:/(host, port).POST / contextRoot / target << serializeToJsonStr(json) >~ { resp => callback(resp.getLines.mkString) })
+      executer(req / target << serializeToJsonStr(json) >~ { resp => callback(resp.getLines.mkString) })
 
     }
 
     //Low level http methods
     def update[T](target: String, json: JValue, callback: String => T): T = {
-      http(:/(host, port).PUT / contextRoot / target <<< serializeToJsonStr(json) >~ { resp => callback(resp.getLines.mkString) })
+      executer(req / target <<< serializeToJsonStr(json) >~ { resp => callback(resp.getLines.mkString) })
 
     }
 
     def update(target: String, json: JValue) = {
-      val req = new Request(:/(host, port).PUT)
-      val (status, headers) = http x ((req / contextRoot / target <<< serializeToJsonStr(json) >:> identity) {
+      //val req = new Request(:/(host, port).PUT.secure)
+      val (status, headers) = executer x ((req / target <<< serializeToJsonStr(json) >:> identity) {
         case (status, _, _, out) => (status, out())
       })
       (status, headers)
@@ -241,7 +266,7 @@ object RestSmokeTestClient {
     }
 
     def delete(target: String)(callback: String => Unit = printResp) = {
-      http(:/(host, port).DELETE / contextRoot / target >~ { resp => callback(resp.getLines.mkString) })
+      executer(req.DELETE / target >~ { resp => callback(resp.getLines.mkString) })
     }
   }
 }

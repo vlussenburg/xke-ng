@@ -20,24 +20,13 @@ class Boot {
 
     // where to search snippet
     LiftRules.addToPackages("com.xebia.xkeng")
-
-    // Build SiteMap
-    /*    def sitemap() = SiteMap(
-
-          Menu("Home") / "index" >> User.AddUserMenusAfter, // Simple menu form
-          // Menu with special Link
-          Menu(Loc("Static", Link(List("static"), true, "/static/index"),
-             "Static Content")))
-    */
-
-    //    LiftRules.setSiteMapFunc(() => User.sitemapMutator(sitemap()))
-
+    LiftRules.enableLiftGC = false;
     init()
     val purge = Props.get("mongo.purge.data").map(_.trim.toBoolean).getOrElse(false)
     val enableSecurity = Props.get("enable.secruity").map(_.trim.toBoolean).getOrElse(true)
 
     purgeAndPushTestdata(purge)
-    LiftRules.exceptionHandler.prepend(ExceptionHandlerAssembly)
+    LiftRules.exceptionHandler.prepend(new ExceptionHandlerAssembly)
     if (enableSecurity) {
       LiftRules.dispatch.append(new XKENGPublicAPIAssembly)
     } else {
@@ -45,17 +34,6 @@ class Boot {
       LiftRules.dispatch.append(new XKENGPublicAPIAssembly with DummySecurityRepositoryComponentImpl)
     }
     LiftRules.dispatch.append(authenticationInterceptor guard XKENGSecuredAPIAssembly)
-    /*
-     * Show the spinny image when an Ajax call starts
-     */
-    LiftRules.ajaxStart = Full(() => LiftRules.jsArtifacts.show("ajax-loader").cmd)
-
-    /*
-     * Make the spinny image go away when it ends
-     */
-    LiftRules.ajaxEnd =
-      Full(() => LiftRules.jsArtifacts.hide("ajax-loader").cmd)
-
     LiftRules.early.append(makeUtf8)
 
   }
