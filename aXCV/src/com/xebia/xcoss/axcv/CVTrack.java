@@ -1,26 +1,26 @@
 package com.xebia.xcoss.axcv;
 
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.xebia.xcoss.axcv.logic.ConferenceServer;
+import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.logic.ProfileManager.Trackable;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
+import com.xebia.xcoss.axcv.tasks.RetrieveSessionTask;
+import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.SessionAdapter;
-import com.xebia.xcoss.axcv.util.XCS;
 
 public class CVTrack extends BaseActivity {
 
-	private Session[] sessions;
+	private ArrayList<Session> sessions;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -38,51 +38,42 @@ public class CVTrack extends BaseActivity {
 	}
 
 	private void switchTo(int sessionIndex) {
-		Session session = sessions[sessionIndex];
+		Session session = sessions.get(sessionIndex);
 		Intent intent = new Intent(this, CVSessionView.class);
-		intent.putExtra(BaseActivity.IA_CONFERENCE, session.getConferenceId());
+		intent.putExtra(BaseActivity.IA_CONFERENCE_ID, session.getConferenceId());
 		intent.putExtra(BaseActivity.IA_SESSION, session.getId());
 		startActivity(intent);
 	}
 
 	@Override
 	protected void onResume() {
-		TreeSet<Session> selectedSessions = new TreeSet<Session>(new SessionComparator());
-		ConferenceServer server = getConferenceServer();
-		Trackable[] markedSessions = getProfileManager().getMarkedSessions(getUser());
-		boolean hasExpiredSession = false;
+		ProfileManager pm = getMyApplication().getProfileManager();
+		Trackable[] markedSessions = pm.getMarkedSessions(getUser());
+		sessions = new ArrayList<Session>();
 		for (Trackable id : markedSessions) {
-			try {
-				Session session = server.getSession(id.sessionId, id.conferenceId);
-				if (session != null) {
-					if (session.isExpired()) {
-						hasExpiredSession = true;
-					} else {
-						selectedSessions.add(session);
+			RetrieveSessionTask task = 
+					new RetrieveSessionTask(R.string.action_retrieve_session, this, new TaskCallBack<Session>() {
+				@Override
+				public void onCalled(Session result) {
+					if (result != null) {
+						updateSessions(result);
 					}
 				}
-			}
-			catch (Exception e) {
-				Log.v(XCS.LOG.COMMUNICATE, "No marked session with id " + id);
-			}
+			});
+			task.setSilent(true);
+			task.execute(id.sessionId, id.conferenceId);
 		}
-		if (hasExpiredSession) {
-			getProfileManager().pruneMarked();
-		}
-		sessions = selectedSessions.toArray(new Session[selectedSessions.size()]);
-		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, sessions);
+		pm.pruneMarked();
+		super.onResume();
+	}
+	
+	private void updateSessions(Session session) {
+		sessions.add(session);
+		Collections.sort(sessions, new SessionComparator());
+		Session[] sessionArray = sessions.toArray(new Session[sessions.size()]);
+		SessionAdapter adapter = new SessionAdapter(this, R.layout.session_item, R.layout.mandatory_item, sessionArray);
 		adapter.setIncludeDate(true);
 		ListView sessionList = (ListView) findViewById(R.id.sessionList);
 		sessionList.setAdapter(adapter);
-		super.onResume();
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		menu.removeItem(XCS.MENU.ADD);
-		menu.removeItem(XCS.MENU.EDIT);
-		menu.removeItem(XCS.MENU.TRACK);
-		return true;
 	}
 }

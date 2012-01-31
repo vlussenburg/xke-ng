@@ -3,30 +3,29 @@ IN PROGRESS
 
 -	Externalize strings
 - 	Hide mark/edit button for expired sessions in session view
-
-TODO
--------------------------------------------------------------------
-client
 -	ASyncTask server communication (Arno)
 	-	Removal of network: crashes.....
--	Caching
--	Certificate check (Michael)
--	Start when no network: Should mention this.
--	Long click on location - show menu.
-
-later op de client
--	Wachtcursor bij search maken (Arno)
-- 	Viewpaging voor locaties: CVSessionList (Arno)
--	Search framework
--	Content providers
--	Multitouch in view mode - show small matrix.
 -	Verbeteren van caching
 	-	Caching: refresh na conference edit/add break (reopen view...)
 	-	Conferenties verdwijnen uit lijst...
 	-	Database caching support
 	-	Toegevoegd/gewijzigde sessie is niet direct zichtbaar
--	Afhandeling 400 meldingen
+-	Certificate check (Michael)
+-	Start when no network: Should mention this.
+-	Long click on location - show menu.
+-	Wachtcursor bij search maken (Arno)
 -	Timeout on login afvangen
+
+TODO
+-------------------------------------------------------------------
+client
+-	Afhandeling 400 meldingen
+
+later op de client
+- 	Viewpaging voor locaties: CVSessionList (Arno)
+-	Search framework
+-	Content providers
+-	Multitouch in view mode - show small matrix.
 
 Veel later op de client
 -	Foto's gebruikers + telefoonnummer
@@ -41,6 +40,7 @@ server
 -	Error handling (/error URL geeft 400 zonder verdere melding)
 -	Nieuwe datum conferentie leidt niet tot nieuwe datum sessies (wordt wel gestuurd)
 -	Support conferenceId within session object (at least for search)
+-	Move sessions (optional) on delete of conference
 
 DONE
 -------------------------------------------------------------------

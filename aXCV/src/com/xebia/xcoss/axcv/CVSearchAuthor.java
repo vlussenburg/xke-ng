@@ -21,9 +21,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.xebia.xcoss.axcv.logic.ConferenceServer;
-import com.xebia.xcoss.axcv.logic.ConferenceServerProxy;
 import com.xebia.xcoss.axcv.model.Author;
+import com.xebia.xcoss.axcv.tasks.RetrieveAuthorsTask;
+import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.AuthorAdapter;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -38,18 +38,13 @@ public class CVSearchAuthor extends BaseActivity {
 	private String startText;
 	private Intent result = new Intent();
 
-	protected ConferenceServer getConferenceServer() {
-		ConferenceServer server = ConferenceServerProxy.getInstance(this);
-		return server;
-	}
-
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.search_items);
 		textView = (AutoCompleteTextView) findViewById(R.id.ssa_text);
 		startText = getResources().getString(R.string.default_input_text);
-		textView.setSelection(0, startText.length()-1);
+		textView.setSelection(0, startText.length());
 		initSelectedAuthors();
 
 		Button closeButton = (Button) findViewById(R.id.ssa_close);
@@ -60,14 +55,18 @@ public class CVSearchAuthor extends BaseActivity {
 				finish();
 			}
 		});
-
+		super.onCreate(savedInstanceState);
+	}
+	
+	private void updateAuthors(List<Author> allPersons) {
 		// Fill the list of options
 		allAuthors = new HashMap<String, Author>();
-		Author[] allPersons = getConferenceServer().getAllAuthors();
-		String[] data = new String[allPersons.length];
-		for (int i = 0; i < allPersons.length; i++) {
-			data[i] = allPersons[i].getName();
-			allAuthors.put(data[i], allPersons[i]);
+		String[] data = new String[allPersons.size()];
+		int i=0;
+		for (Author author : allPersons) {
+			data[i] = author.getName();
+			allAuthors.put(data[i], author);
+			i++;
 		}
 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, data);
@@ -79,10 +78,7 @@ public class CVSearchAuthor extends BaseActivity {
 				updateTypedText();
 				return true;
 			}
-
 		});
-
-		super.onCreate(savedInstanceState);
 	}
 
 	private boolean addAuthor(String authorName) {
@@ -99,26 +95,7 @@ public class CVSearchAuthor extends BaseActivity {
 			}
 			if (!contains) {
 				if (singleMode && selectedAuthors.size() > 0) {
-					Builder builder = new AlertDialog.Builder(this);
-					builder.setTitle("Single select!");
-					builder.setMessage("You cannot select more than one person! What shall I do with the previously selected one?");
-					builder.setIcon(android.R.drawable.ic_dialog_alert);
-					builder.setPositiveButton("Replace", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int i) {
-							selectedAuthors.clear();
-							selectedAuthors.add(author);
-							authorAdapter.notifyDataSetChanged();
-							dialog.dismiss();
-						}
-					});
-					builder.setNegativeButton("Keep", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int i) {
-							dialog.dismiss();
-						}
-					});
-					builder.create().show();
+					challengeSelection(author);
 				} else {
 					selectedAuthors.add(author);
 					Collections.sort(selectedAuthors);
@@ -128,6 +105,29 @@ public class CVSearchAuthor extends BaseActivity {
 			return true;
 		}
 		return false;
+	}
+
+	private void challengeSelection(final Author author) {
+		Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Single select!");
+		builder.setMessage("You cannot select more than one person! What shall I do with the previously selected one?");
+		builder.setIcon(android.R.drawable.ic_dialog_alert);
+		builder.setPositiveButton("Replace", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int i) {
+				selectedAuthors.clear();
+				selectedAuthors.add(author);
+				authorAdapter.notifyDataSetChanged();
+				dialog.dismiss();
+			}
+		});
+		builder.setNegativeButton("Keep", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int i) {
+				dialog.dismiss();
+			}
+		});
+		builder.create().show();
 	}
 
 	private void initSelectedAuthors() {
@@ -147,10 +147,18 @@ public class CVSearchAuthor extends BaseActivity {
 
 	@Override
 	protected void onResume() {
+		new RetrieveAuthorsTask(R.string.action_retrieve_authors, this, new TaskCallBack<List<Author>>() {
+			@Override
+			public void onCalled(List<Author> result) {
+				updateAuthors(result);
+			}
+		}).execute();
+		
 		initSelectedAuthors();
 		authorAdapter = new AuthorAdapter(this, R.layout.author_item_small, selectedAuthors);
 		ListView authorList = (ListView) findViewById(R.id.ssa_list);
 		authorList.setAdapter(authorAdapter);
+
 		super.onResume();
 	}
 

@@ -1,13 +1,15 @@
 package com.xebia.xcoss.axcv;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -20,23 +22,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.xebia.xcoss.axcv.logic.CommException;
-import com.xebia.xcoss.axcv.logic.ConferenceServer;
-import com.xebia.xcoss.axcv.logic.ConferenceServerProxy;
-import com.xebia.xcoss.axcv.logic.DataException;
-import com.xebia.xcoss.axcv.logic.ProfileManager;
-import com.xebia.xcoss.axcv.logic.cache.DataCache;
-import com.xebia.xcoss.axcv.logic.cache.MemoryCache;
+import com.github.droidfu.activities.BetterDefaultActivity;
 import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.ProxyExceptionReporter;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
 
-public abstract class BaseActivity extends Activity {
+/**
+ * IA_NOTIFICATION_ID - ID of notification (optional). Clears the notification flag.
+ * 
+ * @author Michael
+ *
+ */
+public abstract class BaseActivity extends BetterDefaultActivity {
 
-	public static final String IA_CONFERENCE = "ID-conference";
+	public static final String IA_CONFERENCE_ID = "ID-conference";
 	public static final String IA_SESSION = "ID-session";
 	public static final String IA_AUTHORS = "ID-authors";
 	public static final String IA_AUTHOR = "ID-author";
@@ -57,9 +60,6 @@ public abstract class BaseActivity extends Activity {
 	private MenuItem miAdd;
 	private MenuItem miEdit;
 	private MenuItem miTrack;
-
-	private static ProfileManager profileManager;
-	protected static String lastError;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -87,47 +87,85 @@ public abstract class BaseActivity extends Activity {
 		}
 		super.onResume();
 	}
-	
+
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	protected Dialog onCreateDialog(int id) {
+		if (id == XCS.DIALOG.WAITING) {
+			Dialog dialog = new Dialog(this, android.R.style.Theme_Translucent_NoTitleBar);
+			dialog.setContentView(R.layout.waiting);
+			dialog.setCancelable(true);
+			dialog.setOnCancelListener(new OnCancelListener() {
+				@Override
+				public void onCancel(DialogInterface arg0) {
+					BaseActivity.this.finish();
+				}
+			});
+			return dialog;
+		}
+		return super.onCreateDialog(id);
+	}
+
+	@Override
+	public void finish() {
+		removeDialog(XCS.DIALOG.WAITING);
+		// TODO Remove any warning dialog created by createDialog. This leaks...
+		super.finish();
+	}
+	
+	protected void populateMenuOptions(ArrayList<Integer> list) {};
+
+	@Override
+	public final boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 
-		miAdd = menu.add(0, XCS.MENU.ADD, Menu.NONE, R.string.menu_add);
-		miEdit = menu.add(0, XCS.MENU.EDIT, Menu.NONE, R.string.menu_edit);
-		miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
-		miSearch = menu.add(0, XCS.MENU.SEARCH, Menu.NONE, R.string.menu_search);
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		populateMenuOptions(list);
 
-		miAdd.setIcon(android.R.drawable.ic_menu_add);
-		miEdit.setIcon(android.R.drawable.ic_menu_edit);
-		miSettings.setIcon(android.R.drawable.ic_menu_preferences);
-		miSearch.setIcon(android.R.drawable.ic_menu_search);
-
-		if (!StringUtil.isEmpty(getUser())) {
+		if (list.contains(XCS.MENU.ADD)) {
+			miAdd = menu.add(0, XCS.MENU.ADD, Menu.NONE, R.string.menu_add);
+			miAdd.setIcon(android.R.drawable.ic_menu_add);
+		}
+		if (list.contains(XCS.MENU.EDIT)) {
+			miEdit = menu.add(0, XCS.MENU.EDIT, Menu.NONE, R.string.menu_edit);
+			miEdit.setIcon(android.R.drawable.ic_menu_edit);
+		}
+		if (list.contains(XCS.MENU.SETTINGS)) {
+			miSettings = menu.add(0, XCS.MENU.SETTINGS, Menu.NONE, R.string.menu_settings);
+			miSettings.setIcon(android.R.drawable.ic_menu_preferences);
+		}
+		if (list.contains(XCS.MENU.SEARCH)) {
+			miSearch = menu.add(0, XCS.MENU.SEARCH, Menu.NONE, R.string.menu_search);
+			miSearch.setIcon(android.R.drawable.ic_menu_search);
+		}
+		if (list.contains(XCS.MENU.LIST)) {
+			MenuItem menuItem = menu.add(0, XCS.MENU.LIST, Menu.NONE, R.string.menu_list);
+			menuItem.setIcon(R.drawable.ic_menu_list);
+		}
+		if (list.contains(XCS.MENU.TRACK) && !StringUtil.isEmpty(getUser())) {
 			miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
 			miTrack.setIcon(android.R.drawable.ic_menu_agenda);
 		}
+
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		super.onOptionsItemSelected(item);
-
 		switch (item.getItemId()) {
 			case XCS.MENU.SETTINGS:
 				startActivity(new Intent(this, CVSettings.class));
-			break;
+				return true;
 			case XCS.MENU.OVERVIEW:
 				showConferencesList();
-			break;
+				return true;
 			case XCS.MENU.SEARCH:
 				startActivity(new Intent(this, CVSearch.class));
-			break;
+				return true;
 			case XCS.MENU.TRACK:
 				startActivity(new Intent(this, CVTrack.class));
-			break;
+				return true;
 		}
-		return true;
+		return super.onOptionsItemSelected(item);
 	}
 
 	private void showConferencesList() {
@@ -140,28 +178,14 @@ public abstract class BaseActivity extends Activity {
 		finish();
 	}
 
-	public Conference getConference() {
-		return getConference(true);
-	}
-
-	protected Conference getConference(boolean useDefault) {
-		Conference conference = null;
-		ConferenceServer server = getConferenceServer();
-
-		String identifier = null;
+	protected String getSelectedConferenceId() {
 		try {
-			identifier = getIntent().getExtras().getString(IA_CONFERENCE);
-			conference = server.getConference(identifier);
+			return getIntent().getExtras().getString(IA_CONFERENCE_ID);
 		}
 		catch (Exception e) {
-			Log.w(LOG.ALL, "No conference with ID " + identifier);
+			Log.w(LOG.ALL, "No conference in intent.");
 		}
-		if (conference == null && useDefault) {
-			conference = server.getUpcomingConference();
-			Log.w(LOG.ALL, "Conference default " + (conference == null ? "<null>": conference.getTitle()));
-		}
-		// Log.i("XCS", "[GET] Conference (on '" + identifier + "') = " + conference);
-		return conference;
+		return null;
 	}
 
 	protected Session getSelectedSession(Conference conference) {
@@ -187,52 +211,11 @@ public abstract class BaseActivity extends Activity {
 		return sessions.isEmpty() ? null : sessions.iterator().next();
 	}
 
-	protected ConferenceServer getConferenceServer() {
-		ConferenceServer server = ConferenceServerProxy.getInstance(this);
-		if (server == null || server.isLoggedIn() == false) {
-			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-			String user = sp.getString(XCS.PREF.USERNAME, null);
-			String password = sp.getString(XCS.PREF.PASSWORD, "");
-			String type = "?";
-			DataCache cache;
-			try {
-				type = sp.getString(XCS.PREF.CACHETYPE, null);
-				if (type == null) {
-					type = DataCache.Type.Memory.name();
-					sp.edit().putString(XCS.PREF.CACHETYPE, type).commit();
-				}
-				Log.i(XCS.LOG.PROPERTIES, "Using cache type: " + type);
-				cache = DataCache.Type.valueOf(type).newInstance(this);
-			}
-			catch (Exception e) {
-				Log.w(XCS.LOG.PROPERTIES,
-						"Cannot instantiate cache of type " + type + ": " + StringUtil.getExceptionMessage(e));
-				cache = new MemoryCache(this);
-			}
-			server = ConferenceServer.createInstance(user, password, getServerUrl(this), cache);
-		}
-		return server;
-	}
-
-	protected ProfileManager getProfileManager() {
-		if (profileManager == null) {
-			profileManager = new ProfileManager(this);
-		}
-		profileManager.openConnection();
-		return profileManager;
-	}
-
-	protected void closeProfileManager() {
-		if (profileManager != null) {
-			profileManager.closeConnection();
-		}
-	}
-
 	protected Dialog createDialog(String title, String message) {
 		return createDialog(this, title, message);
 	}
 
-	protected static Dialog createDialog(Activity ctx, String title, String message) {
+	public static Dialog createDialog(Context ctx, String title, String message) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 		builder.setTitle(title).setMessage(message).setIcon(android.R.drawable.ic_dialog_alert)
 				.setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
@@ -241,30 +224,6 @@ public abstract class BaseActivity extends Activity {
 					}
 				});
 		return builder.create();
-	}
-
-	protected void onSuccess() {}
-
-	protected void onFailure(String message, String detail) {}
-
-	protected void onAuthenticationFailed(String activity) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Not allowed!")
-				.setMessage("Access for " + activity + " is denied. Specify credentials?")
-				.setIcon(android.R.drawable.ic_dialog_alert)
-				.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
-						startActivity(new Intent(BaseActivity.this, CVSettings.class));
-					}
-				}).setNegativeButton("Continue", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
-						// The next request will do the login again
-						ConferenceServer.close();
-					}
-				});
-		builder.create().show();
 	}
 
 	public static String getServerUrl(Context ctx) {
@@ -280,61 +239,24 @@ public abstract class BaseActivity extends Activity {
 		}
 	}
 
-	public void markSession(Session session, View view, boolean update) {
-		// Breaks are not supported for marking
-		if (session.getType() == Session.Type.BREAK) return;
-
-		ProfileManager pm = getProfileManager();
-		boolean hasMarked = pm.isMarked(getUser(), session.getId());
-		if (update) {
-			if (hasMarked) {
-				if (pm.unmarkSession(getUser(), session)) hasMarked = false;
-			} else {
-				if (pm.markSession(getUser(), session)) hasMarked = true;
-			}
-		}
-
-		if (view instanceof ImageView) {
-			((ImageView) view).setImageResource(hasMarked ? android.R.drawable.btn_star_big_on
-					: android.R.drawable.btn_star_big_off);
-		}
-	}
-
-	public static void handleException(final BaseActivity context, String activity, CommException e) {
-		if (e instanceof DataException) {
-			if (((DataException) e).missing()) {
-				lastError = context == null ? "404" : context.getString(R.string.server_missing_url, activity);
-				Log.w(XCS.LOG.COMMUNICATE, lastError);
-			} else if (((DataException) e).networkError()) {
-				lastError = context == null ? "500" : context.getString(R.string.server_unreachable);
-				Log.w(XCS.LOG.COMMUNICATE, lastError);
-			} else if (((DataException) e).timedOut()) {
-				lastError = context == null ? "400" : context.getString(R.string.server_timeout, activity);
-				Log.w(XCS.LOG.COMMUNICATE, lastError);
-			} else {
-				// Authentication failure
-				if (context != null) {
-					context.onAuthenticationFailed(activity);
-				} else {
-					Log.e(XCS.LOG.COMMUNICATE, "Resource not found while " + activity + ".");
-					lastError = "Not allowed: " + activity;
-				}
-			}
-			return;
-		}
-		Log.e(XCS.LOG.COMMUNICATE, "Communication failure on " + activity + ", due to " + e.getMessage());
-		throw new CommException("Failure on activity '" + activity + "': " + StringUtil.getExceptionMessage(e), e);
-	}
-
 	public String getUser() {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 		String user = sp.getString(XCS.PREF.USERNAME, null);
 		return user;
 	}
 
-	public static String getLastError() {
-		String error = lastError;
-		lastError = null;
-		return error;
+	public Conference findUpcomming(List<Conference> conferences) {
+		for (Conference conference : conferences) {
+			Moment cdate = conference.getStartTime();
+			if (cdate.isBeforeToday()) {
+				continue;
+			}
+			return conference;
+		}
+		return null;
+	}
+
+	public ConferenceViewerApplication getMyApplication() {
+		return (ConferenceViewerApplication) getApplication();
 	}
 }

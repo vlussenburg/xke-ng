@@ -23,10 +23,12 @@ public class Rate {
 	private int rate;
 	// This value is not included in the JSON
 	private transient String value;
+	private transient String sessionId;
 
-	public Rate(RatingBar ratingBar) {
+	public Rate(RatingBar ratingBar, String sessionId) {
 		this.rate = (int)(10 * ratingBar.getRating())/ratingBar.getNumStars();
 		this.value = String.valueOf(ratingBar);
+		this.sessionId = sessionId;
 	}
 
 	public Rate(List<Integer> list) {
@@ -53,5 +55,9 @@ public class Rate {
 	
 	public boolean isRated() {
 		return rate > 0 && rate < VALUES.length;
+	}
+	
+	public String getSessionId() {
+		return sessionId;
 	}
 }

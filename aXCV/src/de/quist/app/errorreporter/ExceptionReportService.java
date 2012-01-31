@@ -45,14 +45,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
-
-import com.xebia.xcoss.axcv.logic.EC2TrustedSocketFactory;
-import com.xebia.xcoss.axcv.util.StringUtil;
-import com.xebia.xcoss.axcv.util.XCS;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -64,6 +59,10 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.util.Log;
+
+import com.xebia.xcoss.axcv.logic.EC2TrustedSocketFactory;
+import com.xebia.xcoss.axcv.util.StringUtil;
+import com.xebia.xcoss.axcv.util.XCS;
 
 public class ExceptionReportService extends ReportingIntentService {
 
@@ -146,6 +145,9 @@ public class ExceptionReportService extends ReportingIntentService {
 		String stacktrace = intent.getStringExtra(EXTRA_STACK_TRACE);
 		String exception = intent.getStringExtra(EXTRA_EXCEPTION_CLASS);
 		String message = intent.getStringExtra(EXTRA_MESSAGE);
+		Log.e(TAG, "Stacktrace : " + stacktrace);
+		Log.e(TAG, "Exception  : " + exception);
+		Log.e(TAG, "Message    : " + message);
 		long availableMemory = intent.getLongExtra(EXTRA_AVAILABLE_MEMORY, -1l);
 		long totalMemory = intent.getLongExtra(EXTRA_TOTAL_MEMORY, -1l);
 		String dateTime = intent.getStringExtra(EXTRA_EXCEPTION_TIME);

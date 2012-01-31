@@ -57,6 +57,7 @@ public class RestClient {
 	private static final int HTTP_TIMEOUT = 15 * 1000;
 	private static GsonBuilder gsonBuilder = null;
 	private static Cookie sessionCookie = null;
+	private static boolean showDataStreams = true;
 
 	private static Gson getGson() {
 		if (gsonBuilder == null) {
@@ -66,11 +67,19 @@ public class RestClient {
 		return gsonBuilder.create();
 	}
 
-	public static <T> T loadObject(String url, Class<T> rvClass, String token) {
+	public static boolean isAuthenticated() {
+		return sessionCookie != null;
+	}
+
+	public static void logout() {
+		sessionCookie = null;
+	}
+
+	public static <T> T loadObject(String url, Class<T> rvClass) {
 		Log.d(LOG.COMMUNICATE, "Loading [" + rvClass.getSimpleName() + "] " + url);
 		Reader reader = null;
 		try {
-			reader = getReader(new HttpGet(url), token);
+			reader = getReader(new HttpGet(url));
 			T result = getGson().fromJson(reader, rvClass);
 			return result;
 		}
@@ -79,11 +88,11 @@ public class RestClient {
 		}
 	}
 
-	public static <T> T loadCollection(String url, Type rvClass, String token) {
+	public static <T> T loadCollection(String url, Type rvClass) {
 		Log.d(LOG.COMMUNICATE, "Loading [" + rvClass.toString() + "] " + url);
 		Reader reader = null;
 		try {
-			reader = getReader(new HttpGet(url), token);
+			reader = getReader(new HttpGet(url));
 			return getGson().fromJson(reader, rvClass);
 		}
 		finally {
@@ -91,11 +100,11 @@ public class RestClient {
 		}
 	}
 
-	public static <T> List<T> loadObjects(String url, Class<T> rvClass, String token) {
+	public static <T> List<T> loadObjects(String url, Class<T> rvClass) {
 		Log.d(LOG.COMMUNICATE, "Loading [[" + rvClass.getSimpleName() + "]] " + url);
 		Reader reader = null;
 		try {
-			reader = getReader(new HttpGet(url), token);
+			reader = getReader(new HttpGet(url));
 			JsonParser parser = new JsonParser();
 			JsonElement parse = parser.parse(reader);
 
@@ -119,18 +128,15 @@ public class RestClient {
 		}
 	}
 
-	public static <T, U> U createObject(String url, T object, Class<U> rvClass, String token) {
+	public static <T, U> U createObject(String url, T object, Class<U> rvClass) {
 		Log.d(LOG.COMMUNICATE, "Creating [" + object.getClass().getSimpleName() + "] " + url);
 		Reader reader = null;
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
 			Log.d(LOG.COMMUNICATE, "POST (create) to '" + url + "': ");
-			// String[] split = postData.split(",");
-			// for (int i = 0; i < split.length; i++) {
-			// Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
-			// }
-			reader = getReader(new HttpPost(url), postData, token);
+			logCommunicationData(postData);
+			reader = getReader(new HttpPost(url), postData);
 			return gson.fromJson(reader, rvClass);
 		}
 		finally {
@@ -138,20 +144,16 @@ public class RestClient {
 		}
 	}
 
-	public static <T> T updateObject(String url, T object, String token) {
+	public static <T> T updateObject(String url, T object) {
 		Log.d(LOG.COMMUNICATE, "Updating [" + object.getClass().getSimpleName() + "] " + url);
 		Reader reader = null;
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
 			Log.d(LOG.COMMUNICATE, "PUT (update) to '" + url + "':");
-			// String[] split = postData.split(",");
-			// for (int i = 0; i < split.length; i++) {
-			// Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
-			// }
-			reader = getReader(new HttpPut(url), postData, token);
+			logCommunicationData(postData);
+			reader = getReader(new HttpPut(url), postData);
 			T result = getGson().fromJson(reader, (Class<T>) object.getClass());
-			// TODO Is result an empty string?
 			return result;
 		}
 		finally {
@@ -159,24 +161,25 @@ public class RestClient {
 		}
 	}
 
-	public static void deleteObject(String url, String token) {
+	public static void deleteObject(String url) {
 		Log.d(LOG.COMMUNICATE, "Deleting [x] " + url);
 		Reader reader = null;
 		try {
-			reader = getReader(new HttpDelete(url), token);
+			reader = getReader(new HttpDelete(url));
 		}
 		finally {
 			StreamUtil.close(reader);
 		}
 	}
 
-	public static <T> List<T> searchObjects(String url, String key, Class<T> rvClass, Object searchParms, String token) {
+	public static <T> List<T> searchObjects(String url, String key, Class<T> rvClass, Object searchParms) {
 		Log.d(LOG.COMMUNICATE, "Searching [" + key + "[" + rvClass.getSimpleName() + "]] " + url);
 		Reader reader = null;
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(searchParms);
-			reader = getReader(new HttpPost(url), postData, token);
+			logCommunicationData(postData);
+			reader = getReader(new HttpPost(url), postData);
 			JsonParser parser = new JsonParser();
 			JsonElement parse = parser.parse(reader);
 
@@ -197,14 +200,23 @@ public class RestClient {
 		}
 	}
 
-	public static <T, V> V postObject(String url, T object, Class<V> rvClass, String token) {
+	private static void logCommunicationData(String postData) {
+		if (showDataStreams) {
+			String[] split = postData.split(",");
+			for (int i = 0; i < split.length; i++) {
+				Log.d(LOG.COMMUNICATE, "  " + split[i] + ",");
+			}
+		}
+	}
+
+	public static <T, V> V postObject(String url, T object, Class<V> rvClass) {
 		Log.d(LOG.COMMUNICATE, "Posting [" + object.getClass().getSimpleName() + "] " + url);
 		Reader reader = null;
 		try {
 			Gson gson = getGson();
 			String postData = gson.toJson(object);
-			// Log.d(LOG.COMMUNICATE, "Post dating [" + postData + "]");
-			reader = getReader(new HttpPost(url), postData, token);
+			logCommunicationData(postData);
+			reader = getReader(new HttpPost(url), postData);
 			return getGson().fromJson(reader, rvClass);
 		}
 		finally {
@@ -212,7 +224,7 @@ public class RestClient {
 		}
 	}
 
-	private static Reader getReader(HttpEntityEnclosingRequestBase request, String content, String token) {
+	private static Reader getReader(HttpEntityEnclosingRequestBase request, String content) {
 		try {
 			if (!StringUtil.isEmpty(content)) {
 				request.setEntity(new StringEntity(content));
@@ -221,10 +233,10 @@ public class RestClient {
 		catch (UnsupportedEncodingException e) {
 			throw new ServerException(request.getURI().toString(), e);
 		}
-		return getReader(request, token);
+		return getReader(request);
 	}
 
-	private static Reader getReader(HttpRequestBase request, String token) {
+	private static Reader getReader(HttpRequestBase request) {
 		DefaultHttpClient httpClient = null;
 		try {
 			httpClient = getHttpClient();
@@ -244,7 +256,9 @@ public class RestClient {
 			handleResponse(request, response);
 
 			String result = readResponse(response);
-			// Log.i(XCS.LOG.COMMUNICATE, "Read: " + result);
+			if (showDataStreams) {
+				Log.i(XCS.LOG.COMMUNICATE, "Read: " + result);
+			}
 			return new StringReader(result);
 		}
 		catch (InterruptedIOException e) {

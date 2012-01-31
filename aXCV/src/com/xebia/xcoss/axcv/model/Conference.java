@@ -10,17 +10,11 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import android.util.Log;
-
 import com.google.gson.annotations.SerializedName;
-import com.xebia.xcoss.axcv.BaseActivity;
-import com.xebia.xcoss.axcv.logic.CommException;
-import com.xebia.xcoss.axcv.logic.ConferenceServer;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.model.util.TimeSlotComparator;
-import com.xebia.xcoss.axcv.ui.FormatUtil;
+import com.xebia.xcoss.axcv.util.FormatUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
-import com.xebia.xcoss.axcv.util.XCS;
 
 public class Conference implements Serializable {
 
@@ -58,7 +52,6 @@ public class Conference implements Serializable {
 	public Conference(Conference original) {
 		this();
 		resetSessions();
-
 		this.id = original.id;
 		this.title = original.title;
 		this.description = original.description;
@@ -85,6 +78,10 @@ public class Conference implements Serializable {
 		return sort(sessions);
 	}
 
+	public void setSessions(Set<Session> sessions) {
+		this.sessions = sessions;
+	}
+	
 	private Set<Session> sort(Set<Session> org) {
 		try {
 			if (((TreeSet<Session>) org).comparator() instanceof SessionComparator) {
@@ -220,66 +217,66 @@ public class Conference implements Serializable {
 		return null;
 	}
 
-	/**
-	 * Adds a session on the server and resets the local stored sessions.
-	 * 
-	 * @param session
-	 * @return
-	 */
-	public boolean addSession(Session session, boolean create) {
-		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + getTitle());
-		try {
-			String id = ConferenceServer.getInstance().storeSession(session, getId(), create);
-			resetSessions();
-			return id != null;
-		}
-		catch (CommException e) {
-			BaseActivity.handleException(null, "adding session", e);
-		}
-		return false;
-	}
-
-	public void deleteSession(Session session) {
-		if (sessions != null) {
-			sessions.remove(session);
-		}
-		try {
-			ConferenceServer.getInstance().deleteSession(session);
-		}
-		catch (CommException e) {
-			BaseActivity.handleException(null, "deleting session", e);
-		}
-	}
-
-	public static Conference create(Conference conference) {
-		try {
-			return ConferenceServer.getInstance().storeConference(conference, true);
-		}
-		catch (CommException e) {
-			BaseActivity.handleException(null, "creating conference", e);
-		}
-		return null;
-	}
-
-	public boolean update() {
-		try {
-			ConferenceServer.getInstance().storeConference(this, false);
-			return true;
-		}
-		catch (CommException e) {
-			BaseActivity.handleException(null, "updating conference", e);
-		}
-		return false;
-	}
-
-	public void delete() {
-		try {
-			ConferenceServer.getInstance().deleteConference(this);
-		}
-		catch (CommException e) {
-			BaseActivity.handleException(null, "deleting conference", e);
-		}
-	}
+//	/**
+//	 * Adds a session on the server and resets the local stored sessions.
+//	 * 
+//	 * @param session
+//	 * @return
+//	 */
+//	public boolean addSession(Session session, boolean create) {
+//		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + getTitle());
+//		try {
+//			String id = ConferenceServer.getInstance().storeSession(session, getId(), create);
+//			resetSessions();
+//			return id != null;
+//		}
+//		catch (CommException e) {
+//			BaseActivity.handleException(null, "adding session", e);
+//		}
+//		return false;
+//	}
+//
+//	public void deleteSession(Session session) {
+//		if (sessions != null) {
+//			sessions.remove(session);
+//		}
+//		try {
+//			ConferenceServer.getInstance().deleteSession(session);
+//		}
+//		catch (CommException e) {
+//			BaseActivity.handleException(null, "deleting session", e);
+//		}
+//	}
+//
+//	public static Conference create(Conference conference) {
+//		try {
+//			return ConferenceServer.getInstance().storeConference(conference, true);
+//		}
+//		catch (CommException e) {
+//			BaseActivity.handleException(null, "creating conference", e);
+//		}
+//		return null;
+//	}
+//
+//	public boolean update() {
+//		try {
+//			ConferenceServer.getInstance().storeConference(this, false);
+//			return true;
+//		}
+//		catch (CommException e) {
+//			BaseActivity.handleException(null, "updating conference", e);
+//		}
+//		return false;
+//	}
+//
+//	public void delete() {
+//		try {
+//			ConferenceServer.getInstance().deleteConference(this);
+//		}
+//		catch (CommException e) {
+//			BaseActivity.handleException(null, "deleting conference", e);
+//		}
+//	}
 
 	private boolean isTimeSlotAvailable(Moment start, int length, Location location) {
 		// Sessions are sorted on start time!

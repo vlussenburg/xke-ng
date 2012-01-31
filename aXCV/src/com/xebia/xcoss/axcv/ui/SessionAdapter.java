@@ -12,8 +12,10 @@ import android.widget.TextView;
 
 import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.CVSessionAdd;
+import com.xebia.xcoss.axcv.ConferenceViewerApplication;
 import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.util.FormatUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -95,13 +97,14 @@ public class SessionAdapter extends BaseAdapter {
 		if (expired || StringUtil.isEmpty(ctx.getUser())) {
 			button.setVisibility(View.GONE);
 		} else {
+			final ConferenceViewerApplication myApp = ctx.getMyApplication();
 			button.setVisibility(View.VISIBLE);
-			ctx.markSession(session, button, false);
+			myApp.markSession(session, button, false);
 			button.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
 					Log.e("XCS", "Marking session: " + session.getTitle() + ":" + session.getConferenceId());
-					ctx.markSession(session, view, true);
+					myApp.markSession(session, view, true);
 				}
 			});
 		}
@@ -138,7 +141,7 @@ public class SessionAdapter extends BaseAdapter {
 
 	private void editSession(Session session) {
 		Intent intent = new Intent(ctx, CVSessionAdd.class);
-		intent.putExtra(BaseActivity.IA_CONFERENCE, session.getConferenceId());
+		intent.putExtra(BaseActivity.IA_CONFERENCE_ID, session.getConferenceId());
 		intent.putExtra(BaseActivity.IA_SESSION, session.getId());
 		ctx.startActivity(intent);
 	}

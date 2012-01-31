@@ -81,11 +81,10 @@
                 android:layout_height="wrap_content" >
 
                 <TextView
-                    android:id="@+id/conferenceDate"
+                    android:id="@+id/sessionLocation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="23 mei 1999" >
+                    android:layout_gravity="center" android:textStyle="bold">
                 </TextView>
 
                 <LinearLayout
@@ -272,6 +271,7 @@
             android:layout_below="@id/sc_header" >
 
             <LinearLayout
+	            android:id="@+id/sc_content_layout"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" >
@@ -303,7 +303,7 @@
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"
                             android:layout_centerVertical="true"
-                            android:text="9.9"
+                            android:text="-"
                             android:textColor="@color/textcolor_title"
                             android:textSize="24sp"
                             android:textStyle="bold" >
@@ -328,11 +328,10 @@
                         </TextView>
 
                         <TextView
-                            android:id="@+id/sessionLocation"
+                            android:id="@+id/conferenceDate"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text="location" >
+                            android:layout_gravity="center">
                         </TextView>
                     </LinearLayout>
 
@@ -362,7 +361,7 @@
                         android:layout_marginLeft="3sp"
                         android:layout_marginRight="3sp"
                         android:gravity="center_horizontal"
-                        android:text="XCoSS - a conference scheduling system"
+                        android:text="Loading..."
                         android:textColor="@color/textcolor_title"
                         android:textSize="18sp" >
                     </TextView>
@@ -374,8 +373,7 @@
                         android:layout_gravity="center"
                         android:layout_marginLeft="8sp"
                         android:layout_marginRight="8sp"
-                        android:paddingBottom="12sp"
-                        android:text="Browse, update, schedule your track on featured conferences via your mobile phone. This session describes the architecture." >
+                        android:paddingBottom="12sp" >
                     </TextView>
                 </LinearLayout>
 
@@ -395,8 +393,7 @@
                     <TextView
                         android:id="@+id/scAuthor"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="M.J.P. van Leeuwen, Geert Bossuyt" >
+                        android:layout_height="wrap_content" >
                     </TextView>
                 </LinearLayout>
 
@@ -416,8 +413,7 @@
                     <TextView
                         android:id="@+id/scAudience"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Anyone interested in Mobile application development" >
+                        android:layout_height="wrap_content">
                     </TextView>
                 </LinearLayout>
 
@@ -437,8 +433,7 @@
                     <TextView
                         android:id="@+id/scLanguage"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Dutch" >
+                        android:layout_height="wrap_content" >
                     </TextView>
                 </LinearLayout>
 
@@ -458,8 +453,7 @@
                     <TextView
                         android:id="@+id/scLimit"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="No limit" >
+                        android:layout_height="wrap_content" >
                     </TextView>
                 </LinearLayout>
 
@@ -479,8 +473,7 @@
                     <TextView
                         android:id="@+id/scPreparation"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Install the Eclipse IDE and Android SDK" >
+                        android:layout_height="wrap_content" >
                     </TextView>
                 </LinearLayout>
 
@@ -500,8 +493,7 @@
                     <TextView
                         android:id="@+id/scLabels"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Android, iOs, Mobile" >
+                        android:layout_height="wrap_content">
                     </TextView>
                 </LinearLayout>
 

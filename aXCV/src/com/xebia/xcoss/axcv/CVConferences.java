@@ -1,13 +1,15 @@
 package com.xebia.xcoss.axcv;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -15,6 +17,10 @@ import android.widget.TextView;
 import com.xebia.xcoss.axcv.layout.SwipeLayout;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
+import com.xebia.xcoss.axcv.tasks.DeleteConferenceTask;
+import com.xebia.xcoss.axcv.tasks.RetrieveConferencesPerYearTask;
+import com.xebia.xcoss.axcv.tasks.SimpleCallBack;
+import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.ConferenceAdapter;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -36,6 +42,7 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 
 	private int shownYear;
 	private Conference[] conferences;
+	private boolean redirect = false;
 
 	/**
 	 * Called when the activity is first created.
@@ -54,8 +61,7 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 		if (getIntent().getBooleanExtra(IA_REDIRECT, true)) {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 			if (sp.getBoolean(XCS.PREF.JUMPTOFIRST, true)) {
-				Log.i(XCS.LOG.NAVIGATE, "Jumping to first upcomming conference.");
-				switchTo(getConferenceServer().getUpcomingConference());
+				redirect = true;
 			}
 		}
 
@@ -65,8 +71,29 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 
 	@Override
 	protected void onResume() {
-		List<Conference> list = getConferenceServer().getConferences(shownYear);
-		Conference upcomingConference = getConferenceServer().getUpcomingConference();
+		refreshScreen();
+		super.onResume();
+	}
+
+	private void refreshScreen() {
+		new RetrieveConferencesPerYearTask(R.string.action_retrieve_conferences, this,
+				new TaskCallBack<List<Conference>>() {
+					@Override
+					public void onCalled(List<Conference> result) {
+						if (result != null) {
+							updateConferences(result);
+							if (redirect) {
+								Log.i(XCS.LOG.NAVIGATE, "Jumping to first upcomming conference.");
+								redirect = false;
+								switchTo(result.get(0));
+							}
+						}
+					}
+				}).execute(shownYear);
+	}
+
+	public void updateConferences(List<Conference> list) {
+		Conference upcomingConference = findUpcomming(list);
 		int position = 0;
 		int idx = 0;
 		conferences = new Conference[list.size()];
@@ -81,7 +108,6 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 		ListView conferencesList = (ListView) findViewById(R.id.conferencesList);
 		conferencesList.setAdapter(adapter);
 		conferencesList.setSelection(position);
-		super.onResume();
 	}
 
 	@Override
@@ -93,8 +119,16 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 				return true;
 			case R.id.edit:
 				Intent intent = new Intent(this, CVConferenceAdd.class);
-				intent.putExtra(BaseActivity.IA_CONFERENCE, conferences[position].getId());
+				intent.putExtra(BaseActivity.IA_CONFERENCE_ID, conferences[position].getId());
 				startActivity(intent);
+				return true;
+			case R.id.delete:
+				CVConferenceAdd.createDeleteDialog(this, conferences[position], new SimpleCallBack() {
+					@Override
+					public void onCalled(Boolean result) {
+						refreshScreen();
+					}
+				}).show();
 				return true;
 		}
 		return super.onContextItemSelected(menuItem);
@@ -115,25 +149,24 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 			} else {
 				intent = new Intent(this, CVSessionView.class);
 			}
-			intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
+			intent.putExtra(BaseActivity.IA_CONFERENCE_ID, conference.getId());
 			startActivity(intent);
 		}
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		menu.removeItem(XCS.MENU.OVERVIEW);
-		menu.removeItem(XCS.MENU.EDIT);
-		return true;
+	protected void populateMenuOptions(ArrayList<Integer> list) {
+		list.add(XCS.MENU.ADD);
+		list.add(XCS.MENU.SETTINGS);
+		list.add(XCS.MENU.SEARCH);
+		list.add(XCS.MENU.TRACK);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Add a conference
 		if (item.getItemId() == XCS.MENU.ADD) {
-			Intent intent = new Intent(this, CVConferenceAdd.class);
-			startActivity(intent);
+			startActivity(new Intent(this, CVConferenceAdd.class));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

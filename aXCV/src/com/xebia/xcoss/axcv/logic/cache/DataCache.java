@@ -13,6 +13,10 @@ import com.xebia.xcoss.axcv.util.XCS;
 
 public abstract class DataCache {
 	protected static final long CACHETIME = 30 * 60 * 1000;
+	
+	public static final String CK_ALL_LOCATIONS = "CK-Location";
+	public static final String CK_ALL_AUTHORS = "CK-Author";
+	public static final String CK_ALL_LABELS = "CK-Label";
 
 	public enum Type {
 		Memory(MemoryCache.class), Database(DatabaseCache.class), None(NoCache.class);
@@ -175,5 +179,14 @@ public abstract class DataCache {
 		}
 		Log.d(XCS.LOG.CACHE, "Cache hit: " + co.object);
 		return co.object;
+	}
+
+	public static String getKey(String... objects) {
+		StringBuilder sb = new StringBuilder("CK");
+		for (String object : objects) {
+			sb.append("-");
+			sb.append(object);
+		}
+		return sb.toString();
 	}
 }

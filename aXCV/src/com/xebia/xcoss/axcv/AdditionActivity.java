@@ -5,7 +5,6 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -56,11 +55,6 @@ public abstract class AdditionActivity extends BaseActivity implements OnCancelL
 		Drawable drawable = getResources().getDrawable(R.drawable.touchtext_disable);
 		TextView view = (TextView) findViewById(id);
 		view.setBackgroundDrawable(drawable);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		return true;
 	}
 
 	protected class DialogHandler implements DialogInterface.OnClickListener,

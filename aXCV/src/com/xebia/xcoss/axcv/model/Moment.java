@@ -99,7 +99,6 @@ public class Moment implements Serializable {
 	}
 
 	private DateTime getDate() {
-		// TODO
 		return new DateTime(year, month, day, hour, minute);
 	}
 
@@ -222,5 +221,4 @@ public class Moment implements Serializable {
 		} else if (!year.equals(other.year)) return false;
 		return true;
 	}
-
 }

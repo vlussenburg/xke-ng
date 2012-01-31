@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +19,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.xebia.xcoss.axcv.tasks.RetrieveLabelsTask;
+import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.LabelAdapter;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -42,6 +42,14 @@ public class CVSearchLabel extends BaseActivity {
 
 		textView = (AutoCompleteTextView) findViewById(R.id.ssa_text);
 		textView.setSelection(0, startText.length());
+		textView.setOnKeyListener(new View.OnKeyListener() {
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
+				CVSearchLabel.this.updateTypedText();
+				return true;
+			}
+		});
 		initSelectedLabels();
 
 		Button closeButton = (Button) findViewById(R.id.ssa_close);
@@ -52,28 +60,28 @@ public class CVSearchLabel extends BaseActivity {
 				finish();
 			}
 		});
-		// Fill the list of options
+		new RetrieveLabelsTask(R.string.action_retrieve_labels, this, new TaskCallBack<List<String>>() {
+			@Override
+			public void onCalled(List<String> result) {
+				updateLabels(result);
+			}
+		}).execute();
+		
+		super.onCreate(savedInstanceState);
+	}
+	
+	private void updateLabels(List<String> labels) {
 		allLabels = new TreeSet<String>();
-		String[] labels = getConferenceServer().getLabels();
-		String[] data = new String[labels.length];
+		String[] data = new String[labels.size()];
 
-		for (int i = 0; i < labels.length; i++) {
-			data[i] = labels[i];
-			allLabels.add(labels[i]);
+		int i = 0;
+		for (String label : labels) {
+			data[i] = label;
+			allLabels.add(label);
 		}
 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, data);
 		textView.setAdapter(adapter);
-		textView.setOnKeyListener(new View.OnKeyListener() {
-			@Override
-			public boolean onKey(View v, int keyCode, KeyEvent event) {
-				if (keyCode != KeyEvent.KEYCODE_ENTER) return false;
-				CVSearchLabel.this.updateTypedText();
-				return true;
-			}
-		});
-
-		super.onCreate(savedInstanceState);
 	}
 
 	protected void updateTypedText() {
@@ -89,7 +97,7 @@ public class CVSearchLabel extends BaseActivity {
 			}
 			if (!addLabel(name)) {
 				// Seems the server will add the label upon updating a session
-//				storeLabel(name);
+//				TODO storeLabel(name);
 			}
 			textView.getText().clear();
 			updateResult();
@@ -119,25 +127,25 @@ public class CVSearchLabel extends BaseActivity {
 		return allLabels.contains(name);
 	}
 
-	private void storeLabel(final String name) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Add label...").setMessage("Create the new label '" + name + "'?")
-				.setIcon(R.drawable.x_conference).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						getConferenceServer().createLabel(name);
-						allLabels.add(name);
-						dialog.dismiss();
-					}
-				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						selectedLabels.remove(name);
-						labelAdapter.notifyDataSetChanged();
-						dialog.dismiss();
-					}
-				});
-		AlertDialog create = builder.create();
-		create.show();
-	}
+//	private void storeLabel(final String name) {
+//		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//		builder.setTitle("Add label...").setMessage("Create the new label '" + name + "'?")
+//				.setIcon(R.drawable.x_conference).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//					public void onClick(DialogInterface dialog, int id) {
+//						getConferenceServer().createLabel(name);
+//						allLabels.add(name);
+//						dialog.dismiss();
+//					}
+//				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+//					public void onClick(DialogInterface dialog, int id) {
+//						selectedLabels.remove(name);
+//						labelAdapter.notifyDataSetChanged();
+//						dialog.dismiss();
+//					}
+//				});
+//		AlertDialog create = builder.create();
+//		create.show();
+//	}
 
 	private void initSelectedLabels() {
 		try {
