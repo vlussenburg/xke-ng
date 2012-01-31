@@ -18,6 +18,7 @@ import com.xebia.xcoss.axcv.tasks.SimpleCallBack;
 import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.SessionCMAdapter;
+import com.xebia.xcoss.axcv.util.FormatUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 /**
@@ -68,6 +69,9 @@ public class CVSessionList extends SessionSwipeActivity {
 
 					updateLocations(conference);
 					updateLocationNavigation();
+
+					TextView sessionLocation = ((TextView) findViewById(R.id.sessionLocation));
+					sessionLocation.setText(getCurrentLocation().getDescription());
 				} else {
 					// TODO The CVTask currently shows a dialog, which will leak when finishing...
 					finish();
