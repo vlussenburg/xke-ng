@@ -48,9 +48,6 @@ public abstract class SearchActivity extends BaseActivity implements SwipeActivi
 			}
 		});
 
-		searchSessions(null);
-		searchAuthors(null);
-
 		final TextView input = (TextView) findViewById(R.id.searchTerm);
 		final ImageView searchButton = (ImageView) findViewById(R.id.searchAction);
 
@@ -111,8 +108,8 @@ public abstract class SearchActivity extends BaseActivity implements SwipeActivi
 			Session session = sessionResults.get(index);
 			if (session.getStartTime() != null) {
 				Intent intent = new Intent(this, CVSessionView.class);
-//				Conference conference = getConferenceServer().getConference(session.getStartTime());
-//				intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
+				// Conference conference = getConferenceServer().getConference(session.getStartTime());
+				// intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
 				intent.putExtra(BaseActivity.IA_SESSION, session.getId());
 				startActivity(intent);
 			}
@@ -132,18 +129,22 @@ public abstract class SearchActivity extends BaseActivity implements SwipeActivi
 		new SearchAuthorsTask(R.string.action_search_authors, this, new TaskCallBack<List<Author>>() {
 			@Override
 			public void onCalled(List<Author> result) {
-				updateAuthors(result);
+				if (result != null) {
+					updateAuthors(result);
+				}
 			}
-		}).execute(new Search().onFreeText(text));
+		}).silent().execute(new Search().onFreeText(text));
 	}
 
 	protected void searchSessions(String text) {
 		new SearchSessionsTask(R.string.action_search_sessions, this, new TaskCallBack<List<Session>>() {
 			@Override
 			public void onCalled(List<Session> result) {
-				updateSessions(result);
+				if (result != null) {
+					updateSessions(result);
+				}
 			}
-		}).execute(new Search().onFreeText(text));
+		}).silent().execute(new Search().onFreeText(text));
 	}
 
 	private void flip() {

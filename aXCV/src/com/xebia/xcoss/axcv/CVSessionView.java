@@ -146,7 +146,7 @@ public class CVSessionView extends SessionSwipeActivity {
 			TextView sessionDescription = (TextView) findViewById(R.id.scDescription);
 			TextView sessionAuthor = (TextView) findViewById(R.id.scAuthor);
 
-//			sessionLocation.setText(currentSession.getLocation().getDescription());
+			// sessionLocation.setText(currentSession.getLocation().getDescription());
 			sessionLocation.setText(getCurrentLocation().getDescription());
 			sessionTitle.setText(currentSession.getTitle());
 			sessionDescription.setText(currentSession.getDescription());
@@ -263,6 +263,9 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
+		if (currentSession == null) {
+			return null;
+		}
 		Dialog dialog = null;
 		switch (id) {
 			case XCS.DIALOG.ADD_RATING:
@@ -353,13 +356,15 @@ public class CVSessionView extends SessionSwipeActivity {
 				startActivity(intent);
 				return true;
 			case XCS.MENU.EDIT:
-				intent.putExtra(BaseActivity.IA_SESSION, currentSession.getId());
-				startActivity(intent);
+				if (currentSession != null) {
+					intent.putExtra(BaseActivity.IA_SESSION, currentSession.getId());
+					startActivity(intent);
+				}
 				return true;
 			case XCS.MENU.LIST:
 				intent = new Intent(this, CVSessionList.class);
 				intent.putExtra(IA_LOCATION_ID, currentLocation);
-				intent.putExtra(IA_CONFERENCE_ID, currentSession.getConferenceId());
+				intent.putExtra(IA_CONFERENCE_ID, getConferenceId());
 				startActivity(intent);
 				return true;
 		}

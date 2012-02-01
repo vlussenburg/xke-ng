@@ -54,8 +54,14 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 		}
 	}
 
-	public void setSilent(boolean silent) {
-		this.silent = silent;
+	public CVTask<ParameterT,ProgressT, ReturnT> silent() {
+		this.silent = true;
+		return this;
+	}
+
+	public CVTask<ParameterT,ProgressT, ReturnT> showProgress() {
+		useCustomDialog(XCS.DIALOG.WAITING);
+		return this;
 	}
 	
 	@Override

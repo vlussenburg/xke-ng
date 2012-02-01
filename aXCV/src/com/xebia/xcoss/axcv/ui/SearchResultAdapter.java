@@ -118,7 +118,7 @@ public class SearchResultAdapter extends BaseAdapter {
 
 	@Override
 	public int getCount() {
-		if (data.size() == 0) return 1;
+		if (data == null || data.size() == 0) return 1;
 		return data.size();
 	}
 
