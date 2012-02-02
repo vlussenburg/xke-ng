@@ -214,6 +214,10 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 		return sessions.isEmpty() ? null : sessions.iterator().next();
 	}
 
+	protected Dialog createDialog(int title, int message) {
+		return createDialog(this, getString(title), getString(message));
+	}
+
 	protected Dialog createDialog(String title, String message) {
 		return createDialog(this, title, message);
 	}
