@@ -8,10 +8,8 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
@@ -41,7 +39,7 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 		currentLocation = getIntent().getExtras().getInt(IA_LOCATION_ID);
 		locations = new Location[0];
 
-		TextView location = (TextView) findViewById(R.id.rightText);
+		TextView location = (TextView) findViewById(R.id.nextLocationText);
 		location.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View arg0) {
@@ -49,7 +47,7 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 				return true;
 			}
 		});
-		location = (TextView) findViewById(R.id.leftText);
+		location = (TextView) findViewById(R.id.prevLocationText);
 		location.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View arg0) {
@@ -175,12 +173,12 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 //		Log.i(XCS.LOG.NAVIGATE, "Update locations: 3. " + previous);
 //		Log.i(XCS.LOG.NAVIGATE, "Update locations: 4. " + next);
 
-		TextView location = (TextView) findViewById(R.id.rightText);
-		ViewGroup group = ((ViewGroup) findViewById(R.id.nextLocationLayout));
+		TextView location = (TextView) findViewById(R.id.nextLocationText);
+//		ViewGroup group = ((ViewGroup) findViewById(R.id.nextLocationLayout));
 		if (next == null) {
-			group.setVisibility(View.INVISIBLE);
+			location.setVisibility(View.INVISIBLE);
 		} else {
-			group.setVisibility(View.VISIBLE);
+			location.setVisibility(View.VISIBLE);
 			location.setText(next.getDescription());
 			location.setOnClickListener(new OnClickListener() {
 				@Override
@@ -189,12 +187,12 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 				}
 			});
 		}
-		location = (TextView) findViewById(R.id.leftText);
-		group = ((ViewGroup) findViewById(R.id.prevLocationLayout));
+		location = (TextView) findViewById(R.id.prevLocationText);
+//		group = ((ViewGroup) findViewById(R.id.prevLocationLayout));
 		if (previous == null) {
-			group.setVisibility(View.INVISIBLE);
+			location.setVisibility(View.INVISIBLE);
 		} else {
-			group.setVisibility(View.VISIBLE);
+			location.setVisibility(View.VISIBLE);
 			location.setText(previous.getDescription());
 			location.setOnClickListener(new OnClickListener() {
 				@Override

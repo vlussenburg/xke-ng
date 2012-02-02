@@ -19,29 +19,25 @@ import com.xebia.xcoss.axcv.model.Search;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.tasks.RetrieveAuthorsTask;
 import com.xebia.xcoss.axcv.tasks.RetrieveLabelPerAuthorTask;
-import com.xebia.xcoss.axcv.tasks.SearchAuthorsTask;
 import com.xebia.xcoss.axcv.tasks.SearchSessionsTask;
 import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.SearchResultAdapter;
 import com.xebia.xcoss.axcv.util.FormatUtil;
-import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class CVAuthor extends BaseActivity {
 
 	private SearchResultAdapter searchAdapter;
 	private Author author;
-	private SearchAuthorsTask saTask;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.author);
 		super.onCreate(savedInstanceState);
-	}
 
-	@Override
-	protected void onResume() {
+		// You only want this once since the author does not change often.
+		// If on resume the author should be looked up again, make sure the layout inflation is not executed twice.
 		new RetrieveAuthorsTask(R.string.action_retrieve_authors, this, new TaskCallBack<List<Author>>() {
 			@Override
 			public void onCalled(List<Author> result) {
@@ -51,7 +47,7 @@ public class CVAuthor extends BaseActivity {
 						loadSessionsAndLabels();
 					}
 				}
-				if ( author == null ) {
+				if (author == null) {
 					Log.w(XCS.LOG.DATA, "No author found!");
 					author = new Author("noauthor", "Author not found", "", "");
 				}
@@ -61,6 +57,13 @@ public class CVAuthor extends BaseActivity {
 				SearchResultAdapter.createAuthorView(row, author);
 			}
 		}).execute();
+	}
+
+	@Override
+	protected void onResume() {
+		if (author != null) {
+			loadSessionsAndLabels();
+		}
 		super.onResume();
 	}
 
@@ -68,7 +71,7 @@ public class CVAuthor extends BaseActivity {
 		String id = getIntent().getExtras().getString(IA_AUTHOR);
 		String name = getIntent().getDataString().replace(XCS.AUTHOR.LINK, "").trim();
 		for (Author author : allAuthors) {
-			if (author.getUserId().equals(id)|| author.getName().equals(name)) {
+			if (author.getUserId().equals(id) || author.getName().equals(name)) {
 				return author;
 			}
 		}

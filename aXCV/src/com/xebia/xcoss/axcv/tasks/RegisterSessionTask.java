@@ -20,6 +20,13 @@ public class RegisterSessionTask extends CVTask<Session, Void, Boolean> {
 		return createUpdateSessions(this, sessions);
 	}
 
+	/**
+	 * This makes the cached conference invalid.
+	 * 
+	 * @param task
+	 * @param sessions
+	 * @return
+	 */
 	protected static Boolean createUpdateSessions(CVTask<?,?,?> task, Session... sessions) {
 		for (Session session : sessions) {
 			String conferenceId = session.getConferenceId();

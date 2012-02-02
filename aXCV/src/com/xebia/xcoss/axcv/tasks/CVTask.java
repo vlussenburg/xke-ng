@@ -1,7 +1,6 @@
 package com.xebia.xcoss.axcv.tasks;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,7 +15,6 @@ import com.xebia.xcoss.axcv.logic.DataException;
 import com.xebia.xcoss.axcv.logic.RestClient;
 import com.xebia.xcoss.axcv.logic.cache.DataCache;
 import com.xebia.xcoss.axcv.model.Credential;
-import com.xebia.xcoss.axcv.util.DebugUtil;
 import com.xebia.xcoss.axcv.util.SecurityUtils;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -35,14 +33,13 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 		this.callback = callback;
 		disableDialog();
 		Log.w(XCS.LOG.COMMUNICATE, "Task created: " + getClass().getSimpleName());
-//		DebugUtil.showCallStack();
+		// DebugUtil.showCallStack();
 	}
 
 	@Override
 	protected ReturnT doCheckedInBackground(Context ctx, ParameterT... params) throws Exception {
 		validateLogin();
-		ReturnT t = background(ctx, params);
-		return t;
+		return background(ctx, params);
 	};
 
 	protected abstract ReturnT background(Context ctx, ParameterT... params) throws Exception;
@@ -54,64 +51,68 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 		}
 	}
 
-	public CVTask<ParameterT,ProgressT, ReturnT> silent() {
+	public CVTask<ParameterT, ProgressT, ReturnT> silent() {
 		this.silent = true;
 		return this;
 	}
 
-	public CVTask<ParameterT,ProgressT, ReturnT> showProgress() {
+	public CVTask<ParameterT, ProgressT, ReturnT> showProgress() {
 		useCustomDialog(XCS.DIALOG.WAITING);
 		return this;
 	}
-	
+
 	@Override
 	protected void handleError(final Context ctx, Exception e) {
-		// Do not throw exception here. It will block the async task waiting dialog.
-		if (callback != null) {
-			try {
+		try {
+			// Do not throw exception here. It will block the async task waiting dialog.
+			if (callback != null) {
 				callback.onCalled(null);
 			}
-			catch (Exception ex) {
-				Log.w(XCS.LOG.COMMUNICATE, "Processing error callback failed: " + StringUtil.getExceptionMessage(ex));
+			String msg = null;
+			if (e instanceof DataException) {
+				if (((DataException) e).missing()) {
+					msg = ctx.getString(R.string.server_missing_url, action);
+				} else if (((DataException) e).networkError()) {
+					msg = ctx.getString(R.string.server_unreachable, action);
+				} else if (((DataException) e).timedOut()) {
+					msg = ctx.getString(R.string.server_timeout, action);
+				} else {
+					AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+					builder.setTitle("Not allowed!")
+							.setMessage("Access for " + action + " is denied. Specify credentials?")
+							.setIcon(android.R.drawable.ic_dialog_alert)
+							.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+									dialog.dismiss();
+									ctx.startActivity(new Intent(ctx, CVSettings.class));
+								}
+							}).setNegativeButton("Continue", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+									dialog.dismiss();
+									RestClient.logout();
+								}
+							});
+					AlertDialog alertDialog = builder.create();
+					alertDialog.show();
+				}
+				if (!silent && msg != null) {
+					Log.w(XCS.LOG.COMMUNICATE, msg);
+					BaseActivity.createDialog(ctx, "Action failed", msg).show();
+				}
+				return;
 			}
-		}
-		String msg = null;
-		if (e instanceof DataException) {
-			if (((DataException) e).missing()) {
-				msg = ctx.getString(R.string.server_missing_url, action);
-			} else if (((DataException) e).networkError()) {
-				msg = ctx.getString(R.string.server_unreachable, action);
-			} else if (((DataException) e).timedOut()) {
-				msg = ctx.getString(R.string.server_timeout, action);
-			} else {
-				AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-				builder.setTitle("Not allowed!")
-						.setMessage("Access for " + action + " is denied. Specify credentials?")
-						.setIcon(android.R.drawable.ic_dialog_alert)
-						.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.dismiss();
-								ctx.startActivity(new Intent(ctx, CVSettings.class));
-							}
-						}).setNegativeButton("Continue", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.dismiss();
-								RestClient.logout();
-							}
-						});
-				AlertDialog alertDialog = builder.create();
-				alertDialog.show();
-			}
-			if (!silent && msg != null) {
+			if (!silent) {
+				msg = "Communication failure on '" + action + "' due to " + StringUtil.getExceptionMessage(e);
 				Log.w(XCS.LOG.COMMUNICATE, msg);
 				BaseActivity.createDialog(ctx, "Action failed", msg).show();
 			}
-			return;
 		}
-		if (!silent) {
-			msg = "Communication failure on '" + action + "' due to " + StringUtil.getExceptionMessage(e);
-			Log.w(XCS.LOG.COMMUNICATE, msg);
-			BaseActivity.createDialog(ctx, "Action failed", msg).show();
+		catch (Exception ex) {
+			Log.w(XCS.LOG.COMMUNICATE, "Processing error callback failed: " + StringUtil.getExceptionMessage(ex));
+			if (ctx instanceof BaseActivity) {
+				((BaseActivity) ctx).getExceptionReporter().reportException(Thread.currentThread(), ex,
+						"Failure during task '" + action + "'");
+			}
 		}
 	}
 

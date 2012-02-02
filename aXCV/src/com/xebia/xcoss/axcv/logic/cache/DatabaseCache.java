@@ -13,15 +13,20 @@ import android.content.Context;
 import android.util.Log;
 import biz.source_code.base64Coder.Base64Coder;
 
+import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class DatabaseCache extends DataCache {
 
 	private ProfileManager profileManager;
+	private BaseActivity context;
 
 	public DatabaseCache(Context ctx) {
 		super(ctx);
+		if ( ctx instanceof BaseActivity) {
+			context = (BaseActivity) ctx;
+		}
 		this.profileManager = new ProfileManager(ctx);
 	}
 
@@ -36,14 +41,6 @@ public class DatabaseCache extends DataCache {
 	public void destroy() {
 		profileManager.closeConnection();
 		super.destroy();
-	}
-	
-	// TODO Call this method ...
-	private static void drop(Context ctx) {
-		ProfileManager profileManager = new ProfileManager(ctx);
-		boolean hasOpened = profileManager.openConnection();
-		profileManager.removeAllCache();
-		if ( hasOpened ) profileManager.closeConnection();
 	}
 
 	@Override
@@ -93,7 +90,7 @@ public class DatabaseCache extends DataCache {
 		return type.getSimpleName() + "." + key;
 	}
 
-	public static String serialize(final Serializable s) {
+	private String serialize(final Serializable s) {
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -101,12 +98,13 @@ public class DatabaseCache extends DataCache {
 			return Base64Coder.encodeLines(baos.toByteArray());
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			if ( context != null )
+				context.getExceptionReporter().reportException(Thread.currentThread(), e, "Serializing for cache");
 		}
 		return null;
 	}
 
-	public static Object deserialize(final String s) {
+	private Object deserialize(final String s) {
 		try {
 			byte[] bytes = Base64Coder.decodeLines(s);
 			ByteArrayInputStream bios = new ByteArrayInputStream(bytes);
@@ -114,7 +112,8 @@ public class DatabaseCache extends DataCache {
 			return ois.readObject();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			if ( context != null )
+				context.getExceptionReporter().reportException(Thread.currentThread(), e, "Deserializing for cache");
 		}
 		return null;
 	}

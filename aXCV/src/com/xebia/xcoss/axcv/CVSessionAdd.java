@@ -277,7 +277,7 @@ public class CVSessionAdd extends AdditionActivity {
 		builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				new DeleteSessionTask(R.string.action_delete_session, ctx, null).execute(session);
-				// A session has been added, so the cache is invalid.
+				// A session has been deleted, so the cache needs to be invalided.
 				scb.onCalled(true);
 			}
 		});

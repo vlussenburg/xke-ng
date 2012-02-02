@@ -26,10 +26,11 @@ import com.github.droidfu.activities.BetterDefaultActivity;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
-import com.xebia.xcoss.axcv.util.ProxyExceptionReporter;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
+
+import de.quist.app.errorreporter.ExceptionReporter;
 
 /**
  * IA_NOTIFICATION_ID - ID of notification (optional). Clears the notification flag.
@@ -60,11 +61,13 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 	private MenuItem miAdd;
 	private MenuItem miEdit;
 	private MenuItem miTrack;
+	private ExceptionReporter exceptionReporter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		ProxyExceptionReporter.register(this);
+		exceptionReporter = ExceptionReporter.register(this);
+//		ProxyExceptionReporter.register(this);
 
 		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);
 		if (conferenceButton != null) {
@@ -258,5 +261,9 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 
 	public ConferenceViewerApplication getMyApplication() {
 		return (ConferenceViewerApplication) getApplication();
+	}
+	
+	public ExceptionReporter getExceptionReporter() {
+		return exceptionReporter;
 	}
 }

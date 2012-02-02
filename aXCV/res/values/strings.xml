@@ -138,4 +138,31 @@
     <string name="action_retrieve_locations">Load locations</string>
     <string name="action_retrieve_rate">Load rate</string>
     <string name="action_retrieve_session">Load session</string>
+
+    <string name="img_conferenceButton">Show conferences</string>
+    <string name="img_icon">Icon</string>
+    <string name="img_nav_left">Previous</string>
+    <string name="img_nav_right">Next</string>
+    <string name="img_nav_up">Up</string>
+    <string name="img_nav_down">Down</string>
+    <string name="img_mark">Mark this session</string>
+    <string name="img_rate">Rate this session</string>
+    
+    <string name="header">Header</string>
+    <string name="labels">Labels</string>
+    <string name="sessions">Sessions</string>
+    <string name="audience">Audience</string>
+    <string name="authors">Author(s)</string>
+    <string name="curricum">Curriculum</string>
+    <string name="language">Language</string>
+    <string name="left">Left</string>
+    <string name="limit">Limit</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="nextsession">Next Session</string>
+    <string name="prevsession">Previous Session</string>
+    <string name="right">Right</string>
+    <string name="schedule">Schedule</string>
+    
+    
 </resources>
