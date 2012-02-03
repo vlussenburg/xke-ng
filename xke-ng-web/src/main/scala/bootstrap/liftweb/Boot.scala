@@ -38,6 +38,8 @@ class Boot {
     //exclude htmls to be processed by lift
     LiftRules.liftRequest.append {
       case Req(_, "html", GetRequest) => false
+      case Req("static" :: Nil, "js", GetRequest) => false
+      case Req("static" :: Nil, "css", GetRequest) => false
     } 
     
 
