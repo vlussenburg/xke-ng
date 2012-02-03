@@ -51,17 +51,14 @@ public class CVTrack extends BaseActivity {
 		Trackable[] markedSessions = pm.getMarkedSessions(getUser());
 		sessions = new ArrayList<Session>();
 		for (Trackable id : markedSessions) {
-			RetrieveSessionTask task = 
-					new RetrieveSessionTask(R.string.action_retrieve_session, this, new TaskCallBack<Session>() {
+			new RetrieveSessionTask(R.string.action_retrieve_session, this, new TaskCallBack<Session>() {
 				@Override
 				public void onCalled(Session result) {
 					if (result != null) {
 						updateSessions(result);
 					}
 				}
-			});
-			task.setSilent(true);
-			task.execute(id.sessionId, id.conferenceId);
+			}).silent().execute(id.sessionId, id.conferenceId);
 		}
 		pm.pruneMarked();
 		super.onResume();

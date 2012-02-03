@@ -1,7 +1,5 @@
 package com.xebia.xcoss.axcv.util;
 
-
-
 public class DebugUtil {
 
 	public static String whoCalledMe() {
@@ -15,20 +13,16 @@ public class DebugUtil {
 		return classname + "." + methodName;// + ":" + lineNumber;
 	}
 
-	public static void showCallStack()
-	{
-		StackTraceElement[] stackTraceElements =
-			Thread.currentThread().getStackTrace();
-		for (int i=2 ; i<stackTraceElements.length; i++)
-		{
+	public static void showCallStack() {
+		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+		System.out.println("##############################################");
+		for (int i = 2; i < stackTraceElements.length; i++) {
 			StackTraceElement ste = stackTraceElements[i];
-		    String classname = ste.getClassName();
-		    String methodName = ste.getMethodName();
-		    int lineNumber = ste.getLineNumber();
-		    System.out.println(
-		    	classname+"."+methodName+":"+lineNumber);
+			String classname = ste.getClassName();
+			String methodName = ste.getMethodName();
+			int lineNumber = ste.getLineNumber();
+			System.out.println(classname + "." + methodName + ":" + lineNumber);
 		}
 	}
-	
 
 }

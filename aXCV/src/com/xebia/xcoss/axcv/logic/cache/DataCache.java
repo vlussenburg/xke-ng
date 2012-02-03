@@ -97,6 +97,12 @@ public abstract class DataCache {
 		return sessions;
 	}
 
+	/**
+	 * The cached conference is now made invalid.
+	 *  
+	 * @param conferenceId
+	 * @param result
+	 */
 	public void add(String conferenceId, Session result) {
 		if ( conferenceId == null ) {
 			throw new RuntimeException("ConferenceId cannot be null!");
@@ -107,17 +113,13 @@ public abstract class DataCache {
 		}
 	}
 
-	public void add(String conferenceId, Iterable<Session> result) {
-		for (Session session : result) {
-			add(conferenceId, session);
-		}
-	}
-
 	public void add(Conference result) {
 		CachedObject<Conference> cachedObject = new CachedObject<Conference>(result);
 		if (result != null) {
 			doPutCachedObject(result.getId(), cachedObject);
-			add(result.getId(), result.getSessions());
+			for (Session session : result.getSessions()) {
+				add(result.getId(), session);
+			}
 		}
 	}
 
@@ -125,6 +127,11 @@ public abstract class DataCache {
 		doPutCachedObject(key, new CachedObject<T>(o));
 	}
 
+	/**
+	 * The cached conference is now made invalid
+	 * 
+	 * @param session
+	 */
 	public void remove(Session session) {
 		doRemoveCachedObject(session.getId().toString(), Session.class);
 	}

@@ -9,6 +9,13 @@ import com.xebia.xcoss.axcv.util.XCS;
 
 public class RetrieveSessionTask extends CVTask<String, Void, Session> {
 
+	/**
+	 * This might make the cached conference invalid...
+	 * 
+	 * @param action
+	 * @param ctx
+	 * @param callback
+	 */
 	public RetrieveSessionTask(int action, BaseActivity ctx, TaskCallBack<Session> callback) {
 		super(action, ctx, callback);
 		useCustomDialog(XCS.DIALOG.WAITING);

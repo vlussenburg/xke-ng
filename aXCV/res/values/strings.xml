@@ -3,7 +3,9 @@
 
     <string name="app_name">Conference Viewer</string>
     <string name="app_full_name">Xebia Conference Viewer</string>
-    <string name="app_version">0.5</string>
+    <string name="app_version">0.6</string>
+    <string name="app_help_url">http://xke.xebia.com/help</string>
+    
     <string name="splash_conference">Xebia Knowledge Exchange</string>
     <string name="splash_company">Xebia</string>
     <string name="splash_version">Version %s</string>
@@ -47,7 +49,7 @@
         <item>Database</item>
         <item>None</item>
     </string-array>
-	<string name="notifyIntervalDefault">15 minutes</string>
+	<string name="notifyIntervalDefault">900</string>
     <string-array name="notifyInterval">
         <item>5 minutes</item>
         <item>15 minutes</item>
@@ -117,6 +119,7 @@
     <string name="error_signal">Check failed: %s</string>
     <string name="notification_on">Update check enabled.</string>
     <string name="notification_off">Update check disabled.</string>
+    <string name="search_no_search">Please specify a valid search text.</string>
     
     <string name="droidfu_progress_dialog_title">Loading&#8230;</string>
     <string name="droidfu_progress_dialog_message">Contacting server to load data.</string>
@@ -138,4 +141,31 @@
     <string name="action_retrieve_locations">Load locations</string>
     <string name="action_retrieve_rate">Load rate</string>
     <string name="action_retrieve_session">Load session</string>
+
+    <string name="img_conferenceButton">Show conferences</string>
+    <string name="img_icon">Icon</string>
+    <string name="img_nav_left">Previous</string>
+    <string name="img_nav_right">Next</string>
+    <string name="img_nav_up">Up</string>
+    <string name="img_nav_down">Down</string>
+    <string name="img_mark">Mark this session</string>
+    <string name="img_rate">Rate this session</string>
+    
+    <string name="header">Header</string>
+    <string name="labels">Labels</string>
+    <string name="sessions">Sessions</string>
+    <string name="audience">Audience</string>
+    <string name="authors">Author(s)</string>
+    <string name="curricum">Curriculum</string>
+    <string name="language">Language</string>
+    <string name="left">Left</string>
+    <string name="limit">Limit</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="nextsession">Next Session</string>
+    <string name="prevsession">Previous Session</string>
+    <string name="right">Right</string>
+    <string name="schedule">Schedule</string>
+    
+    
 </resources>

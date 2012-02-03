@@ -1,7 +1,6 @@
 package com.xebia.xcoss.axcv;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,14 +10,12 @@ import android.widget.TextView;
 
 import com.xebia.xcoss.axcv.layout.SwipeLayout;
 import com.xebia.xcoss.axcv.model.Conference;
-import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.tasks.RetrieveConferenceTask;
 import com.xebia.xcoss.axcv.tasks.SimpleCallBack;
 import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.ScreenTimeUtil;
 import com.xebia.xcoss.axcv.ui.SessionCMAdapter;
-import com.xebia.xcoss.axcv.util.FormatUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
 /**
@@ -53,6 +50,7 @@ public class CVSessionList extends SessionSwipeActivity {
 			public void onCalled(Conference cc) {
 				if (cc != null) {
 					conference = cc;
+					updateLocations(conference);
 					TextView title = (TextView) findViewById(R.id.conferenceTitle);
 					title.setText(cc.getTitle());
 
@@ -67,7 +65,6 @@ public class CVSessionList extends SessionSwipeActivity {
 					ListView sessionList = (ListView) findViewById(R.id.sessionList);
 					sessionList.setAdapter(adapter);
 
-					updateLocations(conference);
 					updateLocationNavigation();
 
 					TextView sessionLocation = ((TextView) findViewById(R.id.sessionLocation));

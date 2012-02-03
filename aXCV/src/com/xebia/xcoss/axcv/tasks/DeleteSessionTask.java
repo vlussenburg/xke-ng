@@ -8,6 +8,13 @@ import com.xebia.xcoss.axcv.model.Session;
 
 public class DeleteSessionTask extends CVTask<Session, Void, Boolean> {
 
+	/**
+	 * Calling this task will make the cached conference invalid. Please compensate.
+	 * 
+	 * @param action
+	 * @param ctx
+	 * @param callback
+	 */
 	public DeleteSessionTask(int action, BaseActivity ctx, TaskCallBack<Boolean> callback) {
 		super(action, ctx, callback);
 	}
