@@ -12,23 +12,42 @@
 </head>
 
 <script type="text/javascript">
+	//global state
+	var currentSessionId;
+	var nextConferenceIndex = 1;
+
 
 	$(document).ready(
-		$("#next").live("pageshow",
+				$("#next").live("pageshow",
                                 function(event, ui) {
 									$.ajax({
 										type: 'GET',
 										dataType: 'json',
 										contentType: 'application/json',
-										url: '/xkeng/conference/next/slots',
+										url: '/xkeng/conference/next/' + nextConferenceIndex +'/slots',
 										success: conferenceSuccessCallback,
 										crossDomain: false,
 										error: function (xhr, ajaxOptions, thrownError) {
 							                    alert("Unable to get conferences\nCode " + xhr.status + "\nMessage " + xhr.status);
 										}
 									})
-                                })
+                                }), 
+				$("#detail").live("pageshow",
+				                function(event, ui) {
+									$.ajax({
+										type: 'GET',
+										dataType: 'json',
+										contentType: 'application/json',
+										url: '/xkeng/session/' + currentSessionId,
+										success: sessionSuccessCallback,
+										crossDomain: false,
+										error: function (xhr, ajaxOptions, thrownError) {
+							                    alert("Unable to get session\nCode " + xhr.status + "\nMessage " + xhr.status);
+										}
+									})
+						        })
 
+	
 	);
 
 /*
@@ -78,41 +97,66 @@
 	function loginSuccessCallback(response) {
 		$.mobile.changePage( "#next", { transition: "slidedown"} );
  	}
- 	var currentSessionId;
+	
+	function showNext() {
+		if(nextConferenceIndex < 1) {
+			nextConferenceIndex = 1
+		} else {
+			nextConferenceIndex = nextConferenceIndex +1
+		}
+		$.mobile.loadPage( "#next", { transition: "slidedown"} );
+
+	}
+	
+	function changeToConferenceOverviewPage() {
+		$.mobile.changePage( "#next", { transition: "fade"} );		
+	}
+	
 	function changeToSessionDetailsPage(id) {
 		currentSessionId = id;
-		$.mobile.changePage( "#detail", { transition: "slidedown"} );
+		$.mobile.changePage( "#detail", { transition: "slide"} );
 	}
 	
  	
+	function getAuthors(session) {
+		var authors = ""
+			for(authorIndex in session.authors) {
+				if(authorIndex > 0) {
+					authors += ", "
+				}
+				authors += session.authors[authorIndex].name
+			}
+		return authors;
+	}
+	
  	function conferenceSuccessCallback(response) {
- 	
-	 	console.log(response)
-	 	 for (slotIndex in response.slots) {
+		$("#next-list").empty()
+	 	for (slotIndex in response.slots) {
 	 		var slot = response.slots[slotIndex]
 	 		$("#next-list").append("<li data-role='list-divider'>" + slot.from + " - " + slot.to + "</li>")
 			for (sessionsIndex in slot.sessions) {
 				var session = slot.sessions[sessionsIndex]
-				var authors = ""
-				for(authorIndex in session.authors) {
-					if(authorIndex > 0) {
-						authors += ", "
-					}
-					authors += session.authors[authorIndex].name
-				}
-				$("#next-list").append("<li><a href='javascript:changeToSessionDetailsPage(\"" + session.id + "\");'><i>" + session.description + "</i><br>by: " +authors + "<br>" + session.location.description + "</a></li>")
+				console.log(session)
+				var authors = getAuthors(session)
+				$("#next-list").append("<li><a href='javascript:changeToSessionDetailsPage(\"" + session.id + "\");'><i>" + session.title + "</i><br>by: " +authors + "<br>" + session.location.description + "</a></li>")
 			}	 		
 	 	 }
-	 	  
- /* 	//list-divider 
-		for (sessionsIndex in response.sessions) {
-			var session = response.sessions[sessionsIndex]
-			
-			$("#next-list").append("<li><a href='javascript:changeToSessionDetailsPage(\"" + session.id + "\");'><i>" + session.description + "</i><br><br>" + session.location.description + "</a></li>")
-		} */
 		$("#next-list").listview("refresh"); 	
  	}
 
+ 	function sessionSuccessCallback(session) {
+		$("#detail-list").empty()
+		var authors = getAuthors(session)
+	 	$("#detail-list").append("<li data-role='list-divider'>Summary</li>")
+		$("#detail-list").append("<li><i>" +  session.title + "</i><br>by: " +authors + "</li>")
+	 	$("#detail-list").append("<li data-role='list-divider'>Location</li>")
+		$("#detail-list").append("<li>" + session.location.description + "<br>Max:" + session.limit+"</li>")
+	    $("#detail-list").append("<li data-role='list-divider'>Description</li>")
+		$("#detail-list").append("<li>" +  session.description + "</li>")
+		$("#detail-list").listview("refresh"); 	
+ 	}
+
+ 	
 </script>
 
 <body>
@@ -149,7 +193,7 @@
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#current" class="ui-btn-active">Current</a></li>
-					<li><a href="#next">Next</a></li>
+					<li><a href="javascript:showNext();">Next</a></li>
 				</ul>
 			</div>
 		</div>
@@ -192,14 +236,13 @@
 
 
 		<div data-role="content">
-			<ul id="next-list" data-role="listview" data-filter="true" />
+			<ul id="detail-list" data-role="listview" />
 		</div>
 
 		<div data-role="footer" data-position="fixed">
 			<div data-role="navbar">
 				<ul>
-					<li><a href="#current" class="ui-btn-active">Current</a></li>
-					<li><a href="#next">Next</a></li>
+					<li><a href="javascript:changeToConferenceOverviewPage();" class="ui-btn-active">Back</a></li>
 				</ul>
 			</div>
 		</div>
