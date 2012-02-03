@@ -59,7 +59,7 @@
         <item>switched off</item>
     </string-array>
     <string-array name="notifyIntervalValues">
-        <item>300</item>
+        <item>30</item>
         <item>900</item>
         <item>3600</item>
         <item>43200</item>

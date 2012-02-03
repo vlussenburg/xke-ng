@@ -230,6 +230,9 @@ public class ProfileManager extends SQLiteOpenHelper {
 	}
 
 	private Trackable[] getSessions(String user, String table) {
+		if ( StringUtil.isEmpty(user) ) {
+			return new Trackable[0];
+		}
 		Log.v(XCS.LOG.COMMUNICATE, "Get all sessions for user " + user + " from " + table);
 		try {
 			checkConnection();

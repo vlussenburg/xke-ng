@@ -18,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.xebia.xcoss.axcv.logic.DataException;
 import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.logic.ProfileManager.Trackable;
 import com.xebia.xcoss.axcv.logic.RestClient;
@@ -31,6 +32,8 @@ import com.xebia.xcoss.axcv.util.SecurityUtils;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
+import de.quist.app.errorreporter.ExceptionReporter;
+
 public class CheckNotificationSignalRetriever extends BroadcastReceiver {
 
 	protected static final String TAG_OWNED = "id-owned_ses";
@@ -39,48 +42,66 @@ public class CheckNotificationSignalRetriever extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context ctx, Intent intent) {
 
-		String path = null;
-		try {
-			ApplicationInfo ai = ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(), PackageManager.GET_META_DATA);
-			path = ai.metaData.getString("com.xebia.xcoss.serverUrl").trim();
-		}
-		catch (NameNotFoundException e) {
-			Log.e(XCS.LOG.ALL, "Notification failure: " + StringUtil.getExceptionMessage(e));
-		}
-		if ( StringUtil.isEmpty(path) ) {
-			Toast.makeText(ctx, "Update check failed. Server URL not found.", Toast.LENGTH_LONG).show();
-			return;
-		}
-
-		Toast.makeText(ctx, "Checking for updates...", Toast.LENGTH_SHORT).show();
-
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
-		String user = sp.getString(XCS.PREF.USERNAME, null);
-		if (!RestClient.isAuthenticated()) {
-			String password = sp.getString(XCS.PREF.PASSWORD, "");
-			Credential credential = new Credential(user, SecurityUtils.decrypt(password));
-			RestClient.postObject(path + "/login", credential, void.class);
-		}
-
-		Handler handler = new CheckNotificationHandler(ctx);
-		ProfileManager pm = new ProfileManager(ctx);
+		ExceptionReporter exceptionReporter = ExceptionReporter.register(ctx);
 		Bundle bundle = intent.getExtras();
 		boolean onMarked = bundle.getBoolean(XCS.PREF.NOTIFYTRACK);
 		boolean onOwned = bundle.getBoolean(XCS.PREF.NOTIFYOWNED);
-		
-		Log.v(XCS.LOG.ALL, "Notification check on owned/tracked: " + onOwned + "/" + onMarked);
 
-		if (onMarked) {
-			ArrayList<String> sessions = getChangesInTrackedSessions(pm, user, path);
-			reportOn(TAG_TRACKED, sessions, handler);
-		}
-		if (onOwned) {
-			ArrayList<String> sessions = getChangesInOwnedSessions(pm, user, path);
-			reportOn(TAG_OWNED, sessions, handler);
+		if (onOwned || onMarked) {
+			String path = null;
+			try {
+				ApplicationInfo ai = ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(),
+						PackageManager.GET_META_DATA);
+				path = ai.metaData.getString("com.xebia.xcoss.serverUrl").trim();
+			}
+			catch (NameNotFoundException e) {
+				Log.e(XCS.LOG.ALL, "Notification failure: " + StringUtil.getExceptionMessage(e));
+			}
+			if (StringUtil.isEmpty(path)) {
+				Toast.makeText(ctx, "Update check failed. Server URL not found.", Toast.LENGTH_LONG).show();
+				return;
+			}
+
+			try {
+				SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+				String user = sp.getString(XCS.PREF.USERNAME, null);
+				
+				if ( StringUtil.isEmpty(user) ) {
+					return;
+				}
+				
+				Toast.makeText(ctx, "Checking for updates...", Toast.LENGTH_SHORT).show();
+
+				if (!RestClient.isAuthenticated()) {
+					String password = sp.getString(XCS.PREF.PASSWORD, "");
+					Credential credential = new Credential(user, SecurityUtils.decrypt(password));
+					RestClient.postObject(path + "/login", credential, void.class);
+				}
+
+				Handler handler = new CheckNotificationHandler(ctx);
+				ProfileManager pm = new ProfileManager(ctx);
+
+				Log.v(XCS.LOG.ALL, "Notification check on owned/tracked: " + onOwned + "/" + onMarked);
+
+				if (onMarked) {
+					ArrayList<String> sessions = getChangesInTrackedSessions(pm, user, path);
+					reportOn(TAG_TRACKED, sessions, handler);
+				}
+				if (onOwned) {
+					ArrayList<String> sessions = getChangesInOwnedSessions(pm, user, path);
+					reportOn(TAG_OWNED, sessions, handler);
+				}
+			}
+			catch (DataException e) {
+				Log.w("notification", "Error on notification: " + e.getMessage());
+			}
+			catch (Exception e) {
+				exceptionReporter.reportException(Thread.currentThread(), e, "Notification service failure");
+			}
 		}
 	}
 
-	protected void reportOn(String type, ArrayList<String> sessionIds, Handler handler) {
+	private void reportOn(String type, ArrayList<String> sessionIds, Handler handler) {
 		if (sessionIds.size() > 0) {
 			Message message = Message.obtain(handler);
 			Bundle data = new Bundle();
@@ -90,7 +111,7 @@ public class CheckNotificationSignalRetriever extends BroadcastReceiver {
 		}
 	}
 
-	protected ArrayList<String> getChangesInOwnedSessions(ProfileManager pm, String user, String path) {
+	private ArrayList<String> getChangesInOwnedSessions(ProfileManager pm, String user, String path) {
 		ArrayList<String> modified = new ArrayList<String>();
 		try {
 			pm.openConnection();
@@ -98,7 +119,8 @@ public class CheckNotificationSignalRetriever extends BroadcastReceiver {
 			Trackable[] ids = pm.getOwnedSessions(user);
 			// Search active sessions on the author
 			Search search = new Search().onAuthor(new Author(user, null, null, null)).after(new Moment());
-			List<Session> allOwnedSessions = RestClient.searchObjects(path + "/search/sessions", "sessions", Session.class, search);
+			List<Session> allOwnedSessions = RestClient.searchObjects(path + "/search/sessions", "sessions",
+					Session.class, search);
 			if (allOwnedSessions == null) {
 				return new ArrayList<String>();
 			}
@@ -116,9 +138,9 @@ public class CheckNotificationSignalRetriever extends BroadcastReceiver {
 					}
 				}
 
-				if ( trackable == null || currentHash != trackable.hash ) {
+				if (trackable == null || currentHash != trackable.hash) {
 					Log.v(XCS.LOG.DATA, "Authored session changed: " + ownedSession.getTitle());
-					if ( trackable == null ) {
+					if (trackable == null) {
 						trackable = pm.new Trackable();
 						trackable.sessionId = id;
 						trackable.conferenceId = ownedSession.getConferenceId();
@@ -137,7 +159,7 @@ public class CheckNotificationSignalRetriever extends BroadcastReceiver {
 		}
 	}
 
-	protected ArrayList<String> getChangesInTrackedSessions(ProfileManager pm, String user, String path) {
+	private ArrayList<String> getChangesInTrackedSessions(ProfileManager pm, String user, String path) {
 		ArrayList<String> modified = new ArrayList<String>();
 		try {
 			pm.openConnection();

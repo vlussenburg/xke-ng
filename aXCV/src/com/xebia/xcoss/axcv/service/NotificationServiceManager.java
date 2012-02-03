@@ -13,12 +13,15 @@ import android.widget.Toast;
 import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.util.XCS;
 
+import de.quist.app.errorreporter.ExceptionReporter;
+
 public class NotificationServiceManager implements SignalRetriever {
 
 	private static final int SERVICE_ID = 873892;
 
 	@Override
 	public void onSignal(Context ctx) {
+		ExceptionReporter.register(ctx);
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
 		boolean onOwned = sp.getBoolean(XCS.PREF.NOTIFYOWNED, false);
 		boolean onMarked = sp.getBoolean(XCS.PREF.NOTIFYTRACK, false);

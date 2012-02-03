@@ -1,7 +1,10 @@
 package com.xebia.xcoss.axcv.model;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import android.util.Log;
 
 import com.xebia.xcoss.axcv.util.StringUtil;
 
@@ -37,6 +40,7 @@ public class Search {
 			if (!StringUtil.isEmpty(author.getUserId())) searchParms.put(Field.AUTHOR_ID.name, author.getUserId());
 			if (!StringUtil.isEmpty(author.getName())) searchParms.put(Field.AUTHOR_NAME.name, author.getName());
 		}
+		Log.i("Search", searchParms.keySet().toString() + " = " + searchParms.values().toString());
 		return this;
 	}
 
