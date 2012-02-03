@@ -202,7 +202,7 @@
 				<artifactId>maven-jetty-plugin</artifactId>
 				<version>6.1.25</version>
 				<configuration>
-					<contextPath>/</contextPath>
+					<contextPath>/xkeng</contextPath>
 					<scanIntervalSeconds>5</scanIntervalSeconds>
 					<connectors>
 						<connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
