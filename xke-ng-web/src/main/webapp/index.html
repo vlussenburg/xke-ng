@@ -1,12 +1,15 @@
-<!DOCTYPE html> 
-<html> 
-	<head> 
-	<title>Status.net</title> 
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
-	<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
-	<script type="text/javascript" src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
-</head> 
+<!DOCTYPE html>
+<html>
+<head>
+<title>Status.net</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+<script type="text/javascript"
+	src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+<script type="text/javascript"
+	src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+</head>
 
 <script type="text/javascript">
 
@@ -17,7 +20,7 @@
 										type: 'GET',
 										dataType: 'json',
 										contentType: 'application/json',
-										url: '/xkeng/conference/next',
+										url: '/xkeng/conference/next/slots',
 										success: conferenceSuccessCallback,
 										crossDomain: false,
 										error: function (xhr, ajaxOptions, thrownError) {
@@ -85,12 +88,28 @@
  	function conferenceSuccessCallback(response) {
  	
 	 	console.log(response)
- 	
+	 	 for (slotIndex in response.slots) {
+	 		var slot = response.slots[slotIndex]
+	 		$("#next-list").append("<li data-role='list-divider'>" + slot.from + " - " + slot.to + "</li>")
+			for (sessionsIndex in slot.sessions) {
+				var session = slot.sessions[sessionsIndex]
+				var authors = ""
+				for(authorIndex in session.authors) {
+					if(authorIndex > 0) {
+						authors += ", "
+					}
+					authors += session.authors[authorIndex].name
+				}
+				$("#next-list").append("<li><a href='javascript:changeToSessionDetailsPage(\"" + session.id + "\");'><i>" + session.description + "</i><br>by: " +authors + "<br>" + session.location.description + "</a></li>")
+			}	 		
+	 	 }
+	 	  
+ /* 	//list-divider 
 		for (sessionsIndex in response.sessions) {
 			var session = response.sessions[sessionsIndex]
 			
 			$("#next-list").append("<li><a href='javascript:changeToSessionDetailsPage(\"" + session.id + "\");'><i>" + session.description + "</i><br><br>" + session.location.description + "</a></li>")
-		}
+		} */
 		$("#next-list").listview("refresh"); 	
  	}
 
@@ -100,89 +119,90 @@
 
 
 	<div data-role="page" id="login">
-	
+
 		<div data-role="header">
 			<h1>Login</h1>
 		</div>
-		
-	
-		<div data-role="content">	
-            <form action="javascript: login();">
-                <input id="username" type="text" placeholder="Your username"/>
-                <input id="password" type="password" placeholder="Your password"/>
-                <button type="submit">Login</button>
-            </form>
+
+
+		<div data-role="content">
+			<form action="javascript: login();">
+				<input id="username" type="text" placeholder="Your username" /> <input
+					id="password" type="password" placeholder="Your password" />
+				<button type="submit">Login</button>
+			</form>
 		</div>
 	</div>
 
 	<div data-role="page" id="next">
-	
+
 		<div data-role="header">
 			<h1>Current XKE</h1>
 		</div>
-		
-	
-		<div data-role="content">	
-			<ul id="next-list" data-role="listview" data-filter="true"/>
+
+
+		<div data-role="content">
+			<ul id="next-list" data-role="listview" data-filter="true" />
 		</div>
-		
+
 		<div data-role="footer" data-position="fixed">
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#current" class="ui-btn-active">Current</a></li>
 					<li><a href="#next">Next</a></li>
 				</ul>
-			</div>	
-		</div>	
+			</div>
+		</div>
 	</div>
-	
+
 	<div data-role="page" id="upcomming">
-	
+
 		<div data-role="header">
 			<h1>Current</h1>
 		</div>
-		
-	
-		<div data-role="content">	
-            <form action="#">
-                <input id="statusUpdateField" type="text" name="resource" placeholder="What are you thinking about" onchange="#"/>
-            </form>
-            <br>
+
+
+		<div data-role="content">
+			<form action="#">
+				<input id="statusUpdateField" type="text" name="resource"
+					placeholder="What are you thinking about" onchange="#" />
+			</form>
+			<br>
 			<ul id="update-list" data-role="listview" data-filter="true">
 			</ul>
 
 		</div>
-		
+
 		<div data-role="footer" data-position="fixed">
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#current">Current</a></li>
 					<li><a href="#next" class="ui-btn-active">Next</a></li>
 				</ul>
-			</div>	
+			</div>
 		</div>
 	</div>
 
 
 	<div data-role="page" id="detail">
-	
-		<div data-role="header" >
+
+		<div data-role="header">
 			<h1 id="detailHeader">Session</h1>
 		</div>
-		
-	
-		<div data-role="content">	
-			<ul id="next-list" data-role="listview" data-filter="true"/>
+
+
+		<div data-role="content">
+			<ul id="next-list" data-role="listview" data-filter="true" />
 		</div>
-		
+
 		<div data-role="footer" data-position="fixed">
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#current" class="ui-btn-active">Current</a></li>
 					<li><a href="#next">Next</a></li>
 				</ul>
-			</div>	
-		</div>	
+			</div>
+		</div>
 	</div>
 </body>
 
