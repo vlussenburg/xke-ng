@@ -104,7 +104,8 @@
 		} else {
 			nextConferenceIndex = nextConferenceIndex +1
 		}
-		$.mobile.loadPage( "#next", { transition: "slidedown"} );
+		console.log(nextConferenceIndex)
+		$.mobile.reloadPage( "#next", { transition: "slidedown"} );
 
 	}
 	
@@ -189,13 +190,16 @@
 			<ul id="next-list" data-role="listview" data-filter="true" />
 		</div>
 
-		<div data-role="footer" data-position="fixed">
+<!-- 		showPage does not work yet. Won't refresh
+<div data-role="footer" data-position="fixed">
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#current" class="ui-btn-active">Current</a></li>
 					<li><a href="javascript:showNext();">Next</a></li>
 				</ul>
 			</div>
+			 -->
+			
 		</div>
 	</div>
 
