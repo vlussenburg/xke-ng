@@ -17,14 +17,15 @@
 										type: 'GET',
 										dataType: 'json',
 										contentType: 'application/json',
-										url: 'https://xke.xebia.com/xkeng/conferences/2012/04/29',
+										url: '/conference/next',
 										success: conferenceSuccessCallback,
-										crossDomain: true,
+										crossDomain: false,
 										error: function (xhr, ajaxOptions, thrownError) {
-							                    alert("Unable to post login\nCode " + xhr.status + "\nMessage " + xhr.status);
+							                    alert("Unable to get conferences\nCode " + xhr.status + "\nMessage " + xhr.status);
 										}
 									})
                                 })
+
 	);
 
 /*
@@ -61,9 +62,9 @@
 			type: 'POST',
 			dataType: 'json',
 			contentType: 'application/json',
-			url: 'https://xke.xebia.com/xkeng/login',
+			url: '/login',
 			success: loginSuccessCallback,
-			crossDomain: true,
+			crossDomain: false,
 			data: JSON.stringify(jsonRequest),
 			error: function (xhr, ajaxOptions, thrownError){
                     alert("Unable to post login\nCode " + xhr.status + "\nMessage " + xhr.status);
@@ -74,16 +75,21 @@
 	function loginSuccessCallback(response) {
 		$.mobile.changePage( "#next", { transition: "slidedown"} );
  	}
- 	
+ 	var currentSessionId;
+	function changeToSessionDetailsPage(id) {
+		currentSessionId = id;
+		$.mobile.changePage( "#detail", { transition: "slidedown"} );
+	}
+	
  	
  	function conferenceSuccessCallback(response) {
  	
 	 	console.log(response)
  	
-		for (sessionsIndex in response[0].sessions) {
-			var session = response[0].sessions[sessionsIndex]
+		for (sessionsIndex in response.sessions) {
+			var session = response.sessions[sessionsIndex]
 			
-			$("#next-list").append("<li><i>" + session.description + "</i><br><br>" + session.location.description + "</li>")
+			$("#next-list").append("<li><a href='javascript:changeToSessionDetailsPage(\"" + session.id + "\");'><i>" + session.description + "</i><br><br>" + session.location.description + "</a></li>")
 		}
 		$("#next-list").listview("refresh"); 	
  	}
@@ -157,6 +163,27 @@
 		</div>
 	</div>
 
+
+	<div data-role="page" id="detail">
+	
+		<div data-role="header" >
+			<h1 id="detailHeader">Session</h1>
+		</div>
+		
+	
+		<div data-role="content">	
+			<ul id="next-list" data-role="listview" data-filter="true"/>
+		</div>
+		
+		<div data-role="footer" data-position="fixed">
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#current" class="ui-btn-active">Current</a></li>
+					<li><a href="#next">Next</a></li>
+				</ul>
+			</div>	
+		</div>	
+	</div>
 </body>
 
 </html>

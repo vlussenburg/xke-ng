@@ -13,8 +13,8 @@ import com.xebia.xkeng.dao.RepositoryTestAssembly._
 @RunWith(classOf[JUnitRunner])
 class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeAndAfterEach with MongoTestConnection {
 
-  val l1 = Location("Maup", 20)
-  val l2 = Location("Laap", 30)
+  val l1 = Location("Laap", 20)
+  val l2 = Location("Maup", 30)
   val l3 = Location("New", 100)
   val fmt = ISODateTimeFormat.dateTime()
   val outputFmt = DateTimeFormat.forPattern("yyyyMMdd");
@@ -41,13 +41,34 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
     c
   }
 
+  it should "return slots that are grouped based on equal slot times and sorted by location within a slot" in {
+    val slot1Start = new DateTime
+    val slot1End = slot1Start.plusMinutes(60)
+    val slot2End = slot1End.plusMinutes(60)
+    val templateSession = Session(slot1Start, new DateTime, l1, "Title", "Desc", "STRATEGIC", "10 people")
+    val s1A = templateSession.copy(end = slot1End, title = "S1A")
+    val s1B = templateSession.copy(end = slot1End, title = "S1B", location = l2)
+    val s1C = templateSession.copy(end = slot1Start.plusMinutes(120), title = "S1C", location = l3)
+    val s2A = templateSession.copy(start = slot1End, end = slot2End, title = "S2A")
+    val s2B = templateSession.copy(start = slot1End, end = slot2End, title = "S2B", location = l2)
+    val c = Conference("XKE", slot1Start, slot2End, List(s2B, s2A, s1C, s1B, s1A), List(l1, l2, l3))
+    val slots = c.slots
+    slots.size should be(3)
+    slots(0).sessions(0) should be(s1A)
+    slots(0).sessions(1) should be(s1B)
+    slots(1).sessions(0) should be(s1C)
+    slots(2).sessions(0) should be(s2A)
+    slots(2).sessions(1) should be(s2B)
+    //println(c.getSlots.map(s => s.key + "\n   " + s.sessions.map(_.title + " " ).mkString).mkString("\n"))
+  }
+
   it should "find conference by year" in {
     val confs = conferenceRepository.findConferences(xke2011_06_03.getYear)
     confs.isEmpty should not be true
     confs.size should equal(3)
   }
 
-  it should "find next conference " in {
+  it should "find next conference" in {
     var conf = conferenceRepository.findNextConference(1)
     conf should not be None
     val Some(c1) = conf

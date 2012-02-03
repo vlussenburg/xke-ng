@@ -17,6 +17,11 @@ trait XKENGSecuredAPI extends RestHelper with Logger {
   this: RestHandlerComponent =>
 
   serve {
+    /**
+     * *******************
+     * conference
+     * *******************
+     */
     // GET /conferences/<year>[/<month>[/<day>]]
     case Req("conferences" :: Nil, _, GetRequest) =>
       getConferences
@@ -26,11 +31,18 @@ trait XKENGSecuredAPI extends RestHelper with Logger {
       getConferences(year, month)
     case Req("conferences" :: AsInt(year) :: AsInt(month) :: AsInt(day) :: Nil, _, GetRequest) =>
       getConferences(year, month, day)
-    /**
-     * *******************
-     * conference
-     * *******************
-     */
+
+    // GET /conference/next/<ahead>
+    case Req("conference" :: "next" :: Nil, _, GetRequest) =>
+      getNextConference(1)
+    case Req("conference" :: "next" :: AsInt(ahead) :: Nil, _, GetRequest) =>
+      getNextConference(ahead)
+
+    // GET /conference/next/<ahead>/slots
+    case Req("conference" :: "next" :: "slots" :: Nil, _, GetRequest) =>
+      getNextConferenceSlots(1)
+    case Req("conference" :: "next" :: AsInt(ahead) :: "slots" :: Nil, _, GetRequest) =>
+      getNextConferenceSlots(ahead)
 
     // POST /conference
     case req @ Req("conference" :: Nil, _, PostRequest) =>
@@ -39,7 +51,7 @@ trait XKENGSecuredAPI extends RestHelper with Logger {
       }
     // GET /conference/<id>
     case Req("conference" :: id :: Nil, _, GetRequest) =>
-    	getConference(id)
+      getConference(id)
     // PUT /conference
     case req @ Req("conference" :: id :: Nil, _, PutRequest) =>
       doWithRequestBody(req.body) {
@@ -54,10 +66,10 @@ trait XKENGSecuredAPI extends RestHelper with Logger {
      * *******************
      */
 
-	// Obsolete. Conference returns all sessions already.
+    // Obsolete. Conference returns all sessions already.
     // GET /conference/<id>/sessions
-	//    case Req("conference" :: id :: "sessions" :: Nil, _, GetRequest) =>
-	//      handleSessionsList(id)
+    //    case Req("conference" :: id :: "sessions" :: Nil, _, GetRequest) =>
+    //      handleSessionsList(id)
 
     // POST /conference/<id>/session
     case req @ Req("conference" :: id :: "session" :: Nil, _, PostRequest) =>
@@ -66,10 +78,10 @@ trait XKENGSecuredAPI extends RestHelper with Logger {
       }
     // PUT /conference/<id>/session OBSOLETE
     //-> PUT session/<id>
-	//    case req @ Req("conference" :: id :: "session" :: Nil, _, PutRequest) =>
-	//      doWithRequestBody(req.body) {
-	//        handleSessionUpdate(id, _)
-	//      }
+    //    case req @ Req("conference" :: id :: "session" :: Nil, _, PutRequest) =>
+    //      doWithRequestBody(req.body) {
+    //        handleSessionUpdate(id, _)
+    //      }
     case req @ Req("session" :: AsLong(id) :: Nil, _, PutRequest) =>
       doWithRequestBody(req.body) {
         handleSessionUpdate(id, _)
@@ -138,7 +150,6 @@ trait XKENGSecuredAPI extends RestHelper with Logger {
         handleSearchSessions(_)
       }
 
-  
     /**
      * *******************
      * feedback

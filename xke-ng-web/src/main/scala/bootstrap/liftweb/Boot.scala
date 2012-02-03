@@ -35,6 +35,11 @@ class Boot {
     }
     LiftRules.dispatch.append(authenticationInterceptor guard XKENGSecuredAPIAssembly)
     LiftRules.early.append(makeUtf8)
+    //exclude htmls to be processed by lift
+    LiftRules.liftRequest.append {
+      case Req(_, "html", GetRequest) => false
+    } 
+    
 
   }
 

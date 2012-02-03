@@ -60,6 +60,25 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     l1.serializeToJson should be(expected)
   }
 
+  it should "serialize a slot correctly" in {
+    val from = fmt.parseDateTime("2011-11-07T16:00:00.000Z")
+    val to = fmt.parseDateTime("2011-11-07T17:00:00.000Z")
+    val expected: JValue = ("from" -> from.toString("HH:mm")) ~
+      ("to" -> to.toString("HH:mm")) ~
+      ("sessions" -> List[Session]())
+    val slot = Slot(from, to, Nil)
+    slotsToJValue(slot) should be(expected)
+  }
+  it should "serialize slots correctly" in {
+    val s1 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "Mongo for world domination", "STRATEGIC", "10 people", List(a1), Nil, Nil, Set())
+    val c = Conference("XKE", xkeStartDate, xkeStartDate.plusHours(4), List(s1), Nil)
+    
+    val json = conferenceSlotsToJValue(c)
+    val JArray(slots) = json \ "slots"
+    val JString(from) = json \ "slots" \ "from"
+    from should be(xkeStartDate.toString("HH:mm"))
+  }
+
   it should "serialize a session with authors, comments and ratings" in {
     val r1 = Rating(10, "peteru")
     val c1 = Comment("blabla", "peteru")
@@ -232,4 +251,5 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     encryptedPwd should be("87ujy79hjy")
     encrypted should be(true)
   }
+
 }

@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 import net.liftweb.json.JsonAST.{ JValue, JArray }
 import net.liftweb.json.ext.JodaTimeSerializers
 import javax.security.auth.login.LoginContext
-import com.xebia.xkeng.model.{ Credential, Session, Location, Conference, Author, Comment, Rating, UserHolder }
+import com.xebia.xkeng.model.{ Credential, Session, Location, Conference, Author, Comment, Rating, UserHolder, Slot }
 import net.liftweb.common.Logger
 import com.xebia.xkeng.serialization.util._
 
@@ -72,8 +72,8 @@ object JsonDomainConverters extends Logger {
     ("id" -> session.id) ~
       ("title" -> session.title) ~
       ("description" -> session.description) ~
-      ("startTime" -> fmt.print(session.start)) ~
-      ("endTime" -> fmt.print(session.end)) ~
+      ("startTime" -> DATE_TIME_FORMAT.print(session.start)) ~
+      ("endTime" -> DATE_TIME_FORMAT.print(session.end)) ~
       ("limit" -> session.limit) ~
       ("type" -> session.sessionType) ~
       ("authors" -> authorsToJArray(session.authors)) ~
@@ -99,10 +99,45 @@ object JsonDomainConverters extends Logger {
   implicit def conferenceToJValue(conference: Conference): JValue = {
     ("id" -> conference._id.toString) ~
       ("title" -> conference.title) ~
-      ("begin" -> fmt.print(conference.begin)) ~
-      ("end" -> fmt.print(conference.end)) ~
+      ("begin" -> DATE_TIME_FORMAT.print(conference.begin)) ~
+      ("end" -> DATE_TIME_FORMAT.print(conference.end)) ~
       ("sessions" -> conference.sessions.map(sessionToJValue(_))) ~
       ("locations" -> conference.locations.map(locationToJValue(_)))
+  }
+  
+  
+    /**
+   *
+   * "id":"4e4a0c48b39c8578c8f7b6d2",
+   * "title":"XKE",
+   * "begin":"2011-08-09T16:00:56.527+02:00",
+   * "end":"2011-08-09T20:00:56.527+02:00",
+   * "slots" [
+   *   { "from":"16:00", "to":"17:00", "sessions" : [...] }
+   *   { "from":"17:00", "to":"18:00", "sessions" : [...] }
+   * ]
+   * }
+   */
+   def conferenceSlotsToJValue(conference: Conference): JValue = {
+    ("id" -> conference._id.toString) ~
+      ("title" -> conference.title) ~
+      ("begin" -> DATE_TIME_FORMAT.print(conference.begin)) ~
+      ("end" -> DATE_TIME_FORMAT.print(conference.end)) ~
+      ("slots" -> conference.slots.map(slotsToJValue(_))) 
+  }
+  
+     /**
+   *
+   * "slot" {
+   * "from" : "16:00",
+   * "to" : "17:00",
+   * "sessions" : [...]
+   * }
+   */
+  implicit def slotsToJValue(slot: Slot): JValue = {
+    ("from" -> slot.key.from.toString(TIME_FORMAT)) ~
+      ("to" -> slot.key.to.toString(TIME_FORMAT)) ~
+      ("sessions" -> slot.sessions.map(sessionToJValue(_)))
   }
 
   /**

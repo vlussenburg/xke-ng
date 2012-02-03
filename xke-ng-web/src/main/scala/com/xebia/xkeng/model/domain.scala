@@ -191,6 +191,10 @@ case class Conference(val _id: ObjectId, title: String, begin: DateTime, end: Da
       case None => throw new IllegalArgumentException("Session with id %s does not exist for conference %s" format (sessionId, _id.toString))
     }
   }
+  
+  def slots:List[Slot] = {
+    sessions.groupBy{s => SlotKey(s.start, s.end)}.map{case (key, sessions) => Slot(key, sessions.sortBy(_.location.description))}.toList.sortBy(_.key)
+  }
 
 }
 
@@ -233,6 +237,28 @@ object Session extends FromJsonDeserializer[Session] {
   }
 
 }
+
+case class SlotKey(from:DateTime, to:DateTime) extends Ordered[SlotKey] {
+  val duration = new Duration(from, to)
+  
+  def compare(other:SlotKey) = {
+   val startDiff = from.compareTo(other.from) 
+   if(startDiff == 0) {
+     duration.compareTo(other.duration) 
+   } else {
+     startDiff
+   }
+    
+   
+  }
+}
+
+case class Slot(key:SlotKey, sessions:List[Session]) 
+
+object Slot {
+  def apply(from:DateTime, to:DateTime, sessions:List[Session]):Slot = Slot(SlotKey(from, to), sessions)
+}
+
 /**
  * Represents a comment for a session
  */

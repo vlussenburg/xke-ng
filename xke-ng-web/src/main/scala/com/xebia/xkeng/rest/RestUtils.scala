@@ -16,12 +16,26 @@ object RestUtils {
     case _ => Full(NotFoundResponse())
   }
 
+  def doWithSome[T](result:Option[T])(process:(T) => JValue):Box[LiftResponse] = result match {
+     case Some(v) => asJsonResp(process(v))
+    case _ => Full(NotFoundResponse())
+  }
+  
+  def doWithSomeNoReturn[T](result:Option[T])(process:(T) => Unit):Box[LiftResponse] = result match {
+     case Some(v) => Full(OkResponse())
+    case _ => Full(NotFoundResponse())
+  }
+  
   def asJsonResp(json: JValue): Box[LiftResponse] = Full(JsonResponse(json))
 
   def doWithRequestBody(byteArray: Box[Array[Byte]])(process: (String) => Box[LiftResponse]): Box[LiftResponse] = {
+    doWithRequestBody(byteArray, BadResponse())(process)
+  }
+  
+   def doWithRequestBody(byteArray: Box[Array[Byte]], alternativeResp:LiftResponse)(process: (String) => Box[LiftResponse]): Box[LiftResponse] = {
     byteArray.toOption match {
       case Some(arr) => process(new String(arr))
-      case None => Full(BadResponse())
+      case None => Full(alternativeResp)
     }
   }
 }
