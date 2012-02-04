@@ -22,6 +22,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.xebia.xcoss.axcv.logic.cache.DataCache;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
@@ -223,7 +224,9 @@ public class CVSessionAdd extends AdditionActivity {
 							@Override
 							public void onCalled(Boolean result) {
 								// A session has been added, so the cache is invalid.
-								getMyApplication().getCache().remove(conference);
+								DataCache cache = getMyApplication().getCache();
+								cache.remove(conference);
+								cache.remove(session);
 								CVSessionAdd.this.finish();
 							}
 						}).execute(session);
@@ -239,7 +242,9 @@ public class CVSessionAdd extends AdditionActivity {
 					createDeleteDialog(CVSessionAdd.this, originalSession, new SimpleCallBack() {
 						@Override
 						public void onCalled(Boolean result) {
-							getMyApplication().getCache().remove(conference);
+							DataCache cache = getMyApplication().getCache();
+							cache.remove(conference);
+							cache.remove(session);
 							finish();
 						}
 					}).show();

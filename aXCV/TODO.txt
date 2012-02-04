@@ -2,19 +2,8 @@ IN PROGRESS
 -------------------------------------------------------------------
 
 -	Externalize strings
-- 	Hide mark/edit button for expired sessions in session view
--	ASyncTask server communication (Arno)
-	-	Removal of network: crashes.....
--	Verbeteren van caching
-	-	Caching: refresh na conference edit/add break (reopen view...)
-	-	Conferenties verdwijnen uit lijst...
-	-	Database caching support
-	-	Toegevoegd/gewijzigde sessie is niet direct zichtbaar
 -	Certificate check (Michael)
--	Start when no network: Should mention this.
--	Long click on location - show menu.
--	Wachtcursor bij search maken (Arno)
--	Timeout on login afvangen
+-	Notification
 
 TODO
 -------------------------------------------------------------------
@@ -41,7 +30,7 @@ server
 -	Nieuwe datum conferentie leidt niet tot nieuwe datum sessies (wordt wel gestuurd)
 -	Support conferenceId within session object (at least for search)
 -	Move sessions (optional) on delete of conference
-
+-	Server does not honor changes in session. PUT succeeds, GET just gives back old data. Jetty restart does not seem to work.
 DONE
 -------------------------------------------------------------------
 -	Login
@@ -87,3 +76,16 @@ DONE
 -	Bij roteren raken de waardes kwijt
 -	Timer naar AlarmManager (Michael)
 -	Transparant overlay for gestures (session view)
+-	ASyncTask server communication (Arno)
+	-	Removal of network: crashes.....
+-	Verbeteren van caching
+	-	Caching: refresh na conference edit/add break (reopen view...)
+	-	Conferenties verdwijnen uit lijst...
+	-	Database caching support
+	-	Toegevoegd/gewijzigde sessie is niet direct zichtbaar
+-	Long click on location - show menu.
+-	Wachtcursor bij search maken (Arno)
+-	Timeout on login afvangen
+- 	Hide mark/edit button for expired sessions in session view
+-	Start when no network: Should mention this.
+	

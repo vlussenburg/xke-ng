@@ -76,7 +76,6 @@ public abstract class SearchActivity extends BaseActivity implements SwipeActivi
 	}
 
 	protected void updateSearch(String text) {
-		DebugUtil.showCallStack();
 		if ( StringUtil.isEmpty(text) ) {
 			createDialog(R.string.menu_search, R.string.search_no_search).show();
 		} else {

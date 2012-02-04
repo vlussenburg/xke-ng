@@ -30,8 +30,11 @@ public class SessionCMAdapter extends SessionAdapter {
 			@Override
 			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 				menu.setHeaderTitle(session.getTitle());
-				menu.add(paramInt, R.id.edit, Menu.NONE, R.string.context_menu_session_edit);
 				menu.add(paramInt, R.id.view, Menu.NONE, R.string.context_menu_session_view);
+				if (!session.isExpired()) {
+					menu.add(paramInt, R.id.edit, Menu.NONE, R.string.context_menu_session_edit);
+					menu.add(paramInt, R.id.delete, Menu.NONE, R.string.context_menu_session_delete);
+				}
 			}
 		});
 	}

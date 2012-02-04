@@ -217,66 +217,12 @@ public class Conference implements Serializable {
 		return null;
 	}
 
-//	/**
-//	 * Adds a session on the server and resets the local stored sessions.
-//	 * 
-//	 * @param session
-//	 * @return
-//	 */
-//	public boolean addSession(Session session, boolean create) {
-//		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + getTitle());
-//		try {
-//			String id = ConferenceServer.getInstance().storeSession(session, getId(), create);
-//			resetSessions();
-//			return id != null;
-//		}
-//		catch (CommException e) {
-//			BaseActivity.handleException(null, "adding session", e);
-//		}
-//		return false;
-//	}
-//
-//	public void deleteSession(Session session) {
-//		if (sessions != null) {
-//			sessions.remove(session);
-//		}
-//		try {
-//			ConferenceServer.getInstance().deleteSession(session);
-//		}
-//		catch (CommException e) {
-//			BaseActivity.handleException(null, "deleting session", e);
-//		}
-//	}
-//
-//	public static Conference create(Conference conference) {
-//		try {
-//			return ConferenceServer.getInstance().storeConference(conference, true);
-//		}
-//		catch (CommException e) {
-//			BaseActivity.handleException(null, "creating conference", e);
-//		}
-//		return null;
-//	}
-//
-//	public boolean update() {
-//		try {
-//			ConferenceServer.getInstance().storeConference(this, false);
-//			return true;
-//		}
-//		catch (CommException e) {
-//			BaseActivity.handleException(null, "updating conference", e);
-//		}
-//		return false;
-//	}
-//
-//	public void delete() {
-//		try {
-//			ConferenceServer.getInstance().deleteConference(this);
-//		}
-//		catch (CommException e) {
-//			BaseActivity.handleException(null, "deleting conference", e);
-//		}
-//	}
+	public boolean isExpired() {
+		if (getEndTime() == null) {
+			return false;
+		}
+		return getEndTime().isBeforeNow();
+	}
 
 	private boolean isTimeSlotAvailable(Moment start, int length, Location location) {
 		// Sessions are sorted on start time!
