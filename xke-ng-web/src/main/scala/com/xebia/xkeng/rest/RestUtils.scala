@@ -22,7 +22,7 @@ object RestUtils {
   }
   
   def doWithSomeNoReturn[T](result:Option[T])(process:(T) => Unit):Box[LiftResponse] = result match {
-     case Some(v) => Full(OkResponse())
+     case Some(v) => process(v);Full(OkResponse())
     case _ => Full(NotFoundResponse())
   }
   

@@ -149,7 +149,7 @@
  	function sessionSuccessCallback(session) {
 		$("#detail-list").empty()
 		var authors = getAuthors(session)
-	 	$("#detail-list").append("<li data-role='list-divider'>Summary</li>")
+	 	$("#detail-list").append("<li data-role='list-divider'>" + session.startTimeShort + " - " + session.endTimeShort + "</li>")
 		$("#detail-list").append("<li><i>" +  session.title + "</i><br>by: " +authors + "</li>")
 	 	$("#detail-list").append("<li data-role='list-divider'>Location</li>")
 		$("#detail-list").append("<li>" + session.location.description + "<br>Max:" + session.limit+"</li>")

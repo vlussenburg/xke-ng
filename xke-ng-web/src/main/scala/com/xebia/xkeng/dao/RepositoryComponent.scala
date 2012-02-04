@@ -128,7 +128,7 @@ trait RepositoryComponent {
      * db.confs.find({'begin':{$gte:'2012-02-03T10:39:07.270Z'}}).sort({'begin':1}).limit(<ahead>)
      */
     def findNextConference(ahead: Int): Option[Conference] = {
-      val futureConferencesQry = ("begin" -> ("$gte" -> new DateTime().toString(MONG_DB_DATE_FORMAT)))
+      val futureConferencesQry = ("begin" -> ("$gte" -> new DateTime().minusDays(1).toString(MONG_DB_DATE_FORMAT)))
       val sortQry = ("begin" -> 1)
       val r = Conference.findAll(futureConferencesQry, sortQry, Limit(ahead))
       if (r.size == ahead) Some(r(ahead - 1)) else None

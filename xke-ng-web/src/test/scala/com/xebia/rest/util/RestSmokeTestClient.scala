@@ -37,7 +37,7 @@ object RestSmokeTestClient {
   case class AwsXkeXebiaComCfg(host: String = "xke.xebia.com", contextRoot: String = "xkeng", port: Int = 443, secure: Boolean = true) extends Config
  
   //define configuration to use:
-  val cfg = AwsXkeXebiaComCfg()
+  val cfg = LocalhostCfg()
   object RestClientHelperImpl extends RestClientHelper {
     val host = cfg.host
     val contextRoot = cfg.contextRoot
@@ -105,7 +105,7 @@ object RestSmokeTestClient {
   }
 
   def updateSession(c: Conference, s: Session): Int = {
-    val (status, _) = update("conference/" + c._id.toString + "/session", sessionToJValue(s))
+    val (status, _) = update("session/" + s.id, sessionToJValue(s))
     status
   }
   def addSession(confId: String, session: Session): Session = {

@@ -125,6 +125,7 @@ trait RestHandlerComponent extends Logger {
       conf => {   
         val session = fromSessionJson(true)(jsonBody)
         conf.saveOrUpdate(session)
+        session
       }
     }
   }

@@ -29,7 +29,7 @@ class MongoConferenceTest extends FlatSpec with ShouldMatchers with BeforeAndAft
   private def createTestConference() = {
     val s1 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "Mongo is a nosql db", "STRATEGIC", "10 people")
     val s2 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l2, "Scala rocks even more", "Scala is a scalable programming language", "STRATEGIC", "20 people", List(a1, a2))
-    val c = Conference(ObjectId.get, "XKE", xkeStartDate, xkeStartDate.plusHours(4), List(s1, s2), List(l1, l2))
+    val c = Conference("XKE", xkeStartDate, xkeStartDate.plusHours(4), List(s1, s2), List(l1, l2))
     c.save
     (s1, s2, c)
 
