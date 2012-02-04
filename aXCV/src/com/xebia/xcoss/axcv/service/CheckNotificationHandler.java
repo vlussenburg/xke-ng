@@ -1,6 +1,6 @@
 package com.xebia.xcoss.axcv.service;
 
-import java.util.ArrayList;
+import java.util.Properties;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -47,17 +47,19 @@ public class CheckNotificationHandler extends Handler {
 		Bundle bundle = msg.getData();
 
 		Log.v(XCS.LOG.ALL, "Handling message");
-		ArrayList<String> sessionIds = bundle.getStringArrayList(CheckNotificationSignalRetriever.TAG_TRACKED);
+		Properties sessionIds = (Properties) bundle.getSerializable(CheckNotificationSignalRetriever.TAG_TRACKED);
 		if (sessionIds != null) {
-			for (String sessionId : sessionIds) {
-				notify("Track change!", R.drawable.x_stat_track, sessionId, BaseActivity.NotificationType.TRACKED);
+			for (Object key : sessionIds.keySet()) {
+				String sessionId = (String) key;
+				notify(sessionIds.getProperty(sessionId), R.drawable.x_stat_track, sessionId, BaseActivity.NotificationType.TRACKED);
 			}
 		}
 
-		sessionIds = bundle.getStringArrayList(CheckNotificationSignalRetriever.TAG_OWNED);
+		sessionIds = (Properties) bundle.getSerializable(CheckNotificationSignalRetriever.TAG_OWNED);
 		if (sessionIds != null) {
-			for (String sessionId : sessionIds) {
-				notify("Session change!", R.drawable.x_stat_owned, sessionId, BaseActivity.NotificationType.OWNED);
+			for (Object key : sessionIds.keySet()) {
+				String sessionId = (String) key;
+				notify(sessionIds.getProperty(sessionId), R.drawable.x_stat_owned, sessionId, BaseActivity.NotificationType.OWNED);
 			}
 		}
 	}
@@ -75,7 +77,7 @@ public class CheckNotificationHandler extends Handler {
 		PendingIntent clickIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		Notification noty = new Notification(xType, title, currentTimeMillis);
-		String message = "Click on this item to show the session.";
+		String message = "Session has changed.";
 		noty.setLatestEventInfo(context, title, message, clickIntent);
 		if (silent) {
 			noty.vibrate = VIBRATE_PATTERN;

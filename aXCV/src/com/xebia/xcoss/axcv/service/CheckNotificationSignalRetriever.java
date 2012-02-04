@@ -3,6 +3,7 @@ package com.xebia.xcoss.axcv.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -84,11 +85,11 @@ public class CheckNotificationSignalRetriever extends BroadcastReceiver {
 				Log.v(XCS.LOG.ALL, "Notification check on owned/tracked: " + onOwned + "/" + onMarked);
 
 				if (onMarked) {
-					ArrayList<String> sessions = getChangesInTrackedSessions(pm, user, path);
+					Properties sessions = getChangesInTrackedSessions(pm, user, path);
 					reportOn(TAG_TRACKED, sessions, handler);
 				}
 				if (onOwned) {
-					ArrayList<String> sessions = getChangesInOwnedSessions(pm, user, path);
+					Properties sessions = getChangesInOwnedSessions(pm, user, path);
 					reportOn(TAG_OWNED, sessions, handler);
 				}
 			}
@@ -101,28 +102,32 @@ public class CheckNotificationSignalRetriever extends BroadcastReceiver {
 		}
 	}
 
-	private void reportOn(String type, ArrayList<String> sessionIds, Handler handler) {
+	private void reportOn(String type, Properties sessionIds, Handler handler) {
 		if (sessionIds.size() > 0) {
 			Message message = Message.obtain(handler);
 			Bundle data = new Bundle();
-			data.putStringArrayList(type, sessionIds);
+			data.putSerializable(type, sessionIds);
 			message.setData(data);
 			handler.sendMessage(message);
 		}
 	}
 
-	private ArrayList<String> getChangesInOwnedSessions(ProfileManager pm, String user, String path) {
-		ArrayList<String> modified = new ArrayList<String>();
+	private Properties getChangesInOwnedSessions(ProfileManager pm, String user, String path) {
+		Properties modified = new Properties();
 		try {
 			pm.openConnection();
 
 			Trackable[] ids = pm.getOwnedSessions(user);
+			List<Trackable> deleted = new ArrayList<Trackable>();
+			for (Trackable trackable : ids) {
+				deleted.add(trackable);
+			}
 			// Search active sessions on the author
 			Search search = new Search().onAuthor(new Author(user, null, null, null)).after(new Moment());
 			List<Session> allOwnedSessions = RestClient.searchObjects(path + "/search/sessions", "sessions",
 					Session.class, search);
 			if (allOwnedSessions == null) {
-				return new ArrayList<String>();
+				return modified;
 			}
 			Collections.sort(allOwnedSessions, new SessionComparator());
 
@@ -134,6 +139,7 @@ public class CheckNotificationSignalRetriever extends BroadcastReceiver {
 				for (int i = 0; i < ids.length; i++) {
 					if (id.equals(ids[i].sessionId)) {
 						trackable = ids[i];
+						deleted.remove(ids[i]);
 						break;
 					}
 				}
@@ -149,8 +155,13 @@ public class CheckNotificationSignalRetriever extends BroadcastReceiver {
 					trackable.date = ownedSession.getStartTime().asLong();
 					trackable.hash = currentHash;
 					pm.updateOwnedSession(trackable);
-					modified.add(id);
+					modified.setProperty(id, ownedSession.getTitle());
 				}
+			}
+			
+			for (Trackable td : deleted) {
+				modified.setProperty(td.sessionId, "Session deleted.");
+				pm.deleteOwnedSession(td);
 			}
 			return modified;
 		}
@@ -159,8 +170,8 @@ public class CheckNotificationSignalRetriever extends BroadcastReceiver {
 		}
 	}
 
-	private ArrayList<String> getChangesInTrackedSessions(ProfileManager pm, String user, String path) {
-		ArrayList<String> modified = new ArrayList<String>();
+	private Properties getChangesInTrackedSessions(ProfileManager pm, String user, String path) {
+		Properties modified = new Properties();
 		try {
 			pm.openConnection();
 			Trackable[] ids = pm.getMarkedSessions(user);
@@ -176,8 +187,12 @@ public class CheckNotificationSignalRetriever extends BroadcastReceiver {
 						ids[i].hash = modificationHash;
 						ids[i].date = session.getStartTime().asLong();
 						pm.updateMarkedSession(ids[i]);
-						modified.add(session.getId());
+						modified.setProperty(session.getId(), session.getTitle());
 					}
+				} else {
+					// sessionDeleted
+					pm.deleteMarkedSession(ids[i]);
+					modified.setProperty(ids[i].sessionId, "Session deleted.");
 				}
 			}
 			return modified;

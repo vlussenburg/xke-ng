@@ -57,7 +57,7 @@ public class RestClient {
 	private static final int HTTP_TIMEOUT = 15 * 1000;
 	private static GsonBuilder gsonBuilder = null;
 	private static Cookie sessionCookie = null;
-	private static boolean showDataStreams = true;
+	private static boolean showDataStreams = false;
 
 	private static Gson getGson() {
 		if (gsonBuilder == null) {

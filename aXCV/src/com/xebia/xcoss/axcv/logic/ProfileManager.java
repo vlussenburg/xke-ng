@@ -224,6 +224,14 @@ public class ProfileManager extends SQLiteOpenHelper {
 	public void updateMarkedSession(Trackable trackable) {
 		updateSession(trackable, TRACK_TABLE);
 	}
+	
+	public void deleteMarkedSession(Trackable trackable) {
+		deleteSession(trackable, TRACK_TABLE);
+	}
+
+	public void deleteOwnedSession(Trackable trackable) {
+		deleteSession(trackable, OWNED_TABLE);
+	}
 
 	public void updateOwnedSession(Trackable trackable) {
 		updateSession(trackable, OWNED_TABLE);
@@ -287,6 +295,19 @@ public class ProfileManager extends SQLiteOpenHelper {
 			catch (Exception e) {
 				Log.w(XCS.LOG.COMMUNICATE, "Insert failed: " + StringUtil.getExceptionMessage(e));
 			}
+		}
+	}
+
+	private void deleteSession(Trackable trackable, String table) {
+		try {
+			checkConnection();
+			String[] whereArgs = new String[2];
+			whereArgs[0] = trackable.userId;
+			whereArgs[1] = String.valueOf(trackable.sessionId);
+			database.delete(table, SES_QUERY_TRACKABLE, whereArgs);
+		}
+		catch (Exception e) {
+			Log.w(XCS.LOG.COMMUNICATE, "Delete failed: " + StringUtil.getExceptionMessage(e));
 		}
 	}
 
