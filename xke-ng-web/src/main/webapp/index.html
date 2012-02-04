@@ -1,30 +1,54 @@
-<!DOCTYPE html> 
-<html> 
-	<head> 
-	<title>Status.net</title> 
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
-	<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
-	<script type="text/javascript" src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
-</head> 
+<!DOCTYPE html>
+<html>
+<head>
+<title>Status.net</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet"
+	href="static/jquery.mobile-1.0.min.css" />
+<script type="text/javascript"
+	src="static/jquery-1.6.4.min.js"></script>
+<script type="text/javascript"
+	src="static/jquery.mobile-1.0.min.js"></script>
+</head>
 
 <script type="text/javascript">
+	//global state
+	var currentSessionId;
+	var nextConferenceIndex = 1;
+
 
 	$(document).ready(
-		$("#next").live("pageshow",
+				$("#next").live("pageshow",
                                 function(event, ui) {
 									$.ajax({
 										type: 'GET',
 										dataType: 'json',
 										contentType: 'application/json',
-										url: 'https://xke.xebia.com/xkeng/conferences/2012/04/29',
+										url: '/xkeng/conference/next/' + nextConferenceIndex +'/slots',
 										success: conferenceSuccessCallback,
-										crossDomain: true,
+										crossDomain: false,
 										error: function (xhr, ajaxOptions, thrownError) {
-							                    alert("Unable to post login\nCode " + xhr.status + "\nMessage " + xhr.status);
+							                    alert("Unable to get conferences\nCode " + xhr.status + "\nMessage " + xhr.status);
 										}
 									})
-                                })
+                                }), 
+				$("#detail").live("pageshow",
+				                function(event, ui) {
+									$.ajax({
+										type: 'GET',
+										dataType: 'json',
+										contentType: 'application/json',
+										url: '/xkeng/session/' + currentSessionId,
+										success: sessionSuccessCallback,
+										crossDomain: false,
+										error: function (xhr, ajaxOptions, thrownError) {
+							                    alert("Unable to get session\nCode " + xhr.status + "\nMessage " + xhr.status);
+										}
+									})
+						        })
+
+	
 	);
 
 /*
@@ -61,9 +85,9 @@
 			type: 'POST',
 			dataType: 'json',
 			contentType: 'application/json',
-			url: 'https://xke.xebia.com/xkeng/login',
+			url: '/xkeng/login',
 			success: loginSuccessCallback,
-			crossDomain: true,
+			crossDomain: false,
 			data: JSON.stringify(jsonRequest),
 			error: function (xhr, ajaxOptions, thrownError){
                     alert("Unable to post login\nCode " + xhr.status + "\nMessage " + xhr.status);
@@ -74,89 +98,160 @@
 	function loginSuccessCallback(response) {
 		$.mobile.changePage( "#next", { transition: "slidedown"} );
  	}
- 	
- 	
- 	function conferenceSuccessCallback(response) {
- 	
-	 	console.log(response)
- 	
-		for (sessionsIndex in response[0].sessions) {
-			var session = response[0].sessions[sessionsIndex]
-			
-			$("#next-list").append("<li><i>" + session.description + "</i><br><br>" + session.location.description + "</li>")
+	
+	function showNext() {
+		if(nextConferenceIndex < 1) {
+			nextConferenceIndex = 1
+		} else {
+			nextConferenceIndex = nextConferenceIndex +1
 		}
+		console.log(nextConferenceIndex)
+		$.mobile.reloadPage( "#next", { transition: "slidedown"} );
+
+	}
+	
+	function changeToConferenceOverviewPage() {
+		$.mobile.changePage( "#next", { transition: "fade"} );		
+	}
+	
+	function changeToSessionDetailsPage(id) {
+		currentSessionId = id;
+		$.mobile.changePage( "#detail", { transition: "slide"} );
+	}
+	
+ 	
+	function getAuthors(session) {
+		var authors = ""
+			for(authorIndex in session.authors) {
+				if(authorIndex > 0) {
+					authors += ", "
+				}
+				authors += session.authors[authorIndex].name
+			}
+		return authors;
+	}
+	
+ 	function conferenceSuccessCallback(response) {
+		$("#next-list").empty()
+	 	for (slotIndex in response.slots) {
+	 		var slot = response.slots[slotIndex]
+	 		$("#next-list").append("<li data-role='list-divider'>" + slot.from + " - " + slot.to + "</li>")
+			for (sessionsIndex in slot.sessions) {
+				var session = slot.sessions[sessionsIndex]
+				console.log(session)
+				var authors = getAuthors(session)
+				$("#next-list").append("<li><a href='javascript:changeToSessionDetailsPage(\"" + session.id + "\");'><i>" + session.title + "</i><br>by: " +authors + "<br>" + session.location.description + "</a></li>")
+			}	 		
+	 	 }
 		$("#next-list").listview("refresh"); 	
  	}
 
+ 	function sessionSuccessCallback(session) {
+		$("#detail-list").empty()
+		var authors = getAuthors(session)
+	 	$("#detail-list").append("<li data-role='list-divider'>" + session.startTimeShort + " - " + session.endTimeShort + "</li>")
+		$("#detail-list").append("<li><i>" +  session.title + "</i><br>by: " +authors + "</li>")
+	 	$("#detail-list").append("<li data-role='list-divider'>Location</li>")
+		$("#detail-list").append("<li>" + session.location.description + "<br>Max:" + session.limit+"</li>")
+	    $("#detail-list").append("<li data-role='list-divider'>Description</li>")
+		$("#detail-list").append("<li>" +  session.description + "</li>")
+		$("#detail-list").listview("refresh"); 	
+ 	}
+
+ 	
 </script>
 
 <body>
 
 
 	<div data-role="page" id="login">
-	
+
 		<div data-role="header">
 			<h1>Login</h1>
 		</div>
-		
-	
-		<div data-role="content">	
-            <form action="javascript: login();">
-                <input id="username" type="text" placeholder="Your username"/>
-                <input id="password" type="password" placeholder="Your password"/>
-                <button type="submit">Login</button>
-            </form>
+
+
+		<div data-role="content">
+			<form action="javascript: login();">
+				<input id="username" type="text" placeholder="Your username" /> <input
+					id="password" type="password" placeholder="Your password" />
+				<button type="submit">Login</button>
+			</form>
 		</div>
 	</div>
 
 	<div data-role="page" id="next">
-	
+
 		<div data-role="header">
 			<h1>Current XKE</h1>
 		</div>
-		
-	
-		<div data-role="content">	
-			<ul id="next-list" data-role="listview" data-filter="true"/>
+
+
+		<div data-role="content">
+			<ul id="next-list" data-role="listview" data-filter="true" />
 		</div>
-		
-		<div data-role="footer" data-position="fixed">
+
+<!-- 		showPage does not work yet. Won't refresh
+<div data-role="footer" data-position="fixed">
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#current" class="ui-btn-active">Current</a></li>
-					<li><a href="#next">Next</a></li>
+					<li><a href="javascript:showNext();">Next</a></li>
 				</ul>
-			</div>	
-		</div>	
+			</div>
+			 -->
+			
+		</div>
 	</div>
-	
+
 	<div data-role="page" id="upcomming">
-	
+
 		<div data-role="header">
 			<h1>Current</h1>
 		</div>
-		
-	
-		<div data-role="content">	
-            <form action="#">
-                <input id="statusUpdateField" type="text" name="resource" placeholder="What are you thinking about" onchange="#"/>
-            </form>
-            <br>
+
+
+		<div data-role="content">
+			<form action="#">
+				<input id="statusUpdateField" type="text" name="resource"
+					placeholder="What are you thinking about" onchange="#" />
+			</form>
+			<br>
 			<ul id="update-list" data-role="listview" data-filter="true">
 			</ul>
 
 		</div>
-		
+
 		<div data-role="footer" data-position="fixed">
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#current">Current</a></li>
 					<li><a href="#next" class="ui-btn-active">Next</a></li>
 				</ul>
-			</div>	
+			</div>
 		</div>
 	</div>
 
+
+	<div data-role="page" id="detail">
+
+		<div data-role="header">
+			<h1 id="detailHeader">Session</h1>
+		</div>
+
+
+		<div data-role="content">
+			<ul id="detail-list" data-role="listview" />
+		</div>
+
+		<div data-role="footer" data-position="fixed">
+			<div data-role="navbar">
+				<ul>
+					<li><a href="javascript:changeToConferenceOverviewPage();" class="ui-btn-active">Back</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
 </body>
 
 </html>

@@ -35,7 +35,7 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
   it should "deserialize a conference with json correctly" in {
     val jsonString = """{"title":"TED-style XKE","begin":"2011-11-07T16:00:00.000Z", "end":"2011-11-07T21:00:00.000Z"}"""
     val result = fromConferenceJson(jsonString)
-    val Conference(_, title, begin, end, _, locations) = result
+    val Conference(_, title, begin, end, _, locations, _) = result
     title should be("TED-style XKE")
     begin should be(fmt.parseDateTime("2011-11-07T16:00:00.000Z"))
     end should be(fmt.parseDateTime("2011-11-07T21:00:00.000Z"))
@@ -45,7 +45,7 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     val jsonString = """{"title":"XKE", "begin":"2011-10-12T18:32:00.354+02:00","end":"2011-10-12T22:32:00.354+02:00","sessions":[{"id":1318177920605,"title":"Mongo rocks","description":"Mongo is a nosql db","startTime":"2011-10-12T18:32:00.354+02:00","endTime":"2011-10-12T19:32:00.354+02:00","limit":"10 people","type":"STRATEGIC","authors":[],"location":{"id":-377039271,"description":"Maup","capacity":20}},{"id":1318177920606,"title":"Scala rocks even more","description":"Scala is a scalable programming language","startTime":"2011-10-12T18:32:00.354+02:00","endTime":"2011-10-12T19:32:00.354+02:00","limit":"20 people","type":"STRATEGIC","authors":[{"userId":"peteru","mail":"upeter@xebia.com","name":"Urs Peter"},{"userId":"amooy","mail":"amooy@xebia.com","name":"Age Mooy"}],"location":{"id":-377039270,"description":"Laap","capacity":30}}],"locations":[{"id":-377039271,"description":"Maup","capacity":20},{"id":-377039270,"description":"Laap","capacity":30}]}"""
 
     val result = fromConferenceJson(jsonString)
-    val Conference(_, title, begin, end, sessions, locations) = result
+    val Conference(_, title, begin, end, sessions, locations, _) = result
     title should be("XKE")
     begin should be(fmt.parseDateTime("2011-10-12T18:32:00.354+02:00"))
     end should be(fmt.parseDateTime("2011-10-12T22:32:00.354+02:00"))
@@ -60,6 +60,25 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     l1.serializeToJson should be(expected)
   }
 
+  it should "serialize a slot correctly" in {
+    val from = fmt.parseDateTime("2011-11-07T16:00:00.000Z")
+    val to = fmt.parseDateTime("2011-11-07T17:00:00.000Z")
+    val expected: JValue = ("from" -> from.toString("HH:mm")) ~
+      ("to" -> to.toString("HH:mm")) ~
+      ("sessions" -> List[Session]())
+    val slot = Slot(from, to, Nil)
+    slotsToJValue(slot) should be(expected)
+  }
+  it should "serialize slots correctly" in {
+    val s1 = Session(xkeStartDate, xkeStartDate.plusMinutes(60), l1, "Mongo rocks", "Mongo for world domination", "STRATEGIC", "10 people", List(a1), Nil, Nil, Set())
+    val c = Conference("XKE", xkeStartDate, xkeStartDate.plusHours(4), List(s1), Nil)
+    
+    val json = conferenceSlotsToJValue(c)
+    val JArray(slots) = json \ "slots"
+    val JString(from) = json \ "slots" \ "from"
+    from should be(xkeStartDate.toString("HH:mm"))
+  }
+
   it should "serialize a session with authors, comments and ratings" in {
     val r1 = Rating(10, "peteru")
     val c1 = Comment("blabla", "peteru")
@@ -71,6 +90,8 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
       ("description" -> s1.description) ~
       ("startTime" -> fmt.print(s1.start)) ~
       ("endTime" -> fmt.print(s1.end)) ~
+      ("startTimeShort" -> s1.start.toString(TIME_FORMAT)) ~
+      ("endTimeShort" -> s1.end.toString(TIME_FORMAT)) ~
       ("limit" -> s1.limit) ~
       ("type" -> s1.sessionType) ~
       ("authors" -> List(a1)) ~
@@ -89,6 +110,8 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
       ("description" -> s1.description) ~
       ("startTime" -> fmt.print(s1.start)) ~
       ("endTime" -> fmt.print(s1.end)) ~
+      ("startTimeShort" -> s1.start.toString(TIME_FORMAT)) ~
+      ("endTimeShort" -> s1.end.toString(TIME_FORMAT)) ~
       ("authors" -> List[Author]()) ~
       ("limit" -> s1.limit) ~
       ("type" -> s1.sessionType) ~
@@ -232,4 +255,5 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     encryptedPwd should be("87ujy79hjy")
     encrypted should be(true)
   }
+
 }

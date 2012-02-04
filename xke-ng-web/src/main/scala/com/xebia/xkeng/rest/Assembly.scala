@@ -7,7 +7,7 @@ import com.mongodb.{ Mongo, MongoOptions, ServerAddress }
 import org.joda.time.DateTime
 import org.bson.types.ObjectId
 import net.liftweb.common._
-import com.xebia.xkeng.model.{ Session, Location, Conference, Author, Facility, AuthorDoc, Labels }
+import com.xebia.xkeng.model.{ Session, Location, Conference, Author, Facility, AuthorDoc, Labels, SlotInfo }
 
 object Assembly extends Logger {
 
@@ -92,12 +92,17 @@ object Assembly extends Logger {
   private def createTestConferences(startDate: DateTime, locations: List[Location], authors: List[Author]) = {
     val a1 = authors(0)
     val a2 = authors(1)
-
-    val s1 = Session(startDate, startDate.plusMinutes(60), locations(0), "Mongo rocks", "Mongo is a paperless document database", "STRATEGIC", "10 people", List(a1), Nil, Nil, Set("Database", "Mongo", "Javascript"))
-    val s2 = Session(startDate, startDate.plusMinutes(60), locations(1), "Scala rocks even more", "Scala is a codeless programming language", "STRATEGIC", "10 people", List(a2), Nil, Nil, Set("Scala", "Functions", "DSL"))
-    val s3 = Session(startDate, startDate.plusMinutes(120), locations(2), "Scala quirks", "No such thing as a free ride when doing scala", "STRATEGIC", "10 people", List(a1, a2), Nil, Nil, Set("Scala", "Functional Programming", "Beauty"))
-    val c = Conference(ObjectId.get, "XKE", startDate, startDate.plusHours(4), Nil, locations)
+    val slot1Start = startDate
+    val slot1End = startDate.plusMinutes(60)
+    val slot2Start = slot1End
+    val slot2End = slot2Start.plusMinutes(60)
+    val schedule = SlotInfo(slot1Start, slot1End) :: SlotInfo(slot2Start, slot2End) :: Nil 
+    val s1 = Session(slot1Start, slot1End, locations(0), "Mongo rocks", "Mongo is a paperless document database", "STRATEGIC", "10 people", List(a1), Nil, Nil, Set("Database", "Mongo", "Javascript"))
+    val s2 = Session(slot1Start, slot1End, locations(1), "Scala rocks even more", "Scala is a codeless programming language", "STRATEGIC", "10 people", List(a2), Nil, Nil, Set("Scala", "Functions", "DSL"))
+    val s3 = Session(slot1Start, slot2End, locations(2), "Scala quirks", "No such thing as a free ride when doing scala", "STRATEGIC", "15 people", List(a1, a2), Nil, Nil, Set("Scala", "Functional Programming", "Beauty"))
+    val s4 = Session(slot2Start, slot2End, locations(0), "Deployment with puppet", "Even animals start to like deploying", "STRATEGIC", "20 people", List(a1, a2), Nil, Nil, Set("Middleware", "Deoployment", "Quick"))
+    val c = Conference("XKE", startDate, startDate.plusHours(4), Nil, locations, schedule)
     c.save
-    List(s1, s2, s3).foreach(c.saveOrUpdate(_))
+    List(s1, s2, s3, s4).foreach(c.saveOrUpdate(_))
   }
 }

@@ -28,13 +28,14 @@ object RestSmokeTestClient {
     val contextRoot: String
     val port: Int
     val secure: Boolean
-
   }
-  case class LocalhostSecureCfg(host: String = "localhost", contextRoot: String = "", port: Int = 8443, secure: Boolean = true) extends Config
-  case class LocalhostCfg(host: String = "localhost", contextRoot: String = "", port: Int = 8080, secure: Boolean = false) extends Config
+  case class LocalhostSecureCfg(host: String = "localhost", contextRoot: String = "xkeng", port: Int = 8443, secure: Boolean = true) extends Config
+  case class LocalhostCfg(host: String = "localhost", contextRoot: String = "xkeng", port: Int = 8080, secure: Boolean = false) extends Config
   case class AwsSecureCfg(host: String = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com", contextRoot: String = "xkeng", port: Int = 8443, secure: Boolean = true) extends Config
   case class AwsCfg(host: String = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com", contextRoot: String = "xkeng", port: Int = 8080, secure: Boolean = false) extends Config
   case class AwsApacheSecureCfg(host: String = "ssl-lb-xkeng-1607107363.eu-west-1.elb.amazonaws.com", contextRoot: String = "xkeng", port: Int = 443, secure: Boolean = true) extends Config
+  case class AwsXkeXebiaComCfg(host: String = "xke.xebia.com", contextRoot: String = "xkeng", port: Int = 443, secure: Boolean = true) extends Config
+ 
   //define configuration to use:
   val cfg = LocalhostCfg()
   object RestClientHelperImpl extends RestClientHelper {
@@ -104,7 +105,7 @@ object RestSmokeTestClient {
   }
 
   def updateSession(c: Conference, s: Session): Int = {
-    val (status, _) = update("conference/" + c._id.toString + "/session", sessionToJValue(s))
+    val (status, _) = update("session/" + s.id, sessionToJValue(s))
     status
   }
   def addSession(confId: String, session: Session): Session = {
