@@ -33,8 +33,7 @@ public class ConferenceAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(final int paramInt, View paramView, ViewGroup parent) {
-		if (views[paramInt] != null)
-			return views[paramInt];
+		if (views[paramInt] != null) return views[paramInt];
 
 		final Conference cfr = (Conference) getItem(paramInt);
 		boolean sameDay = false;
@@ -42,7 +41,7 @@ public class ConferenceAdapter extends BaseAdapter {
 		Moment dt = cfr.getStartTime();
 		if (dt.isBeforeToday()) {
 			colorId = ctx.getResources().getColor(R.color.tc_itemgone);
-		} else if ( !dt.isAfterToday() ) {
+		} else if (!dt.isAfterToday()) {
 			sameDay = true;
 			colorId = ctx.getResources().getColor(R.color.tc_itemactive);
 		}
@@ -60,9 +59,11 @@ public class ConferenceAdapter extends BaseAdapter {
 			@Override
 			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 				menu.setHeaderTitle(cfr.getTitle());
-				menu.add(paramInt, R.id.edit, Menu.NONE, R.string.context_menu_session_edit);
 				menu.add(paramInt, R.id.view, Menu.NONE, R.string.context_menu_session_view);
-				menu.add(paramInt, R.id.delete, Menu.NONE, R.string.context_menu_session_delete);
+				if (!cfr.isExpired()) {
+					menu.add(paramInt, R.id.edit, Menu.NONE, R.string.context_menu_session_edit);
+					menu.add(paramInt, R.id.delete, Menu.NONE, R.string.context_menu_session_delete);
+				}
 			}
 		});
 
@@ -81,11 +82,11 @@ public class ConferenceAdapter extends BaseAdapter {
 		statusView.setTextColor(colorId);
 		dateView.setTextColor(colorId);
 
-		if ( sameDay ) {
+		if (sameDay) {
 			titleView.setTypeface(titleView.getTypeface(), Typeface.BOLD);
 			whenView.setTypeface(whenView.getTypeface(), Typeface.BOLD);
 		}
-		views[paramInt]=row;
+		views[paramInt] = row;
 		return row;
 	}
 

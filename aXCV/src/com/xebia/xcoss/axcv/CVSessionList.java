@@ -91,8 +91,10 @@ public class CVSessionList extends SessionSwipeActivity {
 
 	@Override
 	protected void populateMenuOptions(ArrayList<Integer> list) {
-		list.add(XCS.MENU.ADD);
-		list.add(XCS.MENU.EDIT);
+		if (conference != null && !conference.isExpired()) {
+			list.add(XCS.MENU.ADD);
+			list.add(XCS.MENU.EDIT);
+		}
 		list.add(XCS.MENU.SETTINGS);
 		list.add(XCS.MENU.SEARCH);
 		list.add(XCS.MENU.TRACK);

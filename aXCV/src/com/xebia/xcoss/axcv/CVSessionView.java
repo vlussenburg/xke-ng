@@ -186,7 +186,7 @@ public class CVSessionView extends SessionSwipeActivity {
 			view.setOnClickListener(lReview);
 
 			ImageView button = (ImageView) findViewById(R.id.sessionMarkButton);
-			if (currentSession.getType() == Session.Type.BREAK || StringUtil.isEmpty(getUser())) {
+			if (currentSession.getType() == Session.Type.BREAK || StringUtil.isEmpty(getUser()) || currentSession.isExpired() ) {
 				button.setVisibility(View.GONE);
 			} else {
 				getMyApplication().markSession(currentSession, button, false);
@@ -337,9 +337,13 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	@Override
 	protected void populateMenuOptions(ArrayList<Integer> list) {
-		list.add(XCS.MENU.ADD);
+		if (currentConference != null && !currentConference.isExpired()) {
+			list.add(XCS.MENU.ADD);
+		}
+		if (currentSession != null && !currentSession.isExpired()) {
+			list.add(XCS.MENU.EDIT);
+		}
 		list.add(XCS.MENU.LIST);
-		list.add(XCS.MENU.EDIT);
 		list.add(XCS.MENU.SETTINGS);
 		list.add(XCS.MENU.SEARCH);
 		list.add(XCS.MENU.TRACK);
@@ -487,9 +491,6 @@ public class CVSessionView extends SessionSwipeActivity {
 				session = options.get(options.size() - 1);
 			}
 		}
-		// if (session == null) {
-		// session = getDefaultSession(conference);
-		// }
 		return session;
 	}
 }
