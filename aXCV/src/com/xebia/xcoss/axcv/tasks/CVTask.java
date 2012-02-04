@@ -72,6 +72,8 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 			if (e instanceof DataException) {
 				if (((DataException) e).missing()) {
 					msg = ctx.getString(R.string.server_missing_url, action);
+					// TODO Temporary, since login failure currently returns a 404 
+					RestClient.logout();
 				} else if (((DataException) e).networkError()) {
 					msg = ctx.getString(R.string.server_unreachable, action);
 				} else if (((DataException) e).timedOut()) {
