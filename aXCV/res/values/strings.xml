@@ -49,6 +49,21 @@
         <item>Database</item>
         <item>None</item>
     </string-array>
+    <string-array name="durationInterval">
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>60 minutes</item>
+        <item>90 minutes</item>
+        <item>120 minutes</item>
+    </string-array>
+    <string-array name="languages">
+        <item>Dutch</item>
+        <item>English</item>
+        <item>French</item>
+        <item>Hindi</item>
+    </string-array>
 	<string name="notifyIntervalDefault">900</string>
     <string-array name="notifyInterval">
         <item>5 minutes</item>
@@ -66,7 +81,65 @@
         <item>86400</item>
         <item>off</item>
     </string-array>
-
+    <string-array name="dateIndicators">
+        <item>Last year</item>
+        <item>Next year</item>
+        <item></item>
+        <item>Last week</item>
+        <item>Yesterday</item>
+        <item>Today</item>
+        <item>Tomorrow</item>
+        <item>Next week</item>
+        <item>In {0} days</item>
+        <item>{0} days ago</item>
+        <item>Earlier this year</item>
+        <item>Later this year</item>
+        <item>In {0} weeks</item>
+    </string-array>
+    <string-array name="rateValues">
+		<item>No rating</item>
+		<item>Very poor</item>
+		<item>Poor</item>
+		<item>Less than moderate</item>
+		<item>Moderate</item>
+		<item>Fair</item>
+		<item>Adequate</item>
+		<item>Good</item>
+		<item>Very good</item>
+		<item>Excellent</item>
+		<item>Outstanding</item>
+    </string-array>
+    <string-array name="conferenceFields">
+		<item>Start time</item>
+		<item>End time</item>
+		<item>Title</item>
+		<item>Location</item>
+    </string-array>
+    <string-array name="sessionFields">
+		<item>Start time</item>
+		<item>Title</item>
+		<item>Description</item>
+		<item>Author</item>
+		<item>Number of people</item>
+		<item>Location</item>
+    </string-array>
+    <string-array name="sessionTypes">
+		<item>STANDARD:Presentation:1</item>
+		<item>WORKSHOP:Workshop</item>
+		<item>BRAINSTORM:Brainstorm</item>
+		<item>BOOK:Book review</item>
+		<item>SUMMARY:Report</item>
+		<item>STRATEGIC:Strategy</item>
+		<item>INCUBATOR:Incubator</item>
+		<item>MANDATORY:Corporate:2</item>
+		<item>BREAK:Break:6</item>
+    </string-array>
+    <string-array name="statusFields">
+		<item>fully booked</item>
+		<item>{0} sessions scheduled</item>
+		<item>{0} slots available</item>
+    </string-array>
+    
     <string name="close">Close</string>
     <string name="cancel">Cancel</string>
     <string name="cancelled">Cancelled</string>
@@ -166,6 +239,24 @@
     <string name="prevsession">Previous Session</string>
     <string name="right">Right</string>
     <string name="schedule">Schedule</string>
-    
-    
+
+    <string name="your_rating">Your rating</string>
+    <string name="your_remark">Your remark</string>
+    <string name="no_later_session">No later session</string>
+    <string name="no_earlier_session">No earlier session</string>
+    <string name="no_author_found">Author not found</string>
+    <string name="label_removed">Label removed</string>
+    <string name="single_select">Single select!</string>
+    <string name="single_select_message">You cannot select more than one person! What shall I do with the previously selected one?</string>
+    <string name="replace">Replace</string>
+    <string name="keep">Keep</string>
+    <string name="author_removed">Author removed</string>
+    <string name="select_valid_author">Select a valid author!</string>
+    <string name="session_changed">Session has changed</string>
+    <string name="notify_fail_url">Update check failed. Server URL not found.</string>
+    <string name="notify_check">Checking for updates&#8230;</string>
+    <string name="set_value">Enter value</string>
+    <string name="no_result">No results</string>
+    <string name="enter_new_location">Enter new location</string>
+    <string name="insert_break">Insert break</string>
 </resources>

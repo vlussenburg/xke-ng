@@ -48,7 +48,7 @@ public class LocationInputDialog extends Dialog {
 		params.width = LayoutParams.FILL_PARENT;
 		getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
 
-		setTitle("Enter new location");
+		setTitle(R.string.enter_new_location);
 
 		Button submit = (Button) findViewById(R.id.seCommit);
 		submit.setOnClickListener(new View.OnClickListener() {

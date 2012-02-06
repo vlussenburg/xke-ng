@@ -137,7 +137,7 @@ public class CVSessionView extends SessionSwipeActivity {
 			TextView sessionDate = (TextView) findViewById(R.id.sessionTime);
 			StringBuilder sb = new StringBuilder();
 			sb.append(timeUtil.getAbsoluteTime(currentSession.getStartTime()));
-			sb.append(" - ");
+			sb.append(" - "); //$NON-NLS-1$
 			sb.append(timeUtil.getAbsoluteTime(currentSession.getEndTime()));
 			sessionDate.setText(sb.toString());
 
@@ -186,7 +186,7 @@ public class CVSessionView extends SessionSwipeActivity {
 			view.setOnClickListener(lReview);
 
 			ImageView button = (ImageView) findViewById(R.id.sessionMarkButton);
-			if (currentSession.getType() == Session.Type.BREAK || StringUtil.isEmpty(getUser()) || currentSession.isExpired() ) {
+			if (currentSession.isBreak()|| StringUtil.isEmpty(getUser()) || currentSession.isExpired() ) {
 				button.setVisibility(View.GONE);
 			} else {
 				getMyApplication().markSession(currentSession, button, false);
@@ -205,7 +205,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		if (currentSession == null || StringUtil.isEmpty(currentSession.getId())) {
 			return;
 		}
-		Log.i(XCS.LOG.COMMUNICATE, "Updating rate and reviews");
+		Log.i(XCS.LOG.COMMUNICATE, "Updating rate and reviews"); //$NON-NLS-1$
 		new RetrieveRateTask(R.string.action_retrieve_rate, this, new TaskCallBack<Rate>() {
 			@Override
 			public void onCalled(Rate result) {
@@ -243,7 +243,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		}
 
 		session = getPreviousSession(getCurrentLocation());
-		Log.i(XCS.LOG.NAVIGATE, "Previous session = " + session);
+		Log.i(XCS.LOG.NAVIGATE, "Previous session = " + session); //$NON-NLS-1$
 		viewById = findViewById(R.id.textPreviousSession);
 		layout = (LinearLayout) viewById.getParent();
 		if (session == null) {
@@ -271,7 +271,7 @@ public class CVSessionView extends SessionSwipeActivity {
 			case XCS.DIALOG.ADD_RATING:
 				dialog = new Dialog(this);
 				dialog.setContentView(R.layout.dialog_rating);
-				dialog.setTitle("Your rating");
+				dialog.setTitle(R.string.your_rating);
 				TextView text = (TextView) dialog.findViewById(R.id.drSessionTitle);
 				text.setText(currentSession.getTitle());
 
@@ -304,7 +304,7 @@ public class CVSessionView extends SessionSwipeActivity {
 			case XCS.DIALOG.CREATE_REVIEW:
 				dialog = new Dialog(this);
 				dialog.setContentView(R.layout.dialog_review);
-				dialog.setTitle("Your remark");
+				dialog.setTitle(R.string.your_remark);
 				text = (TextView) dialog.findViewById(R.id.dvSessionTitle);
 				text.setText(currentSession.getTitle());
 
@@ -382,7 +382,7 @@ public class CVSessionView extends SessionSwipeActivity {
 			startActivityCurrentSession();
 			overridePendingTransition(R.anim.slide_bottom_to_top, 0);
 		} else {
-			Toast.makeText(this, "No later session", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.no_later_session, Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -393,7 +393,7 @@ public class CVSessionView extends SessionSwipeActivity {
 			startActivityCurrentSession();
 			overridePendingTransition(R.anim.slide_top_to_bottom, 0);
 		} else {
-			Toast.makeText(this, "No earlier session", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.no_earlier_session, Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 	}
 

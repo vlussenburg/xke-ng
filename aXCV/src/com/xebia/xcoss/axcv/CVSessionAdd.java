@@ -29,7 +29,7 @@ import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
-import com.xebia.xcoss.axcv.model.Session.Type;
+import com.xebia.xcoss.axcv.model.SessionType;
 import com.xebia.xcoss.axcv.tasks.DeleteSessionTask;
 import com.xebia.xcoss.axcv.tasks.RegisterSessionTask;
 import com.xebia.xcoss.axcv.tasks.RetrieveConferenceTask;
@@ -180,7 +180,7 @@ public class CVSessionAdd extends AdditionActivity {
 			view.setText(FormatUtil.getText(session.getPreparation()));
 
 			view = (TextView) findViewById(R.id.sessionType);
-			view.setText(FormatUtil.getText(session.getType()));
+			view.setText(FormatUtil.getText(SessionType.get(session.getType()).toString()));
 
 			ImageView iv = (ImageView) findViewById(R.id.completeness);
 			int completeness = session.calculateCompleteness(8);
@@ -396,9 +396,9 @@ public class CVSessionAdd extends AdditionActivity {
 				rescheduleSession(session.getDuration());
 			break;
 			case R.id.sessionType:
-				Type type = (Type) selection;
-				session.setType(type);
-				activateDetails(type.hasDetails());
+				SessionType type = (SessionType) selection;
+				session.setType(type.getType());
+				activateDetails(!type.isBreak() && !type.isMandatory());
 			break;
 			default:
 				Log.w(LOG.NAVIGATE, "Don't know how to process: " + field);
@@ -466,8 +466,7 @@ public class CVSessionAdd extends AdditionActivity {
 				dialog.setOnDismissListener(this);
 			break;
 			case XCS.DIALOG.INPUT_DURATION:
-				// TODO array handling
-				items = new String[] { "5 min", "10 min", "15 min", "30 min", "60 min", "90 min", "120 min" };
+				items = getResources().getStringArray(R.array.durationInterval);
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.pick_duration);
 				builder.setItems(items, new DialogHandler(this, items, R.id.sessionDuration));
@@ -475,7 +474,7 @@ public class CVSessionAdd extends AdditionActivity {
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.INPUT_LANGUAGE:
-				items = new String[] { "Dutch", "English", "French", "Hindi" };
+				items = getResources().getStringArray(R.array.languages);
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.select_languages);
 				DialogHandler msdhandler = new DialogHandler(this, items, R.id.sessionLanguage);
@@ -509,10 +508,10 @@ public class CVSessionAdd extends AdditionActivity {
 				dialog = new TextInputDialog(this, R.id.sessionTitle);
 			break;
 			case XCS.DIALOG.INPUT_TYPE:
-				Type[] values = Session.Type.values();
+				SessionType[] values = SessionType.getAllTypes();
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.pick_type);
-				ListAdapter ta = new ArrayAdapter<Type>(this, R.layout.simple_list_item_single_choice, values);
+				ListAdapter ta = new ArrayAdapter<SessionType>(this, R.layout.simple_list_item_single_choice, values);
 				builder.setSingleChoiceItems(ta, -1, new DialogHandler(this, values, R.id.sessionType));
 				builder.setNegativeButton(R.string.cancel, cancelClickListener);
 				dialog = builder.create();
@@ -571,10 +570,10 @@ public class CVSessionAdd extends AdditionActivity {
 			case XCS.DIALOG.INPUT_TYPE:
 				lv = ((AlertDialog) dialog).getListView();
 				if (session.getType() != null) {
-					Type type = session.getType();
+					SessionType type = SessionType.get(session.getType());
 					int size = lv.getCount();
 					for (int idx = 0; idx < size; idx++) {
-						Type listType = (Type) lv.getItemAtPosition(idx);
+						SessionType listType = (SessionType) lv.getItemAtPosition(idx);
 						if (type.equals(listType)) {
 							lv.setItemChecked(idx, true);
 							break;

@@ -11,6 +11,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.google.gson.annotations.SerializedName;
+import com.xebia.xcoss.axcv.Messages;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.model.util.TimeSlotComparator;
 import com.xebia.xcoss.axcv.util.FormatUtil;
@@ -33,6 +34,8 @@ public class Conference implements Serializable {
 	}
 
 	private static final long serialVersionUID = 2L;
+
+	private transient static String[] mandatoryFields;
 
 	private String id;
 	private String title;
@@ -64,6 +67,13 @@ public class Conference implements Serializable {
 		this.sessions.addAll(original.sessions);
 	}
 
+	public static void init(String[] input) {
+		if ( input == null || input.length != 4) {
+			throw new RuntimeException(Messages.getString("Exception.5"));
+		}
+		mandatoryFields = input;
+	}
+	
 	// Getters and setters
 
 	public String getId() {
@@ -192,17 +202,20 @@ public class Conference implements Serializable {
 	// Utilities
 
 	public boolean check(List<String> messages) {
-		if (startTime == null || endTime == null) {
-			messages.add("Date, start/end time");
+		if (startTime == null) {
+			messages.add(mandatoryFields[0]);
+		}
+		if (endTime == null) {
+			messages.add(mandatoryFields[1]);
 		}
 		if (StringUtil.isEmpty(title)) {
-			messages.add("Title");
+			messages.add(mandatoryFields[2]);
 		}
 		if (locations == null || locations.isEmpty()) {
-			messages.add("Locations");
+			messages.add(mandatoryFields[3]);
 		}
 		return (messages.size() == 0);
-	}
+		}
 
 	private void resetSessions() {
 		sessions = new TreeSet<Session>(new SessionComparator());

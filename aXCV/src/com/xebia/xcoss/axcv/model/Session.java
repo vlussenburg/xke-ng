@@ -8,6 +8,7 @@ import java.util.TreeSet;
 
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.Messages;
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
@@ -15,24 +16,7 @@ import com.xebia.xcoss.axcv.util.XCS;
 public class Session implements Serializable {
 
 	public enum Type {
-		STANDARD("Presentation"), WORKSHOP("Workshop"), BRAINSTORM("Brainstorm"), BOOK("Book review"), SUMMARY("Report"), STRATEGIC(
-				"Strategy"), INCUBATOR("Incubator"),
-
-		MANDATORY("Corporate (mandatory)"), BREAK("Break"); // This is also Mandatory
-
-		private String text;
-
-		private Type(String txt) {
-			this.text = txt;
-		}
-
-		public String toString() {
-			return text;
-		}
-
-		public boolean hasDetails() {
-			return (this != MANDATORY && this != BREAK);
-		}
+		 STANDARD, WORKSHOP, BRAINSTORM, BOOK, SUMMARY, STRATEGIC, INCUBATOR, MANDATORY, BREAK;
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -59,6 +43,8 @@ public class Session implements Serializable {
 	private String preparation;
 	private Set<String> languages;
 
+	private transient static String[] mandatoryFields;
+
 	public Session() {
 		labels = new TreeSet<String>();
 		authors = new TreeSet<Author>();
@@ -82,6 +68,13 @@ public class Session implements Serializable {
 		authors.addAll(original.authors);
 		labels.addAll(original.labels);
 		languages.addAll(original.languages);
+	}
+
+	public static void init(String[] input) {
+		if (input == null || input.length != 6) {
+			throw new RuntimeException(Messages.getString("Exception.7"));
+		}
+		mandatoryFields = input;
 	}
 
 	public String getId() {
@@ -193,15 +186,8 @@ public class Session implements Serializable {
 		return languages;
 	}
 
-	/**
-	 * Only allow the type to be set if it has no id yet.
-	 */
 	public void setType(Type type) {
-		if (id == null) {
-			this.type = type;
-		} else {
-			Log.w(XCS.LOG.PROPERTIES, "Could not set type to " + type + ", id = " + id);
-		}
+		this.type = type;
 	}
 
 	public Type getType() {
@@ -220,24 +206,24 @@ public class Session implements Serializable {
 
 	public boolean check(List<String> messages) {
 		if (startTime == null) {
-			messages.add("Start time");
+			messages.add(mandatoryFields[0]);
 		}
 		if (StringUtil.isEmpty(title)) {
-			messages.add("Title");
+			messages.add(mandatoryFields[1]);
 		}
 		if (StringUtil.isEmpty(description)) {
-			messages.add("Description");
+			messages.add(mandatoryFields[2]);
 		}
-		if (type != Type.BREAK) {
+		if (!SessionType.get(type).isBreak()) {
 			if (authors.isEmpty()) {
-				messages.add("Author");
+				messages.add(mandatoryFields[3]);
 			}
 			if (StringUtil.isEmpty(limit)) {
-				messages.add("Number of people");
+				messages.add(mandatoryFields[4]);
 			}
 		}
 		if (location == null) {
-			messages.add("Location");
+			messages.add(mandatoryFields[5]);
 		}
 		return (messages.size() == 0);
 	}
@@ -303,11 +289,11 @@ public class Session implements Serializable {
 	}
 
 	public boolean isMandatory() {
-		return (type != null && (type == Type.MANDATORY || type == Type.BREAK));
+		return SessionType.get(type).isMandatory();
 	}
 
 	public boolean isBreak() {
-		return (type != null && type == Type.BREAK);
+		return SessionType.get(type).isBreak();
 	}
 
 	public boolean isExpired() {

@@ -26,7 +26,6 @@ public class NotificationServiceManager implements SignalRetriever {
 		String delay = sp.getString(XCS.PREF.NOTIFYINTERVAL, null);
 		PendingIntent sender = createSender(ctx, sp);
 
-		Log.w("message", "Delay = " + delay);
 		if (sender != null && "off".equalsIgnoreCase(delay) == false) {
 			long interval = Integer.parseInt(delay) * 1000;
 			long startAt = SystemClock.elapsedRealtime() + interval;

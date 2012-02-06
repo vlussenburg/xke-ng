@@ -19,6 +19,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.xebia.xcoss.axcv.R;
 import com.xebia.xcoss.axcv.logic.DataException;
 import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.logic.ProfileManager.Trackable;
@@ -59,7 +60,7 @@ public class CheckNotificationSignalRetriever extends BroadcastReceiver {
 				Log.e(XCS.LOG.ALL, "Notification failure: " + StringUtil.getExceptionMessage(e));
 			}
 			if (StringUtil.isEmpty(path)) {
-				Toast.makeText(ctx, "Update check failed. Server URL not found.", Toast.LENGTH_LONG).show();
+				Toast.makeText(ctx, ctx.getString(R.string.notify_fail_url), Toast.LENGTH_LONG).show();
 				return;
 			}
 
@@ -71,7 +72,7 @@ public class CheckNotificationSignalRetriever extends BroadcastReceiver {
 					return;
 				}
 				
-				Toast.makeText(ctx, "Checking for updates...", Toast.LENGTH_SHORT).show();
+				Toast.makeText(ctx, ctx.getString(R.string.notify_check), Toast.LENGTH_SHORT).show();
 
 				if (!RestClient.isAuthenticated()) {
 					String password = sp.getString(XCS.PREF.PASSWORD, "");

@@ -124,7 +124,7 @@ public class SearchResultAdapter extends BaseAdapter {
 
 	@Override
 	public Object getItem(int paramInt) {
-		if (data.size() == 0) return "No results.";
+		if (data.size() == 0) return ctx.getString(R.string.no_result);
 		return data.get(paramInt);
 	}
 

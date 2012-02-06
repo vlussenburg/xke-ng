@@ -4,6 +4,8 @@ package com.xebia.xcoss.axcv.util;
 
 public class StringUtil {
 
+	public static final int LEN = 50;
+	
 	public static boolean isEmpty(String value) {
 		return value == null || value.trim().length() == 0;
 	}
@@ -25,6 +27,9 @@ public class StringUtil {
 		String message = e.getMessage();
 		if ( StringUtil.isEmpty(message)) {
 			message = e.getClass().getSimpleName().replaceFirst("Exception", "");
+		}
+		if ( message.length() > LEN ) {
+			message = message.substring(0, LEN) + "...";
 		}
 		return message;
 	}

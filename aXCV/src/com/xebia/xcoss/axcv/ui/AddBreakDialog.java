@@ -24,7 +24,7 @@ import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
-import com.xebia.xcoss.axcv.model.Session.Type;
+import com.xebia.xcoss.axcv.model.SessionType;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -51,7 +51,7 @@ public class AddBreakDialog extends Dialog {
 		params.width = LayoutParams.FILL_PARENT;
 		getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
 
-		setTitle("Insert break");
+		setTitle(R.string.insert_break);
 		TextView view = (TextView) findViewById(R.id.seValue);
 		view.setText(R.string.default_break_name);
 
@@ -79,7 +79,7 @@ public class AddBreakDialog extends Dialog {
 
 				if (duration > 0 && location != null && time != null) {
 					Session session = new Session();
-					session.setType(Type.BREAK);
+					session.setType(SessionType.getBreakType().getType());
 					session.setTitle(title);
 					session.setDescription(activity.getString(R.string.default_break_description, location.getDescription()));
 					session.setLocation(location);
@@ -138,7 +138,7 @@ public class AddBreakDialog extends Dialog {
 	private void updateSpinners() {
 		final Spinner spinner = (Spinner) findViewById(R.id.bDuration);
 		if (spinner.getSelectedItemPosition() == Spinner.INVALID_POSITION) {
-			String[] durations = new String[] { "5 min", "10 min", "15 min", "30 min", "60 min", "90 min", "120 min" };
+			String[] durations = activity.getResources().getStringArray(R.array.durationInterval);
 			ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(getContext(),
 					android.R.layout.simple_spinner_item, durations);
 			adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

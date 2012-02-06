@@ -9,6 +9,7 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.Messages;
 import com.xebia.xcoss.axcv.util.XCS;
 
 public class Moment implements Serializable {
@@ -87,7 +88,7 @@ public class Moment implements Serializable {
 
 	public Moment plusMinutes(int length) {
 		if (minute == null || hour == null) {
-			throw new IllegalArgumentException("Moment has no valid time!");
+			throw new IllegalArgumentException(Messages.getString("Exception.1"));
 		}
 		int minuteValue = minute + length;
 		int hourValue = hour;

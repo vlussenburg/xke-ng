@@ -6,6 +6,7 @@ import java.util.List;
 import android.content.Context;
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.Messages;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
@@ -105,7 +106,7 @@ public abstract class DataCache {
 	 */
 	public void add(String conferenceId, Session result) {
 		if ( conferenceId == null ) {
-			throw new RuntimeException("ConferenceId cannot be null!");
+			throw new RuntimeException(Messages.getString("Exception.0"));
 		}
 		if (result != null && result.getId() != null) {
 			result.setConferenceId(conferenceId);

@@ -78,7 +78,7 @@ public class CheckNotificationHandler extends Handler {
 
 		Notification noty = new Notification(xType, title, currentTimeMillis);
 		noty.flags = Notification.FLAG_AUTO_CANCEL;
-		String message = "Session has changed.";
+		String message = context.getString(R.string.session_changed);
 		noty.setLatestEventInfo(context, title, message, clickIntent);
 		if (silent) {
 			noty.vibrate = VIBRATE_PATTERN;

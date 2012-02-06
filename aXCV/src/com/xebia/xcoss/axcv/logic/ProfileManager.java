@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.Messages;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.DebugUtil;
@@ -90,10 +91,10 @@ public class ProfileManager extends SQLiteOpenHelper {
 	private void checkConnection() {
 		if (database == null) {
 			String who = DebugUtil.whoCalledMe();
-			throw new SQLException("Database not started while doing " + who + "!");
+			throw new SQLException(Messages.getString("SQLException.0", who));
 		}
 		if (!database.isOpen() || database.isReadOnly()) {
-			throw new SQLException("Database not open or readonly!");
+			throw new SQLException(Messages.getString("SQLException.1"));
 		}
 	}
 

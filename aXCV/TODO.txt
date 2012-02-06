@@ -1,13 +1,10 @@
 IN PROGRESS
 -------------------------------------------------------------------
 
--	Externalize strings
--	Certificate check (Michael)
--	Notification
-
 TODO
 -------------------------------------------------------------------
 client
+-	Certificate check
 -	Afhandeling 400 meldingen
 
 later op de client
@@ -88,4 +85,6 @@ DONE
 -	Timeout on login afvangen
 - 	Hide mark/edit button for expired sessions in session view
 -	Start when no network: Should mention this.
+-	Notification
+-	Externalize strings
 	

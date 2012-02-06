@@ -49,7 +49,7 @@ public class CVAuthor extends BaseActivity {
 				}
 				if (author == null) {
 					Log.w(XCS.LOG.DATA, "No author found!");
-					author = new Author("noauthor", "Author not found", "", "");
+					author = new Author("noauthor", getString(R.string.no_author_found), "", "");
 				}
 				LayoutInflater inflater = getLayoutInflater();
 				ViewGroup layout = (ViewGroup) findViewById(R.id.av_author_layout);

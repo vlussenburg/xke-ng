@@ -82,7 +82,12 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 							if (redirect) {
 								Log.i(XCS.LOG.NAVIGATE, "Jumping to first upcomming conference.");
 								redirect = false;
-								switchTo(result.get(0));
+								for (Conference conference : result) {
+									if ( !conference.isExpired() ) {
+										switchTo(conference);
+										break;
+									}
+								}
 							}
 						}
 					}

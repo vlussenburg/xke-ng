@@ -179,7 +179,7 @@ public class CVSearchLabel extends BaseActivity {
 				selectedLabels.remove(position);
 				updateResult();
 				labelAdapter.notifyDataSetChanged();
-				Toast.makeText(getApplicationContext(), "Label removed", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), R.string.label_removed, Toast.LENGTH_SHORT).show();
 				return true;
 			default:
 				return super.onContextItemSelected(menuItem);

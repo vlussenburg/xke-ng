@@ -2,11 +2,12 @@ package com.xebia.xcoss.axcv.util;
 
 import java.util.List;
 
+import com.xebia.xcoss.axcv.Messages;
 import com.xebia.xcoss.axcv.model.Remark;
 
 public class FormatUtil {
 
-	public static final String NONE_FOUND = "<None>";
+	public static final String NONE_FOUND = Messages.getString("FormatUtil.0");
 	private static final String LINE = System.getProperty("line.separator");
 
 	public static String getText(double rate) {
@@ -52,7 +53,7 @@ public class FormatUtil {
 
 	public static CharSequence getText(String value) {
 		if (StringUtil.isEmpty(value)) {
-			return "<Specify value>";
+			return Messages.getString("FormatUtil.1");
 		}
 		return value;
 	}
@@ -69,7 +70,7 @@ public class FormatUtil {
 
 	public static String getText(Object object) {
 		if (object == null) {
-			return "<Specify value>";
+			return Messages.getString("FormatUtil.1");
 		}
 		return object.toString();
 	}

@@ -1,5 +1,6 @@
 package com.xebia.xcoss.axcv.logic;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -34,12 +35,14 @@ public class EC2TrustedSocketFactory extends SSLSocketFactory {
 
 			public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {
 				for (X509Certificate x509Certificate : xcs) {
-					
-					Log.e("debug", "check Server: " + string + " * " + x509Certificate.getIssuerDN());
+					x509Certificate.checkValidity();
+					Log.e("debug", "check issuer : " + x509Certificate.getIssuerDN());
+					Log.e("debug", "check subject: " + x509Certificate.getSubjectDN());
 				}
 			}
 
 			public X509Certificate[] getAcceptedIssuers() {
+				// TODO : Add the Comodo certificate
 				return null;
 			}
 		};
@@ -49,7 +52,18 @@ public class EC2TrustedSocketFactory extends SSLSocketFactory {
 
     private static KeyStore createKeyStore() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        trustStore.load(null, null);
+        FileInputStream is = new FileInputStream("/system/etc/security/cacerts.bks");
+        trustStore.load(is, null);
+//        Enumeration<String> e = trustStore.aliases();
+//        while ( e.hasMoreElements() ) {
+//        	String key = e.nextElement();
+//        	Certificate certificate = trustStore.getCertificate(key);
+//        	String message = "?";
+//        	if ( certificate instanceof X509Certificate ) {
+//        		message = ((X509Certificate)certificate).getSubjectDN().toString();
+//        	}
+//			Log.v("Security", message);
+//        }
         return trustStore;
 	}
 

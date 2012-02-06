@@ -21,7 +21,6 @@ import com.xebia.xcoss.axcv.tasks.SearchAuthorsTask;
 import com.xebia.xcoss.axcv.tasks.SearchSessionsTask;
 import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.SearchResultAdapter;
-import com.xebia.xcoss.axcv.util.DebugUtil;
 import com.xebia.xcoss.axcv.util.StringUtil;
 
 public abstract class SearchActivity extends BaseActivity implements SwipeActivity {

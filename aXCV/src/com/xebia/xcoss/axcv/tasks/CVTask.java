@@ -105,6 +105,7 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 			}
 			if (!silent) {
 				msg = "Communication failure on '" + action + "' due to " + StringUtil.getExceptionMessage(e);
+				e.printStackTrace();
 				Log.w(XCS.LOG.COMMUNICATE, msg);
 				BaseActivity.createDialog(ctx, "Action failed", msg).show();
 			}
