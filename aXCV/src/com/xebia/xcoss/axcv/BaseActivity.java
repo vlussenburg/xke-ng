@@ -80,16 +80,16 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 		}
 	}
 
-	@Override
-	protected void onResume() {
-		String notificationId = getIntent().getStringExtra(IA_NOTIFICATION_ID);
-		if (notificationId != null) {
-			NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-			Log.w("debug", "Notification - Cancel on " + notificationId);
-			mgr.cancel(notificationId.hashCode());
-		}
-		super.onResume();
-	}
+//	@Override
+//	protected void onResume() {
+//		String notificationId = getIntent().getStringExtra(IA_NOTIFICATION_ID);
+//		if (notificationId != null) {
+//			NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//			Log.w("debug", "Notification - Cancel on " + notificationId);
+//			mgr.cancel(notificationId.hashCode());
+//		}
+//		super.onResume();
+//	}
 
 	@Override
 	protected Dialog onCreateDialog(int id) {

@@ -34,6 +34,7 @@ public class EC2TrustedSocketFactory extends SSLSocketFactory {
 
 			public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {
 				for (X509Certificate x509Certificate : xcs) {
+					
 					Log.e("debug", "check Server: " + string + " * " + x509Certificate.getIssuerDN());
 				}
 			}
@@ -43,7 +44,7 @@ public class EC2TrustedSocketFactory extends SSLSocketFactory {
 			}
 		};
         sslContext.init(null, new TrustManager[] { easyTrustManager }, null);
-        setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        setHostnameVerifier(SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
     }
 
     private static KeyStore createKeyStore() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {

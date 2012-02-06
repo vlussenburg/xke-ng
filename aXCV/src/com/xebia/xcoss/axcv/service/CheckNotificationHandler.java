@@ -77,6 +77,7 @@ public class CheckNotificationHandler extends Handler {
 		PendingIntent clickIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		Notification noty = new Notification(xType, title, currentTimeMillis);
+		noty.flags = Notification.FLAG_AUTO_CANCEL;
 		String message = "Session has changed.";
 		noty.setLatestEventInfo(context, title, message, clickIntent);
 		if (silent) {
