@@ -488,7 +488,7 @@ public class CVSessionAdd extends AdditionActivity {
 
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.select_location);
-				ListAdapter la = new ArrayAdapter<Location>(this, android.R.layout.simple_spinner_item, locations);
+				ListAdapter la = new ArrayAdapter<Location>(this, R.layout.simple_list_item, locations);
 				builder.setSingleChoiceItems(la, -1, new DialogHandler(this, locations, R.id.sessionLocation));
 				dialog = builder.create();
 			break;

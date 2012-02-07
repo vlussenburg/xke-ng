@@ -1,9 +1,13 @@
 package com.xebia.xcoss.axcv.tasks;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 
 import com.xebia.xcoss.axcv.BaseActivity;
 import com.xebia.xcoss.axcv.logic.RestClient;
+import com.xebia.xcoss.axcv.logic.cache.DataCache;
 import com.xebia.xcoss.axcv.model.Remark;
 
 public class RegisterRemarkTask extends CVTask<Remark, Void, Boolean> {
@@ -17,6 +21,8 @@ public class RegisterRemarkTask extends CVTask<Remark, Void, Boolean> {
 		for (Remark remark : remarks) {
 			String requestUrl = getRequestUrl("/feedback/", remark.getSessionId(), "/comment");
 			RestClient.createObject(requestUrl, remark, Remark[].class);
+			String key = DataCache.getKey("Remark", remark.getSessionId());
+			getStorage().removeObject(key, new ArrayList<Remark>().getClass());
 		}
 		return true;
 	}

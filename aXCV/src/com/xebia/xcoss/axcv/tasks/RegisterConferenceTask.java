@@ -48,7 +48,8 @@ public class RegisterConferenceTask extends CVTask<Conference, Void, Conference>
 			RegisterSessionTask.createUpdateSessions(this, sessions);
 		}
 		
-		conference.setSessions(sessionsToAdd);
+		Set<Session> sessions = conference.getSessions();
+		sessions.addAll(sessionsToAdd);
 		getStorage().add(conference);
 		return conference;
 	}

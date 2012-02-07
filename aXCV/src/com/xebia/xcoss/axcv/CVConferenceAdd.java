@@ -63,13 +63,6 @@ public class CVConferenceAdd extends AdditionActivity {
 		setContentView(R.layout.add_conference);
 		super.onCreate(savedInstanceState);
 
-		new RetrieveLocationsTask(R.string.action_retrieve_locations, this, new TaskCallBack<List<Location>>() {
-			@Override
-			public void onCalled(List<Location> result) {
-				locations = result;
-			}
-		}).execute();
-
 		ADD_NEW_LOCATION = getString(R.string.add_location);
 		timeFormatter = new ScreenTimeUtil(this);
 		breakSessions = new TreeSet<Session>(new SessionComparator());
@@ -95,6 +88,17 @@ public class CVConferenceAdd extends AdditionActivity {
 				}
 			}).execute(getSelectedConferenceId());
 		}
+	}
+
+	@Override
+	protected void onResume() {
+		new RetrieveLocationsTask(R.string.action_retrieve_locations, this, new TaskCallBack<List<Location>>() {
+			@Override
+			public void onCalled(List<Location> result) {
+				locations = result;
+			}
+		}).execute();
+		super.onResume();
 	}
 
 	private boolean loadFrom(Bundle savedInstanceState) {
@@ -267,10 +271,25 @@ public class CVConferenceAdd extends AdditionActivity {
 			case R.id.conferenceLocText:
 				if (!StringUtil.isEmpty(value)) {
 					if (selection instanceof Location) {
-						new RegisterLocationTask(R.string.action_register_location, this).execute((Location) selection);
+						Location loc = (Location) selection;
+						Location existing = null;
+						for (Location l : locations) {
+							if ( l.equals(loc) ) {
+								existing = l;
+								break;
+							}
+						}
+						if ( existing == null ) {
+							new RegisterLocationTask(R.string.action_register_location, this).execute(loc);
+							// Temporary add it...
+							locations.add(loc);
+							conference.addLocation(loc);
+						} else {
+							conference.addLocation(existing);
+						}
 					}
 				}
-				// fallThrough
+				break;
 			case R.id.conferenceLocations:
 				if (ADD_NEW_LOCATION.equals(value)) {
 					showDialog(XCS.DIALOG.CREATE_LOCATION);

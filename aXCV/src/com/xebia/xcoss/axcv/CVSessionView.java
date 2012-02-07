@@ -316,6 +316,7 @@ public class CVSessionView extends SessionSwipeActivity {
 					@Override
 					public void onClick(View paramView) {
 						Remark remark = new Remark(getUser(), edit.getText().toString(), currentSession.getId());
+						edit.setText("");
 						new RegisterRemarkTask(R.string.action_register_remark, CVSessionView.this).execute(remark);
 						dismissDialog(XCS.DIALOG.CREATE_REVIEW);
 						if (timer != null) scheduleRateAndReviewRefresh();
