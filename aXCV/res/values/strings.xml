@@ -3,14 +3,14 @@
 
     <string name="app_name">Conference Viewer</string>
     <string name="app_full_name">Xebia Conference Viewer</string>
-    <string name="app_version">0.6</string>
+    <string name="app_version">0.7</string>
     <string name="app_help_url">http://xke.xebia.com/help</string>
     
     <string name="splash_conference">Xebia Knowledge Exchange</string>
     <string name="splash_company">Xebia</string>
     <string name="splash_version">Version %s</string>
-    <string name="splash_copyright">Copyright &#169; 2011 Xebia B.V.</string>
-    <string name="splash_copyright2">Copyright &#169; 2011 Xebia B.V. All rights reserved.</string>
+    <string name="splash_copyright">Copyright &#169; 2012 Xebia B.V.</string>
+    <string name="splash_copyright2">Copyright &#169; 2012 Xebia B.V. All rights reserved.</string>
     <string name="menu_settings">Preferences</string>
     <string name="menu_search">Search</string>
     <string name="menu_overview">Conferences</string>
