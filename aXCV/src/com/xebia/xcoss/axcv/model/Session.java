@@ -237,8 +237,9 @@ public class Session implements Serializable {
 		}
 		// Description: Max 35
 		if (!StringUtil.isEmpty(description)) {
-			value += Math.min(35, description.replaceAll("\\w", "").length() * 1.4);
-			Log.v(XCS.LOG.ALL, "Description '" + description.replaceAll("\\w", "") + "' boosted value to " + value);
+			String dscrpt = description.replaceAll("\\s", "");
+			value += Math.min(35, dscrpt.length() * 1.4);
+			Log.v(XCS.LOG.ALL, "Description '" + dscrpt + "' boosted value to " + value);
 		}
 		// startTime: Max 5
 		if (startTime != null) {

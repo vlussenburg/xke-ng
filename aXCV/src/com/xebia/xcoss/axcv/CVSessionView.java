@@ -186,7 +186,7 @@ public class CVSessionView extends SessionSwipeActivity {
 			view.setOnClickListener(lReview);
 
 			ImageView button = (ImageView) findViewById(R.id.sessionMarkButton);
-			if (currentSession.isBreak()|| StringUtil.isEmpty(getUser()) || currentSession.isExpired() ) {
+			if (currentSession.isBreak() || StringUtil.isEmpty(getUser()) || currentSession.isExpired()) {
 				button.setVisibility(View.GONE);
 			} else {
 				getMyApplication().markSession(currentSession, button, false);
@@ -209,10 +209,12 @@ public class CVSessionView extends SessionSwipeActivity {
 		new RetrieveRateTask(R.string.action_retrieve_rate, this, new TaskCallBack<Rate>() {
 			@Override
 			public void onCalled(Rate result) {
-				TextView view = (TextView) findViewById(R.id.scRating);
-				view.setText(FormatUtil.getText(result));
+				if (result != null) {
+					TextView view = (TextView) findViewById(R.id.scRating);
+					view.setText(FormatUtil.getText(result));
+				}
 			}
-		}).execute(currentSession.getId());
+		}).silent().execute(currentSession.getId());
 
 		new RetrieveRemarksTask(R.string.action_retrieve_remarks, this, new TaskCallBack<List<Remark>>() {
 			@Override
@@ -221,7 +223,7 @@ public class CVSessionView extends SessionSwipeActivity {
 				Spanned spannedContent = Html.fromHtml(FormatUtil.getHtml(result));
 				view.setText(spannedContent, BufferType.SPANNABLE);
 			}
-		}).execute(currentSession.getId());
+		}).silent().execute(currentSession.getId());
 	}
 
 	private void updatePreviousAndNextSessionButtons() {

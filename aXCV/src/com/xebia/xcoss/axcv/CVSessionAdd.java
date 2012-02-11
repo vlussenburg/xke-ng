@@ -192,8 +192,7 @@ public class CVSessionAdd extends AdditionActivity {
 				iv.invalidate();
 			}
 
-			findViewById(R.id.detailsTitle).setVisibility(session.isBreak() ? View.GONE : View.VISIBLE);
-			findViewById(R.id.detailsLayout).setVisibility(session.isBreak() ? View.GONE : View.VISIBLE);
+			activateDetails(!session.isBreak() && !session.isMandatory());
 		}
 	}
 
@@ -223,11 +222,15 @@ public class CVSessionAdd extends AdditionActivity {
 						new TaskCallBack<Boolean>() {
 							@Override
 							public void onCalled(Boolean result) {
-								// A session has been added, so the cache is invalid.
-								DataCache cache = getMyApplication().getCache();
-								cache.remove(conference);
-								cache.remove(session);
-								CVSessionAdd.this.finish();
+								if ( result != null ) {
+									// A session has been added, so the cache is invalid.
+									DataCache cache = getMyApplication().getCache();
+									cache.remove(conference);
+									if ( !create ) {
+										cache.remove(session);
+									}
+									CVSessionAdd.this.finish();
+								}
 							}
 						}).execute(session);
 			}
@@ -408,6 +411,9 @@ public class CVSessionAdd extends AdditionActivity {
 	}
 
 	private void activateDetails(boolean state) {
+		// We could hide the section altogether
+		// findViewById(R.id.detailsTitle).setVisibility(session.isBreak() ? View.GONE : View.VISIBLE);
+		// findViewById(R.id.detailsLayout).setVisibility(session.isBreak() ? View.GONE : View.VISIBLE);
 		findViewById(R.id.sessionAudience).setEnabled(state);
 		findViewById(R.id.sessionCount).setEnabled(state);
 		findViewById(R.id.sessionPreps).setEnabled(state);

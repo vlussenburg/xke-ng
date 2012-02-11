@@ -14,7 +14,7 @@ import com.xebia.xcoss.axcv.util.XCS;
 
 public abstract class DataCache {
 	protected static final long CACHETIME = 30 * 60 * 1000;
-	
+
 	public static final String CK_ALL_LOCATIONS = "CK-Location";
 	public static final String CK_ALL_AUTHORS = "CK-Author";
 	public static final String CK_ALL_LABELS = "CK-Label";
@@ -100,12 +100,12 @@ public abstract class DataCache {
 
 	/**
 	 * The cached conference is now made invalid.
-	 *  
+	 * 
 	 * @param conferenceId
 	 * @param result
 	 */
 	public void add(String conferenceId, Session result) {
-		if ( conferenceId == null ) {
+		if (conferenceId == null) {
 			throw new RuntimeException(Messages.getString("Exception.0"));
 		}
 		if (result != null && result.getId() != null) {
@@ -134,13 +134,17 @@ public abstract class DataCache {
 	 * @param session
 	 */
 	public void remove(Session session) {
-		doRemoveCachedObject(session.getId().toString(), Session.class);
+		if (session != null && session.getId() != null) {
+			doRemoveCachedObject(session.getId(), Session.class);
+		}
 	}
 
 	public void remove(Conference conference) {
-		doRemoveCachedObject(conference.getId(), Conference.class);
-		for (Session session : conference.getSessions()) {
-			remove(session);
+		if (conference != null && conference.getId() != null) {
+			doRemoveCachedObject(conference.getId(), Conference.class);
+			for (Session session : conference.getSessions()) {
+				remove(session);
+			}
 		}
 	}
 

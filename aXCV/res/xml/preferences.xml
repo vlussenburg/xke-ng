@@ -50,7 +50,7 @@
 			android:defaultValue="HH:mm'u'" />
 		<ListPreference
 			android:title="Caching"
-			android:summary="Which caching policy?"
+			android:summary="Which caching policy (requires restart)?"
 			android:key="CacheType"
 			android:defaultValue="1"
 			android:entries="@array/cacheNames"

@@ -162,7 +162,7 @@
     <string name="no_session_added">No session added</string>
     <string name="session_not_added">Session could not be added (%s).</string>
     <string name="delete_session">Delete session</string>
-    <string name="confirm_delete_session">Are you sure to delete session \'%1$s\' on %1$s?</string>
+    <string name="confirm_delete_session">Are you sure to delete session \'%1$s\' on %2$s?</string>
     <string name="rescheduling_failed">Rescheduling failed</string>
     <string name="reschedule_failed_message">The session cannot be scheduled. Shorten session, use another location or choose another conference.</string>
     <string name="pick_conference">Pick a conference</string>
@@ -178,8 +178,6 @@
     <string name="intended_audience">Intended audience</string>
     <string name="add_conference">Add conference</string>
     <string name="edit_conference">Edit conference</string>
-    <string name="no_conference_added">No conference added</string>
-    <string name="conference_could_not_be_added">Conference could not be added (%s.)</string>
     <string name="conference_with_sessions">This conference has %d sessions(s).</string>
     <string name="confirm_delete_conference">Are you sure to delete conference \'%1$s\' on %2$s?</string>
     <string name="delete_conference">Delete conference</string>
@@ -259,4 +257,6 @@
     <string name="no_result">No results</string>
     <string name="enter_new_location">Enter new location</string>
     <string name="insert_break">Insert break</string>
+    <string name="could_not_delete_location">Cannot remove location as there are still sessions hosted there.</string>
+    <string name="could_not_change_time">Cannot change time as it would invalidate sessions. Move those sessions first.</string>
 </resources>

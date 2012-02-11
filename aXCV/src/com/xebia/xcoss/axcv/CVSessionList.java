@@ -76,7 +76,7 @@ public class CVSessionList extends SessionSwipeActivity {
 			}
 		}).execute(getConferenceId());
 	}
-	
+
 	public void switchTo(int paramInt) {
 		switchTo(getConferenceId(), paramInt);
 	}
@@ -137,8 +137,10 @@ public class CVSessionList extends SessionSwipeActivity {
 				CVSessionAdd.createDeleteDialog(this, sessions[position], new SimpleCallBack() {
 					@Override
 					public void onCalled(Boolean result) {
-						getMyApplication().getCache().remove(conference);
-						refreshScreen();
+						if (result != null) {
+							getMyApplication().getCache().remove(conference);
+							refreshScreen();
+						}
 					}
 				}).show();
 				return true;
