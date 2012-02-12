@@ -29,7 +29,7 @@ public class Session implements Serializable {
 	private String description;
 	private Moment startTime;
 	private Moment endTime;
-	private String limit = "Unlimited";
+	private String limit = Messages.getString("FormatUtil.2");
 	private Type type = Type.STANDARD;
 	private Set<Author> authors;
 	private Location location;

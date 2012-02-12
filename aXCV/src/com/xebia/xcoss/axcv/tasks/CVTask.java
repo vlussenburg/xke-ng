@@ -37,7 +37,7 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 	}
 
 	@Override
-	protected ReturnT doCheckedInBackground(Context ctx, ParameterT... params) throws Exception {
+	final protected ReturnT doCheckedInBackground(Context ctx, ParameterT... params) throws Exception {
 		validateLogin();
 		return background(ctx, params);
 	};
@@ -45,7 +45,7 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 	protected abstract ReturnT background(Context ctx, ParameterT... params) throws Exception;
 
 	@Override
-	protected void after(Context ctx, ReturnT result) {
+	final protected void after(Context ctx, ReturnT result) {
 		if (callback != null) {
 			callback.onCalled(result);
 		}
@@ -62,7 +62,7 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 	}
 
 	@Override
-	protected void handleError(final Context ctx, Exception e) {
+	final protected void handleError(final Context ctx, Exception e) {
 		try {
 			// Do not throw exception here. It will block the async task waiting dialog.
 			if (callback != null) {
@@ -80,15 +80,15 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 					msg = ctx.getString(R.string.server_timeout, action);
 				} else {
 					AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-					builder.setTitle("Not allowed!")
-							.setMessage("Access for " + action + " is denied. Specify credentials?")
+					builder.setTitle(R.string.auth_failed_title)
+							.setMessage(ctx.getString(R.string.auth_failed, action))
 							.setIcon(android.R.drawable.ic_dialog_alert)
-							.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+							.setPositiveButton(R.string.edit, new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int id) {
 									dialog.dismiss();
 									ctx.startActivity(new Intent(ctx, CVSettings.class));
 								}
-							}).setNegativeButton("Continue", new DialogInterface.OnClickListener() {
+							}).setNegativeButton(R.string.ignore, new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int id) {
 									dialog.dismiss();
 									RestClient.logout();
@@ -99,15 +99,15 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 				}
 				if (!silent && msg != null) {
 					Log.w(XCS.LOG.COMMUNICATE, msg);
-					BaseActivity.createDialog(ctx, "Action failed", msg).show();
+					BaseActivity.createDialog(ctx, ctx.getString(R.string.action_failed), msg).show();
 				}
 				return;
 			}
 			if (!silent) {
-				msg = "Communication failure on '" + action + "' due to " + StringUtil.getExceptionMessage(e);
+				msg = ctx.getString(R.string.communication_failure, action, StringUtil.getExceptionMessage(e));
 				e.printStackTrace();
 				Log.w(XCS.LOG.COMMUNICATE, msg);
-				BaseActivity.createDialog(ctx, "Action failed", msg).show();
+				BaseActivity.createDialog(ctx, ctx.getString(R.string.action_failed), msg).show();
 			}
 		}
 		catch (Exception ex) {

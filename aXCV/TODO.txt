@@ -5,6 +5,9 @@ IN PROGRESS
 TODO
 -------------------------------------------------------------------
 client
+-	Validatie ingegeven datum/tijdformaat
+-	Swipe in zoekscherm werkt niet op leeg scherm
+
 -	BUG Reschedule with duration 120 overwrites breaks
 -	Certificate check
 -	Afhandeling 400 meldingen

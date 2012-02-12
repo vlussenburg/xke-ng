@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">conferentie Viewer</string>
+    <string name="app_full_name">Xebia conferentie Viewer</string>
+    <string name="app_version">0.7</string>
+    <string name="app_help_url">http://xke.xebia.com/help</string>
+    
+    <string name="splash_conferentie">Xebia Knowledge Exchange</string>
+    <string name="splash_company">Xebia</string>
+    <string name="splash_version">Versie %s</string>
+    <string name="splash_copyright">Copyright &#169; 2012 Xebia B.V.</string>
+    <string name="splash_copyright2">Copyright &#169; 2012 Xebia B.V. Alle rechten voorbehouden.</string>
+    <string name="menu_settings">Voorkeuren</string>
+    <string name="menu_search">Zoeken</string>
+    <string name="menu_overview">Conferenties</string>
+    <string name="menu_add">Toevoegen</string>
+    <string name="menu_edit">Wijzigen</string>
+    <string name="menu_track">Mijn schema</string>
+    <string name="menu_list">Lijstweergave</string>
+    <string name="password_set">Wachtwoord opgeslagen</string>
+    <string name="password_unset">Geen wachtwoord gespecificeerd</string>
+    <string name="session_title">Sessietitel</string>
+    <string name="modify_session">Wijzig sessie</string>
+    <string name="author_select">Selecteer presentators&#8230;</string>
+    <string name="label_select">Selecteer labels&#8230;</string>
+    <string name="empty_value">&lt;geef waarde></string>
+    <string name="default_input_text">&lt;start ingave></string>
+    <string name="my_track_title">Mijn schema</string>
+    <string name="context_menu_presentator_view">Toon presentator</string>
+    <string name="context_menu_presentator_remove">Verwijder presentator</string>
+    <string name="context_menu_label_remove">Verwijder label</string>
+    <string name="context_menu_session_edit">Wijzig</string>
+    <string name="context_menu_session_view">Toon</string>
+    <string name="context_menu_session_delete">Verwijder</string>
+    <string name="sizeLabel">Locatiegrootte</string>
+    <string name="newLocationLabel">Naam van de locatie</string>
+    <string name="breakLabel">Pauze</string>
+    <string name="default_break_name">Diner</string>
+    <string name="default_break_description">Gezamenlijke activiteit op %s</string>
+
+    <string-array name="cacheNames">
+        <item>In geheugen</item>
+        <item>In database</item>
+        <item>Geen cache</item>
+    </string-array>
+    <string-array name="cacheClassNames">
+        <item>Memory</item>
+        <item>Database</item>
+        <item>None</item>
+    </string-array>
+    <string-array name="durationInterval">
+        <item>5 minuten</item>
+        <item>10 minuten</item>
+        <item>15 minuten</item>
+        <item>30 minuten</item>
+        <item>60 minuten</item>
+        <item>90 minuten</item>
+        <item>120 minuten</item>
+    </string-array>
+    <string-array name="languages">
+        <item>Dutch</item>
+        <item>English</item>
+        <item>French</item>
+        <item>Hindi</item>
+    </string-array>
+	<string name="notifyIntervalDefault">900</string>
+    <string-array name="notifyInterval">
+        <item>5 minuten</item>
+        <item>15 minuten</item>
+        <item>1 uur</item>
+        <item>12 uur</item>
+        <item>24 uur</item>
+        <item>uitgeschakeld</item>
+    </string-array>
+    <string-array name="notifyIntervalValues">
+        <item>300</item>
+        <item>900</item>
+        <item>3600</item>
+        <item>43200</item>
+        <item>86400</item>
+        <item>off</item>
+    </string-array>
+    <string-array name="dateIndicators">
+        <item>vorig jaar</item>
+        <item>volgend jaar</item>
+        <item></item>
+        <item>vorige week</item>
+        <item>gisteren</item>
+        <item>vandaag</item>
+        <item>morgen</item>
+        <item>volgende week</item>
+        <item>over {0} dagen</item>
+        <item>{0} dagen geleden</item>
+        <item>eerder dit jaar</item>
+        <item>later dit jaar</item>
+        <item>over {0} weken</item>
+    </string-array>
+    <string-array name="rateValues">
+		<item>Geen waardering</item>
+		<item>Erg slecht</item>
+		<item>Slecht</item>
+		<item>Erg matig</item>
+		<item>Matig</item>
+		<item>Redelijk</item>
+		<item>Voldoende</item>
+		<item>Goed</item>
+		<item>Erg goed</item>
+		<item>Steengoed</item>
+		<item>Superieur!</item>
+    </string-array>
+    <string-array name="conferentieFields">
+		<item>Starttijd</item>
+		<item>Eindtijd</item>
+		<item>Titel</item>
+		<item>Locatie</item>
+    </string-array>
+    <string-array name="sessionFields">
+		<item>Starttijd</item>
+		<item>Titel</item>
+		<item>Omschrijving</item>
+		<item>Presentator</item>
+		<item>Aantal personen</item>
+		<item>Locatie</item>
+    </string-array>
+    <string-array name="sessionTypes">
+		<item>STANDARD:Presentatie:1</item>
+		<item>WORKSHOP:Workshop</item>
+		<item>BRAINSTORM:Brainstorm</item>
+		<item>BOOK:Boekbespreking</item>
+		<item>SUMMARY:Rapport</item>
+		<item>STRATEGIC:Strategie</item>
+		<item>INCUBATOR:Incubator</item>
+		<item>MANDATORY:Bedrijfsbreed:2</item>
+		<item>BREAK:Pauze:6</item>
+    </string-array>
+    <string-array name="statusFields">
+		<item>volgeboekt</item>
+		<item>{0} sessies ingepland</item>
+		<item>{0} blokken beschikbaar</item>
+    </string-array>
+    
+    <string name="close">Sluiten</string>
+    <string name="cancel">Annuleren</string>
+    <string name="cancelled">Geannuleerd</string>
+    <string name="delete">Verwijder</string>
+    <string name="error">Fout</string>
+    <string name="failed">Gefaald</string>
+    <string name="warning">Waarschuwing</string>
+    <string name="ignore">Negeren</string>
+    <string name="edit">Wijzig</string>
+    
+    <string name="session_add">Voeg sessie toe</string>
+    <string name="session_edit">Wijzig sessie</string>
+    <string name="duration_minutes">%d min</string>
+    <string name="loading">Laden&#8230; Een moment a.u.b.</string>
+    <string name="auth_failed_title">Niet toegestaan</string>
+    <string name="auth_failed">Actie \'%s\' is niet toegestaan. Geef de juiste toegangsgegevens op.</string>
+    <string name="action_failed">Actie mislukt</string>
+    <string name="communication_failure">Communicatiefout bij \'%1$s\' veroorzaakt door %2$s.</string>
+    <string name="server_unreachable">Server onbereikbaar</string>
+    <string name="server_missing_url">Geen resultaat bij \'%s\'</string>
+    <string name="server_timeout">Geen tijdige reactie op \'%s\'</string>
+    <string name="specify_attributes">Geef de volgende waarden op: %s</string>
+    <string name="no_session_added">Sessie niet toegevoegd</string>
+    <string name="session_not_added">Sessie kon niet worden toegevoegd (%s)</string>
+    <string name="delete_session">Verwijder sessie</string>
+    <string name="confirm_delete_session">De sessie \'%1$s\' op %2$s verwijderen?</string>
+    <string name="rescheduling_failed">Inplannen mislukt</string>
+    <string name="reschedule_failed_message">De sessie kon niet opnieuw worden ingepland. Verkort of verplaats de sessie naar een andere locatie of datum.</string>
+    <string name="pick_conferentie">Kies een conferentie</string>
+    <string name="pick_start">Kies een starttijd</string>
+    <string name="conferentie_fully_booked">Deze conferentie is volgeboekt!</string>
+    <string name="pick_duration">Kies de duur</string>
+    <string name="select_languages">Kies de talen</string>
+    <string name="select_location">Kies een locatie</string>
+    <string name="pick_type">Selecteer een type</string>
+    <string name="preparation">Voorbereiding</string>
+    <string name="description">Beschrijving</string>
+    <string name="number_of_people">Aantal personen</string>
+    <string name="intended_audience">Doelgroep</string>
+    <string name="add_conferentie">Conferentie toevoegen</string>
+    <string name="edit_conferentie">Wijzig conferentie</string>
+    <string name="conferentie_with_sessions">Deze conferentie heeft %d sessies</string>
+    <string name="confirm_delete_conferentie">De conferentie \'%1$s\' op %2$s verwijderen?</string>
+    <string name="delete_conferentie">Verwijder conferentie</string>
+    <string name="move_delete">Verplaats &amp; verwijder</string>
+    <string name="failure_move_session">Mislukt! Een sessie kan niet worden verplaatst</string>
+    <string name="add_location">Nieuw&#8230;</string>
+    <string name="conferentie_detail">Details conferentie</string>
+    <string name="no_location_date">Geen locatie en/of datum gespecificeerd</string>
+    <string name="conferentie_title">Conferentietitel</string>
+    <string name="notification_on">Meldingen ingeschakeld</string>
+    <string name="notification_off">Meldingen uitgechakeld</string>
+    <string name="search_no_search">Geef een geldige zoektekst op</string>
+    
+    <string name="droidfu_progress_dialog_title">Laden&#8230;</string>
+    <string name="droidfu_progress_dialog_message">Er wordt contact gezocht met de server</string>
+    
+    <string name="action_search_sessions">Zoek sessies</string>
+    <string name="action_search_presentators">Zoek presentator</string>
+    <string name="action_delete_session">Verwijder sessie</string>
+    <string name="action_delete_conferentie">Delete conferentie</string>
+    <string name="action_register_conferentie">Registreer conferentie</string>
+    <string name="action_register_location">Registreer locatie</string>
+    <string name="action_register_rate">Geef waardering</string>
+    <string name="action_register_remark">Plaats opmerking</string>
+    <string name="action_register_session">Registreer sessie</string>
+    <string name="action_retrieve_presentators">Laad presentatoren</string>
+    <string name="action_retrieve_conferentie">Laad conferentie</string>
+    <string name="action_retrieve_conferenties">Laad conferenties</string>
+    <string name="action_retrieve_remarks">Laad commentaar</string>
+    <string name="action_retrieve_labels">Laad labels</string>
+    <string name="action_retrieve_locations">Laad locaties</string>
+    <string name="action_retrieve_rate">Laad waardering</string>
+    <string name="action_retrieve_session">Laad sessie</string>
+
+    <string name="img_conferenceButton">Toon conferenties</string>
+    <string name="img_icon">Logo</string>
+    <string name="img_nav_left">Vorige</string>
+    <string name="img_nav_right">Volgende</string>
+    <string name="img_nav_up">Op</string>
+    <string name="img_nav_down">Neer</string>
+    <string name="img_mark">Markeer sessie</string>
+    <string name="img_rate">Waardeer sessie</string>
+    <string name="img_edit">Wijzig sessie</string>
+    <string name="img_author">Presentator</string>
+    <string name="img_completeness">Toont hoe compleet de details zijn</string>
+    
+    <string name="header">Kop</string>
+    <string name="labels">Labels</string>
+    <string name="sessions">Sessies</string>
+    <string name="audience">Doelgroep</string>
+    <string name="authors">presentator(en)</string>
+    <string name="curricum">Curriculum</string>
+    <string name="language">Taal</string>
+    <string name="left">Links</string>
+    <string name="limit">Limiet</string>
+    <string name="date">Datum</string>
+    <string name="time">Tijd</string>
+    <string name="nextsession">Volgende</string>
+    <string name="prevsession">Vorige</string>
+    <string name="right">Rechts</string>
+    <string name="schedule">Schema</string>
+
+    <string name="your_rating">Waardering</string>
+    <string name="your_remark">Opmerking</string>
+    <string name="no_later_session">Geen latere sessie</string>
+    <string name="no_earlier_session">Geen eerdere sessie</string>
+    <string name="no_presentator_found">Presentator niet gevonden</string>
+    <string name="label_removed">Label verwijderd</string>
+    <string name="single_select">Enkelvoudige keuze!</string>
+    <string name="single_select_message">Er kan niet meer dan 1 persoon worden geselecteerd! Wat dient er met de vorige te gebeuren?</string>
+    <string name="replace">Vervang</string>
+    <string name="keep">Bewaar</string>
+    <string name="author_removed">Presentator verwijderd</string>
+    <string name="select_valid_presentator">Kies een geldige presentator!</string>
+    <string name="session_changed">Sessie is gewijzigd</string>
+    <string name="notify_fail_url">Controle op wijzigingen mislukt</string>
+    <string name="notify_check">Controle op wijzigingen&#8230;</string>
+    <string name="set_value">Geef waarde</string>
+    <string name="no_result">Geen resultaat</string>
+    <string name="enter_new_location">Geef nieuwe locatie op</string>
+    <string name="insert_break">Voeg pauze toe</string>
+    <string name="could_not_delete_location">De locatie kan niet woden gewijzigd. Er worden daar nog sessies gegeven.</string>
+    <string name="could_not_change_time">De tijd kan niet worden gewijzigd, hierdoor vallen er sessies buiten het schema. Verplaats deze sessies eerst.</string>
+
+    <string name="submit">Bevestig</string>
+    <string name="duration">Duur</string>
+    <string name="location">Locatie</string>
+    <string name="start">Start</string>
+    <string name="search">Zoeken</string>
+    <string name="submit_review">Geef een opmerking in en klik \'Bevestig\'.</string>
+    <string name="submit_rate">Geef een waardering voor deze sessie en klik \'Bevestig\'.</string>
+    
+    <string name="author_mail">Mailadres</string>
+    <string name="author_name">Naam presentator</string>
+    <string name="author_phone">Telefoonnummer</string>
+    <string name="authors_col">Presentatoren:</string>
+    <string name="breaks">Pauzes</string>
+    <string name="conference">Conferentie</string>
+    <string name="conferences">Conferenties</string>
+    <string name="details">Details</string>
+    <string name="empty">Leeg</string>
+    <string name="end_time">Eindtijd</string>
+    <string name="labels_col">Labels:</string>
+    <string name="locations">Locaties</string>
+    <string name="no_open_slots">volgeboekt</string>
+    <string name="nrof_people">Aantal mensen</string>
+    <string name="organizer">Organisator</string>
+    <string name="planning">Planning</string>
+    <string name="reschedule">Verplaats</string>
+    <string name="save">Opslaan</string>
+    <string name="separator"> / </string>
+    <string name="session">Sessie</string>
+    <string name="start_time">Starttijd</string>
+    <string name="title">Titel</string>
+    <string name="today">Vandaag</string>
+    <string name="type">Soort</string>
+    
+</resources>

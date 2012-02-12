@@ -1,36 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:stretchColumns="1"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
-	<TableRow
-		android:id="@+id/tableRow1"
-		android:layout_height="fill_parent"
-		android:layout_width="wrap_content">
-		<TextView
-			android:textSize="@dimen/ts_sessiontitle"
-			android:layout_column="1"
-			android:text="Title"
-			android:layout_height="wrap_content"
-			android:paddingRight="3dp"
-			android:paddingLeft="3dp"
-			android:id="@+id/ses_title"
-			android:layout_width="fill_parent"></TextView>
-		<TextView
-			android:gravity="right"
-			android:textColor="@color/tc_sessionschedule"
-			android:textSize="@dimen/ts_sessionschedule"
-			android:text="no open slots"
-			android:layout_height="wrap_content"
-			android:paddingRight="3dp"
-			android:paddingLeft="3dp"
-			android:id="@+id/ses_locdate"
-			android:layout_width="wrap_content"></TextView>
-	</TableRow>
-	<View
-		android:id="@+id/tabDivider"
-		android:layout_height="2dp"
-		android:layout_width="fill_parent"
-		android:background="@color/linebreak" />
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:stretchColumns="1" >
+
+    <TableRow
+        android:id="@+id/tableRow1"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent" >
+
+        <TextView
+            android:id="@+id/ses_title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:text="@string/title"
+            android:textSize="@dimen/ts_sessiontitle" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/ses_locdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:text="@string/no_open_slots"
+            android:textColor="@color/tc_sessionschedule"
+            android:textSize="@dimen/ts_sessionschedule" >
+        </TextView>
+    </TableRow>
+
+    <View
+        android:id="@+id/tabDivider"
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@color/linebreak" />
+
 </TableLayout>

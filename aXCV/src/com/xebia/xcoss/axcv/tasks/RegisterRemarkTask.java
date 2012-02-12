@@ -1,7 +1,6 @@
 package com.xebia.xcoss.axcv.tasks;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.content.Context;
 

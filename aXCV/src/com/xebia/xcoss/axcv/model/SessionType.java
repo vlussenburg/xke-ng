@@ -5,8 +5,6 @@ import java.util.List;
 
 import com.xebia.xcoss.axcv.model.Session.Type;
 
-import android.util.Log;
-
 public class SessionType {
 
 	private Type key;

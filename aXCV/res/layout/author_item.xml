@@ -1,61 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:stretchColumns="1"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	android:orientation="vertical">
-	<View
-		android:layout_width="fill_parent"
-		android:id="@+id/tabDivider"
-		android:background="@color/linebreak"
-		android:layout_height="1dp"></View>
-	<LinearLayout
-		android:layout_width="fill_parent"
-		android:id="@+id/linearLayout2"
-		android:orientation="horizontal"
-		android:layout_height="wrap_content">
-		<FrameLayout
-			android:layout_width="wrap_content"
-			android:padding="3dp"
-			android:layout_height="fill_parent"
-			android:id="@+id/frameLayout1">
-			<ImageView
-				android:src="@drawable/ic_menu_list"
-				android:layout_height="wrap_content"
-				android:layout_width="wrap_content"
-				android:background="@drawable/touchtext" android:id="@+id/author_image"></ImageView>
-		</FrameLayout>
-		<LinearLayout
-			android:layout_width="fill_parent"
-			android:id="@+id/linearLayout3"
-			android:layout_height="fill_parent"
-			android:layout_weight="2"
-			android:orientation="vertical">
-			<TextView
-				android:text="Michaël van Leeuwen"
-				android:textSize="@dimen/ts_sessiontitle"
-				android:paddingRight="3dp"
-				android:layout_width="wrap_content"
-				android:paddingLeft="3dp"
-				android:id="@+id/author_name"
-				android:layout_height="wrap_content"></TextView>
-			<TextView
-				android:textSize="@dimen/ts_sessiondetail"
-				android:paddingRight="3dp"
-				android:layout_width="wrap_content"
-				android:paddingLeft="3dp"
-				android:layout_height="wrap_content"
-				android:id="@+id/author_mail"
-				android:text="mvanleeuwen@xebia.com"></TextView>
-			<TextView
-				android:textSize="@dimen/ts_sessiondetail"
-				android:paddingRight="3dp"
-				android:layout_width="wrap_content"
-				android:paddingLeft="3dp"
-				android:layout_height="wrap_content"
-				android:id="@+id/author_phone"
-				android:text="06 55891506"></TextView>
-		</LinearLayout>
-	</LinearLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:stretchColumns="1" >
+
+    <View
+        android:id="@+id/tabDivider"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@color/linebreak" >
+    </View>
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:baselineAligned="false"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <FrameLayout
+            android:id="@+id/frameLayout1"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:padding="3dp" >
+
+            <ImageView
+                android:id="@+id/author_image"
+                android:contentDescription="@string/img_author"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/touchtext"
+                android:src="@drawable/ic_menu_list" >
+            </ImageView>
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout3"
+            android:layout_width="0dip"
+            android:layout_height="fill_parent"
+            android:layout_weight="2"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/author_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/author_name"
+                android:textSize="@dimen/ts_sessiontitle" >
+            </TextView>
+
+            <TextView
+                android:id="@+id/author_mail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/author_mail"
+                android:textSize="@dimen/ts_sessiondetail" >
+            </TextView>
+
+            <TextView
+                android:id="@+id/author_phone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="@string/author_phone"
+                android:textSize="@dimen/ts_sessiondetail" >
+            </TextView>
+        </LinearLayout>
+    </LinearLayout>
+
 </LinearLayout>

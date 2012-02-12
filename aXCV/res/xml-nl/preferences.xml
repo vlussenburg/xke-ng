@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:key="xcvpreferences">
+	<PreferenceCategory android:title="Inloggegevens">
+		<com.xebia.xcoss.axcv.preference.EditTextPreference
+			android:dialogTitle="Specificeer gebruikersnaam"
+			android:dialogMessage="Inlognaam op de server"
+			android:key="Username"
+			android:singleLine="true"
+			android:title="Gebruikersnaam"
+			android:summary="(niet aanwezig)" />
+		<com.xebia.xcoss.axcv.preference.EditPasswordPreference
+			android:dialogTitle="Specificeer wachtwoord"
+			android:dialogMessage="Het wachtwoord wordt versleuteld opgeslagen."
+			android:key="Password"
+			android:password="true"
+			android:title="Wachtwoord"
+			android:singleLine="true"
+			android:summary="(leeg)" />
+	</PreferenceCategory>
+	<PreferenceCategory android:title="Voorkeuren">
+		<CheckBoxPreference
+			android:key="Upcoming"
+			android:title="Open conferentie"
+			android:defaultValue="true"
+			android:summaryOff="Toon de lijst van conferenties van dit jaar"
+			android:summaryOn="Open de eerstvolgende conferentie" />
+		<CheckBoxPreference
+			android:key="ListView"
+			android:title="Lijstweergave"
+			android:defaultValue="true"
+			android:summaryOff="Weergave per sessie"
+			android:summaryOn="Weergave als schema per locatie" />
+		<com.xebia.xcoss.axcv.preference.EditDateTimeFormatPreference
+			android:dialogTitle="Datumformaat"
+			android:dialogMessage="Specificeer het formaat van de datum"
+			android:key="DateFormat"
+			android:title="Datumformaat"
+			android:summary="(standaard)"
+			android:singleLine="true"
+			android:defaultValue="d MMMM yyyy" />
+		<com.xebia.xcoss.axcv.preference.EditDateTimeFormatPreference
+			android:dialogTitle="Tijdformaat"
+			android:dialogMessage="Specifeer het formaat van de tijd"
+			android:key="TimeFormat"
+			android:title="Tijdformaat"
+			android:summary="(standaard)"
+			android:singleLine="true"
+			android:defaultValue="HH:mm'u'" />
+		<ListPreference
+			android:title="Cache"
+			android:summary="Welk cachebeleid (herstart vereist)?"
+			android:key="CacheType"
+			android:defaultValue="1"
+			android:entries="@array/cacheNames"
+			android:entryValues="@array/cacheClassNames" />
+	</PreferenceCategory>
+	<PreferenceCategory android:title="Meldingen">
+		<RingtonePreference
+			android:ringtoneType="all"
+			android:key="NotificationSound"
+			android:title="Meldingstoon"
+			android:showDefault="true"
+			android:showSilent="true"
+			android:summary="Geluid gebruikt voor meldingen" />
+		<com.xebia.xcoss.axcv.preference.CheckBoxPreference
+			signalRetriever=".service.NotificationServiceManager"
+			android:key="NotifyOwned"
+			android:title="Mijn presentaties"
+			android:defaultValue="false"
+			android:summaryOff="Geen melding als mijn presentatie verandert"
+			android:summaryOn="Waarschuwing als mijn presentatie is veranderd" />
+		<com.xebia.xcoss.axcv.preference.CheckBoxPreference
+			signalRetriever=".service.NotificationServiceManager"
+			android:key="NotifyTrack"
+			android:title="Mijn schema"
+			android:defaultValue="false"
+			android:summaryOff="Geen melding als mijn schema verandert"
+			android:summaryOn="Waarschuwing als mijn schema is veranderd" />
+		<com.xebia.xcoss.axcv.preference.ListPreference
+			signalRetriever=".service.NotificationServiceManager"
+			android:title="Interval"
+			android:summary="Controleer veranderingen in dit interval"
+			android:key="NotifyInterval"
+			android:defaultValue="@string/notifyIntervalDefault"
+			android:entries="@array/notifyInterval"
+			android:entryValues="@array/notifyIntervalValues" />
+			</PreferenceCategory>
+	<PreferenceCategory android:title="Over">
+		<Preference
+			android:key="ApplicationName"
+			android:title="@string/app_full_name" />
+		<Preference
+			android:key="ApplicationVersion"
+			android:title="Versie"
+			android:summary="@string/app_version" />
+		<com.xebia.xcoss.axcv.preference.LinkPreference
+			url="http://xke.xebia.com/help/"
+			android:key="ApplicationHelp"
+			android:title="Toon handleiding"
+			android:summary="Handleiding op xebia.com" />
+	</PreferenceCategory>
+</PreferenceScreen>
