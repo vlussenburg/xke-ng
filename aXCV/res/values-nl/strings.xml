@@ -22,7 +22,7 @@
     <string name="password_unset">Geen wachtwoord gespecificeerd</string>
     <string name="session_title">Sessietitel</string>
     <string name="modify_session">Wijzig sessie</string>
-    <string name="author_select">Selecteer presentators&#8230;</string>
+    <string name="author_select">Selecteer presentatoren&#8230;</string>
     <string name="label_select">Selecteer labels&#8230;</string>
     <string name="empty_value">&lt;geef waarde></string>
     <string name="default_input_text">&lt;start ingave></string>
@@ -198,7 +198,7 @@
     <string name="droidfu_progress_dialog_message">Er wordt contact gezocht met de server</string>
     
     <string name="action_search_sessions">Zoek sessies</string>
-    <string name="action_search_presentators">Zoek presentator</string>
+    <string name="action_search_authors">Zoek presentator</string>
     <string name="action_delete_session">Verwijder sessie</string>
     <string name="action_delete_conferentie">Delete conferentie</string>
     <string name="action_register_conferentie">Registreer conferentie</string>
@@ -206,7 +206,7 @@
     <string name="action_register_rate">Geef waardering</string>
     <string name="action_register_remark">Plaats opmerking</string>
     <string name="action_register_session">Registreer sessie</string>
-    <string name="action_retrieve_presentators">Laad presentatoren</string>
+    <string name="action_retrieve_authors">Laad presentatoren</string>
     <string name="action_retrieve_conferentie">Laad conferentie</string>
     <string name="action_retrieve_conferenties">Laad conferenties</string>
     <string name="action_retrieve_remarks">Laad commentaar</string>
@@ -231,7 +231,7 @@
     <string name="labels">Labels</string>
     <string name="sessions">Sessies</string>
     <string name="audience">Doelgroep</string>
-    <string name="authors">presentator(en)</string>
+    <string name="authors">Door wie</string>
     <string name="curricum">Curriculum</string>
     <string name="language">Taal</string>
     <string name="left">Links</string>
