@@ -15,7 +15,7 @@ public class XCS {
 
 	public static class AUTHOR {
 		public static final String LINK = "author://xebia/";
-		public static final Pattern PATTERN = Pattern.compile("[\\w]+([\\w\\s])*");
+		public static final Pattern PATTERN = Pattern.compile("[\\w]+([\\w\\s-])*");
 	}
 
 	public static class DIALOG {
