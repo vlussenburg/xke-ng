@@ -35,7 +35,8 @@ public class RegisterSessionTask extends CVTask<Session, Void, Boolean> {
 				session = RestClient.createObject(requestUrl, session, Session.class);
 			} else {
 				String requestUrl = task.getRequestUrl("/session/", session.getId());
-				session = RestClient.updateObject(requestUrl, session);
+				// Returned object is null
+				/*session = */ RestClient.updateObject(requestUrl, session);
 			}
 			// Server does not return conferenceId, so extracted before creation.
 			session.setConferenceId(conferenceId);
