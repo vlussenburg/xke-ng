@@ -80,9 +80,7 @@
 	function login() {
 		var jsonRequest = {}
 		jsonRequest.username = $("#username").val();
-		;
 		jsonRequest.password = $("#password").val();
-		;
 
 		$.ajax({
 			type : 'POST',
@@ -144,6 +142,7 @@
 
 	function conferenceSuccessCallback(response) {
 		$("#next-list").empty()
+		$("#xke-name").html(response.title)
 		for (slotIndex in response.slots) {
 			var slot = response.slots[slotIndex]
 			$("#next-list").append(
@@ -170,10 +169,10 @@
 				"<li data-role='list-divider'>" + session.startTimeShort
 						+ " - " + session.endTimeShort + "</li>")
 		$("#detail-list").append(
-				"<li><i>" + session.title + "</i><br>by: " + authors + "</li>")
+				"<li><i>" + session.title + "</i><br/>by: " + authors + "</li>")
 		$("#detail-list").append("<li data-role='list-divider'>Location</li>")
 		$("#detail-list").append(
-				"<li>" + session.location.description + "<br>Max:"
+				"<li>" + session.location.description + "<br/>Max:"
 						+ session.limit + "</li>")
 		$("#detail-list").append(
 				"<li data-role='list-divider'>Description</li>")
@@ -202,11 +201,12 @@
 	<div data-role="page" id="next">
 
 		<div data-role="header">
-			<h1>Current XKE</h1>
+			<h1 id="xke-name">Current XKE</h1>
 		</div>
 
 		<div data-role="content">
-			<ul id="next-list" data-role="listview" data-filter="true" />
+			<ul id="next-list" data-role="listview" data-filter="true">
+			</ul>
 		</div>
 
 		<!-- 		showPage does not work yet. Won't refresh
@@ -256,7 +256,8 @@
 		</div>
 
 		<div data-role="content">
-			<ul id="detail-list" data-role="listview" />
+			<ul id="detail-list" data-role="listview" >
+			</ul>
 		</div>
 
 		<div data-role="footer" data-position="fixed">
