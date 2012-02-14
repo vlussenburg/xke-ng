@@ -2,6 +2,7 @@ package com.xebia.xcoss.axcv.layout;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -14,6 +15,7 @@ public class SwipeLayout extends FrameLayout {
 
     private MotionEvent mCurrentDownEvent;
     private MotionEvent mCurrentUpEvent;
+    private static final int swipeMinDistance = 50;
 
     /**
      * Determines speed during touch scrolling
@@ -75,10 +77,11 @@ public class SwipeLayout extends FrameLayout {
             mCurrentUpEvent = MotionEvent.obtain(ev);
             // A fling must travel the minimum tap distance
             final VelocityTracker velocityTracker = mVelocityTracker;
-            velocityTracker.computeCurrentVelocity(1000);
+            // Number of pixels per 100 milliseconds
+            velocityTracker.computeCurrentVelocity(100);
             final float velocityY = velocityTracker.getYVelocity();
             final float velocityX = velocityTracker.getXVelocity();
-
+            
             if ((Math.abs(velocityY) > ViewConfiguration.getMinimumFlingVelocity())
                     || (Math.abs(velocityX) > ViewConfiguration.getMinimumFlingVelocity())){
                 handled = onFling(mCurrentDownEvent, mCurrentUpEvent, velocityX, velocityY);
@@ -100,23 +103,23 @@ public class SwipeLayout extends FrameLayout {
 
 		if (Math.abs(deltaX) > Math.abs(deltaY)) {
 			// Left/right swipe
-//			if (Math.abs(velocityX) > swipeThresholdVelocity && Math.abs(deltaX) > swipeMinDistance) {
+			if (Math.abs(deltaX) > swipeMinDistance) {
 				if (deltaX > 0)
 					activity.onSwipeRightToLeft();
 				else
 					activity.onSwipeLeftToRight();
 				return true;
-//			}
+			}
 		} else {
 			// Up/down swipe
-//			if (Math.abs(velocityY) > swipeThresholdVelocity && Math.abs(deltaY) > swipeMinDistance) {
+			if (Math.abs(deltaY) > swipeMinDistance) {
 				if (deltaY > 0)
 					activity.onSwipeBottomToTop();
 				else
 					activity.onSwipeTopToBottom();
 				return true;
-//			}
+			}
 		}
-//		return false;
+		return false;
 	}
 }
