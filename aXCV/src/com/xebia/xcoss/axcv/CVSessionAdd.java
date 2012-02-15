@@ -22,13 +22,14 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.xebia.xcoss.axcv.logic.cache.DataCache;
 import com.xebia.xcoss.axcv.model.Author;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Conference.TimeSlot;
 import com.xebia.xcoss.axcv.model.Location;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
-import com.xebia.xcoss.axcv.model.Session.Type;
+import com.xebia.xcoss.axcv.model.SessionType;
 import com.xebia.xcoss.axcv.tasks.DeleteSessionTask;
 import com.xebia.xcoss.axcv.tasks.RegisterSessionTask;
 import com.xebia.xcoss.axcv.tasks.RetrieveConferenceTask;
@@ -179,7 +180,7 @@ public class CVSessionAdd extends AdditionActivity {
 			view.setText(FormatUtil.getText(session.getPreparation()));
 
 			view = (TextView) findViewById(R.id.sessionType);
-			view.setText(FormatUtil.getText(session.getType()));
+			view.setText(FormatUtil.getText(SessionType.get(session.getType()).toString()));
 
 			ImageView iv = (ImageView) findViewById(R.id.completeness);
 			int completeness = session.calculateCompleteness(8);
@@ -191,8 +192,7 @@ public class CVSessionAdd extends AdditionActivity {
 				iv.invalidate();
 			}
 
-			findViewById(R.id.detailsTitle).setVisibility(session.isBreak() ? View.GONE : View.VISIBLE);
-			findViewById(R.id.detailsLayout).setVisibility(session.isBreak() ? View.GONE : View.VISIBLE);
+			activateDetails(!session.isBreak() && !session.isMandatory());
 		}
 	}
 
@@ -222,9 +222,15 @@ public class CVSessionAdd extends AdditionActivity {
 						new TaskCallBack<Boolean>() {
 							@Override
 							public void onCalled(Boolean result) {
-								// A session has been added, so the cache is invalid.
-								getMyApplication().getCache().remove(conference);
-								CVSessionAdd.this.finish();
+								if ( result != null ) {
+									// A session has been added, so the cache is invalid.
+									DataCache cache = getMyApplication().getCache();
+									cache.remove(conference);
+									if ( !create ) {
+										cache.remove(session);
+									}
+									CVSessionAdd.this.finish();
+								}
 							}
 						}).execute(session);
 			}
@@ -239,7 +245,9 @@ public class CVSessionAdd extends AdditionActivity {
 					createDeleteDialog(CVSessionAdd.this, originalSession, new SimpleCallBack() {
 						@Override
 						public void onCalled(Boolean result) {
-							getMyApplication().getCache().remove(conference);
+							DataCache cache = getMyApplication().getCache();
+							cache.remove(conference);
+							cache.remove(session);
 							finish();
 						}
 					}).show();
@@ -277,7 +285,7 @@ public class CVSessionAdd extends AdditionActivity {
 		builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				new DeleteSessionTask(R.string.action_delete_session, ctx, null).execute(session);
-				// A session has been added, so the cache is invalid.
+				// A session has been deleted, so the cache needs to be invalided.
 				scb.onCalled(true);
 			}
 		});
@@ -391,9 +399,9 @@ public class CVSessionAdd extends AdditionActivity {
 				rescheduleSession(session.getDuration());
 			break;
 			case R.id.sessionType:
-				Type type = (Type) selection;
-				session.setType(type);
-				activateDetails(type.hasDetails());
+				SessionType type = (SessionType) selection;
+				session.setType(type.getType());
+				activateDetails(!type.isBreak() && !type.isMandatory());
 			break;
 			default:
 				Log.w(LOG.NAVIGATE, "Don't know how to process: " + field);
@@ -403,6 +411,9 @@ public class CVSessionAdd extends AdditionActivity {
 	}
 
 	private void activateDetails(boolean state) {
+		// We could hide the section altogether
+		// findViewById(R.id.detailsTitle).setVisibility(session.isBreak() ? View.GONE : View.VISIBLE);
+		// findViewById(R.id.detailsLayout).setVisibility(session.isBreak() ? View.GONE : View.VISIBLE);
 		findViewById(R.id.sessionAudience).setEnabled(state);
 		findViewById(R.id.sessionCount).setEnabled(state);
 		findViewById(R.id.sessionPreps).setEnabled(state);
@@ -461,8 +472,7 @@ public class CVSessionAdd extends AdditionActivity {
 				dialog.setOnDismissListener(this);
 			break;
 			case XCS.DIALOG.INPUT_DURATION:
-				// TODO array handling
-				items = new String[] { "5 min", "10 min", "15 min", "30 min", "60 min", "90 min", "120 min" };
+				items = getResources().getStringArray(R.array.durationInterval);
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.pick_duration);
 				builder.setItems(items, new DialogHandler(this, items, R.id.sessionDuration));
@@ -470,7 +480,7 @@ public class CVSessionAdd extends AdditionActivity {
 				dialog = builder.create();
 			break;
 			case XCS.DIALOG.INPUT_LANGUAGE:
-				items = new String[] { "Dutch", "English", "French", "Hindi" };
+				items = getResources().getStringArray(R.array.languages);
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.select_languages);
 				DialogHandler msdhandler = new DialogHandler(this, items, R.id.sessionLanguage);
@@ -484,7 +494,7 @@ public class CVSessionAdd extends AdditionActivity {
 
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.select_location);
-				ListAdapter la = new ArrayAdapter<Location>(this, android.R.layout.simple_spinner_item, locations);
+				ListAdapter la = new ArrayAdapter<Location>(this, R.layout.simple_list_item, locations);
 				builder.setSingleChoiceItems(la, -1, new DialogHandler(this, locations, R.id.sessionLocation));
 				dialog = builder.create();
 			break;
@@ -504,10 +514,10 @@ public class CVSessionAdd extends AdditionActivity {
 				dialog = new TextInputDialog(this, R.id.sessionTitle);
 			break;
 			case XCS.DIALOG.INPUT_TYPE:
-				Type[] values = Session.Type.values();
+				SessionType[] values = SessionType.getAllTypes();
 				builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.pick_type);
-				ListAdapter ta = new ArrayAdapter<Type>(this, R.layout.simple_list_item_single_choice, values);
+				ListAdapter ta = new ArrayAdapter<SessionType>(this, R.layout.simple_list_item_single_choice, values);
 				builder.setSingleChoiceItems(ta, -1, new DialogHandler(this, values, R.id.sessionType));
 				builder.setNegativeButton(R.string.cancel, cancelClickListener);
 				dialog = builder.create();
@@ -566,10 +576,10 @@ public class CVSessionAdd extends AdditionActivity {
 			case XCS.DIALOG.INPUT_TYPE:
 				lv = ((AlertDialog) dialog).getListView();
 				if (session.getType() != null) {
-					Type type = session.getType();
+					SessionType type = SessionType.get(session.getType());
 					int size = lv.getCount();
 					for (int idx = 0; idx < size; idx++) {
-						Type listType = (Type) lv.getItemAtPosition(idx);
+						SessionType listType = (SessionType) lv.getItemAtPosition(idx);
 						if (type.equals(listType)) {
 							lv.setItemChecked(idx, true);
 							break;

@@ -63,13 +63,6 @@ public class CVConferenceAdd extends AdditionActivity {
 		setContentView(R.layout.add_conference);
 		super.onCreate(savedInstanceState);
 
-		new RetrieveLocationsTask(R.string.action_retrieve_locations, this, new TaskCallBack<List<Location>>() {
-			@Override
-			public void onCalled(List<Location> result) {
-				locations = result;
-			}
-		}).execute();
-
 		ADD_NEW_LOCATION = getString(R.string.add_location);
 		timeFormatter = new ScreenTimeUtil(this);
 		breakSessions = new TreeSet<Session>(new SessionComparator());
@@ -87,7 +80,7 @@ public class CVConferenceAdd extends AdditionActivity {
 					}
 					TextView tv = (TextView) findViewById(R.id.addModifyTitle);
 					tv.setText(originalConference == null ? R.string.add_conference : R.string.edit_conference);
-					if (create) { // TODO || conference.getStartTime().isBeforeNow()) {
+					if (create || conference.getStartTime().isBeforeNow()) {
 						((Button) findViewById(R.id.actionDelete)).setVisibility(View.GONE);
 					}
 					showConference();
@@ -95,6 +88,17 @@ public class CVConferenceAdd extends AdditionActivity {
 				}
 			}).execute(getSelectedConferenceId());
 		}
+	}
+
+	@Override
+	protected void onResume() {
+		new RetrieveLocationsTask(R.string.action_retrieve_locations, this, new TaskCallBack<List<Location>>() {
+			@Override
+			public void onCalled(List<Location> result) {
+				locations = result;
+			}
+		}).execute();
+		super.onResume();
 	}
 
 	private boolean loadFrom(Bundle savedInstanceState) {
@@ -201,8 +205,6 @@ public class CVConferenceAdd extends AdditionActivity {
 									CVConferenceAdd.this.finish();
 								} else {
 									Log.e(LOG.ALL, "Adding conference failed.");
-									createDialog(getString(R.string.no_conference_added),
-											getString(R.string.conference_could_not_be_added)).show();
 								}
 							}
 						});
@@ -214,10 +216,12 @@ public class CVConferenceAdd extends AdditionActivity {
 		button.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
-				createDeleteDialog(CVConferenceAdd.this, conference, new SimpleCallBack() {@Override
-				public void onCalled(Boolean result) {
-					finish();
-				}}).show();
+				createDeleteDialog(CVConferenceAdd.this, conference, new SimpleCallBack() {
+					@Override
+					public void onCalled(Boolean result) {
+						finish();
+					}
+				}).show();
 			}
 		});
 	}
@@ -241,22 +245,30 @@ public class CVConferenceAdd extends AdditionActivity {
 			break;
 			case R.id.conferenceDate:
 				moment = (Moment) selection;
-				conference.onStartTime().setDate(moment);
-				conference.onEndTime().setDate(moment);
-				for (Session session : conference.getSessions()) {
-					session.onStartTime().setDate(moment);
-					session.onEndTime().setDate(moment);
+				if (!moment.isBeforeToday()) {
+					conference.onStartTime().setDate(moment);
+					conference.onEndTime().setDate(moment);
+					for (Session session : conference.getSessions()) {
+						session.onStartTime().setDate(moment);
+						session.onEndTime().setDate(moment);
+					}
 				}
 			break;
 			case R.id.conferenceStart:
 				moment = (Moment) selection;
-				// TODO : Check if there are sessions invalid
-				conference.onStartTime().setTime(moment.getHour(), moment.getMinute());
+				if ( hasSessionsOutsideOf(moment, conference.onEndTime()) ) {
+					createDialog(R.string.error, R.string.could_not_change_time).show();
+				} else {
+					conference.onStartTime().setTime(moment.getHour(), moment.getMinute());
+				}
 			break;
 			case R.id.conferenceEnd:
 				moment = (Moment) selection;
-				// TODO : Check if there are sessions invalid
-				conference.onEndTime().setTime(moment.getHour(), moment.getMinute());
+				if ( hasSessionsOutsideOf(conference.onStartTime(), moment) ) {
+					createDialog(R.string.error, R.string.could_not_change_time).show();
+				} else {
+					conference.onEndTime().setTime(moment.getHour(), moment.getMinute());
+				}
 			break;
 			case R.id.conferenceDescription:
 				conference.setDescription(value);
@@ -267,10 +279,25 @@ public class CVConferenceAdd extends AdditionActivity {
 			case R.id.conferenceLocText:
 				if (!StringUtil.isEmpty(value)) {
 					if (selection instanceof Location) {
-						new RegisterLocationTask(R.string.action_register_location, this).execute((Location) selection);
+						Location loc = (Location) selection;
+						Location existing = null;
+						for (Location l : locations) {
+							if (l.equals(loc)) {
+								existing = l;
+								break;
+							}
+						}
+						if (existing == null) {
+							new RegisterLocationTask(R.string.action_register_location, this).execute(loc);
+							// Temporary add it...
+							locations.add(loc);
+							conference.addLocation(loc);
+						} else {
+							conference.addLocation(existing);
+						}
 					}
 				}
-				// fallThrough
+			break;
 			case R.id.conferenceLocations:
 				if (ADD_NEW_LOCATION.equals(value)) {
 					showDialog(XCS.DIALOG.CREATE_LOCATION);
@@ -289,7 +316,11 @@ public class CVConferenceAdd extends AdditionActivity {
 					Iterable<Location> locations = conference.getLocations();
 					for (Location location : locations) {
 						if (location.getDescription().equals(value)) {
-							conference.removeLocation(location);
+							if ( conference.getSessions(location).isEmpty() ) {
+								conference.removeLocation(location);
+							} else {
+								createDialog(R.string.error, R.string.could_not_delete_location).show();
+							}
 							break;
 						}
 					}
@@ -304,6 +335,16 @@ public class CVConferenceAdd extends AdditionActivity {
 				Log.w(LOG.NAVIGATE, "Don't know how to process: " + field);
 		}
 		showConference();
+	}
+
+	private boolean hasSessionsOutsideOf(Moment start, Moment end) {
+		for (Session session : conference.getSessions()) {
+			if ( session.getStartTime().isBefore(start) || session.getEndTime().isAfter(end)) {
+				Log.w("Validate", "Session is outside plan: " + session.toString());
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -354,15 +395,18 @@ public class CVConferenceAdd extends AdditionActivity {
 			break;
 			case XCS.DIALOG.INPUT_TIME_START:
 				time = conference.getStartTime();
+				if (time == null) {
+					time = new Moment(9, 0);
+				}
 				timeSetListener = new OnTimeSetListener() {
 					@Override
 					public void onTimeSet(TimePicker paramTimePicker, int h, int m) {
-						updateField(R.id.conferenceStart, new Moment(h, m), true);
+						Moment moment = new Moment(conference.getStartTime());
+						moment.setTime(h, m);
+						updateField(R.id.conferenceStart, moment, true);
 					}
 				};
-				int hour = time == null ? 9 : time.getHour();
-				int minute = time == null ? 0 : time.getMinute();
-				dialog = new TimePickerDialog(this, timeSetListener, hour, minute, true);
+				dialog = new TimePickerDialog(this, timeSetListener, time.getHour(), time.getMinute(), true);
 			break;
 			case XCS.DIALOG.INPUT_TIME_END:
 				time = conference.getEndTime();
@@ -372,7 +416,9 @@ public class CVConferenceAdd extends AdditionActivity {
 				timeSetListener = new OnTimeSetListener() {
 					@Override
 					public void onTimeSet(TimePicker tp, int h, int m) {
-						updateField(R.id.conferenceEnd, new Moment(h, m), true);
+						Moment moment = new Moment(conference.getEndTime());
+						moment.setTime(h, m);
+						updateField(R.id.conferenceEnd, moment, true);
 					}
 				};
 				dialog = new TimePickerDialog(this, timeSetListener, time.getHour(), time.getMinute(), true);
@@ -504,7 +550,8 @@ public class CVConferenceAdd extends AdditionActivity {
 	@Override
 	public void onCancel(DialogInterface di) {}
 
-	protected static AlertDialog createDeleteDialog(final BaseActivity ctx, final Conference conference, final SimpleCallBack scb) {
+	protected static AlertDialog createDeleteDialog(final BaseActivity ctx, final Conference conference,
+			final SimpleCallBack scb) {
 		int size = conference.getSessions().size();
 		StringBuilder message = new StringBuilder();
 		String NEWLINE = System.getProperty("line.separator");

@@ -69,21 +69,28 @@ trait RestHandlerComponent extends Logger {
   }
 
   def getConference(id: String) = {
-    conferenceRepository.findConference(id) match {
-      case Some(c) => asJsonResp(c)
-      case _ => Full(NotFoundResponse())
+    doWithSome(conferenceRepository.findConference(id)) {c => c}
+  }
+
+  def getNextConference(ahead: Int) = {
+    asJsonResp(conferenceRepository.findNextConference(ahead))
+  }
+
+  def getNextConferenceSlots(ahead: Int) = {
+    doWithSome(conferenceRepository.findNextConference(ahead)) {
+      conferenceSlotsToJValue(_)
     }
   }
 
   def handleConferenceUpdate(id: String, jsonBody: String) = {
-    conferenceRepository.findConference(id) match {
-      case Some(confToUpdate) => {
-        val confFromJson = fromConferenceJson(jsonBody)
-        val updatedConf = confFromJson.copy(_id = confToUpdate._id, sessions = confToUpdate.sessions)
-        updatedConf.save
-        asJsonResp(updatedConf)
-      }
-      case None => Full(NotFoundResponse())
+    doWithSome(conferenceRepository.findConference(id)) {
+      confToUpdate =>
+        {
+          val confFromJson = fromConferenceJson(jsonBody)
+          val updatedConf = confFromJson.copy(_id = confToUpdate._id, sessions = confToUpdate.sessions)
+          updatedConf.save
+          updatedConf
+        }
     }
 
   }
@@ -104,10 +111,7 @@ trait RestHandlerComponent extends Logger {
    */
 
   def getSession(id: Long) = {
-    sessionRepository.findSessionById(id).map(_._2) match {
-      case s @ Some(_) => asJsonResp(s)
-       case _ => Full(NotFoundResponse())
-    } 
+    doWithSome(sessionRepository.findSessionById(id).map(_._2)) {s => s} 
   }
 
   def handleSessionsList(conferenceId: String): Box[LiftResponse] = {
@@ -117,13 +121,12 @@ trait RestHandlerComponent extends Logger {
   }
 
   def handleSessionCreate(conferenceId: String, jsonBody: String) = {
-    conferenceRepository.findConference(conferenceId) match {
-      case Some(conf) => {
+    doWithSome(conferenceRepository.findConference(conferenceId)) {
+      conf => {   
         val session = fromSessionJson(true)(jsonBody)
         conf.saveOrUpdate(session)
-        asJsonResp(session)
+        session
       }
-      case _ => Full(NotFoundResponse())
     }
   }
 
@@ -133,19 +136,17 @@ trait RestHandlerComponent extends Logger {
   }
 
   def handleSessionUpdate(sessionId: Long, jsonBody: String): Box[LiftResponse] = {
-    sessionRepository.findSessionById(sessionId) match {
-      case Some((conf, session)) => {
+    doWithSomeNoReturn(sessionRepository.findSessionById(sessionId)) {
+      case (conf, session) => {
         val updatedSession = fromSessionJson(false)(jsonBody)
         conf.saveOrUpdate(updatedSession.copy(id = session.id, ratings = session.ratings, comments = session.comments))
-        Full(OkResponse())
       }
-      case _ => Full(NotFoundResponse())
-    }
+    }  
   }
 
   def handleSessionDelete(sessionId: Long) = {
     sessionRepository.deleteSessionById(sessionId)
-    Full(OkResponse()) 
+    Full(OkResponse())
   }
   /**
    * =============================
@@ -211,11 +212,9 @@ trait RestHandlerComponent extends Logger {
    * =============================
    */
   def readComments(sessionId: Long) = {
-    sessionRepository.findSessionById(sessionId) match {
-      case Some((conference, session)) => asJsonResp(session.comments)
-      case None => Full(NotFoundResponse())
+    doWithSome(sessionRepository.findSessionById(sessionId)) {
+      case (_, session) => session.comments
     }
-
   }
 
   def handleCommentCreate(sessionId: Long, jsonBody: String) = {
@@ -228,9 +227,8 @@ trait RestHandlerComponent extends Logger {
    * =============================
    */
   def readRatings(sessionId: Long) = {
-    sessionRepository.findSessionById(sessionId) match {
-      case Some((conference, session)) => asJsonResp(session.ratings)
-      case None => Full(NotFoundResponse())
+    doWithSome(sessionRepository.findSessionById(sessionId) ) {
+      case (_, session) => session.ratings
     }
   }
 

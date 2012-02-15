@@ -104,19 +104,27 @@ object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps
   def addSessionListener(listener: SessionListener*) = listeners = listeners ::: listener.toList
 
   def apply(title: String, begin: DateTime, end: DateTime, sessions: List[Session], locations: List[Location]): Conference = {
-    Conference(ObjectId.get, title, begin, end, sessions, locations)
+    Conference(ObjectId.get, title, begin, end, sessions, locations, Nil)
+  }
+
+  def apply(title: String, begin: DateTime, end: DateTime, sessions: List[Session], locations: List[Location], schedule: List[SlotInfo]): Conference = {
+    Conference(ObjectId.get, title, begin, end, sessions, locations, schedule)
   }
 
   def apply(id: String, title: String, begin: DateTime, end: DateTime, sessions: List[Session], locations: List[Location]): Conference = {
-    Conference(new ObjectId(id), title, begin, end, sessions, locations)
+    Conference(new ObjectId(id), title, begin, end, sessions, locations, Nil)
   }
+  def apply(id: String, title: String, begin: DateTime, end: DateTime, sessions: List[Session], locations: List[Location], schedule: List[SlotInfo]): Conference = {
+    Conference(new ObjectId(id), title, begin, end, sessions, locations, schedule)
+  }
+
 }
 
 /**
  * Represents a Conference, a conference has a number of locations, where sessions are available.
  * This class is a case class, due to net.liftweb.mongodb requirements.
  */
-case class Conference(val _id: ObjectId, title: String, begin: DateTime, end: DateTime, var sessions: List[Session], var locations: List[Location]) extends MongoDocument[Conference] {
+case class Conference(val _id: ObjectId, title: String, begin: DateTime, end: DateTime, var sessions: List[Session], var locations: List[Location], val schedule: List[SlotInfo]) extends MongoDocument[Conference] {
 
   def meta = Conference
 
@@ -192,13 +200,21 @@ case class Conference(val _id: ObjectId, title: String, begin: DateTime, end: Da
     }
   }
 
+  def slots: List[Slot] = {
+    if (!schedule.isEmpty) {
+      def sessionForSlot(key: SlotInfo) = sessions.filter { s => key.fits(s) }.sortBy { _.location.description }
+      schedule.sorted.map { key => Slot(key, sessionForSlot(key)) }
+    } else {
+      sessions.groupBy { s => SlotInfo(s.start, s.end) }.map { case (key, sessions) => Slot(key, sessions.sortBy(_.location.description)) }.toList.sortBy(_.key)
+    }
+  }
+
 }
 
 /**
  * Represents a Session at a location. A Session contains time, space and session properties.
  */
 case class Session(val id: Long, val start: DateTime, val end: DateTime, val location: Location, val title: String, val description: String, sessionType: String, val limit: String, authors: List[Author], ratings: List[Rating], comments: List[Comment], labels: Set[String]) extends ToJsonSerializer[Session] {
-  def period = new Period(start.getMillis, end.getMillis)
 
   protected[model] def addComment(comment: Comment): Session = copy(comments = comment :: comments)
 
@@ -208,6 +224,10 @@ case class Session(val id: Long, val start: DateTime, val end: DateTime, val loc
       case Some(_) => copy(ratings = (rating :: ratings.filterNot(_.userId == rating.userId)))
       case None => copy(ratings = rating :: ratings)
     }
+  }
+
+  def isInRange(slotDuration: SlotInfo) = {
+
   }
 }
 
@@ -233,6 +253,47 @@ object Session extends FromJsonDeserializer[Session] {
   }
 
 }
+/**
+ * SlotInfo identifies a slot by means of time (from -> to) and
+ * a description
+ */
+case class SlotInfo(from: DateTime, to: DateTime, title:String = "Session") extends Ordered[SlotInfo] {
+  val duration = new Duration(from, to)
+
+  /**
+   * compares a slot
+   */
+  def compare(other: SlotInfo) = {
+    val startDiff = from.compareTo(other.from)
+    if (startDiff == 0) {
+      duration.compareTo(other.duration)
+    } else {
+      startDiff
+    }
+  }
+
+  /**
+   * Checks whether a session begin and session end
+   * fits in a slot
+   */
+  def fits(session: Session): Boolean = {
+    val beforeSlotMinutes = Minutes.minutesBetween(from, session.end).getMinutes()
+    val afterSlotMinutes = Minutes.minutesBetween(session.start, to).getMinutes()
+    beforeSlotMinutes > 0 && afterSlotMinutes > 0
+  }
+
+}
+
+/**
+ * Represents a slot consisting of a SlotInfo and corresponding session
+ */
+case class Slot(key: SlotInfo, sessions: List[Session])
+
+object Slot {
+  def apply(from: DateTime, to: DateTime, title:String, sessions: List[Session]): Slot = Slot(SlotInfo(from, to, title), sessions)
+  def apply(from: DateTime, to: DateTime, sessions: List[Session]): Slot = Slot(SlotInfo(from, to), sessions)
+}
+
 /**
  * Represents a comment for a session
  */

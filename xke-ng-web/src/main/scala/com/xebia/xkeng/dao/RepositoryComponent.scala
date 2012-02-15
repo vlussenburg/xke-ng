@@ -25,6 +25,8 @@ trait ConferenceRepository {
 
   def findConference(id: String): Option[Conference]
 
+  def findNextConference(ahead: Int): Option[Conference]
+
   def findSessionsOfConference(id: String): List[Session]
 
 }
@@ -84,6 +86,7 @@ trait RepositoryComponent {
   class ConferenceRepositoryImpl extends ConferenceRepository {
 
     val fmt = DateTimeFormat.forPattern("yyyyMMdd");
+    val MONG_DB_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
 
     private def dateRegexpQry(begin: String) = {
       ("begin" -> ("$regex" -> ("^%s.*".format(begin))))
@@ -119,6 +122,16 @@ trait RepositoryComponent {
     def findAllLabels(): List[String] = {
       val confererencesWithLabels = Conference.findAll(new BasicDBObject(), Some(new BasicDBObjectBuilder().add("sessions.label", 1).get()))
       Nil
+    }
+   
+    /**
+     * db.confs.find({'begin':{$gte:'2012-02-03T10:39:07.270Z'}}).sort({'begin':1}).limit(<ahead>)
+     */
+    def findNextConference(ahead: Int): Option[Conference] = {
+      val futureConferencesQry = ("begin" -> ("$gte" -> new DateTime().minusDays(1).toString(MONG_DB_DATE_FORMAT)))
+      val sortQry = ("begin" -> 1)
+      val r = Conference.findAll(futureConferencesQry, sortQry, Limit(ahead))
+      if (r.size == ahead) Some(r(ahead - 1)) else None
     }
 
   }

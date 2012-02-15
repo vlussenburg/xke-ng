@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.Messages;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.DebugUtil;
@@ -90,10 +91,10 @@ public class ProfileManager extends SQLiteOpenHelper {
 	private void checkConnection() {
 		if (database == null) {
 			String who = DebugUtil.whoCalledMe();
-			throw new SQLException("Database not started while doing " + who + "!");
+			throw new SQLException(Messages.getString("SQLException.0", who));
 		}
 		if (!database.isOpen() || database.isReadOnly()) {
-			throw new SQLException("Database not open or readonly!");
+			throw new SQLException(Messages.getString("SQLException.1"));
 		}
 	}
 
@@ -224,12 +225,23 @@ public class ProfileManager extends SQLiteOpenHelper {
 	public void updateMarkedSession(Trackable trackable) {
 		updateSession(trackable, TRACK_TABLE);
 	}
+	
+	public void deleteMarkedSession(Trackable trackable) {
+		deleteSession(trackable, TRACK_TABLE);
+	}
+
+	public void deleteOwnedSession(Trackable trackable) {
+		deleteSession(trackable, OWNED_TABLE);
+	}
 
 	public void updateOwnedSession(Trackable trackable) {
 		updateSession(trackable, OWNED_TABLE);
 	}
 
 	private Trackable[] getSessions(String user, String table) {
+		if ( StringUtil.isEmpty(user) ) {
+			return new Trackable[0];
+		}
 		Log.v(XCS.LOG.COMMUNICATE, "Get all sessions for user " + user + " from " + table);
 		try {
 			checkConnection();
@@ -284,6 +296,19 @@ public class ProfileManager extends SQLiteOpenHelper {
 			catch (Exception e) {
 				Log.w(XCS.LOG.COMMUNICATE, "Insert failed: " + StringUtil.getExceptionMessage(e));
 			}
+		}
+	}
+
+	private void deleteSession(Trackable trackable, String table) {
+		try {
+			checkConnection();
+			String[] whereArgs = new String[2];
+			whereArgs[0] = trackable.userId;
+			whereArgs[1] = String.valueOf(trackable.sessionId);
+			database.delete(table, SES_QUERY_TRACKABLE, whereArgs);
+		}
+		catch (Exception e) {
+			Log.w(XCS.LOG.COMMUNICATE, "Delete failed: " + StringUtil.getExceptionMessage(e));
 		}
 	}
 

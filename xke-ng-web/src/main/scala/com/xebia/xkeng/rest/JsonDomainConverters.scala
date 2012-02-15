@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 import net.liftweb.json.JsonAST.{ JValue, JArray }
 import net.liftweb.json.ext.JodaTimeSerializers
 import javax.security.auth.login.LoginContext
-import com.xebia.xkeng.model.{ Credential, Session, Location, Conference, Author, Comment, Rating, UserHolder }
+import com.xebia.xkeng.model.{ Credential, Session, Location, Conference, Author, Comment, Rating, UserHolder, Slot, SlotInfo }
 import net.liftweb.common.Logger
 import com.xebia.xkeng.serialization.util._
 
@@ -72,8 +72,10 @@ object JsonDomainConverters extends Logger {
     ("id" -> session.id) ~
       ("title" -> session.title) ~
       ("description" -> session.description) ~
-      ("startTime" -> fmt.print(session.start)) ~
-      ("endTime" -> fmt.print(session.end)) ~
+      ("startTime" -> DATE_TIME_FORMAT.print(session.start)) ~
+      ("endTime" -> DATE_TIME_FORMAT.print(session.end)) ~
+      ("startTimeShort" -> session.start.toString(TIME_FORMAT)) ~
+      ("endTimeShort" -> session.end.toString(TIME_FORMAT)) ~
       ("limit" -> session.limit) ~
       ("type" -> session.sessionType) ~
       ("authors" -> authorsToJArray(session.authors)) ~
@@ -99,10 +101,45 @@ object JsonDomainConverters extends Logger {
   implicit def conferenceToJValue(conference: Conference): JValue = {
     ("id" -> conference._id.toString) ~
       ("title" -> conference.title) ~
-      ("begin" -> fmt.print(conference.begin)) ~
-      ("end" -> fmt.print(conference.end)) ~
+      ("begin" -> DATE_TIME_FORMAT.print(conference.begin)) ~
+      ("end" -> DATE_TIME_FORMAT.print(conference.end)) ~
       ("sessions" -> conference.sessions.map(sessionToJValue(_))) ~
       ("locations" -> conference.locations.map(locationToJValue(_)))
+  }
+  
+  
+    /**
+   *
+   * "id":"4e4a0c48b39c8578c8f7b6d2",
+   * "title":"XKE",
+   * "begin":"2011-08-09T16:00:56.527+02:00",
+   * "end":"2011-08-09T20:00:56.527+02:00",
+   * "slots" [
+   *   { "from":"16:00", "to":"17:00", "sessions" : [...] }
+   *   { "from":"17:00", "to":"18:00", "sessions" : [...] }
+   * ]
+   * }
+   */
+   def conferenceSlotsToJValue(conference: Conference): JValue = {
+    ("id" -> conference._id.toString) ~
+      ("title" -> conference.title) ~
+      ("begin" -> DATE_TIME_FORMAT.print(conference.begin)) ~
+      ("end" -> DATE_TIME_FORMAT.print(conference.end)) ~
+      ("slots" -> conference.slots.map(slotsToJValue(_))) 
+  }
+  
+     /**
+   *
+   * "slot" {
+   * "from" : "16:00",
+   * "to" : "17:00",
+   * "sessions" : [...]
+   * }
+   */
+  implicit def slotsToJValue(slot: Slot): JValue = {
+    ("from" -> slot.key.from.toString(TIME_FORMAT)) ~
+      ("to" -> slot.key.to.toString(TIME_FORMAT)) ~
+      ("sessions" -> slot.sessions.map(sessionToJValue(_)))
   }
 
   /**
@@ -166,9 +203,7 @@ object JsonDomainConverters extends Logger {
     val ratingsSerializer = (json: JValue) => fromRatingFullJson(serializeToJsonStr(json))
     val ratings = deserializeList[Rating](sessJson \\ "ratings", ratingsSerializer)
     val labels = deserializeStringList(sessJson \\ "labels").toSet
-
     val session = Session(start, end, location, title, description, sessionType, limit, authors, ratings, comments, labels)
-
     if (!isNew) {
       val JInt(id) = (sessJson \! "id")
       return session.copy(id = id.toLong)
@@ -178,13 +213,14 @@ object JsonDomainConverters extends Logger {
 
   def fromConferenceJson(jsonString: String): Conference = {
     val JObject(confJson) = JsonParser.parse(jsonString)
-
     val JString(title) = confJson \! "title"
     val JString(AsDateTime(begin)) = confJson \\! "begin"
     val JString(AsDateTime(end)) = confJson \\! "end"
     val locations: List[Location] = deserializeList[Location](confJson \\ "locations")
     val sessionSerializer = (json: JValue) => fromSessionJson(false)(serializeToJsonStr(json))
     val sessions: List[Session] = deserializeList[Session](confJson \\ "sessions", sessionSerializer)
+    val slotInfoSerializer = (json: JValue) => fromSlotInfoJson(serializeToJsonStr(json))
+    val schedule: List[SlotInfo] = deserializeList[SlotInfo](confJson \\ "schedule", slotInfoSerializer)
     val conference = (confJson \ "id") match {
       case JString(id) => Conference(id, title, begin, end, sessions, locations)
       case _ => Conference(title, begin, end, sessions, locations)
@@ -192,6 +228,18 @@ object JsonDomainConverters extends Logger {
     conference
 
   }
+  
+  def fromSlotInfoJson(jsonString: String): SlotInfo = {
+    val JObject(slotJson) = JsonParser.parse(jsonString)
+    val JString(AsDateTime(from)) = slotJson \! "from"
+    val JString(AsDateTime(to)) = slotJson \! "to"
+     (slotJson \ "title") match {
+      case JString(title) =>  SlotInfo(from, to, title)
+      case _ =>  SlotInfo(from, to)
+    }
+  }
+
+  
 
   def fromLocationJson(isNew: Boolean)(jsonString: String): Location = {
     val JObject(locJson) = JsonParser.parse(jsonString)

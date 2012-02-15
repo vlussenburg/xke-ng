@@ -118,13 +118,13 @@ public class SearchResultAdapter extends BaseAdapter {
 
 	@Override
 	public int getCount() {
-		if (data.size() == 0) return 1;
+		if (data == null || data.size() == 0) return 1;
 		return data.size();
 	}
 
 	@Override
 	public Object getItem(int paramInt) {
-		if (data.size() == 0) return "No results.";
+		if (data.size() == 0) return ctx.getString(R.string.no_result);
 		return data.get(paramInt);
 	}
 

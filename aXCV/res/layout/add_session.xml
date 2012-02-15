@@ -1,439 +1,533 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	xmlns:android="http://schemas.android.com/apk/res/android">
-	<!-- Header part of the session -->
-	<LinearLayout
-		android:orientation="vertical"
-		android:background="@android:color/black"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_alignParentTop="true"
-		android:id="@+id/sc_header">
-		<RelativeLayout
-			android:layout_height="wrap_content"
-			android:layout_width="fill_parent"
-			android:id="@+id/relativeLayout1">
-			<ImageView
-				android:layout_height="wrap_content"
-				android:layout_width="wrap_content"
-				android:src="@drawable/x_conference"
-				android:id="@+id/conferenceButton"
-				android:layout_alignParentLeft="true"></ImageView>
-			<TextView
-				android:layout_height="fill_parent"
-				android:layout_width="wrap_content"
-				android:paddingLeft="7sp"
-				android:layout_alignWithParentIfMissing="true"
-				android:gravity="center_vertical"
-				android:layout_toRightOf="@+id/conferenceButton"
-				android:layout_alignTop="@+id/conferenceButton"
-				android:layout_alignBottom="@+id/conferenceButton"
-				android:textSize="@dimen/textsize_title"
-				android:text="Empty"
-				android:id="@+id/addModifyTitle"></TextView>
-			<ImageButton
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:src="@drawable/x_conference"
-				android:id="@+id/imageButton5"
-				android:layout_toLeftOf="@+id/imageButton4"
-				android:layout_alignTop="@+id/imageButton4"
-				android:layout_alignBottom="@+id/imageButton4"
-				android:visibility="gone"></ImageButton>
-			<ImageView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"
-				android:src="@drawable/x_complete_1"
-				android:id="@+id/completeness" android:layout_margin="5sp"></ImageView>
-		</RelativeLayout>
-		<View
-			android:id="@+id/firstDivider"
-			android:layout_height="2dp"
-			android:layout_width="fill_parent"
-			android:background="@color/linebreak" />
-	</LinearLayout>
-	<!-- Footer part of the session -->
-	<LinearLayout
-		android:orientation="vertical"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_alignParentBottom="true"
-		android:id="@+id/sc_navigate">
-		<View
-			android:layout_height="2dp"
-			android:layout_width="fill_parent"
-			android:background="@color/linebreak"
-			android:id="@+id/thirdDivider" />
-		<LinearLayout
-			android:layout_height="wrap_content"
-			android:id="@+id/linearLayout3"
-			android:layout_width="fill_parent"
-			android:gravity="center">
-			<Button
-				android:text="Save"
-				android:layout_width="wrap_content"
-				android:id="@+id/actionSave"
-				android:layout_height="wrap_content"></Button>
-			<Button
-				android:text="Reschedule"
-				android:layout_width="wrap_content"
-				android:id="@+id/actionReschedule"
-				android:layout_height="wrap_content"></Button>
-			<Button
-				android:text="Delete"
-				android:layout_width="wrap_content"
-				android:id="@+id/actionDelete"
-				android:layout_height="wrap_content"></Button>
-		</LinearLayout>
-	</LinearLayout>
-	<!-- Content part of the session -->
-	<ScrollView
-		android:id="@+id/sc_content"
-		android:layout_below="@id/sc_header"
-		android:layout_above="@id/sc_navigate"
-		android:layout_width="fill_parent"
-		android:layout_height="fill_parent">
-		<LinearLayout
-			android:orientation="vertical"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content">
-			<TextView
-				android:background="@drawable/rateslider"
-				android:textSize="@dimen/ts_group"
-				android:id="@+id/TextView11"
-				android:layout_width="fill_parent"
-				android:paddingRight="5sp"
-				android:paddingLeft="5sp"
-				android:textColor="@color/textcolor_header"
-				android:paddingBottom="2sp"
-				android:layout_height="wrap_content"
-				android:paddingTop="2sp"
-				android:text="Planning"></TextView>
-			<TableLayout
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:id="@+id/TableLayout01"
-				android:padding="6sp">
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow06"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView07"
-						android:text="Conference"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/conferenceName"
-						android:layout_weight="1"></TextView>
-				</TableRow>
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow04"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView14"
-						android:text="Date"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/conferenceDate"
-						android:background="@drawable/touchtext_disable"
-						android:layout_weight="1"></TextView>
-				</TableRow>
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow05"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView12"
-						android:text="Start"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionStart"
-						android:layout_weight="1"></TextView>
-				</TableRow>
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow07"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView10"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"
-						android:text="Duration"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionDuration"
-						android:layout_weight="1"></TextView>
-				</TableRow>
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow12"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView24"
-						android:layout_height="wrap_content"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_width="wrap_content"
-						android:text="Location"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionLocation"
-						android:layout_weight="1"></TextView>
-				</TableRow>
-			</TableLayout>
-			<TextView
-				android:background="@drawable/rateslider"
-				android:textSize="@dimen/ts_group"
-				android:id="@+id/TextView16"
-				android:layout_width="fill_parent"
-				android:text="Session"
-				android:paddingRight="5sp"
-				android:paddingLeft="5sp"
-				android:textColor="@color/textcolor_header"
-				android:layout_height="wrap_content"
-				android:paddingTop="2sp"
-				android:paddingBottom="2sp"></TextView>
-			<TableLayout
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:id="@+id/TableLayout02"
-				android:padding="6sp">
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow14"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView99"
-						android:text="Type"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionType"
-						android:layout_weight="1"></TextView>
-				</TableRow>
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow08"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView18"
-						android:text="Title"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionTitle"
-						android:layout_weight="1"></TextView>
-				</TableRow>
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow13"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView17"
-						android:text="Description"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionDescription"
-						android:layout_weight="1"></TextView>
-				</TableRow>
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow09"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView15"
-						android:text="Authors"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionAuthors"
-						android:layout_weight="1"></TextView>
-				</TableRow>
-			</TableLayout>
-			<TextView
-				android:layout_height="wrap_content"
-				android:layout_width="fill_parent"
-				android:paddingLeft="5sp"
-				android:paddingRight="5sp"
-				android:paddingBottom="2sp"
-				android:paddingTop="2sp"
-				android:background="@drawable/rateslider"
-				android:textSize="@dimen/ts_group"
-				android:textColor="@color/textcolor_header"
-				android:text="Details"
-				android:id="@+id/detailsTitle"></TextView>
-			<TableLayout
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:padding="6sp"
-				android:id="@+id/detailsLayout">
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow03"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView06"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"
-						android:text="Audience"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionAudience"
-						android:layout_weight="1"></TextView>
-				</TableRow>
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow02"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView04"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"
-						android:text="Preparation"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionPreps"
-						android:layout_weight="1"></TextView>
-				</TableRow>
-				<TableRow
-					android:id="@+id/tableRow1"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/textView3"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:text="# People"></TextView>
-					<TextView
-						android:textSize="@dimen/ts_attribute"
-						android:layout_marginLeft="5sp"
-						android:id="@+id/sessionCount"
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"
-						android:layout_weight="1"></TextView>
-				</TableRow>
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow11"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView23"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"
-						android:text="Language"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionLanguage"
-						android:layout_weight="1"></TextView>
-				</TableRow>
-				<TableRow
-					android:layout_width="wrap_content"
-					android:id="@+id/TableRow10"
-					android:layout_height="wrap_content">
-					<TextView
-						android:id="@+id/TextView21"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"
-						android:text="Labels"></TextView>
-					<TextView
-						android:text="@string/empty_value"
-						android:padding="1sp"
-						android:textSize="@dimen/ts_attribute"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="5sp"
-						android:layout_width="wrap_content"
-						android:id="@+id/sessionLabels"
-						android:layout_weight="1"></TextView>
-				</TableRow>
-			</TableLayout>
-		</LinearLayout>
-	</ScrollView>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <!-- Header part of the session -->
+
+    <LinearLayout
+        android:id="@+id/sc_header"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@android:color/black"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <ImageView
+                android:id="@+id/conferenceButton"
+                android:contentDescription="@string/img_conferenceButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:src="@drawable/x_conference" >
+            </ImageView>
+
+            <TextView
+                android:id="@+id/addModifyTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_alignBottom="@+id/conferenceButton"
+                android:layout_alignTop="@+id/conferenceButton"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_toRightOf="@+id/conferenceButton"
+                android:gravity="center_vertical"
+                android:paddingLeft="7sp"
+                android:text="@string/empty"
+                android:textSize="@dimen/textsize_title" >
+            </TextView>
+
+            <ImageView
+                android:id="@+id/completeness"
+                android:contentDescription="@string/img_completeness"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_margin="5sp"
+                android:src="@drawable/x_complete_1" >
+            </ImageView>
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/firstDivider"
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="@color/linebreak" />
+    </LinearLayout>
+    <!-- Footer part of the session -->
+
+    <LinearLayout
+        android:id="@+id/sc_navigate"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical" >
+
+        <View
+            android:id="@+id/thirdDivider"
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="@color/linebreak" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout3"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center" >
+
+            <Button
+                android:id="@+id/actionSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/save" >
+            </Button>
+
+            <Button
+                android:id="@+id/actionReschedule"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/reschedule" >
+            </Button>
+
+            <Button
+                android:id="@+id/actionDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/delete" >
+            </Button>
+        </LinearLayout>
+    </LinearLayout>
+    <!-- Content part of the session -->
+
+    <ScrollView
+        android:id="@+id/sc_content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@id/sc_navigate"
+        android:layout_below="@id/sc_header" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/TextView11"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rateslider"
+                android:paddingBottom="2sp"
+                android:paddingLeft="5sp"
+                android:paddingRight="5sp"
+                android:paddingTop="2sp"
+                android:text="@string/planning"
+                android:textColor="@color/textcolor_header"
+                android:textSize="@dimen/ts_group" >
+            </TextView>
+
+            <TableLayout
+                android:id="@+id/TableLayout01"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="6sp" >
+
+                <TableRow
+                    android:id="@+id/TableRow06"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/TextView07"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/conference"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/conferenceName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5sp"
+                        android:layout_weight="1"
+                        android:padding="1sp"
+                        android:text="@string/empty_value"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/TableRow04"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/TextView14"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/date"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/conferenceDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5sp"
+                        android:layout_weight="1"
+                        android:background="@drawable/touchtext_disable"
+                        android:text="@string/empty_value"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/TableRow05"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/TextView12"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/start"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/sessionStart"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5sp"
+                        android:layout_weight="1"
+                        android:padding="1sp"
+                        android:text="@string/empty_value"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/TableRow07"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/TextView10"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/duration"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/sessionDuration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5sp"
+                        android:layout_weight="1"
+                        android:padding="1sp"
+                        android:text="@string/empty_value"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/TableRow12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/TextView24"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/location"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/sessionLocation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5sp"
+                        android:layout_weight="1"
+                        android:padding="1sp"
+                        android:text="@string/empty_value"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+                </TableRow>
+            </TableLayout>
+
+            <TextView
+                android:id="@+id/TextView16"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rateslider"
+                android:paddingBottom="2sp"
+                android:paddingLeft="5sp"
+                android:paddingRight="5sp"
+                android:paddingTop="2sp"
+                android:text="@string/session"
+                android:textColor="@color/textcolor_header"
+                android:textSize="@dimen/ts_group" >
+            </TextView>
+
+            <TableLayout
+                android:id="@+id/TableLayout02"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="6sp" >
+
+                <TableRow
+                    android:id="@+id/TableRow14"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/TextView99"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/type"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/sessionType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5sp"
+                        android:layout_weight="1"
+                        android:padding="1sp"
+                        android:text="@string/empty_value"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/TableRow08"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/TextView18"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/sessionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5sp"
+                        android:layout_weight="1"
+                        android:padding="1sp"
+                        android:text="@string/empty_value"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/TableRow13"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/TextView17"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/description"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/sessionDescription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5sp"
+                        android:layout_weight="1"
+                        android:padding="1sp"
+                        android:text="@string/empty_value"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/TableRow09"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/TextView15"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/authors"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/sessionAuthors"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5sp"
+                        android:layout_weight="1"
+                        android:padding="1sp"
+                        android:text="@string/empty_value"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+                </TableRow>
+            </TableLayout>
+
+            <TextView
+                android:id="@+id/detailsTitle"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rateslider"
+                android:paddingBottom="2sp"
+                android:paddingLeft="5sp"
+                android:paddingRight="5sp"
+                android:paddingTop="2sp"
+                android:text="@string/details"
+                android:textColor="@color/textcolor_header"
+                android:textSize="@dimen/ts_group" >
+            </TextView>
+
+            <TableLayout
+                android:id="@+id/detailsLayout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="6sp" >
+
+                <TableRow
+                    android:id="@+id/TableRow03"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/TextView06"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/audience"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/sessionAudience"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5sp"
+                        android:layout_weight="1"
+                        android:padding="1sp"
+                        android:text="@string/empty_value"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/TableRow02"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/TextView04"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/preparation"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/sessionPreps"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5sp"
+                        android:layout_weight="1"
+                        android:padding="1sp"
+                        android:text="@string/empty_value"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tableRow1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/textView3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nrof_people"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/sessionCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5sp"
+                        android:layout_weight="1"
+                        android:padding="1sp"
+                        android:text="@string/empty_value"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/TableRow11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/TextView23"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/language"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/sessionLanguage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5sp"
+                        android:layout_weight="1"
+                        android:padding="1sp"
+                        android:text="@string/empty_value"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/TableRow10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/TextView21"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/labels"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/sessionLabels"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5sp"
+                        android:layout_weight="1"
+                        android:padding="1sp"
+                        android:text="@string/empty_value"
+                        android:textSize="@dimen/ts_attribute" >
+                    </TextView>
+                </TableRow>
+            </TableLayout>
+        </LinearLayout>
+    </ScrollView>
+
 </RelativeLayout>

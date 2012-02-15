@@ -3,12 +3,14 @@
 
     <string name="app_name">Conference Viewer</string>
     <string name="app_full_name">Xebia Conference Viewer</string>
-    <string name="app_version">0.5</string>
+    <string name="app_version">0.7</string>
+    <string name="app_help_url">http://xke.xebia.com/help</string>
+    
     <string name="splash_conference">Xebia Knowledge Exchange</string>
     <string name="splash_company">Xebia</string>
     <string name="splash_version">Version %s</string>
-    <string name="splash_copyright">Copyright &#169; 2011 Xebia B.V.</string>
-    <string name="splash_copyright2">Copyright &#169; 2011 Xebia B.V. All rights reserved.</string>
+    <string name="splash_copyright">Copyright &#169; 2012 Xebia B.V.</string>
+    <string name="splash_copyright2">Copyright &#169; 2012 Xebia B.V. All rights reserved.</string>
     <string name="menu_settings">Preferences</string>
     <string name="menu_search">Search</string>
     <string name="menu_overview">Conferences</string>
@@ -16,6 +18,7 @@
     <string name="menu_edit">Edit</string>
     <string name="menu_track">My Track</string>
     <string name="menu_list">List view</string>
+    <string name="menu_running">Now showing</string>
     <string name="password_set">Password stored</string>
     <string name="password_unset">No password specified</string>
     <string name="session_title">Session title</string>
@@ -35,7 +38,7 @@
     <string name="newLocationLabel">Location name</string>
     <string name="breakLabel">Break</string>
     <string name="default_break_name">Dinner break</string>
-    <string name="default_break_description">Dinner break @ %s</string>
+    <string name="default_break_description">Common activity @ %s</string>
 
     <string-array name="cacheNames">
         <item>In memory</item>
@@ -47,7 +50,22 @@
         <item>Database</item>
         <item>None</item>
     </string-array>
-	<string name="notifyIntervalDefault">15 minutes</string>
+    <string-array name="durationInterval">
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>60 minutes</item>
+        <item>90 minutes</item>
+        <item>120 minutes</item>
+    </string-array>
+    <string-array name="languages">
+        <item>Dutch</item>
+        <item>English</item>
+        <item>French</item>
+        <item>Hindi</item>
+    </string-array>
+	<string name="notifyIntervalDefault">900</string>
     <string-array name="notifyInterval">
         <item>5 minutes</item>
         <item>15 minutes</item>
@@ -64,7 +82,65 @@
         <item>86400</item>
         <item>off</item>
     </string-array>
-
+    <string-array name="dateIndicators">
+        <item>Last year</item>
+        <item>Next year</item>
+        <item></item>
+        <item>Last week</item>
+        <item>Yesterday</item>
+        <item>Today</item>
+        <item>Tomorrow</item>
+        <item>Next week</item>
+        <item>In {0} days</item>
+        <item>{0} days ago</item>
+        <item>Earlier this year</item>
+        <item>Later this year</item>
+        <item>In {0} weeks</item>
+    </string-array>
+    <string-array name="rateValues">
+		<item>No rating</item>
+		<item>Very poor</item>
+		<item>Poor</item>
+		<item>Less than moderate</item>
+		<item>Moderate</item>
+		<item>Fair</item>
+		<item>Adequate</item>
+		<item>Good</item>
+		<item>Very good</item>
+		<item>Excellent</item>
+		<item>Outstanding</item>
+    </string-array>
+    <string-array name="conferenceFields">
+		<item>Start time</item>
+		<item>End time</item>
+		<item>Title</item>
+		<item>Location</item>
+    </string-array>
+    <string-array name="sessionFields">
+		<item>Start time</item>
+		<item>Title</item>
+		<item>Description</item>
+		<item>Author</item>
+		<item>Number of people</item>
+		<item>Location</item>
+    </string-array>
+    <string-array name="sessionTypes">
+		<item>STANDARD:Presentation:1</item>
+		<item>WORKSHOP:Workshop</item>
+		<item>BRAINSTORM:Brainstorm</item>
+		<item>BOOK:Book review</item>
+		<item>SUMMARY:Report</item>
+		<item>STRATEGIC:Strategy</item>
+		<item>INCUBATOR:Incubator</item>
+		<item>MANDATORY:Corporate:2</item>
+		<item>BREAK:Break:6</item>
+    </string-array>
+    <string-array name="statusFields">
+		<item>fully booked</item>
+		<item>{0} sessions scheduled</item>
+		<item>{0} slots available</item>
+    </string-array>
+    
     <string name="close">Close</string>
     <string name="cancel">Cancel</string>
     <string name="cancelled">Cancelled</string>
@@ -72,22 +148,25 @@
     <string name="error">Error</string>
     <string name="failed">Failed</string>
     <string name="warning">Warning</string>
+    <string name="ignore">Ignore</string>
+    <string name="edit">Edit</string>
 
     <string name="session_add">Add session</string>
     <string name="session_edit">Edit session</string>
     <string name="duration_minutes">%d min</string>
-    <string name="cancel_during_load">The initial loading was cancelled. The application will be closed.</string>
     <string name="loading">Loading. Please wait&#8230;</string>
-    <string name="connection_to_server_failed">Connection to server failed (%s).</string>
-    <string name="auth_failed">Authentication failed. Please set credentials.</string>
+    <string name="auth_failed_title">Not authorized</string>
+    <string name="auth_failed">Authentication failed for task \'%s\'. Please set credentials.</string>
+    <string name="action_failed">Action failed</string>
+    <string name="communication_failure">Communication failure on \'%1$s\' due to %2$s.</string>
     <string name="server_unreachable">Server unreachable</string>
     <string name="server_missing_url">No result for \'%s\'</string>
     <string name="server_timeout">Time out on \'%s\'</string>
-    <string name="specify_attributes">"Please specify the following attributes: "%s</string>
+    <string name="specify_attributes">Please specify the following attributes: %s</string>
     <string name="no_session_added">No session added</string>
     <string name="session_not_added">Session could not be added (%s).</string>
     <string name="delete_session">Delete session</string>
-    <string name="confirm_delete_session">Are you sure to delete session \'%1$s\' on %1$s?</string>
+    <string name="confirm_delete_session">Are you sure to delete session \'%1$s\' on %2$s?</string>
     <string name="rescheduling_failed">Rescheduling failed</string>
     <string name="reschedule_failed_message">The session cannot be scheduled. Shorten session, use another location or choose another conference.</string>
     <string name="pick_conference">Pick a conference</string>
@@ -103,9 +182,7 @@
     <string name="intended_audience">Intended audience</string>
     <string name="add_conference">Add conference</string>
     <string name="edit_conference">Edit conference</string>
-    <string name="no_conference_added">No conference added</string>
-    <string name="conference_could_not_be_added">Conference could not be added (%s.)</string>
-    <string name="conference_with_sessions">This conference has %d sessions(s).</string>
+    <string name="conference_with_sessions">This conference has %d session(s).</string>
     <string name="confirm_delete_conference">Are you sure to delete conference \'%1$s\' on %2$s?</string>
     <string name="delete_conference">Delete conference</string>
     <string name="move_delete">Move &amp; delete</string>
@@ -114,9 +191,9 @@
     <string name="conference_detail">Conference detail</string>
     <string name="no_location_date">No locations and/or date specified yet</string>
     <string name="conference_title">Conference title</string>
-    <string name="error_signal">Check failed: %s</string>
     <string name="notification_on">Update check enabled.</string>
     <string name="notification_off">Update check disabled.</string>
+    <string name="search_no_search">Please specify a valid search text.</string>
     
     <string name="droidfu_progress_dialog_title">Loading&#8230;</string>
     <string name="droidfu_progress_dialog_message">Contacting server to load data.</string>
@@ -138,4 +215,91 @@
     <string name="action_retrieve_locations">Load locations</string>
     <string name="action_retrieve_rate">Load rate</string>
     <string name="action_retrieve_session">Load session</string>
+
+    <string name="img_conferenceButton">Show conferences</string>
+    <string name="img_icon">Icon</string>
+    <string name="img_nav_left">Previous</string>
+    <string name="img_nav_right">Next</string>
+    <string name="img_nav_up">Up</string>
+    <string name="img_nav_down">Down</string>
+    <string name="img_mark">Mark this session</string>
+    <string name="img_rate">Rate this session</string>
+    <string name="img_edit">Edit this session</string>
+    <string name="img_author">Author</string>
+    <string name="img_completeness">Shows how complete the details are</string>
+    
+    <string name="header">Header</string>
+    <string name="labels">Labels</string>
+    <string name="sessions">Sessions</string>
+    <string name="audience">Audience</string>
+    <string name="authors">Author(s)</string>
+    <string name="curriculum">Curriculum</string>
+    <string name="language">Language</string>
+    <string name="left">Left</string>
+    <string name="limit">Limit</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="nextsession">Next Session</string>
+    <string name="prevsession">Previous Session</string>
+    <string name="right">Right</string>
+    <string name="schedule">Schedule</string>
+
+    <string name="your_rating">Your rating</string>
+    <string name="your_remark">Your remark</string>
+    <string name="no_later_session">No later session</string>
+    <string name="no_earlier_session">No earlier session</string>
+    <string name="no_author_found">Author not found</string>
+    <string name="label_removed">Label removed</string>
+    <string name="single_select">Single select!</string>
+    <string name="single_select_message">You cannot select more than one person! What shall I do with the previously selected one?</string>
+    <string name="replace">Replace</string>
+    <string name="keep">Keep</string>
+    <string name="author_removed">Author removed</string>
+    <string name="select_valid_author">Select a valid author!</string>
+    <string name="session_changed">Session has changed</string>
+    <string name="notify_fail_url">Update check failed. Server URL not found.</string>
+    <string name="notify_check">Checking for updates&#8230;</string>
+    <string name="set_value">Enter value</string>
+    <string name="no_result">No results</string>
+    <string name="enter_new_location">Enter new location</string>
+    <string name="insert_break">Insert break</string>
+    <string name="could_not_delete_location">Cannot remove location as there are still sessions hosted there.</string>
+    <string name="could_not_change_time">Cannot change time as it would invalidate sessions. Move those sessions first.</string>
+    
+    <string name="submit">Submit</string>
+    <string name="duration">Duration</string>
+    <string name="location">Location</string>
+    <string name="start">Start</string>
+    <string name="search">Search</string>
+    <string name="submit_review">Enter your comment on this session and click \'Submit\'.</string>
+    <string name="submit_rate">Enter your rating for this session by setting the slider in position and click \'Submit\'.</string>
+    
+    <string name="author_mail">Mail address</string>
+    <string name="author_name">Name of author</string>
+    <string name="author_phone">Phone number</string>
+    <string name="authors_col">Authors:</string>
+    <string name="breaks">Breaks</string>
+    <string name="conference">Conference</string>
+    <string name="conferences">Conferences</string>
+    <string name="details">Details</string>
+    <string name="empty">Empty</string>
+    <string name="end_time">End time</string>
+    <string name="labels_col">Labels:</string>
+    <string name="locations">Locations</string>
+    <string name="no_open_slots">no open slots</string>
+    <string name="nrof_people">People (#)</string>
+    <string name="organizer">Organizer</string>
+    <string name="planning">Planning</string>
+    <string name="reschedule">Reschedule</string>
+    <string name="save">Save</string>
+    <string name="separator"> / </string>
+    <string name="session">Session</string>
+    <string name="start_time">Start time</string>
+    <string name="title">Title</string>
+    <string name="today">Today</string>
+    <string name="type">Type</string>
+
+    <string name="earlier_in_time">Earlier</string>
+    <string name="later_in_time">Later</string>
+    
 </resources>

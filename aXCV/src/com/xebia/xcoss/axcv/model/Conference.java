@@ -11,6 +11,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.google.gson.annotations.SerializedName;
+import com.xebia.xcoss.axcv.Messages;
 import com.xebia.xcoss.axcv.model.util.SessionComparator;
 import com.xebia.xcoss.axcv.model.util.TimeSlotComparator;
 import com.xebia.xcoss.axcv.util.FormatUtil;
@@ -33,6 +34,8 @@ public class Conference implements Serializable {
 	}
 
 	private static final long serialVersionUID = 2L;
+
+	private transient static String[] mandatoryFields;
 
 	private String id;
 	private String title;
@@ -64,6 +67,13 @@ public class Conference implements Serializable {
 		this.sessions.addAll(original.sessions);
 	}
 
+	public static void init(String[] input) {
+		if ( input == null || input.length != 4) {
+			throw new RuntimeException(Messages.getString("Exception.5"));
+		}
+		mandatoryFields = input;
+	}
+	
 	// Getters and setters
 
 	public String getId() {
@@ -192,17 +202,20 @@ public class Conference implements Serializable {
 	// Utilities
 
 	public boolean check(List<String> messages) {
-		if (startTime == null || endTime == null) {
-			messages.add("Date, start/end time");
+		if (startTime == null) {
+			messages.add(mandatoryFields[0]);
+		}
+		if (endTime == null) {
+			messages.add(mandatoryFields[1]);
 		}
 		if (StringUtil.isEmpty(title)) {
-			messages.add("Title");
+			messages.add(mandatoryFields[2]);
 		}
 		if (locations == null || locations.isEmpty()) {
-			messages.add("Locations");
+			messages.add(mandatoryFields[3]);
 		}
 		return (messages.size() == 0);
-	}
+		}
 
 	private void resetSessions() {
 		sessions = new TreeSet<Session>(new SessionComparator());
@@ -217,66 +230,12 @@ public class Conference implements Serializable {
 		return null;
 	}
 
-//	/**
-//	 * Adds a session on the server and resets the local stored sessions.
-//	 * 
-//	 * @param session
-//	 * @return
-//	 */
-//	public boolean addSession(Session session, boolean create) {
-//		Log.w(XCS.LOG.ALL, "Adding " + session.getTitle() + " to " + getTitle());
-//		try {
-//			String id = ConferenceServer.getInstance().storeSession(session, getId(), create);
-//			resetSessions();
-//			return id != null;
-//		}
-//		catch (CommException e) {
-//			BaseActivity.handleException(null, "adding session", e);
-//		}
-//		return false;
-//	}
-//
-//	public void deleteSession(Session session) {
-//		if (sessions != null) {
-//			sessions.remove(session);
-//		}
-//		try {
-//			ConferenceServer.getInstance().deleteSession(session);
-//		}
-//		catch (CommException e) {
-//			BaseActivity.handleException(null, "deleting session", e);
-//		}
-//	}
-//
-//	public static Conference create(Conference conference) {
-//		try {
-//			return ConferenceServer.getInstance().storeConference(conference, true);
-//		}
-//		catch (CommException e) {
-//			BaseActivity.handleException(null, "creating conference", e);
-//		}
-//		return null;
-//	}
-//
-//	public boolean update() {
-//		try {
-//			ConferenceServer.getInstance().storeConference(this, false);
-//			return true;
-//		}
-//		catch (CommException e) {
-//			BaseActivity.handleException(null, "updating conference", e);
-//		}
-//		return false;
-//	}
-//
-//	public void delete() {
-//		try {
-//			ConferenceServer.getInstance().deleteConference(this);
-//		}
-//		catch (CommException e) {
-//			BaseActivity.handleException(null, "deleting conference", e);
-//		}
-//	}
+	public boolean isExpired() {
+		if (getEndTime() == null) {
+			return false;
+		}
+		return getEndTime().isBeforeNow();
+	}
 
 	private boolean isTimeSlotAvailable(Moment start, int length, Location location) {
 		// Sessions are sorted on start time!
@@ -305,7 +264,8 @@ public class Conference implements Serializable {
 			Location location) {
 
 		int prefstart = Math.max(start == null ? 0 : start.asMinutes(), startTime.asMinutes());
-
+		int sessionDuration = duration < TimeSlot.MIN_LENGTH ? TimeSlot.LENGTH : duration;
+		
 		for (Session session : getSessions()) {
 			if (!location.equals(session.getLocation()) || session.equals(rescheduleSession)) {
 				continue;
@@ -320,8 +280,8 @@ public class Conference implements Serializable {
 			} else {
 				// There is room before this session
 				int available = sesstart - prefstart;
-				if (available >= duration) {
-					return getTimeSlot(prefstart, duration, location);
+				if (available >= sessionDuration) {
+					return getTimeSlot(prefstart, sessionDuration, location);
 				}
 				// Not enough time available. Try with a later time.
 				prefstart = session.getEndTime().asMinutes();
@@ -330,8 +290,8 @@ public class Conference implements Serializable {
 
 		// Check last session till end of conference.
 		int endspace = endTime.asMinutes() - prefstart;
-		if (endspace >= duration) {
-			return getTimeSlot(prefstart, duration, location);
+		if (endspace >= sessionDuration) {
+			return getTimeSlot(prefstart, sessionDuration, location);
 		}
 		return null;
 	}

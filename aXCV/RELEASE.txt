@@ -1,0 +1,3 @@
+Version 0.7
+  - Implemented Dutch translation
+  - Make user name and password volatile (no restart needed)

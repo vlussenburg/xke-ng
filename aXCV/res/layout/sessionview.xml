@@ -11,7 +11,7 @@
         android:layout_height="fill_parent" >
 
         <!-- Header part of the session -->
-
+
         <LinearLayout
             android:id="@+id/sc_header"
             android:layout_width="fill_parent"
@@ -19,7 +19,7 @@
             android:layout_alignParentTop="true"
             android:background="@android:color/black"
             android:orientation="vertical"
-            android:text="Header" >
+            android:text="@string/header" >
 
             <RelativeLayout
                 android:id="@+id/relativeLayout1"
@@ -27,6 +27,7 @@
                 android:layout_height="wrap_content" >
 
                 <ImageView
+                    android:contentDescription="@string/img_conferenceButton"
                     android:id="@+id/conferenceButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -44,29 +45,9 @@
                     android:layout_toRightOf="@+id/conferenceButton"
                     android:gravity="center_vertical"
                     android:paddingLeft="7sp"
-                    android:text="Schedule"
+                    android:text="@string/schedule"
                     android:textSize="@dimen/textsize_title" >
                 </TextView>
-
-                <ImageButton
-                    android:id="@+id/imageButton5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/imageButton4"
-                    android:layout_alignTop="@+id/imageButton4"
-                    android:layout_toLeftOf="@+id/imageButton4"
-                    android:src="@drawable/x_conference"
-                    android:visibility="gone" >
-                </ImageButton>
-
-                <ImageButton
-                    android:id="@+id/imageButton4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:src="@drawable/x_conference"
-                    android:visibility="gone" >
-                </ImageButton>
             </RelativeLayout>
 
             <View
@@ -87,50 +68,31 @@
                     android:layout_gravity="center" android:textStyle="bold">
                 </TextView>
 
-                <LinearLayout
-                    android:id="@+id/nextLocationLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right" >
+<!--                 <LinearLayout -->
+<!--                     android:id="@+id/nextLocationLayout" -->
+<!--                     android:layout_width="wrap_content" -->
+<!--                     android:layout_height="wrap_content" -->
+<!--                     android:layout_gravity="right" > -->
 
                     <TextView
-                        android:id="@+id/rightText"
+                        android:id="@+id/nextLocationText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingRight="3dp"
-                        android:text="Right" >
+                        android:drawableRight="@drawable/arrow_right_float"
+                        android:layout_gravity="right"
+                        android:text="@string/right" >
                     </TextView>
 
-                    <ImageView
-                        android:id="@+id/ImageView04"
-                        android:layout_width="wrap_content"
-                        android:layout_height="fill_parent"
-                        android:src="@drawable/arrow_right_float" >
-                    </ImageView>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/prevLocationLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left" >
-
-                    <ImageView
-                        android:id="@+id/ImageView04"
-                        android:layout_width="wrap_content"
-                        android:layout_height="fill_parent"
-                        android:src="@drawable/arrow_left_float" >
-                    </ImageView>
-
                     <TextView
-                        android:id="@+id/leftText"
+                        android:id="@+id/prevLocationText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="left"
                         android:paddingLeft="3dp"
-                        android:text="Left" >
+                        android:drawableLeft="@drawable/arrow_left_float"
+                        android:text="@string/left" >
                     </TextView>
-                </LinearLayout>
             </FrameLayout>
 
             <View
@@ -146,15 +108,16 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:padding="2sp"
             android:orientation="vertical" >
 
-            <LinearLayout
-                android:id="@+id/linearLayout3"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="2sp" >
+<!--             <LinearLayout -->
+<!--                 android:id="@+id/linearLayout3" -->
+<!--                 android:layout_width="fill_parent" -->
+<!--                 android:layout_height="wrap_content" -->
+<!--                 android:gravity="center" -->
+<!--                 android:orientation="vertical" -->
+<!--                 android:padding="2sp" > -->
 
                 <LinearLayout
                     android:id="@+id/prevSessionLayout"
@@ -164,6 +127,7 @@
                     android:gravity="center" >
 
                     <ImageView
+	                    android:contentDescription="@string/img_nav_up"
                         android:id="@+id/imageView1"
                         android:layout_width="wrap_content"
                         android:layout_height="fill_parent"
@@ -176,10 +140,11 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:padding="4sp"
-                        android:text="Previous Session" >
+                        android:text="@string/prevsession" >
                     </TextView>
 
                     <ImageView
+	                    android:contentDescription="@string/img_nav_up"
                         android:id="@+id/ImageView01"
                         android:layout_width="wrap_content"
                         android:layout_height="fill_parent"
@@ -201,6 +166,7 @@
                     android:gravity="center" >
 
                     <ImageView
+	                    android:contentDescription="@string/img_nav_down"
                         android:id="@+id/ImageView03"
                         android:layout_width="wrap_content"
                         android:layout_height="fill_parent"
@@ -213,53 +179,17 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:padding="4sp"
-                        android:text="Next Session" >
+                        android:text="@string/nextsession" >
                     </TextView>
 
                     <ImageView
+	                    android:contentDescription="@string/img_nav_down"
                         android:id="@+id/ImageView02"
                         android:layout_width="wrap_content"
                         android:layout_height="fill_parent"
                         android:src="@android:drawable/arrow_down_float" >
                     </ImageView>
                 </LinearLayout>
-            </LinearLayout>
-            <!--
-			<LinearLayout
-			android:layout_height="wrap_content"
-			android:id="@+id/linearLayout3"
-			android:layout_width="fill_parent"
-			android:gravity="center">
-			<ImageView
-			android:layout_height="wrap_content"
-			android:layout_width="wrap_content"
-			android:src="@drawable/location_previous"
-			android:id="@+id/slideLocationMin"
-			android:padding="1sp"
-			android:layout_weight="1"></ImageView>
-			<ImageView
-			android:layout_height="wrap_content"
-			android:src="@drawable/time_previous"
-			android:layout_width="wrap_content"
-			android:id="@+id/slideTimeMin"
-			android:padding="1sp"
-			android:layout_weight="1"></ImageView>
-			<ImageView
-			android:layout_height="wrap_content"
-			android:layout_width="wrap_content"
-			android:src="@drawable/time_next"
-			android:id="@+id/slideTimePlus"
-			android:padding="1sp"
-			android:layout_weight="1"></ImageView>
-			<ImageView
-			android:layout_height="wrap_content"
-			android:layout_width="wrap_content"
-			android:src="@drawable/location_next"
-			android:id="@+id/slideLocationPlus"
-			android:padding="1sp"
-			android:layout_weight="1"></ImageView>
-			</LinearLayout>
-            -->
         </LinearLayout>
         <!-- Content part of the session -->
 
@@ -289,6 +219,7 @@
                         android:paddingRight="8sp" >
 
                         <ImageView
+		                    android:contentDescription="@string/img_rate"
                             android:id="@+id/scRatingImage"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -303,7 +234,6 @@
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"
                             android:layout_centerVertical="true"
-                            android:text="-"
                             android:textColor="@color/textcolor_title"
                             android:textSize="24sp"
                             android:textStyle="bold" >
@@ -323,7 +253,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:text="17.00u - 18.00u"
+                            android:text="@string/time"
                             android:textSize="18sp" >
                         </TextView>
 
@@ -336,6 +266,7 @@
                     </LinearLayout>
 
                     <ImageView
+	                    android:contentDescription="@string/img_mark"
                         android:id="@+id/sessionMarkButton"
                         android:layout_width="wrap_content"
                         android:layout_height="fill_parent"
@@ -361,7 +292,7 @@
                         android:layout_marginLeft="3sp"
                         android:layout_marginRight="3sp"
                         android:gravity="center_horizontal"
-                        android:text="Loading..."
+                        android:text="@string/loading"
                         android:textColor="@color/textcolor_title"
                         android:textSize="18sp" >
                     </TextView>
@@ -378,7 +309,7 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/linearLayout2"
+                    android:id="@+id/linearLayout4"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content" >
 
@@ -387,7 +318,7 @@
                         android:layout_width="85sp"
                         android:layout_height="wrap_content"
                         android:paddingRight="8sp"
-                        android:text="Author(s)" >
+                        android:text="@string/authors" >
                     </TextView>
 
                     <TextView
@@ -407,7 +338,7 @@
                         android:layout_width="85sp"
                         android:layout_height="wrap_content"
                         android:paddingRight="8sp"
-                        android:text="Audience" >
+                        android:text="@string/audience" >
                     </TextView>
 
                     <TextView
@@ -418,7 +349,7 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/linearLayout3"
+                    android:id="@+id/linearLayout10"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content" >
 
@@ -427,7 +358,7 @@
                         android:layout_width="85sp"
                         android:layout_height="wrap_content"
                         android:paddingRight="8sp"
-                        android:text="Language" >
+                        android:text="@string/language" >
                     </TextView>
 
                     <TextView
@@ -438,7 +369,7 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/linearLayout4"
+                    android:id="@+id/linearLayout11"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content" >
 
@@ -447,7 +378,7 @@
                         android:layout_width="85sp"
                         android:layout_height="wrap_content"
                         android:paddingRight="8sp"
-                        android:text="Limit" >
+                        android:text="@string/limit" >
                     </TextView>
 
                     <TextView
@@ -467,7 +398,7 @@
                         android:layout_width="85sp"
                         android:layout_height="wrap_content"
                         android:paddingRight="8sp"
-                        android:text="Preparation" >
+                        android:text="@string/preparation" >
                     </TextView>
 
                     <TextView
@@ -487,7 +418,7 @@
                         android:layout_width="85sp"
                         android:layout_height="wrap_content"
                         android:paddingRight="8sp"
-                        android:text="Labels" >
+                        android:text="@string/labels" >
                     </TextView>
 
                     <TextView
@@ -512,7 +443,7 @@
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:clickable="true"
-                        android:padding="2px"
+                        android:padding="2dp"
                         android:textColor="@android:color/black"
                         android:textSize="10sp" />
                 </ScrollView>

@@ -57,7 +57,13 @@ public class RestClient {
 	private static final int HTTP_TIMEOUT = 15 * 1000;
 	private static GsonBuilder gsonBuilder = null;
 	private static Cookie sessionCookie = null;
-	private static boolean showDataStreams = true;
+	private static boolean showDataStreams = false;
+
+//	static {
+//		// In the adb shell, setprop log.tag.org.apache.http.headers and log.tag.org.apache.http.wire to VERBOSE
+//		java.util.logging.Logger.getLogger("org.apache.http.wire").setLevel(java.util.logging.Level.FINEST);
+//		java.util.logging.Logger.getLogger("org.apache.http.headers").setLevel(java.util.logging.Level.FINEST);
+//	}
 
 	private static Gson getGson() {
 		if (gsonBuilder == null) {
@@ -312,12 +318,14 @@ public class RestClient {
 		HttpConnectionParams.setSoTimeout(params, HTTP_TIMEOUT);
 		params.setBooleanParameter("http.protocol.expect-continue", false);
 		SchemeRegistry registry = new SchemeRegistry();
-		registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
 		registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 8080));
 		try {
-			SSLSocketFactory sslSocketFactory = new EC2TrustedSocketFactory();
+   			SSLSocketFactory sslSocketFactory = new EC2TrustedSocketFactory();
+   			// Comodo is not a trusted provider (yet?)
+   			// HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
+   			// sslSocketFactory.setHostnameVerifier((X509HostnameVerifier) hostnameVerifier);
+			// Define only one port for the scheme, otherwise it will be overwritten
 			registry.register(new Scheme("https", sslSocketFactory, 443));
-			registry.register(new Scheme("https", sslSocketFactory, 8443));
 		}
 		catch (Exception e) {
 			Log.e(XCS.LOG.COMMUNICATE, "Could not use secure connection: " + StringUtil.getExceptionMessage(e));

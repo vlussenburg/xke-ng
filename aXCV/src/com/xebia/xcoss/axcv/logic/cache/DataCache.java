@@ -6,6 +6,7 @@ import java.util.List;
 import android.content.Context;
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.Messages;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
@@ -13,7 +14,7 @@ import com.xebia.xcoss.axcv.util.XCS;
 
 public abstract class DataCache {
 	protected static final long CACHETIME = 30 * 60 * 1000;
-	
+
 	public static final String CK_ALL_LOCATIONS = "CK-Location";
 	public static final String CK_ALL_AUTHORS = "CK-Author";
 	public static final String CK_ALL_LABELS = "CK-Label";
@@ -97,9 +98,15 @@ public abstract class DataCache {
 		return sessions;
 	}
 
+	/**
+	 * The cached conference is now made invalid.
+	 * 
+	 * @param conferenceId
+	 * @param result
+	 */
 	public void add(String conferenceId, Session result) {
-		if ( conferenceId == null ) {
-			throw new RuntimeException("ConferenceId cannot be null!");
+		if (conferenceId == null) {
+			throw new RuntimeException(Messages.getString("Exception.0"));
 		}
 		if (result != null && result.getId() != null) {
 			result.setConferenceId(conferenceId);
@@ -107,17 +114,13 @@ public abstract class DataCache {
 		}
 	}
 
-	public void add(String conferenceId, Iterable<Session> result) {
-		for (Session session : result) {
-			add(conferenceId, session);
-		}
-	}
-
 	public void add(Conference result) {
 		CachedObject<Conference> cachedObject = new CachedObject<Conference>(result);
 		if (result != null) {
 			doPutCachedObject(result.getId(), cachedObject);
-			add(result.getId(), result.getSessions());
+			for (Session session : result.getSessions()) {
+				add(result.getId(), session);
+			}
 		}
 	}
 
@@ -125,14 +128,23 @@ public abstract class DataCache {
 		doPutCachedObject(key, new CachedObject<T>(o));
 	}
 
+	/**
+	 * The cached conference is now made invalid
+	 * 
+	 * @param session
+	 */
 	public void remove(Session session) {
-		doRemoveCachedObject(session.getId().toString(), Session.class);
+		if (session != null && session.getId() != null) {
+			doRemoveCachedObject(session.getId(), Session.class);
+		}
 	}
 
 	public void remove(Conference conference) {
-		doRemoveCachedObject(conference.getId(), Conference.class);
-		for (Session session : conference.getSessions()) {
-			remove(session);
+		if (conference != null && conference.getId() != null) {
+			doRemoveCachedObject(conference.getId(), Conference.class);
+			for (Session session : conference.getSessions()) {
+				remove(session);
+			}
 		}
 	}
 

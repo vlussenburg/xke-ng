@@ -1,31 +1,21 @@
 IN PROGRESS
 -------------------------------------------------------------------
 
--	Externalize strings
-- 	Hide mark/edit button for expired sessions in session view
--	ASyncTask server communication (Arno)
-	-	Removal of network: crashes.....
--	Verbeteren van caching
-	-	Caching: refresh na conference edit/add break (reopen view...)
-	-	Conferenties verdwijnen uit lijst...
-	-	Database caching support
-	-	Toegevoegd/gewijzigde sessie is niet direct zichtbaar
--	Certificate check (Michael)
--	Start when no network: Should mention this.
--	Long click on location - show menu.
--	Wachtcursor bij search maken (Arno)
--	Timeout on login afvangen
 
 TODO
 -------------------------------------------------------------------
 client
+-	Validatie ingegeven datum/tijdformaat
+-	Swipe in zoekscherm werkt niet op leeg scherm
+
+-	BUG Reschedule with duration 120 overwrites breaks
+-	Certificate check
 -	Afhandeling 400 meldingen
 
 later op de client
 - 	Viewpaging voor locaties: CVSessionList (Arno)
 -	Search framework
 -	Content providers
--	Multitouch in view mode - show small matrix.
 
 Veel later op de client
 -	Foto's gebruikers + telefoonnummer
@@ -33,15 +23,15 @@ Veel later op de client
 -	Edit personal profile (?)
 
 server
--	Unimplemented fields of conference (organiser, description) and session (...)
--	Session scheduling
 -	Zoeken
 -	403 on session expiration or invalid login
--	Error handling (/error URL geeft 400 zonder verdere melding)
 -	Nieuwe datum conferentie leidt niet tot nieuwe datum sessies (wordt wel gestuurd)
+-	Unimplemented fields of conference (organiser, description) and session (...)
+-	Session scheduling
+-	Error handling (/error URL geeft 400 zonder verdere melding)
 -	Support conferenceId within session object (at least for search)
 -	Move sessions (optional) on delete of conference
-
+-	Server does not honor changes in session. PUT succeeds, GET just gives back old data. Jetty restart does not seem to work.
 DONE
 -------------------------------------------------------------------
 -	Login
@@ -87,3 +77,28 @@ DONE
 -	Bij roteren raken de waardes kwijt
 -	Timer naar AlarmManager (Michael)
 -	Transparant overlay for gestures (session view)
+-	ASyncTask server communication (Arno)
+	-	Removal of network: crashes.....
+-	Verbeteren van caching
+	-	Caching: refresh na conference edit/add break (reopen view...)
+	-	Conferenties verdwijnen uit lijst...
+	-	Database caching support
+	-	Toegevoegd/gewijzigde sessie is niet direct zichtbaar
+-	Long click on location - show menu.
+-	Wachtcursor bij search maken (Arno)
+-	Timeout on login afvangen
+- 	Hide mark/edit button for expired sessions in session view
+-	Start when no network: Should mention this.
+-	Notification
+-	Externalize strings
+	
+FIX Completeness level description
+FIX Crash on adding new session
+FIX On timeout adding conference: duplicate message
+FIX Edit corporate shows editable details
+FIX '<specify value>' if rate load fails
+FIX Rate and remark download are not silent
+FIX Possible to add conferences in history
+FIX Keep add/edit session open on error
+FIX Remove location - any sessions there? - 
+FIX Change time - any sessions there? -

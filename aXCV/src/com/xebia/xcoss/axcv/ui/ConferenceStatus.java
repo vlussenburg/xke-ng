@@ -1,9 +1,11 @@
 package com.xebia.xcoss.axcv.ui;
 
+import java.text.MessageFormat;
 import java.util.Set;
 
 import android.util.Log;
 
+import com.xebia.xcoss.axcv.Messages;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Session;
 import com.xebia.xcoss.axcv.util.XCS.LOG;
@@ -11,8 +13,17 @@ import com.xebia.xcoss.axcv.util.XCS.LOG;
 public class ConferenceStatus {
 
 	private static final int slotSize = 60;
+	private static String[] status;
+	
+	public static void init(String[] input) {
+		if ( input == null || input.length != 3) {
+			throw new RuntimeException(Messages.getString("Exception.6"));
+		}
+		status = input;
+	}
 	
 	public static String getStatus(Conference cfr) {
+		if ( status == null ) throw new RuntimeException(Messages.getString("Exception.6"));
 		try {
 			int locsize = cfr.getLocations().size();
 			int trackDuration = cfr.getEndTime().asMinutes() - cfr.getStartTime().asMinutes();
@@ -32,15 +43,15 @@ public class ConferenceStatus {
 			int openSlots = (totalDuration-bookedDuration-locsize*mandatoryDuration)/slotSize;
 
 			if (expectedSlots == 0) {
-				return "n/a";
+				return "";
 			}
 			if (openSlots <= 0) {
-				return "fully booked";
+				return status[0];
 			}
 			if (openSlots < expectedSlots / 2) {
-				return "" + cfr.getSessions().size() + " sessions scheduled";
+				return MessageFormat.format(status[1], cfr.getSessions().size());
 			}
-			return "" + openSlots + " slots available";
+			return MessageFormat.format(status[2], openSlots);
 		}
 		catch (Exception e) {
 			Log.e(LOG.ALL, "Status fail: " + e.getMessage(), e);

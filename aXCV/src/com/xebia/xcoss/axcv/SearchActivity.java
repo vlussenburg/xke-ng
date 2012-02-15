@@ -21,6 +21,7 @@ import com.xebia.xcoss.axcv.tasks.SearchAuthorsTask;
 import com.xebia.xcoss.axcv.tasks.SearchSessionsTask;
 import com.xebia.xcoss.axcv.tasks.TaskCallBack;
 import com.xebia.xcoss.axcv.ui.SearchResultAdapter;
+import com.xebia.xcoss.axcv.util.StringUtil;
 
 public abstract class SearchActivity extends BaseActivity implements SwipeActivity {
 
@@ -48,26 +49,21 @@ public abstract class SearchActivity extends BaseActivity implements SwipeActivi
 			}
 		});
 
-		searchSessions(null);
-		searchAuthors(null);
-
 		final TextView input = (TextView) findViewById(R.id.searchTerm);
 		final ImageView searchButton = (ImageView) findViewById(R.id.searchAction);
 
 		searchButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View paramView) {
-				String text = input.getText().toString();
+				updateSearch(input.getText().toString().trim());
 				input.setText("");
-				searchSessions(text);
-				searchAuthors(text);
 			}
 		});
 
 		input.setOnKeyListener(new View.OnKeyListener() {
 			@Override
 			public boolean onKey(View view, int keyCode, KeyEvent event) {
-				if (keyCode == KeyEvent.KEYCODE_ENTER) {
+				if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
 					searchButton.performClick();
 					return true;
 				}
@@ -78,6 +74,15 @@ public abstract class SearchActivity extends BaseActivity implements SwipeActivi
 		super.onCreate(savedInstanceState);
 	}
 
+	protected void updateSearch(String text) {
+		if ( StringUtil.isEmpty(text) ) {
+			createDialog(R.string.menu_search, R.string.search_no_search).show();
+		} else {
+			searchSessions(text);
+			searchAuthors(text);
+		}
+	}
+	
 	private void updateAuthors(List<Author> results) {
 		this.authorResults = results;
 		authorAdapter = new SearchResultAdapter(this, results);
@@ -111,8 +116,8 @@ public abstract class SearchActivity extends BaseActivity implements SwipeActivi
 			Session session = sessionResults.get(index);
 			if (session.getStartTime() != null) {
 				Intent intent = new Intent(this, CVSessionView.class);
-//				Conference conference = getConferenceServer().getConference(session.getStartTime());
-//				intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
+				// Conference conference = getConferenceServer().getConference(session.getStartTime());
+				// intent.putExtra(BaseActivity.IA_CONFERENCE, conference.getId());
 				intent.putExtra(BaseActivity.IA_SESSION, session.getId());
 				startActivity(intent);
 			}
@@ -132,18 +137,22 @@ public abstract class SearchActivity extends BaseActivity implements SwipeActivi
 		new SearchAuthorsTask(R.string.action_search_authors, this, new TaskCallBack<List<Author>>() {
 			@Override
 			public void onCalled(List<Author> result) {
-				updateAuthors(result);
+				if (result != null) {
+					updateAuthors(result);
+				}
 			}
-		}).execute(new Search().onFreeText(text));
+		}).silent().execute(new Search().onFreeText(text));
 	}
 
 	protected void searchSessions(String text) {
 		new SearchSessionsTask(R.string.action_search_sessions, this, new TaskCallBack<List<Session>>() {
 			@Override
 			public void onCalled(List<Session> result) {
-				updateSessions(result);
+				if (result != null) {
+					updateSessions(result);
+				}
 			}
-		}).execute(new Search().onFreeText(text));
+		}).silent().execute(new Search().onFreeText(text));
 	}
 
 	private void flip() {

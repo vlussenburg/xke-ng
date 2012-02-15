@@ -21,7 +21,7 @@ class XKENGPublicAPI extends RestHelper with Logger {
   serve {
     // POST /login
     case req @ Req("login" :: Nil, _, PostRequest) =>
-      doWithRequestBody(req.body) {
+      doWithRequestBody(req.body, ForbiddenResponse("Invalid credentials")) {
         login(_)
       }
 

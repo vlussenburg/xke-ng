@@ -2,6 +2,8 @@ package com.xebia.xcoss.axcv.logic;
 
 import java.net.URI;
 
+import com.xebia.xcoss.axcv.Messages;
+
 public class DataException extends CommException {
 
 	private static final long serialVersionUID = 539794302349294965L;
@@ -13,7 +15,7 @@ public class DataException extends CommException {
 	}
 
 	public DataException(Code code, URI uri) {
-		super(code.name() + " on " + uri.toString());
+		super(Messages.getString("DataException.0", code.name(), uri.toString()));
 		this.code = code;
 	}
 

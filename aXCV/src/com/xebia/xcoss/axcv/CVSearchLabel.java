@@ -38,8 +38,18 @@ public class CVSearchLabel extends BaseActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.search_items);
-		startText = getResources().getString(R.string.default_input_text);
 
+		allLabels = new TreeSet<String>();
+		new RetrieveLabelsTask(R.string.action_retrieve_labels, this, new TaskCallBack<List<String>>() {
+			@Override
+			public void onCalled(List<String> labels) {
+				if (labels != null) {
+					updateAllLabels(labels);
+				}
+			}
+		}).showProgress().execute();
+
+		startText = getResources().getString(R.string.default_input_text);
 		textView = (AutoCompleteTextView) findViewById(R.id.ssa_text);
 		textView.setSelection(0, startText.length());
 		textView.setOnKeyListener(new View.OnKeyListener() {
@@ -60,27 +70,23 @@ public class CVSearchLabel extends BaseActivity {
 				finish();
 			}
 		});
-		new RetrieveLabelsTask(R.string.action_retrieve_labels, this, new TaskCallBack<List<String>>() {
-			@Override
-			public void onCalled(List<String> result) {
-				updateLabels(result);
-			}
-		}).execute();
-		
+
 		super.onCreate(savedInstanceState);
 	}
-	
-	private void updateLabels(List<String> labels) {
-		allLabels = new TreeSet<String>();
-		String[] data = new String[labels.size()];
 
-		int i = 0;
-		for (String label : labels) {
-			data[i] = label;
-			allLabels.add(label);
-		}
+	@Override
+	protected void onResume() {
+		initSelectedLabels();
+		labelAdapter = new LabelAdapter(this, R.layout.author_item_small, selectedLabels);
+		ListView labelList = (ListView) findViewById(R.id.ssa_list);
+		labelList.setAdapter(labelAdapter);
+		super.onResume();
+	}
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, data);
+	public void updateAllLabels(List<String> labels) {
+		allLabels.addAll(labels);
+		String[] labellist = allLabels.toArray(new String[allLabels.size()]);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, labellist);
 		textView.setAdapter(adapter);
 	}
 
@@ -97,7 +103,7 @@ public class CVSearchLabel extends BaseActivity {
 			}
 			if (!addLabel(name)) {
 				// Seems the server will add the label upon updating a session
-//				TODO storeLabel(name);
+				// TODO storeLabel(name);
 			}
 			textView.getText().clear();
 			updateResult();
@@ -127,25 +133,25 @@ public class CVSearchLabel extends BaseActivity {
 		return allLabels.contains(name);
 	}
 
-//	private void storeLabel(final String name) {
-//		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setTitle("Add label...").setMessage("Create the new label '" + name + "'?")
-//				.setIcon(R.drawable.x_conference).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//					public void onClick(DialogInterface dialog, int id) {
-//						getConferenceServer().createLabel(name);
-//						allLabels.add(name);
-//						dialog.dismiss();
-//					}
-//				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
-//					public void onClick(DialogInterface dialog, int id) {
-//						selectedLabels.remove(name);
-//						labelAdapter.notifyDataSetChanged();
-//						dialog.dismiss();
-//					}
-//				});
-//		AlertDialog create = builder.create();
-//		create.show();
-//	}
+	// private void storeLabel(final String name) {
+	// AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	// builder.setTitle("Add label...").setMessage("Create the new label '" + name + "'?")
+	// .setIcon(R.drawable.x_conference).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+	// public void onClick(DialogInterface dialog, int id) {
+	// getConferenceServer().createLabel(name);
+	// allLabels.add(name);
+	// dialog.dismiss();
+	// }
+	// }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+	// public void onClick(DialogInterface dialog, int id) {
+	// selectedLabels.remove(name);
+	// labelAdapter.notifyDataSetChanged();
+	// dialog.dismiss();
+	// }
+	// });
+	// AlertDialog create = builder.create();
+	// create.show();
+	// }
 
 	private void initSelectedLabels() {
 		try {
@@ -156,15 +162,6 @@ public class CVSearchLabel extends BaseActivity {
 			Log.w(XCS.LOG.COMMUNICATE, "No labels loaded: " + e.getMessage());
 			selectedLabels = new ArrayList<String>();
 		}
-	}
-
-	@Override
-	protected void onResume() {
-		initSelectedLabels();
-		labelAdapter = new LabelAdapter(this, R.layout.author_item_small, selectedLabels);
-		ListView labelList = (ListView) findViewById(R.id.ssa_list);
-		labelList.setAdapter(labelAdapter);
-		super.onResume();
 	}
 
 	@Override
@@ -182,7 +179,7 @@ public class CVSearchLabel extends BaseActivity {
 				selectedLabels.remove(position);
 				updateResult();
 				labelAdapter.notifyDataSetChanged();
-				Toast.makeText(getApplicationContext(), "Label removed", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), R.string.label_removed, Toast.LENGTH_SHORT).show();
 				return true;
 			default:
 				return super.onContextItemSelected(menuItem);

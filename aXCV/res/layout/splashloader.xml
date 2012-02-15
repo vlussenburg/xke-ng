@@ -1,53 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical"
-	android:background="@android:color/black"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
-	<ImageView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:src="@drawable/x_conference"
-		android:layout_gravity="center"
-		android:layout_marginTop="10dp" android:id="@+id/conferenceButton"></ImageView>
-	<TextView
-		android:id="@+id/txtConference"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:textColor="@color/textcolor_title"
-		android:textSize="@dimen/textsize_title"
-		android:text="@string/splash_conference"
-		android:layout_gravity="center"
-		android:layout_marginTop="3dp"></TextView>
-	<TextView
-		android:id="@+id/txtCompany"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:textColor="@color/textcolor_company"
-		android:textSize="@dimen/textsize_company"
-		android:text="@string/splash_company"
-		android:textStyle="bold"
-		android:layout_gravity="center"
-		android:layout_marginTop="15dp"></TextView>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/black"
+    android:orientation="vertical" >
 
-	<RelativeLayout
-		android:layout_width="fill_parent"
-		android:id="@+id/relativeLayout1"
-		android:layout_height="fill_parent" android:gravity="center|bottom">
-		<TextView
-			android:text="@string/splash_copyright"
-			android:textColor="@color/textcolor_copyright"
-			android:background="@color/background_copyright"
-			android:layout_height="wrap_content"
-			android:id="@+id/copyright"
-			android:layout_width="wrap_content" 
-			android:layout_marginBottom="10dp"
-			android:paddingTop="5dp"
-			android:paddingRight="5dp"
-			android:paddingLeft="5dp"
-			android:paddingBottom="5dp"
+    <ImageView
+        android:id="@+id/conferenceButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:contentDescription="@string/img_conferenceButton"
+        android:src="@drawable/x_conference" >
+    </ImageView>
 
-></TextView>
-	</RelativeLayout>
+    <TextView
+        android:id="@+id/txtConference"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="3dp"
+        android:text="@string/splash_conference"
+        android:textColor="@color/textcolor_title"
+        android:textSize="@dimen/textsize_title" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/txtCompany"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp"
+        android:text="@string/splash_company"
+        android:textColor="@color/textcolor_company"
+        android:textSize="@dimen/textsize_company"
+        android:textStyle="bold" >
+    </TextView>
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center|bottom" >
+
+        <TextView
+            android:id="@+id/copyright"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@color/background_copyright"
+            android:paddingBottom="5dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="5dp"
+            android:text="@string/splash_copyright"
+            android:textColor="@color/textcolor_copyright" >
+        </TextView>
+    </RelativeLayout>
+
 </LinearLayout>

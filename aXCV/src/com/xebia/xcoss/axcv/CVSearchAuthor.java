@@ -109,10 +109,10 @@ public class CVSearchAuthor extends BaseActivity {
 
 	private void challengeSelection(final Author author) {
 		Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Single select!");
-		builder.setMessage("You cannot select more than one person! What shall I do with the previously selected one?");
+		builder.setTitle(R.string.single_select);
+		builder.setMessage(R.string.single_select_message);
 		builder.setIcon(android.R.drawable.ic_dialog_alert);
-		builder.setPositiveButton("Replace", new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(R.string.replace, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int i) {
 				selectedAuthors.clear();
@@ -121,7 +121,7 @@ public class CVSearchAuthor extends BaseActivity {
 				dialog.dismiss();
 			}
 		});
-		builder.setNegativeButton("Keep", new DialogInterface.OnClickListener() {
+		builder.setNegativeButton(R.string.keep, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int i) {
 				dialog.dismiss();
@@ -183,7 +183,7 @@ public class CVSearchAuthor extends BaseActivity {
 				selectedAuthors.remove(position);
 				updateResult();
 				authorAdapter.notifyDataSetChanged();
-				Toast.makeText(getApplicationContext(), "Author removed", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), R.string.author_removed, Toast.LENGTH_SHORT).show();
 				return true;
 			default:
 				return super.onContextItemSelected(menuItem);
@@ -204,7 +204,7 @@ public class CVSearchAuthor extends BaseActivity {
 			}
 
 			if (!addAuthor(authorName)) {
-				Toast.makeText(getApplicationContext(), "Select a valid author!", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), R.string.select_valid_author, Toast.LENGTH_SHORT).show();
 			}
 			textView.getText().clear();
 			updateResult();

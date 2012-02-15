@@ -22,6 +22,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
+                android:contentDescription="@string/img_conferenceButton"
                 android:src="@drawable/x_conference" >
             </ImageView>
 
@@ -35,29 +36,9 @@
                 android:layout_toRightOf="@+id/conferenceButton"
                 android:gravity="center_vertical"
                 android:paddingLeft="7sp"
-                android:text="Schedule"
+                android:text="@string/schedule"
                 android:textSize="@dimen/textsize_title" >
             </TextView>
-
-            <ImageButton
-                android:id="@+id/imageButton5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/imageButton4"
-                android:layout_alignTop="@+id/imageButton4"
-                android:layout_toLeftOf="@+id/imageButton4"
-                android:src="@drawable/x_conference"
-                android:visibility="gone" >
-            </ImageButton>
-
-            <ImageButton
-                android:id="@+id/imageButton4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:src="@drawable/x_conference"
-                android:visibility="gone" >
-            </ImageButton>
         </RelativeLayout>
 
         <View
@@ -75,68 +56,45 @@
                 android:id="@+id/sessionLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center" android:textStyle="bold">
+                android:layout_gravity="center"
+                android:textStyle="bold" >
             </TextView>
 
-            <LinearLayout
-                android:id="@+id/nextLocationLayout"
+            <TextView
+                android:id="@+id/nextLocationText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right" >
+                android:layout_gravity="right"
+                android:drawableRight="@drawable/arrow_right_float"
+                android:paddingRight="3dp"
+                android:text="@string/right" >
+            </TextView>
 
-                <TextView
-                    android:id="@+id/rightText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingRight="3dp"
-                    android:text="Right" >
-                </TextView>
-
-                <ImageView
-                    android:id="@+id/ImageView04"
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:src="@drawable/arrow_right_float" >
-                </ImageView>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/prevLocationLayout"
+            <TextView
+                android:id="@+id/prevLocationText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left" >
-
-                <ImageView
-                    android:id="@+id/ImageView04"
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:src="@drawable/arrow_left_float" >
-                </ImageView>
-
-                <TextView
-                    android:id="@+id/leftText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:paddingLeft="3dp"
-                    android:text="Left" >
-                </TextView>
-            </LinearLayout>
+                android:layout_gravity="left"
+                android:drawableLeft="@drawable/arrow_left_float"
+                android:paddingLeft="3dp"
+                android:text="@string/left" >
+            </TextView>
         </FrameLayout>
-
+
         <FrameLayout
             android:id="@+id/frameLayout2"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" android:background="@color/background_copyright">
+            android:layout_height="wrap_content"
+            android:background="@color/background_copyright" >
 
             <TextView
                 android:id="@+id/conferenceDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="23 mei 1999" android:textStyle="bold">
+                android:text="@string/date"
+                android:textStyle="bold" >
             </TextView>
-
         </FrameLayout>
 
         <ListView

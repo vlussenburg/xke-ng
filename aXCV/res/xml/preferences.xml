@@ -50,7 +50,7 @@
 			android:defaultValue="HH:mm'u'" />
 		<ListPreference
 			android:title="Caching"
-			android:summary="Which caching policy?"
+			android:summary="Which caching policy (requires restart)?"
 			android:key="CacheType"
 			android:defaultValue="1"
 			android:entries="@array/cacheNames"
@@ -96,7 +96,7 @@
 			android:title="Version"
 			android:summary="@string/app_version" />
 		<com.xebia.xcoss.axcv.preference.LinkPreference
-			url="http://www.xebiamobile.com/"
+			url="http://xke.xebia.com/help/"
 			android:key="ApplicationHelp"
 			android:title="Show tutorial"
 			android:summary="Online tutorial on xebia.com" />

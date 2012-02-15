@@ -3,6 +3,7 @@ package com.xebia.xcoss.axcv;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -12,7 +13,11 @@ import com.github.droidfu.DroidFuApplication;
 import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.logic.cache.DataCache;
 import com.xebia.xcoss.axcv.logic.cache.MemoryCache;
+import com.xebia.xcoss.axcv.model.Conference;
+import com.xebia.xcoss.axcv.model.Rate;
 import com.xebia.xcoss.axcv.model.Session;
+import com.xebia.xcoss.axcv.model.SessionType;
+import com.xebia.xcoss.axcv.ui.ConferenceStatus;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
@@ -20,19 +25,22 @@ public class ConferenceViewerApplication extends DroidFuApplication {
 
 	private ProfileManager profileManager;
 	private DataCache storage;
-	private String user;
-	private String password;
 
 	public ConferenceViewerApplication() {
 		// Don't init credentials here; preferences not yet initialized
 	}
 
-	private void initCredentials() {
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-		this.user = sp.getString(XCS.PREF.USERNAME, null);
-		this.password = sp.getString(XCS.PREF.PASSWORD, "");
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		Resources rsc = getApplicationContext().getResources();
+		Rate.init(rsc.getStringArray(R.array.rateValues));
+		Conference.init(rsc.getStringArray(R.array.conferenceFields));
+		Session.init(rsc.getStringArray(R.array.sessionFields));
+		ConferenceStatus.init(rsc.getStringArray(R.array.statusFields));
+		SessionType.init(rsc.getStringArray(R.array.sessionTypes));
 	}
-
+	
 	protected ProfileManager getProfileManager() {
 		if (profileManager == null) {
 			profileManager = new ProfileManager(this);
@@ -59,17 +67,13 @@ public class ConferenceViewerApplication extends DroidFuApplication {
 	}
 
 	public String getUser() {
-		if (StringUtil.isEmpty(user)) {
-			initCredentials();
-		}
-		return user;
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		return sp.getString(XCS.PREF.USERNAME, null);
 	}
 
 	public String getPassword() {
-		if (StringUtil.isEmpty(password)) {
-			initCredentials();
-		}
-		return password;
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		return sp.getString(XCS.PREF.PASSWORD, "");
 	}
 
 	public DataCache getCache() {
@@ -107,7 +111,7 @@ public class ConferenceViewerApplication extends DroidFuApplication {
 
 	public void markSession(Session session, View view, boolean update) {
 		// Breaks are not supported for marking
-		if (session.getType() == Session.Type.BREAK) return;
+		if (session.isBreak()) return;
 
 		ProfileManager pm = getProfileManager();
 		boolean hasMarked = pm.isMarked(getUser(), session.getId());

@@ -15,7 +15,7 @@
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content">
 			<TextView
-				android:text="Title"
+				android:text="@string/title"
 				android:textSize="@dimen/ts_itemtitle"
 				android:id="@+id/cnf_title"
 				android:padding="3dip"
@@ -24,7 +24,7 @@
 				android:layout_width="fill_parent"
 				android:layout_weight="1"></TextView>
 			<TextView
-				android:text="Today"
+				android:text="@string/today"
 				android:textSize="@dimen/ts_itemwhen"
 				android:id="@+id/cnf_when"
 				android:padding="3dip"
@@ -40,7 +40,7 @@
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content">
 			<TextView
-				android:text="Jun 7th, 2011"
+				android:text="@string/empty_value"
 				android:textSize="@dimen/ts_itemdetail"
 				android:id="@+id/cnf_date"
 				android:padding="3dip"
@@ -49,7 +49,7 @@
 				android:layout_width="fill_parent"
 				android:layout_weight="1"></TextView>
 			<TextView
-				android:text="no open slots"
+				android:text="@string/no_open_slots"
 				android:textSize="@dimen/ts_itemdetail"
 				android:id="@+id/cnf_status"
 				android:padding="3dip"

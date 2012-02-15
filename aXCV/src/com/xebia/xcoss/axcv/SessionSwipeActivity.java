@@ -8,10 +8,8 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
@@ -37,11 +35,14 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		currentConferenceId = (String) getIntent().getExtras().get(IA_CONFERENCE_ID);
-		currentLocation = getIntent().getExtras().getInt(IA_LOCATION_ID);
+		Bundle extras = getIntent().getExtras();
+		if (extras != null) {
+			currentConferenceId = (String) extras.get(IA_CONFERENCE_ID);
+			currentLocation = extras.getInt(IA_LOCATION_ID);
+		}
 		locations = new Location[0];
 
-		TextView location = (TextView) findViewById(R.id.rightText);
+		TextView location = (TextView) findViewById(R.id.nextLocationText);
 		location.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View arg0) {
@@ -49,7 +50,7 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 				return true;
 			}
 		});
-		location = (TextView) findViewById(R.id.leftText);
+		location = (TextView) findViewById(R.id.prevLocationText);
 		location.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View arg0) {
@@ -64,7 +65,7 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 		if (id == XCS.DIALOG.INPUT_LOCATION) {
 			Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle(R.string.select_location);
-			ListAdapter la = new ArrayAdapter<Location>(this, android.R.layout.simple_spinner_item, locations);
+			ListAdapter la = new ArrayAdapter<Location>(this, R.layout.simple_list_item, locations);
 			builder.setSingleChoiceItems(la, -1, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int i) {
@@ -110,6 +111,10 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 		return currentConferenceId;
 	}
 
+	protected void setConferenceId(Conference cfg) {
+		this.currentConferenceId = cfg.getId();
+	}
+
 	@Override
 	public void onSwipeLeftToRight() {
 		Location location = getPreviousLocation();
@@ -150,7 +155,7 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 		List<Location> list = cc.getLocations();
 		locations = list.toArray(new Location[list.size()]);
 	}
-	
+
 	protected void updateCurrentLocation(Session session) {
 		if (session != null && !session.isMandatory()) {
 			for (int i = 0; i < locations.length; i++) {
@@ -161,26 +166,26 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 			}
 		}
 	}
-	
+
 	protected void updateLocationNavigation() {
 		Location previous = getPreviousLocation();
 		Location next = getNextLocation();
 
-//		StringBuilder sb = new StringBuilder();
-//		if (locations != null) for (Location loc : locations)
-//			sb.append(loc);
-//
-//		Log.i(XCS.LOG.NAVIGATE, "Update locations: 1. " + sb.toString());
-//		Log.i(XCS.LOG.NAVIGATE, "Update locations: 2. " + getCurrentLocation());
-//		Log.i(XCS.LOG.NAVIGATE, "Update locations: 3. " + previous);
-//		Log.i(XCS.LOG.NAVIGATE, "Update locations: 4. " + next);
+		// StringBuilder sb = new StringBuilder();
+		// if (locations != null) for (Location loc : locations)
+		// sb.append(loc);
+		//
+		// Log.i(XCS.LOG.NAVIGATE, "Update locations: 1. " + sb.toString());
+		// Log.i(XCS.LOG.NAVIGATE, "Update locations: 2. " + getCurrentLocation());
+		// Log.i(XCS.LOG.NAVIGATE, "Update locations: 3. " + previous);
+		// Log.i(XCS.LOG.NAVIGATE, "Update locations: 4. " + next);
 
-		TextView location = (TextView) findViewById(R.id.rightText);
-		ViewGroup group = ((ViewGroup) findViewById(R.id.nextLocationLayout));
+		TextView location = (TextView) findViewById(R.id.nextLocationText);
+		// ViewGroup group = ((ViewGroup) findViewById(R.id.nextLocationLayout));
 		if (next == null) {
-			group.setVisibility(View.INVISIBLE);
+			location.setVisibility(View.INVISIBLE);
 		} else {
-			group.setVisibility(View.VISIBLE);
+			location.setVisibility(View.VISIBLE);
 			location.setText(next.getDescription());
 			location.setOnClickListener(new OnClickListener() {
 				@Override
@@ -189,12 +194,12 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 				}
 			});
 		}
-		location = (TextView) findViewById(R.id.leftText);
-		group = ((ViewGroup) findViewById(R.id.prevLocationLayout));
+		location = (TextView) findViewById(R.id.prevLocationText);
+		// group = ((ViewGroup) findViewById(R.id.prevLocationLayout));
 		if (previous == null) {
-			group.setVisibility(View.INVISIBLE);
+			location.setVisibility(View.INVISIBLE);
 		} else {
-			group.setVisibility(View.VISIBLE);
+			location.setVisibility(View.VISIBLE);
 			location.setText(previous.getDescription());
 			location.setOnClickListener(new OnClickListener() {
 				@Override

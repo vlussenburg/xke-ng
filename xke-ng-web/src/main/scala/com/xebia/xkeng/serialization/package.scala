@@ -17,12 +17,13 @@ import net.liftweb.json.Serialization
 import net.liftweb.json.parse
 package object util {
 
-  val fmt = ISODateTimeFormat.dateTime()
+  val DATE_TIME_FORMAT = ISODateTimeFormat.dateTime()
+    val TIME_FORMAT = "HH:mm"
   implicit val formats: Formats = Serialization.formats(NoTypeHints) ++ JodaTimeSerializers.all
 
   object AsDateTime {
     def unapply(isoDateString: String): Option[DateTime] = {
-      try { Some(fmt.parseDateTime(isoDateString)) }
+      try { Some(DATE_TIME_FORMAT.parseDateTime(isoDateString)) }
       catch {
         case e: Exception => None
       }

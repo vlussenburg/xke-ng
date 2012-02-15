@@ -12,7 +12,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_margin="10sp"
         android:gravity="center_horizontal"
-        android:text="Please specify your rating for this session by setting the slider in position and click &apos;Submit&apos;."
+        android:text="@string/submit_rate"
         android:textColor="@color/textcolor_title" >
     </TextView>
 
@@ -24,7 +24,7 @@
         android:gravity="center"
         android:paddingLeft="5sp"
         android:paddingRight="5sp"
-        android:text="XCoss - a very long title to show on this dialog"
+        android:text="@string/empty_value"
         android:textSize="18sp" >
     </TextView>
 
@@ -41,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Moderate"
+        android:text="@string/empty_value"
         android:textColor="@color/textcolor_title" >
     </TextView>
 
@@ -51,7 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_margin="20sp"
-        android:text="Submit" >
+        android:text="@string/submit" >
     </Button>
 
 </LinearLayout>

@@ -3,8 +3,6 @@ package com.xebia.xcoss.axcv;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,7 +15,6 @@ import android.widget.TextView;
 import com.xebia.xcoss.axcv.layout.SwipeLayout;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
-import com.xebia.xcoss.axcv.tasks.DeleteConferenceTask;
 import com.xebia.xcoss.axcv.tasks.RetrieveConferencesPerYearTask;
 import com.xebia.xcoss.axcv.tasks.SimpleCallBack;
 import com.xebia.xcoss.axcv.tasks.TaskCallBack;
@@ -85,7 +82,12 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 							if (redirect) {
 								Log.i(XCS.LOG.NAVIGATE, "Jumping to first upcomming conference.");
 								redirect = false;
-								switchTo(result.get(0));
+								for (Conference conference : result) {
+									if ( !conference.isExpired() ) {
+										switchTo(conference);
+										break;
+									}
+								}
 							}
 						}
 					}
@@ -160,6 +162,7 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 		list.add(XCS.MENU.SETTINGS);
 		list.add(XCS.MENU.SEARCH);
 		list.add(XCS.MENU.TRACK);
+		list.add(XCS.MENU.RUNNING);
 	}
 
 	@Override

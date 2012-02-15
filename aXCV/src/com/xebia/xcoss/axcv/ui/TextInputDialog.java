@@ -45,7 +45,7 @@ public class TextInputDialog extends Dialog {
 		params.width = LayoutParams.FILL_PARENT;
 		getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
 
-		setTitle("Enter value");
+		setTitle(R.string.set_value);
 
 		Button submit = (Button) findViewById(R.id.seCommit);
 		submit.setOnClickListener(new View.OnClickListener() {
