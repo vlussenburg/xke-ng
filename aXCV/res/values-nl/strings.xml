@@ -18,6 +18,7 @@
     <string name="menu_edit">Wijzigen</string>
     <string name="menu_track">Mijn schema</string>
     <string name="menu_list">Lijstweergave</string>
+    <string name="menu_running">Programma</string>
     <string name="password_set">Wachtwoord opgeslagen</string>
     <string name="password_unset">Geen wachtwoord gespecificeerd</string>
     <string name="session_title">Sessietitel</string>
@@ -136,8 +137,8 @@
     </string-array>
     <string-array name="statusFields">
 		<item>volgeboekt</item>
-		<item>{0} sessies ingepland</item>
-		<item>{0} blokken beschikbaar</item>
+		<item>{0} sessies gepland</item>
+		<item>{0} open blokken</item>
     </string-array>
     
     <string name="close">Sluiten</string>
@@ -298,4 +299,6 @@
     <string name="today">Vandaag</string>
     <string name="type">Soort</string>
     
+    <string name="earlier_in_time">Eerder</string>
+    <string name="later_in_time">Later</string>
 </resources>

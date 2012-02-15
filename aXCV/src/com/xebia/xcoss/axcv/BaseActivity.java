@@ -45,6 +45,7 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 	public static final String IA_AUTHOR = "ID-author";
 	public static final String IA_LABELS = "ID-labels";
 	public static final String IA_CONF_YEAR = "ID-year";
+	public static final String IA_MOMENT = "ID-moment";
 	public static final String IA_REDIRECT = "ID-redirect";
 	public static final String IA_LOCATION_ID = "ID-location";
 	public static final String IA_SESSION_START = "ID-sstart";
@@ -60,13 +61,13 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 	private MenuItem miAdd;
 	private MenuItem miEdit;
 	private MenuItem miTrack;
+	private MenuItem miRunning;
 	private ExceptionReporter exceptionReporter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		exceptionReporter = ExceptionReporter.register(this);
-//		ProxyExceptionReporter.register(this);
 
 		ImageView conferenceButton = (ImageView) findViewById(R.id.conferenceButton);
 		if (conferenceButton != null) {
@@ -78,17 +79,6 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 			});
 		}
 	}
-
-//	@Override
-//	protected void onResume() {
-//		String notificationId = getIntent().getStringExtra(IA_NOTIFICATION_ID);
-//		if (notificationId != null) {
-//			NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//			Log.w("debug", "Notification - Cancel on " + notificationId);
-//			mgr.cancel(notificationId.hashCode());
-//		}
-//		super.onResume();
-//	}
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
@@ -143,6 +133,10 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 			MenuItem menuItem = menu.add(0, XCS.MENU.LIST, Menu.NONE, R.string.menu_list);
 			menuItem.setIcon(R.drawable.ic_menu_list);
 		}
+		if (list.contains(XCS.MENU.RUNNING)) {
+			MenuItem menuItem = menu.add(0, XCS.MENU.RUNNING, Menu.NONE, R.string.menu_running);
+			menuItem.setIcon(android.R.drawable.ic_menu_recent_history);
+		}
 		if (list.contains(XCS.MENU.TRACK) && !StringUtil.isEmpty(getUser())) {
 			miTrack = menu.add(0, XCS.MENU.TRACK, Menu.NONE, R.string.menu_track);
 			miTrack.setIcon(android.R.drawable.ic_menu_agenda);
@@ -165,6 +159,9 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 				return true;
 			case XCS.MENU.TRACK:
 				startActivity(new Intent(this, CVTrack.class));
+				return true;
+			case XCS.MENU.RUNNING:
+				startActivity(new Intent(this, CVRunning.class));
 				return true;
 		}
 		return super.onOptionsItemSelected(item);

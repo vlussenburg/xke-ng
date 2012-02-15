@@ -350,6 +350,7 @@ public class CVSessionView extends SessionSwipeActivity {
 		list.add(XCS.MENU.SETTINGS);
 		list.add(XCS.MENU.SEARCH);
 		list.add(XCS.MENU.TRACK);
+		list.add(XCS.MENU.RUNNING);
 	}
 
 	@Override

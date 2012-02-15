@@ -35,8 +35,11 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		currentConferenceId = (String) getIntent().getExtras().get(IA_CONFERENCE_ID);
-		currentLocation = getIntent().getExtras().getInt(IA_LOCATION_ID);
+		Bundle extras = getIntent().getExtras();
+		if (extras != null) {
+			currentConferenceId = (String) extras.get(IA_CONFERENCE_ID);
+			currentLocation = extras.getInt(IA_LOCATION_ID);
+		}
 		locations = new Location[0];
 
 		TextView location = (TextView) findViewById(R.id.nextLocationText);
@@ -108,6 +111,10 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 		return currentConferenceId;
 	}
 
+	protected void setConferenceId(Conference cfg) {
+		this.currentConferenceId = cfg.getId();
+	}
+
 	@Override
 	public void onSwipeLeftToRight() {
 		Location location = getPreviousLocation();
@@ -148,7 +155,7 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 		List<Location> list = cc.getLocations();
 		locations = list.toArray(new Location[list.size()]);
 	}
-	
+
 	protected void updateCurrentLocation(Session session) {
 		if (session != null && !session.isMandatory()) {
 			for (int i = 0; i < locations.length; i++) {
@@ -159,22 +166,22 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 			}
 		}
 	}
-	
+
 	protected void updateLocationNavigation() {
 		Location previous = getPreviousLocation();
 		Location next = getNextLocation();
 
-//		StringBuilder sb = new StringBuilder();
-//		if (locations != null) for (Location loc : locations)
-//			sb.append(loc);
-//
-//		Log.i(XCS.LOG.NAVIGATE, "Update locations: 1. " + sb.toString());
-//		Log.i(XCS.LOG.NAVIGATE, "Update locations: 2. " + getCurrentLocation());
-//		Log.i(XCS.LOG.NAVIGATE, "Update locations: 3. " + previous);
-//		Log.i(XCS.LOG.NAVIGATE, "Update locations: 4. " + next);
+		// StringBuilder sb = new StringBuilder();
+		// if (locations != null) for (Location loc : locations)
+		// sb.append(loc);
+		//
+		// Log.i(XCS.LOG.NAVIGATE, "Update locations: 1. " + sb.toString());
+		// Log.i(XCS.LOG.NAVIGATE, "Update locations: 2. " + getCurrentLocation());
+		// Log.i(XCS.LOG.NAVIGATE, "Update locations: 3. " + previous);
+		// Log.i(XCS.LOG.NAVIGATE, "Update locations: 4. " + next);
 
 		TextView location = (TextView) findViewById(R.id.nextLocationText);
-//		ViewGroup group = ((ViewGroup) findViewById(R.id.nextLocationLayout));
+		// ViewGroup group = ((ViewGroup) findViewById(R.id.nextLocationLayout));
 		if (next == null) {
 			location.setVisibility(View.INVISIBLE);
 		} else {
@@ -188,7 +195,7 @@ public abstract class SessionSwipeActivity extends BaseActivity implements Swipe
 			});
 		}
 		location = (TextView) findViewById(R.id.prevLocationText);
-//		group = ((ViewGroup) findViewById(R.id.prevLocationLayout));
+		// group = ((ViewGroup) findViewById(R.id.prevLocationLayout));
 		if (previous == null) {
 			location.setVisibility(View.INVISIBLE);
 		} else {

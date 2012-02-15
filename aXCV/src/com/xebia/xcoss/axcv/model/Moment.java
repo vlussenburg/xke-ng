@@ -27,7 +27,7 @@ public class Moment implements Serializable {
 		public FixedMoment(Moment clone) {
 			super(clone);
 		}
-		
+
 		public void setDate(int year, int month, int day) {
 			Log.e(XCS.LOG.DATA, "Date cannot be set on a fixed moment!");
 		}
@@ -36,7 +36,7 @@ public class Moment implements Serializable {
 			Log.e(XCS.LOG.DATA, "Time cannot be set on a fixed moment!");
 		}
 	}
-	
+
 	public Moment(Moment clone) {
 		this.year = clone.year;
 		this.month = clone.month;
@@ -59,6 +59,10 @@ public class Moment implements Serializable {
 		DateTime now = DateTime.now();
 		setTime(now.getHourOfDay(), now.getMinuteOfHour());
 		setDate(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth());
+	}
+	
+	public static Moment fromMinutes(int min) {
+		return new Moment(min/60, min%60);
 	}
 
 	public void setDate(int year, int month, int day) {
@@ -86,6 +90,10 @@ public class Moment implements Serializable {
 		return result;
 	}
 
+	public Moment minMinutes(int length) {
+		return plusMinutes(-1 * length);
+	}
+
 	public Moment plusMinutes(int length) {
 		if (minute == null || hour == null) {
 			throw new IllegalArgumentException(Messages.getString("Exception.1"));
@@ -95,6 +103,9 @@ public class Moment implements Serializable {
 		if (minuteValue >= 60) {
 			hourValue += (minuteValue / 60);
 			minuteValue = minuteValue % 60;
+		} else if (minuteValue < 0) {
+			hourValue += (minuteValue / 60);
+			minuteValue = -1 * minuteValue % 60;
 		}
 		return new Moment(hourValue, minuteValue);
 	}
@@ -170,7 +181,7 @@ public class Moment implements Serializable {
 		DateTime ths = getDate();
 		int yearDiff = ths.getYear() - now.getYear();
 		int daysDiff = ths.getDayOfYear() - now.getDayOfYear();
-		return yearDiff*365 + daysDiff;
+		return yearDiff * 365 + daysDiff;
 	}
 
 	public int getYearOffset() {
@@ -178,7 +189,7 @@ public class Moment implements Serializable {
 		DateTime ths = getDate();
 		return ths.getYear() - now.getYear();
 	}
-	
+
 	public static Moment fromString(String timeValue) {
 		DateTime dt = DateTime.parse(timeValue);
 		DateTime dtLocal = dt.withZone(DateTimeZone.getDefault());
