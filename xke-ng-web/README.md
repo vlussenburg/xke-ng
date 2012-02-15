@@ -13,6 +13,8 @@ Building web
 
 You can build the project either using maven, or using sbt (>= 0.10)
 
+Make sure MongoDB is running, otherwise tests will fail.
+
 Maven (http://maven.apache.org/)
 
 * mvn clean install
@@ -26,3 +28,10 @@ Running web
 1. Make sure MongoDB is running
 2. mvn jetty:run
 3. Go to http://localhost:8080/xkeng/index.html
+
+
+Running MongoDB
+---------------
+(paths use the ux notation)
+Create a database folder for MongoDB e.g. data/db in MongoDB folder
+Start MongoDB: bin/mongod --dbpath data/db
