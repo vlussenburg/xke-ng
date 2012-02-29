@@ -4,12 +4,9 @@
 <title>Status.net</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link rel="stylesheet"
-	href="static/jquery.mobile-1.0.min.css" />
-<script type="text/javascript"
-	src="static/jquery-1.6.4.min.js"></script>
-<script type="text/javascript"
-	src="static/jquery.mobile-1.0.min.js"></script>
+<link rel="stylesheet" href="static/jquery.mobile-1.0.min.css" />
+<script type="text/javascript" src="static/jquery-1.6.4.min.js"></script>
+<script type="text/javascript" src="static/jquery.mobile-1.0.min.js"></script>
 </head>
 
 <script type="text/javascript">
@@ -17,148 +14,176 @@
 	var currentSessionId;
 	var nextConferenceIndex = 1;
 
-
 	$(document).ready(
-				$("#next").live("pageshow",
-                                function(event, ui) {
-									$.ajax({
-										type: 'GET',
-										dataType: 'json',
-										contentType: 'application/json',
-										url: '/xkeng/conference/next/' + nextConferenceIndex +'/slots',
-										success: conferenceSuccessCallback,
-										crossDomain: false,
-										error: function (xhr, ajaxOptions, thrownError) {
-							                    alert("Unable to get conferences\nCode " + xhr.status + "\nMessage " + xhr.status);
-										}
-									})
-                                }), 
-				$("#detail").live("pageshow",
-				                function(event, ui) {
-									$.ajax({
-										type: 'GET',
-										dataType: 'json',
-										contentType: 'application/json',
-										url: '/xkeng/session/' + currentSessionId,
-										success: sessionSuccessCallback,
-										crossDomain: false,
-										error: function (xhr, ajaxOptions, thrownError) {
-							                    alert("Unable to get session\nCode " + xhr.status + "\nMessage " + xhr.status);
-										}
-									})
-						        })
+			$("#next").live(
+					"pageshow",
+					function(event, ui) {
+						$.ajax({
+							type : 'GET',
+							dataType : 'json',
+							contentType : 'application/json',
+							url : '/xkeng/conference/next/'
+									+ nextConferenceIndex + '/slots',
+							success : conferenceSuccessCallback,
+							crossDomain : false,
+							error : function(xhr, ajaxOptions, thrownError) {
+								alert("Unable to get conferences\nCode "
+										+ xhr.status + "\nMessage "
+										+ xhr.status);
+							}
+						})
+					}),
+			$("#detail").live(
+					"pageshow",
+					function(event, ui) {
+						$("#detail-list").empty()
+						$.mobile.showPageLoadingMsg();
+						$.ajax({
+							type : 'GET',
+							dataType : 'json',
+							contentType : 'application/json',
+							url : '/xkeng/session/' + currentSessionId,
+							success : sessionSuccessCallback,
+							crossDomain : false,
+							error : function(xhr, ajaxOptions, thrownError) {
+								alert("Unable to get session\nCode "
+										+ xhr.status + "\nMessage "
+										+ xhr.status);
+							}
+						})
+					})
 
-	
 	);
 
-/*
-	function updateCallback(response) {
-		$.mobile.hidePageLoadingMsg();
-		console.log("update was POST-ed")
-		$("#update-list").children().remove();
-		$("#update-list").listview("refresh");
-		$("#statusUpdateField").val("")
-		getHomeTimeline();
-	}
-*/
+	/*
+	 function updateCallback(response) {
+	 $.mobile.hidePageLoadingMsg();
+	 console.log("update was POST-ed")
+	 $("#update-list").children().remove();
+	 $("#update-list").listview("refresh");
+	 $("#statusUpdateField").val("")
+	 getHomeTimeline();
+	 }
+	 */
 
-/*
-	function homeTimeLineCallback(response){
-		console.log("callback called");
-		
-		for (updateIndex in response) {
-		var update = response[updateIndex]
-			$("#update-list").append("<li><i>" + update.user.screen_name + "</i><br><br>" + update.text + "</li>")
-		}
-		$("#update-list").listview("refresh");
-		
-		console.log(response)
-	}
-*/
+	/*
+	 function homeTimeLineCallback(response){
+	 console.log("callback called");
 	
+	 for (updateIndex in response) {
+	 var update = response[updateIndex]
+	 $("#update-list").append("<li><i>" + update.user.screen_name + "</i><br><br>" + update.text + "</li>")
+	 }
+	 $("#update-list").listview("refresh");
+	
+	 console.log(response)
+	 }
+	 */
+
 	function login() {
 		var jsonRequest = {}
-		jsonRequest.username = $("#username").val();;
-		jsonRequest.password = $("#password").val();;
+		jsonRequest.username = $("#username").val();
+		;
+		jsonRequest.password = $("#password").val();
+		;
 
 		$.ajax({
-			type: 'POST',
-			dataType: 'json',
-			contentType: 'application/json',
-			url: '/xkeng/login',
-			success: loginSuccessCallback,
-			crossDomain: false,
-			data: JSON.stringify(jsonRequest),
-			error: function (xhr, ajaxOptions, thrownError){
-                    alert("Unable to post login\nCode " + xhr.status + "\nMessage " + xhr.status);
+			type : 'POST',
+			dataType : 'json',
+			contentType : 'application/json',
+			url : '/xkeng/login',
+			success : loginSuccessCallback,
+			crossDomain : false,
+			data : JSON.stringify(jsonRequest),
+			error : function(xhr, ajaxOptions, thrownError) {
+				alert("Unable to post login\nCode " + xhr.status + "\nMessage "
+						+ xhr.status);
 			}
 		});
 	}
-	
+
 	function loginSuccessCallback(response) {
-		$.mobile.changePage( "#next", { transition: "slidedown"} );
- 	}
-	
+		$.mobile.changePage("#next", {
+			transition : "slidedown"
+		});
+	}
+
 	function showNext() {
-		if(nextConferenceIndex < 1) {
+		if (nextConferenceIndex < 1) {
 			nextConferenceIndex = 1
 		} else {
-			nextConferenceIndex = nextConferenceIndex +1
+			nextConferenceIndex = nextConferenceIndex + 1
 		}
 		console.log(nextConferenceIndex)
-		$.mobile.reloadPage( "#next", { transition: "slidedown"} );
+		$.mobile.reloadPage("#next", {
+			transition : "slidedown"
+		});
 
 	}
-	
+
 	function changeToConferenceOverviewPage() {
-		$.mobile.changePage( "#next", { transition: "fade"} );		
+		$.mobile.changePage("#next", {
+			transition : "fade"
+		});
 	}
-	
+
 	function changeToSessionDetailsPage(id) {
 		currentSessionId = id;
-		$.mobile.changePage( "#detail", { transition: "slide"} );
+		$.mobile.changePage("#detail", {
+			transition : "slide"
+		});
 	}
-	
- 	
+
 	function getAuthors(session) {
 		var authors = ""
-			for(authorIndex in session.authors) {
-				if(authorIndex > 0) {
-					authors += ", "
-				}
-				authors += session.authors[authorIndex].name
+		for (authorIndex in session.authors) {
+			if (authorIndex > 0) {
+				authors += ", "
 			}
+			authors += session.authors[authorIndex].name
+		}
 		return authors;
 	}
-	
- 	function conferenceSuccessCallback(response) {
+
+	function conferenceSuccessCallback(response) {
 		$("#next-list").empty()
-	 	for (slotIndex in response.slots) {
-	 		var slot = response.slots[slotIndex]
-	 		$("#next-list").append("<li data-role='list-divider'>" + slot.from + " - " + slot.to + "</li>")
+		for (slotIndex in response.slots) {
+			var slot = response.slots[slotIndex]
+			$("#next-list").append(
+					"<li data-role='list-divider'>" + slot.from + " - "
+							+ slot.to + "</li>")
 			for (sessionsIndex in slot.sessions) {
 				var session = slot.sessions[sessionsIndex]
 				console.log(session)
 				var authors = getAuthors(session)
-				$("#next-list").append("<li><a href='javascript:changeToSessionDetailsPage(\"" + session.id + "\");'><i>" + session.title + "</i><br>by: " +authors + "<br>" + session.location.description + "</a></li>")
-			}	 		
-	 	 }
-		$("#next-list").listview("refresh"); 	
- 	}
+				$("#next-list").append(
+						"<li><a href='javascript:changeToSessionDetailsPage(\""
+								+ session.id + "\");'><i>" + session.title
+								+ "</i><br>by: " + authors + "<br>"
+								+ session.location.description + "</a></li>")
+			}
+		}
+		$("#next-list").listview("refresh");
+	}
 
- 	function sessionSuccessCallback(session) {
-		$("#detail-list").empty()
+	function sessionSuccessCallback(session) {
+		$.mobile.hidePageLoadingMsg();
 		var authors = getAuthors(session)
-	 	$("#detail-list").append("<li data-role='list-divider'>" + session.startTimeShort + " - " + session.endTimeShort + "</li>")
-		$("#detail-list").append("<li><i>" +  session.title + "</i><br>by: " +authors + "</li>")
-	 	$("#detail-list").append("<li data-role='list-divider'>Location</li>")
-		$("#detail-list").append("<li>" + session.location.description + "<br>Max:" + session.limit+"</li>")
-	    $("#detail-list").append("<li data-role='list-divider'>Description</li>")
-		$("#detail-list").append("<li>" +  session.description + "</li>")
-		$("#detail-list").listview("refresh"); 	
- 	}
+		$("#detail-list").append(
+				"<li data-role='list-divider'>" + session.startTimeShort
+						+ " - " + session.endTimeShort + "</li>")
+		$("#detail-list").append(
+				"<li><i>" + session.title + "</i><br>by: " + authors + "</li>")
+		$("#detail-list").append("<li data-role='list-divider'>Location</li>")
+		$("#detail-list").append(
+				"<li>" + session.location.description + "<br>Max:"
+						+ session.limit + "</li>")
+		$("#detail-list").append(
+				"<li data-role='list-divider'>Description</li>")
+		$("#detail-list").append("<li>" + session.description + "</li>")
 
- 	
+		$("#detail-list").listview("refresh");
+	}
 </script>
 
 <body>
@@ -184,23 +209,14 @@
 
 		<div data-role="header">
 			<h1>Current XKE</h1>
+	<!-- 
+			<a href="#chooseConference" data-rel="dialog" class="ui-btn-right">Conferences</a>
+ -->
 		</div>
 
 
 		<div data-role="content">
 			<ul id="next-list" data-role="listview" data-filter="true" />
-		</div>
-
-<!-- 		showPage does not work yet. Won't refresh
-<div data-role="footer" data-position="fixed">
-			<div data-role="navbar">
-				<ul>
-					<li><a href="#current" class="ui-btn-active">Current</a></li>
-					<li><a href="javascript:showNext();">Next</a></li>
-				</ul>
-			</div>
-			 -->
-			
 		</div>
 	</div>
 
@@ -208,6 +224,7 @@
 
 		<div data-role="header">
 			<h1>Current</h1>
+
 		</div>
 
 
@@ -233,25 +250,44 @@
 	</div>
 
 
-	<div data-role="page" id="detail">
+	<div data-role="page" id="detail" data-add-back-btn="true">
 
 		<div data-role="header">
 			<h1 id="detailHeader">Session</h1>
+			<!-- 
+			<a href="index.html" data-icon="check" class="ui-btn-right">Save</a>
+		 -->
 		</div>
 
 
 		<div data-role="content">
 			<ul id="detail-list" data-role="listview" />
 		</div>
+<!-- 
+		<div data-role="fieldcontain">
+			<label for="slider-2">Input slider:</label> <input type="range"
+				name="slider-2" id="slider-2" value="25" min="0" max="100"
+				data-theme="a" data-track-theme="b" />
+		</div>
+		<label for="slider-fill">Input slider:</label> <input type="range"
+			name="slider" id="slider-fill" value="60" min="0" max="100"
+			data-highlight="true" />
+ -->
+	</div>
 
-		<div data-role="footer" data-position="fixed">
-			<div data-role="navbar">
-				<ul>
-					<li><a href="javascript:changeToConferenceOverviewPage();" class="ui-btn-active">Back</a></li>
-				</ul>
-			</div>
+	<div data-role="page" id="chooseConference">
+
+		<div data-role="header">
+			<h1 id="detailHeader">Choose a conference</h1>
+		</div>
+
+
+		<div data-role="content">
+			<ul id="detail-list" data-role="listview" />
 		</div>
 	</div>
+
+
 </body>
 
 </html>
