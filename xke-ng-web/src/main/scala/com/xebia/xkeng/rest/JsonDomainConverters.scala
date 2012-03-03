@@ -11,7 +11,6 @@ import com.xebia.xkeng.model.{ Credential, Session, Location, Conference, Author
 import net.liftweb.common.Logger
 import com.xebia.xkeng.serialization.util._
 
-
 /**
  * {
  * "conferences":[
@@ -81,7 +80,7 @@ object JsonDomainConverters extends Logger {
       ("authors" -> authorsToJArray(session.authors)) ~
       ("comments" -> commentsToJArray(session.comments)) ~
       ("ratings" -> ratingsFullToJArray(session.ratings)) ~
-      ("labels" -> serializeStringsToJArray(session.labels.toSeq : _*)) ~
+      ("labels" -> serializeStringsToJArray(session.labels.toSeq: _*)) ~
       ("location" -> locationToJValue(session.location))
   }
 
@@ -106,9 +105,8 @@ object JsonDomainConverters extends Logger {
       ("sessions" -> conference.sessions.map(sessionToJValue(_))) ~
       ("locations" -> conference.locations.map(locationToJValue(_)))
   }
-  
-  
-    /**
+
+  /**
    *
    * "id":"4e4a0c48b39c8578c8f7b6d2",
    * "title":"XKE",
@@ -120,15 +118,38 @@ object JsonDomainConverters extends Logger {
    * ]
    * }
    */
-   def conferenceSlotsToJValue(conference: Conference): JValue = {
-    ("id" -> conference._id.toString) ~
+  def conferenceSlotsToJValue(conference: Conference): JValue = {
+    val slots: JValue = ("slots" -> conference.slots.map(slotsToJValue(_)))
+    conferenceSummaryToJValue(conference).merge(slots)
+  }
+
+  /**
+   *
+   * "id":"4e4a0c48b39c8578c8f7b6d2",
+   * "title":"XKE",
+   * "begin":"2011-08-09T16:00:56.527+02:00",
+   * "end":"2011-08-09T20:00:56.527+02:00",
+   * }
+   */
+  def conferenceSummaryToJValue(conference: Conference, next: Boolean = false): JValue = {
+    val summary = ("id" -> conference._id.toString) ~
       ("title" -> conference.title) ~
       ("begin" -> DATE_TIME_FORMAT.print(conference.begin)) ~
-      ("end" -> DATE_TIME_FORMAT.print(conference.end)) ~
-      ("slots" -> conference.slots.map(slotsToJValue(_))) 
+      ("end" -> DATE_TIME_FORMAT.print(conference.end))
+
+    if (next) {
+      val nextIndication: JValue = ("next" -> true)
+      summary.merge(nextIndication)
+    } else summary
   }
-  
-     /**
+
+  def conferencesSummaryToJValue(conferences: List[Conference], next: Option[Conference] = None): JValue = {
+    conferences.map { c =>
+      val isNext = next.map(_ == c).getOrElse(false)
+      conferenceSummaryToJValue(c, isNext)
+    }
+  }
+  /**
    *
    * "slot" {
    * "from" : "16:00",
@@ -173,13 +194,12 @@ object JsonDomainConverters extends Logger {
       ("rate" -> rating.rate)
   }
 
-  
   implicit def conferencesToJArray(conferences: List[Conference]): JValue = new JArray(conferences.map(conferenceToJValue))
   implicit def locationsToJArray(locations: List[Location]): JValue = new JArray(locations.map(locationToJValue))
   implicit def commentsToJArray(comments: List[Comment]): JValue = new JArray(comments.map(commentToJValue))
   implicit def ratingsToJArray(ratings: List[Rating]): JValue = new JArray(ratings.map(rating => JInt(rating.rate)))
   implicit def authorsToJArray(authors: List[Author]): JValue = new JArray(authors.map(_.serializeToJson))
-  implicit def labelsToJArray(labels: Set[String]): JValue = serializeStringsToJArray(labels.toSeq : _*)
+  implicit def labelsToJArray(labels: Set[String]): JValue = serializeStringsToJArray(labels.toSeq: _*)
   def ratingsFullToJArray(ratings: List[Rating]): JValue = new JArray(ratings.map(ratingFullToJValue))
 
   /**
@@ -228,18 +248,16 @@ object JsonDomainConverters extends Logger {
     conference
 
   }
-  
+
   def fromSlotInfoJson(jsonString: String): SlotInfo = {
     val JObject(slotJson) = JsonParser.parse(jsonString)
     val JString(AsDateTime(from)) = slotJson \! "from"
     val JString(AsDateTime(to)) = slotJson \! "to"
-     (slotJson \ "title") match {
-      case JString(title) =>  SlotInfo(from, to, title)
-      case _ =>  SlotInfo(from, to)
+    (slotJson \ "title") match {
+      case JString(title) => SlotInfo(from, to, title)
+      case _ => SlotInfo(from, to)
     }
   }
-
-  
 
   def fromLocationJson(isNew: Boolean)(jsonString: String): Location = {
     val JObject(locJson) = JsonParser.parse(jsonString)
@@ -256,7 +274,7 @@ object JsonDomainConverters extends Logger {
   def fromCommentJson(jsonString: String): Comment = {
     val JObject(jsonValue) = JsonParser.parse(jsonString)
     val JString(comment) = jsonValue \! "comment"
-    val user = if(UserHolder.isLoggedIn) UserHolder.loggedInAuthor.userId else "guest"
+    val user = if (UserHolder.isLoggedIn) UserHolder.loggedInAuthor.userId else "guest"
     Comment(comment, user)
   }
 
@@ -274,7 +292,7 @@ object JsonDomainConverters extends Logger {
   def fromRatingJson(jsonString: String): Rating = {
     val JObject(jsonValue) = JsonParser.parse(jsonString)
     val JInt(rate) = jsonValue \! "rate"
-    val user = if(UserHolder.isLoggedIn) UserHolder.loggedInAuthor.userId else "guest"
+    val user = if (UserHolder.isLoggedIn) UserHolder.loggedInAuthor.userId else "guest"
     Rating(rate.toInt, user)
   }
 
@@ -288,10 +306,10 @@ object JsonDomainConverters extends Logger {
   def fromCredentialJson(jsonString: String): Credential = {
     val JObject(jsonValue) = JsonParser.parse(jsonString)
     val JString(name) = jsonValue \! "username"
-    val pwd = (jsonValue \ "password").values   
-    if(pwd != None) Credential(name, pwd.toString) else {
+    val pwd = (jsonValue \ "password").values
+    if (pwd != None) Credential(name, pwd.toString) else {
       val JString(encryptedPwd) = (jsonValue \! "encryptedPassword")
-      Credential(name, encryptedPwd, true) 
+      Credential(name, encryptedPwd, true)
     }
   }
 

@@ -27,6 +27,8 @@ trait ConferenceRepository {
 
   def findNextConference(ahead: Int): Option[Conference]
 
+  def findConferencesRange(amountPastConferences: Int, amountFutureConferences: Int): (List[Conference], Option[Conference])
+
   def findSessionsOfConference(id: String): List[Session]
 
 }
@@ -117,14 +119,6 @@ trait RepositoryComponent {
     def findConference(id: String) = Conference.find(id)
 
     /**
-     * db.confs.find({}, {'sessions.labels':1})
-     */
-    def findAllLabels(): List[String] = {
-      val confererencesWithLabels = Conference.findAll(new BasicDBObject(), Some(new BasicDBObjectBuilder().add("sessions.label", 1).get()))
-      Nil
-    }
-   
-    /**
      * db.confs.find({'begin':{$gte:'2012-02-03T10:39:07.270Z'}}).sort({'begin':1}).limit(<ahead>)
      */
     def findNextConference(ahead: Int): Option[Conference] = {
@@ -132,6 +126,21 @@ trait RepositoryComponent {
       val sortQry = ("begin" -> 1)
       val r = Conference.findAll(futureConferencesQry, sortQry, Limit(ahead))
       if (r.size == ahead) Some(r(ahead - 1)) else None
+    }
+
+    /**
+     * db.confs.find({'begin':{$gte:'2012-02-03T10:39:07.270Z'}}, {'sessions':0}).sort({'begin':1}).limit(future)
+     * db.confs.find({'begin':{$lt:'2012-02-03T10:39:07.270Z'}}, {'sessions':0}).sort({'begin':1}).limit(future)
+     */
+    def findConferencesRange(amountPastConferences: Int, amountFutureConferences: Int): (List[Conference], Option[Conference]) = {
+      val offsetDate = new DateTime().hourOfDay.setCopy(16).minuteOfHour.setCopy(0).minusDays(1)
+      val pastConferencesQry = ("begin" -> ("$lt" -> offsetDate.toString(MONG_DB_DATE_FORMAT)))
+      val futureConferencesQry = ("begin" -> ("$gte" -> offsetDate.toString(MONG_DB_DATE_FORMAT)))
+      val sortQry = ("begin" -> 1)
+      val past = if(amountPastConferences > 0) Conference.findAll(pastConferencesQry, sortQry, Limit(amountPastConferences)) else Nil
+      val future = if(amountFutureConferences > 0) Conference.findAll(futureConferencesQry, sortQry, Limit(amountFutureConferences)) else Nil
+      val next = if(future.isEmpty) None else Some(future.head)
+      (past ::: future, next)
     }
 
   }

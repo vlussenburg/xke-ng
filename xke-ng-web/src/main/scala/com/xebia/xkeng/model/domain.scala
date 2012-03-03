@@ -96,7 +96,9 @@ trait EmbeddedDocumentOps[T] {
  * Defines the structure of a Conference.
  */
 object Conference extends MongoDocumentMeta[Conference] with EmbeddedDocumentOps[Conference] {
+
   override def collectionName = "confs"
+
 
   override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
 
@@ -257,7 +259,7 @@ object Session extends FromJsonDeserializer[Session] {
  * SlotInfo identifies a slot by means of time (from -> to) and
  * a description
  */
-case class SlotInfo(from: DateTime, to: DateTime, title:String = "Session") extends Ordered[SlotInfo] {
+case class SlotInfo(from: DateTime, to: DateTime, title: String = "Session") extends Ordered[SlotInfo] {
   val duration = new Duration(from, to)
 
   /**
@@ -290,7 +292,7 @@ case class SlotInfo(from: DateTime, to: DateTime, title:String = "Session") exte
 case class Slot(key: SlotInfo, sessions: List[Session])
 
 object Slot {
-  def apply(from: DateTime, to: DateTime, title:String, sessions: List[Session]): Slot = Slot(SlotInfo(from, to, title), sessions)
+  def apply(from: DateTime, to: DateTime, title: String, sessions: List[Session]): Slot = Slot(SlotInfo(from, to, title), sessions)
   def apply(from: DateTime, to: DateTime, sessions: List[Session]): Slot = Slot(SlotInfo(from, to), sessions)
 }
 
@@ -315,6 +317,7 @@ case class Author(userId: String, mail: String, name: String) extends ToJsonSeri
  */
 case class AuthorDoc(_id: ObjectId, author: Author) extends MongoDocument[AuthorDoc] {
   def meta = AuthorDoc
+
 }
 
 /**
@@ -325,6 +328,8 @@ object AuthorDoc extends MongoDocumentMeta[AuthorDoc] {
 
   override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
 
+  ensureIndex(("author.userId" -> 1))
+  ensureIndex(("author.name" -> 1))
   def apply(author: Author): AuthorDoc = {
     AuthorDoc(ObjectId.get, author)
   }
@@ -372,7 +377,8 @@ case class Facility(val _id: ObjectId, name: String, var locations: List[Locatio
  */
 object Facility extends MongoDocumentMeta[Facility] with EmbeddedDocumentOps[Facility] {
   override def collectionName = "facility"
-
+  ensureIndex(("locations.id" -> 1))
+  ensureIndex(("locations.name" -> 1))
   override def formats = (super.formats + new ObjectIdSerializer) ++ JodaTimeSerializers.all
 
   def apply(name: String, locations: List[Location]): Facility = {

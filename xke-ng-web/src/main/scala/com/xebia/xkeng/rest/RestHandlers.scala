@@ -69,9 +69,16 @@ trait RestHandlerComponent extends Logger {
   }
 
   def getConference(id: String) = {
-    doWithSome(conferenceRepository.findConference(id)) {c => c}
+    doWithSome(conferenceRepository.findConference(id)) { c => c }
   }
 
+  
+   def getConferenceSlot(id: String) = {
+    doWithSome(conferenceRepository.findConference(id)) { 
+      conferenceSlotsToJValue(_)
+    }
+  }
+   
   def getNextConference(ahead: Int) = {
     asJsonResp(conferenceRepository.findNextConference(ahead))
   }
@@ -80,6 +87,11 @@ trait RestHandlerComponent extends Logger {
     doWithSome(conferenceRepository.findNextConference(ahead)) {
       conferenceSlotsToJValue(_)
     }
+  }
+
+  def getConferencesRange(amountPastConferences: Int, amountFutureConferences: Int) = {
+    val (confs, next) = conferenceRepository.findConferencesRange(amountPastConferences, amountFutureConferences)
+    asJsonResp(conferencesSummaryToJValue(confs, next))
   }
 
   def handleConferenceUpdate(id: String, jsonBody: String) = {
@@ -111,7 +123,7 @@ trait RestHandlerComponent extends Logger {
    */
 
   def getSession(id: Long) = {
-    doWithSome(sessionRepository.findSessionById(id).map(_._2)) {s => s} 
+    doWithSome(sessionRepository.findSessionById(id).map(_._2)) { s => s }
   }
 
   def handleSessionsList(conferenceId: String): Box[LiftResponse] = {
@@ -122,11 +134,12 @@ trait RestHandlerComponent extends Logger {
 
   def handleSessionCreate(conferenceId: String, jsonBody: String) = {
     doWithSome(conferenceRepository.findConference(conferenceId)) {
-      conf => {   
-        val session = fromSessionJson(true)(jsonBody)
-        conf.saveOrUpdate(session)
-        session
-      }
+      conf =>
+        {
+          val session = fromSessionJson(true)(jsonBody)
+          conf.saveOrUpdate(session)
+          session
+        }
     }
   }
 
@@ -141,7 +154,7 @@ trait RestHandlerComponent extends Logger {
         val updatedSession = fromSessionJson(false)(jsonBody)
         conf.saveOrUpdate(updatedSession.copy(id = session.id, ratings = session.ratings, comments = session.comments))
       }
-    }  
+    }
   }
 
   def handleSessionDelete(sessionId: Long) = {
@@ -227,7 +240,7 @@ trait RestHandlerComponent extends Logger {
    * =============================
    */
   def readRatings(sessionId: Long) = {
-    doWithSome(sessionRepository.findSessionById(sessionId) ) {
+    doWithSome(sessionRepository.findSessionById(sessionId)) {
       case (_, session) => session.ratings
     }
   }

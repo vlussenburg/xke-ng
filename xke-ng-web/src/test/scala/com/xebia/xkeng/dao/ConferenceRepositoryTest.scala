@@ -111,6 +111,17 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
     conf should be(None)
   }
 
+  it should "find conferences range" in {
+    val (conf, next) = conferenceRepository.findConferencesRange(2, 1)
+    next should not be None
+    next.get.begin should be(xkeFuture1)
+    conf should not be Nil
+    conf.size should be(3)
+       val (conf2, next2) = conferenceRepository.findConferencesRange(3, 0)
+        next2 should be(None)
+    conf2 should not be Nil
+  }
+
   it should "find conference by year and month" in {
     val confs = conferenceRepository.findConferences(xke2011_06_03.getYear, xke2011_06_03.getMonthOfYear)
     confs should not be (Nil)

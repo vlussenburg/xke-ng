@@ -6,8 +6,12 @@ import net.liftweb.mongodb.{ DefaultMongoIdentifier, MongoDB }
 import com.mongodb.{ Mongo, MongoOptions, ServerAddress }
 import org.joda.time.DateTime
 import org.bson.types.ObjectId
+import net.liftweb.json._
 import net.liftweb.common._
+import net.liftweb.json.JsonDSL._
 import com.xebia.xkeng.model.{ Session, Location, Conference, Author, Facility, AuthorDoc, Labels, SlotInfo }
+import net.liftweb.mongodb.{ MongoDocument, ObjectIdSerializer, MongoDocumentMeta }
+import com.mongodb.BasicDBObject
 
 object Assembly extends Logger {
 
@@ -22,7 +26,7 @@ object Assembly extends Logger {
     private val crowdSysUserPwd = Props.get("crowd.sysuser.pwd").get
     private val crowdBase = Props.get("crowd.base.url").get
     private val crowdConnectionCheck = Props.get("crowd.conn.check").map(_.trim.toBoolean).getOrElse(false)
-     val authenticationRepository = AuthenticationRepository(crowdBase, crowdSysUser, crowdSysUserPwd, crowdConnectionCheck)
+    val authenticationRepository = AuthenticationRepository(crowdBase, crowdSysUser, crowdSysUserPwd, crowdConnectionCheck)
 
   }
 
@@ -53,6 +57,14 @@ object Assembly extends Logger {
     info("MongoDB connect properties= " + srvr)
     info("MongoDB properties= " + mo)
     MongoDB.defineDb(DefaultMongoIdentifier, new Mongo(srvr, mo), Props.get("mongo.db.name").getOrElse("xkeng"))
+    ensureIndexes()
+    
+    //Unittests with maven fail when indexes are ensured in ConferenceMetaData class. Here it works...
+    def ensureIndexes() {
+      Conference.ensureIndex(("begin" -> 1))
+      Conference.ensureIndex(("sessions.id" -> -1))
+      Conference.ensureIndex(("locations.id" -> -1))
+    }
   }
 
   def purgeAndPushTestdata(forcePurge: Boolean = false) = {
@@ -96,7 +108,7 @@ object Assembly extends Logger {
     val slot1End = startDate.plusMinutes(60)
     val slot2Start = slot1End
     val slot2End = slot2Start.plusMinutes(60)
-    val schedule = SlotInfo(slot1Start, slot1End) :: SlotInfo(slot2Start, slot2End) :: Nil 
+    val schedule = SlotInfo(slot1Start, slot1End) :: SlotInfo(slot2Start, slot2End) :: Nil
     val s1 = Session(slot1Start, slot1End, locations(0), "Mongo rocks", "Mongo is a paperless document database", "STRATEGIC", "10 people", List(a1), Nil, Nil, Set("Database", "Mongo", "Javascript"))
     val s2 = Session(slot1Start, slot1End, locations(1), "Scala rocks even more", "Scala is a codeless programming language", "STRATEGIC", "10 people", List(a2), Nil, Nil, Set("Scala", "Functions", "DSL"))
     val s3 = Session(slot1Start, slot2End, locations(2), "Scala quirks", "No such thing as a free ride when doing scala", "STRATEGIC", "15 people", List(a1, a2), Nil, Nil, Set("Scala", "Functional Programming", "Beauty"))

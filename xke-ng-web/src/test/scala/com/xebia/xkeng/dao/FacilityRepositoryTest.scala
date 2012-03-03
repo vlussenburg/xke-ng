@@ -17,7 +17,7 @@ class FacilityRepositoryTest extends FlatSpec with ShouldMatchers with BeforeAnd
   val l2 = Location("Laap", 30)
   val l3 = Location("New", 100)
 
-  override def beforeEach() {
+  override def beforeEach() { 
     init()
     createTestLocations();
   }

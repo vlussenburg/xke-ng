@@ -37,13 +37,18 @@ trait XKENGSecuredAPI extends RestHelper with Logger {
       getNextConference(1)
     case Req("conference" :: "next" :: AsInt(ahead) :: Nil, _, GetRequest) =>
       getNextConference(ahead)
+    case Req("conferences" :: "summary" :: "pastcount" :: AsInt(amountPastConferences) :: "futurecount" :: AsInt(amountFutureConferences) :: Nil, _, GetRequest) =>
+      getConferencesRange(amountPastConferences, amountFutureConferences)
 
     // GET /conference/next/<ahead>/slots
     case Req("conference" :: "next" :: "slots" :: Nil, _, GetRequest) =>
       getNextConferenceSlots(1)
     case Req("conference" :: "next" :: AsInt(ahead) :: "slots" :: Nil, _, GetRequest) =>
       getNextConferenceSlots(ahead)
-
+  // GET /conference/<id>
+    case Req("conference" :: id ::"slots" ::  Nil, _, GetRequest) =>
+      getConferenceSlot(id)
+      
     // POST /conference
     case req @ Req("conference" :: Nil, _, PostRequest) =>
       doWithRequestBody(req.body) {
