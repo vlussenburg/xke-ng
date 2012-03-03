@@ -296,6 +296,8 @@
 
 	function showSessionDetailsPage() {
 		$("#detail-list").empty()
+		$("#rating-stars").empty()
+		$("#rate-button").empty()		
 		$.mobile.changePage("#detail", {
 			transition : "slide"
 		});
@@ -413,6 +415,8 @@
 		$("#detail-list").append(
 				"<li data-role='list-divider'>" + session.ratings.length + " Rating(s)</li>")
 		renderRatings(session.ratings)
+		$("#rate-button").append("<a href='#rate' data-role='button' data-rel='dialog' >Rate</a>")
+		$("#rate-button").trigger("create"); 
 		$("#detail-list").listview("refresh");
 	}
 </script>
@@ -462,9 +466,9 @@
 		<div data-role="content">
 			<ul id="detail-list" data-role="listview" />	
 		</div>
+		
 		<br/><div id="rating-stars"></div><br/>
 		<div id="rate-button">
-			<a href="#rate" data-role="button" data-rel="dialog" >Rate</a>
 		</div>
 
 <!--		<div data-role="footer" data-position="fixed">
