@@ -264,7 +264,8 @@ public class Conference implements Serializable {
 			Location location) {
 
 		int prefstart = Math.max(start == null ? 0 : start.asMinutes(), startTime.asMinutes());
-
+		int sessionDuration = duration < TimeSlot.MIN_LENGTH ? TimeSlot.LENGTH : duration;
+		
 		for (Session session : getSessions()) {
 			if (!location.equals(session.getLocation()) || session.equals(rescheduleSession)) {
 				continue;
@@ -279,8 +280,8 @@ public class Conference implements Serializable {
 			} else {
 				// There is room before this session
 				int available = sesstart - prefstart;
-				if (available >= duration) {
-					return getTimeSlot(prefstart, duration, location);
+				if (available >= sessionDuration) {
+					return getTimeSlot(prefstart, sessionDuration, location);
 				}
 				// Not enough time available. Try with a later time.
 				prefstart = session.getEndTime().asMinutes();
@@ -289,8 +290,8 @@ public class Conference implements Serializable {
 
 		// Check last session till end of conference.
 		int endspace = endTime.asMinutes() - prefstart;
-		if (endspace >= duration) {
-			return getTimeSlot(prefstart, duration, location);
+		if (endspace >= sessionDuration) {
+			return getTimeSlot(prefstart, sessionDuration, location);
 		}
 		return null;
 	}

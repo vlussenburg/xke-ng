@@ -101,8 +101,11 @@ object Assembly extends Logger {
     val s2 = Session(slot1Start, slot1End, locations(1), "Scala rocks even more", "Scala is a codeless programming language", "STRATEGIC", "10 people", List(a2), Nil, Nil, Set("Scala", "Functions", "DSL"))
     val s3 = Session(slot1Start, slot2End, locations(2), "Scala quirks", "No such thing as a free ride when doing scala", "STRATEGIC", "15 people", List(a1, a2), Nil, Nil, Set("Scala", "Functional Programming", "Beauty"))
     val s4 = Session(slot2Start, slot2End, locations(0), "Deployment with puppet", "Even animals start to like deploying", "STRATEGIC", "20 people", List(a1, a2), Nil, Nil, Set("Middleware", "Deoployment", "Quick"))
-    val c = Conference("XKE", startDate, startDate.plusHours(4), Nil, locations, schedule)
+    val c = Conference("Test-XKE", startDate, startDate.plusHours(4), Nil, locations, schedule)
     c.save
+    val startDate2 = startDate.plusDays(14)
+    val c2 = Conference("NextTest-XKE", startDate2, startDate2.plusHours(4), Nil, locations, schedule)
+    c2.save
     List(s1, s2, s3, s4).foreach(c.saveOrUpdate(_))
   }
 }

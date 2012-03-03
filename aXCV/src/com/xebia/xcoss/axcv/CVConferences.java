@@ -162,6 +162,7 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 		list.add(XCS.MENU.SETTINGS);
 		list.add(XCS.MENU.SEARCH);
 		list.add(XCS.MENU.TRACK);
+		list.add(XCS.MENU.RUNNING);
 	}
 
 	@Override

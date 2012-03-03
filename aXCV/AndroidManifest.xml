@@ -116,7 +116,11 @@
                     android:scheme="tag" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name="CVRunning"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        
         <receiver
             android:name=".service.CheckNotificationSignalRetriever"
             android:process=":remote" >

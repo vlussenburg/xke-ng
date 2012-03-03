@@ -25,8 +25,6 @@ public class ConferenceViewerApplication extends DroidFuApplication {
 
 	private ProfileManager profileManager;
 	private DataCache storage;
-	private String user;
-	private String password;
 
 	public ConferenceViewerApplication() {
 		// Don't init credentials here; preferences not yet initialized
@@ -43,12 +41,6 @@ public class ConferenceViewerApplication extends DroidFuApplication {
 		SessionType.init(rsc.getStringArray(R.array.sessionTypes));
 	}
 	
-	private void initCredentials() {
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-		this.user = sp.getString(XCS.PREF.USERNAME, null);
-		this.password = sp.getString(XCS.PREF.PASSWORD, "");
-	}
-
 	protected ProfileManager getProfileManager() {
 		if (profileManager == null) {
 			profileManager = new ProfileManager(this);
@@ -75,17 +67,13 @@ public class ConferenceViewerApplication extends DroidFuApplication {
 	}
 
 	public String getUser() {
-		if (StringUtil.isEmpty(user)) {
-			initCredentials();
-		}
-		return user;
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		return sp.getString(XCS.PREF.USERNAME, null);
 	}
 
 	public String getPassword() {
-		if (StringUtil.isEmpty(password)) {
-			initCredentials();
-		}
-		return password;
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		return sp.getString(XCS.PREF.PASSWORD, "");
 	}
 
 	public DataCache getCache() {

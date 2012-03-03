@@ -18,6 +18,7 @@
     <string name="menu_edit">Edit</string>
     <string name="menu_track">My Track</string>
     <string name="menu_list">List view</string>
+    <string name="menu_running">Now showing</string>
     <string name="password_set">Password stored</string>
     <string name="password_unset">No password specified</string>
     <string name="session_title">Session title</string>
@@ -297,5 +298,8 @@
     <string name="title">Title</string>
     <string name="today">Today</string>
     <string name="type">Type</string>
+
+    <string name="earlier_in_time">Earlier</string>
+    <string name="later_in_time">Later</string>
     
 </resources>
