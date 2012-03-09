@@ -5,7 +5,7 @@ import _root_.net.liftweb.http._
 import _root_.net.liftweb.http.provider._
 import _root_.net.liftweb.sitemap._
 import com.xebia.xkeng.rest.Assembly._
-import com.xebia.xkeng.rest.SecurityInterceptor._
+import com.xebia.xkeng.rest.XKENGSecurityInterceptor
 import net.liftweb.util.Props
 import net.liftweb.mongodb.{ DefaultMongoIdentifier, MongoDB }
 import com.mongodb.{ Mongo, MongoOptions, ServerAddress }
@@ -33,7 +33,7 @@ class Boot {
       warn("Starting application in dev mode without security")
       LiftRules.dispatch.append(new XKENGPublicAPIAssembly with DummySecurityRepositoryComponentImpl)
     }
-    LiftRules.dispatch.append(authenticationInterceptor guard XKENGSecuredAPIAssembly)
+    LiftRules.dispatch.append(XKENGSecurityInterceptor guard XKENGSecuredAPIAssembly)
     LiftRules.early.append(makeUtf8)
     //exclude htmls to be processed by lift
     LiftRules.liftRequest.append {

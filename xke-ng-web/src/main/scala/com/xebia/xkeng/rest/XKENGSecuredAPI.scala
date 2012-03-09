@@ -13,6 +13,23 @@ import net.liftweb.util.BasicTypesHelpers._
 import com.xebia.xkeng.model._
 import RestUtils._
 
+/**
+ * Responsible for intercepting all secured requests
+ * and check whether user is authorized to perform
+ * requested action
+ */
+object XKENGSecurityInterceptor extends RestHelper {
+  serve {
+    case req if !UserHolder.isLoggedIn => {
+      Full(ForbiddenResponse("Not authorized"))
+    }
+  }
+  /**
+   * Allows you to put a guard around a Dispatch Partial Function
+   */
+  def guard(other: LiftRules.DispatchPF): LiftRules.DispatchPF = this.orElse(other)
+}
+
 trait XKENGSecuredAPI extends RestHelper with Logger {
   this: RestHandlerComponent =>
 

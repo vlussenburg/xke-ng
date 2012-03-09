@@ -35,11 +35,18 @@ class XKENGPublicAPI extends RestHelper with Logger {
 
 }
 /**
- * Interceptor that checks whether a user is logged in
- * before forwarding a request
+ * Responsible for intercepting all secured requests
+ * and check whether user is authorized to perform
+ * requested action
  */
-object SecurityInterceptor {
-  val authenticationInterceptor: PartialFunction[Req, Unit] = {
-    case _ if UserHolder.isLoggedIn =>
+object XKENGSecurityInterceptor extends RestHelper {
+  serve {
+    case req if !UserHolder.isLoggedIn => {
+      Full(ForbiddenResponse("Not authorized"))
+    }
   }
+  /**
+   * Allows you to put a guard around a Dispatch Partial Function
+   */
+  def guard(other: LiftRules.DispatchPF): LiftRules.DispatchPF = this.orElse(other)
 }
