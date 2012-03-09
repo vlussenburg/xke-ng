@@ -168,10 +168,30 @@
 		return date
 	}
 	
+	function handleException(xhr, ajaxOptions, thrownError) {
+		switch(xhr.status)
+		{
+		case 403:
+			alert("Please login again")
+			showLoginPage()
+		  break;
+		case 404:
+			//alert("Cannot find requested object")
+			changeToConferencePage(null, false)
+		  break;
+		default:
+			alert("An unexpected error occured\nCode "
+					+ xhr.status + "\nMessage "
+					+ xhr.status);
+			changeToConferencePage(null, false)
+		}
+	}
+	
+	
 	$(document).bind("mobileinit", function(){
 		//$.mobile.pageLoading();  
 		//$(document).ready(
-			$("#next").live(
+			$("#conf").live(
 					"pageshow",
 					function(event, ui) {
 						if(currentConferenceId) {
@@ -183,11 +203,7 @@
 										+ currentConferenceId + '/slots',
 								success : conferenceSuccessCallback,
 								crossDomain : false,
-								error : function(xhr, ajaxOptions, thrownError) {
-									alert("Unable to get conferences\nCode "
-											+ xhr.status + "\nMessage "
-											+ xhr.status);
-								}
+								error : handleException
 
 						})
 						} else {
@@ -198,11 +214,7 @@
 								url : '/xkeng/conference/next/1/slots',
 								success : conferenceSuccessCallback,
 								crossDomain : false,
-								error : function(xhr, ajaxOptions, thrownError) {
-									alert("Unable to get conferences\nCode "
-											+ xhr.status + "\nMessage "
-											+ xhr.status);
-								}
+								error : handleException
 							})						
 							
 						}
@@ -211,6 +223,7 @@
 					"pageshow",
 					function(event, ui) {
 						$.mobile.showPageLoadingMsg();
+						cleanSessionDetails()
 						$.ajax({
 							type : 'GET',
 							dataType : 'json',
@@ -218,11 +231,7 @@
 							url : '/xkeng/session/' + currentSessionId,
 							success : sessionSuccessCallback,
 							crossDomain : false,
-							error : function(xhr, ajaxOptions, thrownError) {
-								alert("Unable to get session\nCode "
-										+ xhr.status + "\nMessage "
-										+ xhr.status);
-							}
+							error : handleException
 						})
 					}),					
 					$("#chooseConference").live(
@@ -234,14 +243,10 @@
 									type : 'GET',
 									dataType : 'json',
 									contentType : 'application/json',
-									url : '/xkeng/conferences/summary/pastcount/5/futurecount/10',
+									url : '/xkeng/conferences/summary/pastcount/3/futurecount/5',
 									success : conferenceSummarySuccessCallback,
 									crossDomain : false,
-									error : function(xhr, ajaxOptions, thrownError) {
-										alert("Unable to get session\nCode "
-												+ xhr.status + "\nMessage "
-												+ xhr.status);
-									}
+									error : handleException
 								})
 							})
 
@@ -280,24 +285,34 @@
 			success :  showSessionDetailsPage,
 			crossDomain : false,
 			data : JSON.stringify(jsonRequest),
-			error : function(xhr, ajaxOptions, thrownError) {
-				alert("Unable to post login\nCode " + xhr.status + "\nMessage "
-						+ xhr.status);
-			}
+			error : handleException
 		});
 	 }
 	 
+
+		function showLoginPage() {
+			$.mobile.changePage("#login", {
+				transition : "fade"
+			});
+		}	
+
+	 
 	function loginSuccessCallback(response) {
-		$.mobile.changePage("#next", {
+		$.mobile.changePage("#conf", {
 			transition : "slidedown"
 		});
 	}
 
-
-	function showSessionDetailsPage() {
+	
+	function cleanSessionDetails() {
 		$("#detail-list").empty()
 		$("#rating-stars").empty()
 		$("#rate-button").empty()		
+		
+	}
+
+	function showSessionDetailsPage() {
+		//cleanSessionDetails()
 		$.mobile.changePage("#detail", {
 			transition : "slide"
 		});
@@ -311,7 +326,7 @@
 	function changeToConferencePage(id, next) {
 		isNextConference = next
 		currentConferenceId = id
-		$.mobile.changePage("#next", {
+		$.mobile.changePage("#conf", {
 			transition : "fade"
 		});
 	}
@@ -331,22 +346,24 @@
 		$.mobile.hidePageLoadingMsg();
 		for (confIndex in conferences) {
 			var conf = conferences[confIndex]
-			var confDate = getFormattedDate(conf.begin, "ddd, dd mmm yyyy") +  ' : '  + conf.title
+			var confTitle = getFormattedDate(conf.begin, "ddd, dd mmm yyyy") +  ' : '  + conf.title
 			var next = false
+			var liEl = "<li>"
 			if(conf.next) {
-				confDate = '<i>' + confDate + ' <- NEXT</i>'
+				liEl = "<li data-theme='e'>"
+				confTitle = "<i>" + confTitle + " </i><p class='ui-li-count'>NEXT</p>"
 				next = true
 			}
 			$("#summary-list").append(
-						"<li><a href='javascript:changeToConferencePage(\""
-								+ conf.id + "\"," + next + ");'>" +confDate +  "</a></li>")
+						liEl + "<a href='javascript:changeToConferencePage(\""
+								+ conf.id + "\"," + next + ");'>" +confTitle +  "</a></li>")
 		}
 		$("#summary-list").listview("refresh");
 	}
 	
 	function conferenceSuccessCallback(response) {
 		
-		$("#next-list").empty()
+		$("#conf-list").empty()
 		var confTitle = getFormattedDate(response.begin, "ddd, dd mmm yyyy") + ' : ' +response.title
 		if(isNextConference) {
 			confTitle = 'NEXT: ' +  confTitle
@@ -354,23 +371,38 @@
 		$("#conf-title").html(confTitle)	
 		for (slotIndex in response.slots) {
 			var slot = response.slots[slotIndex]
-			$("#next-list").append(
+			$("#conf-list").append(
 					"<li data-role='list-divider'>" + slot.from + " - "
 							+ slot.to + "</li>")
 			for (sessionsIndex in slot.sessions) {
 				var session = slot.sessions[sessionsIndex]
-				console.log(session)
 				var authors = getAuthors(session)
-				$("#next-list").append(
+				$("#conf-list").append(
 						"<li><a href='javascript:changeToSessionDetailsPage(\""
-								+ session.id + "\");'><i>" + session.title
-								+ "</i><br>by: " + authors + "<br>"
-								+ session.location.description + "</a></li>")
+								+ session.id + "\");'><span><i>" + splitText(session.title, 32, '<br>')
+								+ "</i></span><br><br><p>by: " + authors + "</p><span class='ui-li-aside'> "
+								+ session.location.description + "&nbsp;&nbsp;&nbsp;</span></a></li>")
 			}
 		}
-		$("#next-list").listview("refresh");
+		$("#conf-list").listview("refresh");
 	}
 
+	function splitText(text, chunkLength, separator) {
+		if(text != null && text.length > chunkLength) {
+			var finalText = ""
+			var pattern = ".{1," + chunkLength + "}"
+			var split = text.match(new RegExp(pattern, "gi"));
+			for(splitIndex in split) {
+				finalText += split[splitIndex] 
+				if(splitIndex < (split.length -1)) {
+					finalText += separator
+				}
+			}	
+			return finalText
+		}
+		return text
+	}
+	
 	function getRatingAverage(ratings) {
 		if(ratings) {
 			var total = 0	
@@ -383,16 +415,20 @@
 	}
 
 	function renderRatings(ratings) {
+		var maxRating = 5
 		var avgRating = getRatingAverage(ratings)
-		var ratingStars = ""
-		for(var i = 0; i<10; i++) {
+		if(avgRating > maxRating) {
+			avgRating = avgRating % maxRating
+		}
+		var ratingStars = "<div style='margin: auto 1.5em; display: inline-block;'>"
+		for(var i = 0; i<maxRating; i++) {
 			if(avgRating != 0 && i == (avgRating -1)) {
 				ratingStars +="<input name='star1' type='radio' class='star' data-role='none' disabled='disabled' checked='checked' /> ";
 			} else {
 				ratingStars += "<input name='star1' type='radio' class='star' data-role='none' disabled='disabled' /> ";
 			}						
 		}
-		$("#rating-stars").html(ratingStars)
+		$("#rating-stars").html(ratingStars + " </div>")
 		$('input[type=radio].star').rating(); 
 	}
 	
@@ -404,11 +440,11 @@
 				"<li data-role='list-divider'>" + session.startTimeShort
 						+ " - " + session.endTimeShort + "</li>")
 		$("#detail-list").append(
-				"<li><i>" + session.title + "</i><br>by: " + authors + "</li>")
+				"<li><h3><i>" + splitText(session.title, 32, '<br>') + "</i></h3>by: " + authors + "<p></li>")
 		$("#detail-list").append("<li data-role='list-divider'>Location</li>")
 		$("#detail-list").append(
-				"<li>" + session.location.description + "<br>Max:"
-						+ session.limit + "</li>")
+				"<li>" + session.location.description + "<p class='ui-li-aside'>Max:"
+						+ session.limit + "</p></li>")
 		$("#detail-list").append(
 				"<li data-role='list-divider'>Description</li>")
 		$("#detail-list").append("<li>" + session.description + "</li>")
@@ -441,24 +477,26 @@
 		</div>
 	</div>
 
-	<div data-role="page" id="next">
+	<div data-role="page" id="conf">
 
 		<div data-role="header">
 			<h1><div id="conf-title"> XKE</div></h1>	
-			<a href="#chooseConference" data-rel="dialog" class="ui-btn-right">Conferences</a>
+			<a href="#chooseConference" data-rel="dialog" class="ui-btn-right">XKEs</a>
 		</div>
 
 
 		<div data-role="content">
-			<ul id="next-list" data-role="listview" data-filter="true" />
+			<ul id="conf-list" data-role="listview" data-filter="true" />
 		</div>
 	</div>
-
-
-		<div data-role="page" id="detail" data-add-back-btn="true">
+		<div data-role="page" id="detail" >
 		<div data-role="header">
 			<h1 id="detailHeader"><div id="session-title">Session</div></h1>
+<a href="#conf" data-rel="page" class="ui-btn-left" data-transition="fade">Back</a>
 			<!-- 
+		
+data-add-back-btn="true"
+
 			<a href="index.html" data-icon="check" class="ui-btn-right">Save</a>
 		 -->
 		</div>
@@ -501,7 +539,7 @@
 		
 		<form action="javascript: rate();">
 			<div data-role="fieldcontain">
-			<input type="number" data-type="range" name="slider" id="slider-0" value="0" min="0" max="10" data-highlight="true" track-theme="a" />
+			<input type="number" data-type="range" name="slider" id="slider-0" value="0" min="0" max="5" data-highlight="true" track-theme="a" />
 			
 			</div>
 			<button type="submit">Save</button>

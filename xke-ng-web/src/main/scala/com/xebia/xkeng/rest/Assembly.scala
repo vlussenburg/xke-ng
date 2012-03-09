@@ -111,7 +111,7 @@ object Assembly extends Logger {
     val schedule = SlotInfo(slot1Start, slot1End) :: SlotInfo(slot2Start, slot2End) :: Nil
     val s1 = Session(slot1Start, slot1End, locations(0), "Mongo rocks", "Mongo is a paperless document database", "STRATEGIC", "10 people", List(a1), Nil, Nil, Set("Database", "Mongo", "Javascript"))
     val s2 = Session(slot1Start, slot1End, locations(1), "Scala rocks even more", "Scala is a codeless programming language", "STRATEGIC", "10 people", List(a2), Nil, Nil, Set("Scala", "Functions", "DSL"))
-    val s3 = Session(slot1Start, slot2End, locations(2), "Scala quirks", "No such thing as a free ride when doing scala", "STRATEGIC", "15 people", List(a1, a2), Nil, Nil, Set("Scala", "Functional Programming", "Beauty"))
+    val s3 = Session(slot1Start, slot2End, locations(2), "Zero Maintenance Middleware - A Continuous Delivery Concept", "Richard Pot and Erwin Embsen are developing / implementing Zero Maintenance Middleware at KVK. ZMM deals with the lifecycle of applications, operating systems and middleware, and is based on VMWare, Puppet and Deployit. ", "STRATEGIC", "15 people", List(a1, a2), Nil, Nil, Set("Scala", "Functional Programming", "Beauty"))
     val s4 = Session(slot2Start, slot2End, locations(0), "Deployment with puppet", "Even animals start to like deploying", "STRATEGIC", "20 people", List(a1, a2), Nil, Nil, Set("Middleware", "Deoployment", "Quick"))
     val c = Conference("Test-XKE", startDate, startDate.plusHours(4), Nil, locations, schedule)
     c.save

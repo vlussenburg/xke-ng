@@ -14,7 +14,7 @@ import com.atlassian.crowd.model.user.{ User => CrowdUser };
 import RestUtils._
 
 /**
- * Responsible for security related tasks such as authentication
+ * Exposes the public API of XKENG
  */
 class XKENGPublicAPI extends RestHelper with Logger {
   this: RestHandlerComponent =>
@@ -33,20 +33,4 @@ class XKENGPublicAPI extends RestHelper with Logger {
 
   }
 
-}
-/**
- * Responsible for intercepting all secured requests
- * and check whether user is authorized to perform
- * requested action
- */
-object XKENGSecurityInterceptor extends RestHelper {
-  serve {
-    case req if !UserHolder.isLoggedIn => {
-      Full(ForbiddenResponse("Not authorized"))
-    }
-  }
-  /**
-   * Allows you to put a guard around a Dispatch Partial Function
-   */
-  def guard(other: LiftRules.DispatchPF): LiftRules.DispatchPF = this.orElse(other)
 }
