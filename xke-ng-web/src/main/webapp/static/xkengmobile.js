@@ -1,4 +1,166 @@
+//========================================
+//Local Storage
+//========================================
+var LocalStorageAPI = {};
+	LocalStorageAPI.confId = 'selectedConf';
+	LocalStorageAPI.setConf = function(conf) {
+		localStorage[this.confId] = JSON.stringify(conf);
+	};
+	LocalStorageAPI.getConf = function() {
+		return JSON.parse(localStorage[this.confId]);
+	};
+	LocalStorageAPI.getSession = function(sessId) {
+		var slots = this.getConf().slots;
+		for(slotIndex in slots) {
+			var sessions = slots[slotIndex].sessions;
+			for(sessionIndex in sessions) {
+				var session = sessions[sessionIndex];
+				if(session.id == sessId) {
+					return session;
+				}
+			}
+		}
+		return null;
+	};
+	LocalStorageAPI.setSession = function(session) {
+		var conf = this.getConf();
+		var slots = conf.slots;
+		for(slotIndex in slots) {
+			var sessions = slots[slotIndex].sessions;
+			for(sessionIndex in sessions) {
+				var storedSession = sessions[sessionIndex];
+				if(storedSession.id == session.id) {
+					sessions[sessionIndex] = session;
+				}
+			}
+		}
+		this.setConf(conf);
+	};
 
+//========================================
+//Communication
+//========================================
+	ProxyAPI = {};
+	ProxyAPI.loadConfById = function(confId, callback) {
+		var persistCallback = function(conf) {
+			LocalStorageAPI.setConf(conf);
+			callback(conf);
+		};
+		if(confId) {
+			var selectedConf = LocalStorageAPI.getConf();
+			if(selectedConf != null && selectedConf.id == confId) {
+				console.log('load local conf: ' + conf.id);
+				callback(selectedConf);
+			} else {
+				console.log('load remote conf');
+				$.ajax({
+					type : 'GET',
+					dataType : 'json',
+					contentType : 'application/json',
+					url : '/xkeng/conference/'
+							+ confId + '/slots',
+					success : persistCallback,
+					crossDomain : false,
+					error : handleException
+	
+			});
+			}
+		} else {
+			console.log('load initial conf');
+			$.ajax({
+				type : 'GET',
+				dataType : 'json',
+				contentType : 'application/json',
+				url : '/xkeng/conference/next/1/slots',
+				success : persistCallback,
+				crossDomain : false,
+				error : handleException
+			})				;
+		}
+	}
+		
+		ProxyAPI.loadSessionById = function(sessId, callback, forceReload) {
+				var selectedSession = LocalStorageAPI.getSession(sessId);
+				if(selectedSession && !forceReload) {
+					console.log('load local session: ' + sessId);
+					callback(selectedSession)
+				} else {
+					console.log('load remote session');
+					var callbacks = function(session) {
+						$.mobile.hidePageLoadingMsg();
+						LocalStorageAPI.setSession(session);
+			 			callback(session);
+		 			};
+					$.mobile.showPageLoadingMsg();
+					$.ajax({
+						type : 'GET',
+						dataType : 'json',
+						contentType : 'application/json',
+						url : '/xkeng/session/' + sessId,
+						success : callbacks,
+						crossDomain : false,
+						error : handleException
+					});
+				}
+		};
+	ProxyAPI.loadConfSummary = function(pastcount, futurecount) {
+		$.ajax({
+			type : 'GET',
+			dataType : 'json',
+			contentType : 'application/json',
+			url : '/xkeng/conferences/summary/pastcount/' + pastcount + '/futurecount/' + futurecount,
+			success : conferenceSummarySuccessCallback,
+			crossDomain : false,
+			error : handleException
+		});
+	};
+	ProxyAPI.rateSession = function(sessId, rating, callback) {
+		 var jsonRequest = {};
+			jsonRequest.rate = rating;
+			$.ajax({
+				type : 'POST',
+				dataType : 'json',
+				contentType : 'application/json',
+				url : '/xkeng/feedback/' + sessId + '/rating' ,
+				success :  callback,
+				crossDomain : false,
+				data : JSON.stringify(jsonRequest),
+				error : handleException
+			});
+	};
+	
+	ProxyAPI.login = function(username, password, successCallback, failureCallback) {
+		var jsonRequest = {};
+		jsonRequest.username = username;
+		jsonRequest.password = password;
+		$.ajax({
+			type : 'POST',
+			dataType : 'json',
+			contentType : 'application/json',
+			url : '/xkeng/login',
+			success : successCallback,
+			crossDomain : false,
+			data : JSON.stringify(jsonRequest),
+			error : failureCallback
+		});
+	};
+	
+	ProxyAPI.logout = function(callback) {
+		$.ajax({
+			type : 'GET',
+			url : '/xkeng/logout',
+			success : callback,
+			crossDomain : false,
+			error : function(xhr, ajaxOptions, thrownError) {
+				alert("Unable to login\nStatus Code " + xhr.status + "\nMessage: "
+						+ thrownError );
+			}
+		});
+	};
+
+//========================================
+//Utilities
+//========================================
 	var dateFormat = function () {
 		var	token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g,
 			timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,
@@ -135,34 +297,34 @@
 	    offset -= date.getTimezoneOffset();
 	    time = (Number(date) + (offset * 60 * 1000));
 	    this.setTime(Number(time));
-	}
+	};
 	
 	function getFormattedDate(isoDateStr, format) {
-		var date = toDate(isoDateStr)
-		date.setISO8601(isoDateStr)
+		var date = toDate(isoDateStr);
+		date.setISO8601(isoDateStr);
 		return date.format(format);
 	}
 	
 	function toDate(isoDateStr) {
-		var date = new Date()
-		date.setISO8601(isoDateStr)
-		return date
+		var date = new Date();
+		date.setISO8601(isoDateStr);
+		return date;
 	}
 	
 	function splitText(text, chunkLength, separator) {
 		if(text != null && text.length > chunkLength) {
-			var finalText = ""
-			var pattern = ".{1," + chunkLength + "}"
+			var finalText = "";
+			var pattern = ".{1," + chunkLength + "}";
 			var split = text.match(new RegExp(pattern, "gi"));
 			for(splitIndex in split) {
-				finalText += split[splitIndex] 
+				finalText += split[splitIndex] ;
 				if(splitIndex < (split.length -1)) {
-					finalText += separator
+					finalText += separator;
 				}
 			}	
-			return finalText
+			return finalText;
 		}
-		return text
+		return text;
 	}
 	
 	

@@ -38,126 +38,11 @@
 			changeToConferencePage(null, false)
 		}
 	}
-	
-	
-	ProxyAPI = {};
-	ProxyAPI.loadConfById = function(confId, callback) {
-		if(confId) {
-			var selectedConf = LocalStorageAPI.getConf()
-			if(selectedConf != null && selectedConf.id == confId) {
-				console.log('load local conf: ' + conf.id)
-				callback(selectedConf)
-			} else {
-				console.log('load remote conf')
-				$.ajax({
-					type : 'GET',
-					dataType : 'json',
-					contentType : 'application/json',
-					url : '/xkeng/conference/'
-							+ confId + '/slots',
-					success : callback,
-					crossDomain : false,
-					error : handleException
-	
-			})
-			}
-		} else {
-			console.log('load initial conf')
-			$.ajax({
-				type : 'GET',
-				dataType : 'json',
-				contentType : 'application/json',
-				url : '/xkeng/conference/next/1/slots',
-				success : callback,
-				crossDomain : false,
-				error : handleException
-			})				
-		}
-	}
-		
-		ProxyAPI.loadSessionById = function(sessId, callback, forceReload) {
-				var selectedSession = LocalStorageAPI.getSession(sessId)
-				if(selectedSession && !forceReload) {
-					console.log('load local session: ' + sessId)
-					callback(selectedSession)
-				} else {
-					console.log('load remote session')
-					var callbacks = function(session) {
-						$.mobile.hidePageLoadingMsg();
-						LocalStorageAPI.setSession(session)
-			 			callback(session)
-		 			}
-					$.mobile.showPageLoadingMsg();
-					$.ajax({
-						type : 'GET',
-						dataType : 'json',
-						contentType : 'application/json',
-						url : '/xkeng/session/' + sessId,
-						success : callbacks,
-						crossDomain : false,
-						error : handleException
-					})
-				}
-		}
-	ProxyAPI.loadConfSummary = function(pastcount, futurecount) {
-		$.ajax({
-			type : 'GET',
-			dataType : 'json',
-			contentType : 'application/json',
-			url : '/xkeng/conferences/summary/pastcount/' + pastcount + '/futurecount/' + futurecount,
-			success : conferenceSummarySuccessCallback,
-			crossDomain : false,
-			error : handleException
-		})
-	}
-	ProxyAPI.rateSession = function(sessId, rating, callback) {
-		 var jsonRequest = {}
-			jsonRequest.rate = rating;
-			$.ajax({
-				type : 'POST',
-				dataType : 'json',
-				contentType : 'application/json',
-				url : '/xkeng/feedback/' + sessId + '/rating' ,
-				success :  callback,
-				crossDomain : false,
-				data : JSON.stringify(jsonRequest),
-				error : handleException
-			});
-	}
-	
-	
 	$(document).bind("mobileinit", function(){
-		//$.mobile.pageLoading();  
-		//$(document).ready(
 			$("#conf").live(
 					"pageshow",
 					function(event, ui) {
 						ProxyAPI.loadConfById(GuiState.currentConferenceId, conferenceSuccessCallback)
-
-	/* 					if(GuiState.currentConferenceId) {
-							$.ajax({
-								type : 'GET',
-								dataType : 'json',
-								contentType : 'application/json',
-								url : '/xkeng/conference/'
-										+ GuiState.currentConferenceId + '/slots',
-								success : conferenceSuccessCallback,
-								crossDomain : false,
-								error : handleException
-
-						})
-						} else {
-							$.ajax({
-								type : 'GET',
-								dataType : 'json',
-								contentType : 'application/json',
-								url : '/xkeng/conference/next/1/slots',
-								success : conferenceSuccessCallback,
-								crossDomain : false,
-								error : handleException
-							})						
-							
-						} */
 					}),
 			$("#detail").live(
 					"pageshow",
@@ -165,88 +50,53 @@
 						cleanSessionDetails()
 						ProxyAPI.loadSessionById(GuiState.currentSessionId, sessionSuccessCallback, GuiState.forceSessionReload)
 						GuiState.forceSessionReload = false
-/* 						$.ajax({
-							type : 'GET',
-							dataType : 'json',
-							contentType : 'application/json',
-							url : '/xkeng/session/' + GuiState.currentSessionId,
-							success : sessionSuccessCallback,
-							crossDomain : false,
-							error : handleException
-						})
- */					}),					
-					$("#chooseConference").live(
-							"pageshow",
-							function(event, ui) {
-								$.mobile.showPageLoadingMsg();
-								ProxyAPI.loadConfSummary(3,5)
-	/* 							$.ajax({
-									type : 'GET',
-									dataType : 'json',
-									contentType : 'application/json',
-									url : '/xkeng/conferences/summary/pastcount/3/futurecount/5',
-									success : conferenceSummarySuccessCallback,
-									crossDomain : false,
-									error : handleException
-								}) */
-							})
-
-	//);
-							//$.mobile.pageLoading(true);  
+				}),					
+			$("#chooseConference").live(
+					"pageshow",
+					function(event, ui) {
+						$.mobile.showPageLoadingMsg();
+						ProxyAPI.loadConfSummary(3,5)
+					})
 	});
 
-
 	function login() {
-		var jsonRequest = {}
-		jsonRequest.username = $("#username").val();
-		jsonRequest.password = $("#password").val();
-		$.ajax({
-			type : 'POST',
-			dataType : 'json',
-			contentType : 'application/json',
-			url : '/xkeng/login',
-			success : loginSuccessCallback,
-			crossDomain : false,
-			data : JSON.stringify(jsonRequest),
-			error : function(xhr, ajaxOptions, thrownError) {
-				alert("Unable to post login\nCode " + xhr.status + "\nMessage "
-						+ xhr.status);
-			}
-		});
+		$("#loginFailure").empty();
+		var username = $("#username").val();
+		var password = $("#password").val();
+		ProxyAPI.login(username, password, loginSuccessCallback, loginFailureCallback)
+	}
+	
+	function loginFailureCallback(xhr, ajaxOptions, thrownError) {
+		if(xhr.status == 403) {
+			$("#loginFailure").html("<p style='color:red'>You entered invalid credentials.<br>Please try again.</p>");
+		} else {
+			$("#loginFailure").html("<p style='color:red'>An unexpected error occured.\nStatus Code " + xhr.status + "\nMessage: "
+				+ thrownError + "\nTry again later."</p>");			
+		}
+	}
+	
+	function logout() {
+		ProxyAPI.logout(showLoginPage)
 	}
 
 	 function rate() {
 		 GuiState.forceSessionReload = true
 		 var rating = parseInt($("#slider-0").val())
 		 ProxyAPI.rateSession(GuiState.currentSessionId, rating, showSessionDetailsPage)
-		/*  var jsonRequest = {}
-		jsonRequest.rate = ;
-		$.ajax({
-			type : 'POST',
-			dataType : 'json',
-			contentType : 'application/json',
-			url : '/xkeng/feedback/' + GuiState.currentSessionId + '/rating' ,
-			success :  showSessionDetailsPage,
-			crossDomain : false,
-			data : JSON.stringify(jsonRequest),
-			error : handleException
-		}); */
 	 }
 	 
 
-		function showLoginPage() {
-			$.mobile.changePage("#login", {
-				transition : "fade"
-			});
-		}	
-
+	function showLoginPage() {
+		$.mobile.changePage("#login", {
+			transition : "fade"
+		});
+	}	
 	 
 	function loginSuccessCallback(response) {
 		$.mobile.changePage("#conf", {
 			transition : "slidedown"
 		});
 	}
-
 	
 	function cleanSessionDetails() {
 		$("#detail-list").empty()
@@ -256,7 +106,6 @@
 	}
 
 	function showSessionDetailsPage() {
-		//cleanSessionDetails()
 		$.mobile.changePage("#detail", {
 			transition : "slide"
 		});
@@ -308,8 +157,6 @@
 	
 	function conferenceSuccessCallback(response) {
 		GuiState.currentConferenceId = response.id
-		LocalStorageAPI.setConf(response)
-		
 		$("#conf-list").empty()
 		var confTitle = getFormattedDate(response.begin, "ddd, dd mmm yyyy") + ' : ' +response.title
 		if(GuiState.isNextConference) {
@@ -362,8 +209,6 @@
 	}
 	
 	function sessionSuccessCallback(session) {
-		
-
 		$.mobile.hidePageLoadingMsg();
 		var authors = getAuthors(session)
 		$("#session-title").html("Session " + getFormattedDate(session.startTime, "ddd, dd mmm yyyy"))
@@ -387,67 +232,18 @@
 		$("#detail-list").listview("refresh");
 	}
 	
-	var LocalStorageAPI = {};
-	LocalStorageAPI.confId = 'selectedConf'
-	LocalStorageAPI.setConf = function(conf) {
-		localStorage[this.confId] = JSON.stringify(conf)
-	}
-	LocalStorageAPI.getConf = function() {
-		return JSON.parse(localStorage[this.confId])
-	}
-	LocalStorageAPI.getSession = function(sessId) {
-		var slots = this.getConf().slots
-		for(slotIndex in slots) {
-			var sessions = slots[slotIndex].sessions
-			for(sessionIndex in sessions) {
-				var session = sessions[sessionIndex]
-				if(session.id == sessId) {
-					return session
-				}
-			}
-		}
-		return null
-	}
-	LocalStorageAPI.setSession = function(session) {
-		var conf = this.getConf()
-		var slots = conf.slots
-		for(slotIndex in slots) {
-			var sessions = slots[slotIndex].sessions
-			for(sessionIndex in sessions) {
-				var storedSession = sessions[sessionIndex]
-				if(storedSession.id == session.id) {
-					sessions[sessionIndex] = session
-				}
-			}
-		}
-		this.setConf(conf)
-	}
-	
-	function printRatings(ratings) {
-		if(ratings) {
-			var total = ""	
-			for(ratingIndex in ratings) {
-				total += ratings[ratingIndex].rate + " "
-			}
-			return total		
-		}
-		return "empty";
-	}
 	
 </script>
 <script type="text/javascript" src="static/jquery.mobile-1.0.1.min.js"></script>
 </head>
 <body>
 
-
 	<div data-role="page" id="login">
-
 		<div data-role="header">
-			<h1>Login</h1>
+			<h1>XKE Next Generation</h1>
 		</div>
-
-
 		<div data-role="content">
+			<div id="loginFailure" ></div>
 			<form action="javascript: login();">
 				<input id="username" type="text" placeholder="Your username" /> <input
 					id="password" type="password" placeholder="Your password" />
@@ -459,34 +255,25 @@
 	<div data-role="page" id="conf">
 
 		<div data-role="header">
-			<h1><div id="conf-title"> XKE</div></h1>	
+			<h1><span id="conf-title">XKE</span></h1>	
+			<a href="javascript:logout();" data-rel="page" class="ui-btn-left" data-transition="fade">Logout</a>
 			<a href="#chooseConference" data-rel="dialog" class="ui-btn-right">XKEs</a>
 		</div>
-
-
 		<div data-role="content">
 			<ul id="conf-list" data-role="listview" data-filter="true" />
 		</div>
 	</div>
-		<div data-role="page" id="detail" >
+	
+	<div data-role="page" id="detail" >
 		<div data-role="header">
-			<h1 id="detailHeader"><div id="session-title">Session</div></h1>
-<a href="#conf" data-rel="page" class="ui-btn-left" data-transition="fade">Back</a>
-			<!-- 
-		
-data-add-back-btn="true"
-
-			<a href="index.html" data-icon="check" class="ui-btn-right">Save</a>
-		 -->
+			<h1 id="detailHeader"><span id="session-title">Session</span></h1>
+			<a href="#conf" data-rel="page" class="ui-btn-left" data-transition="fade">Back</a>
 		</div>
-
 		<div data-role="content">
 			<ul id="detail-list" data-role="listview" />	
 		</div>
-		
 		<br/><div id="rating-stars"></div><br/>
-		<div id="rate-button">
-		</div>
+		<div id="rate-button"></div>
 
 <!--		<div data-role="footer" data-position="fixed">
 			<div data-role="navbar">
@@ -500,7 +287,6 @@ data-add-back-btn="true"
 	</div>
 
 	<div data-role="page" id="chooseConference">
-
 		<div data-role="header">
 			<h1 id="detailHeader">Choose a conference</h1>
 		</div>
@@ -510,22 +296,18 @@ data-add-back-btn="true"
 	</div>
 
 	<div data-role="page" id="rate">
-
 		<div data-role="header">
-			<h1 id="detailHeader">Rate</h1>
+			<h1 id="detailHeader">Rate Session</h1>
 		</div>
 		<div data-role="content">
-		
 		<form action="javascript: rate();">
 			<div data-role="fieldcontain">
-			<input type="number" data-type="range" name="slider" id="slider-0" value="0" min="0" max="10" data-highlight="true" track-theme="a" />
-			
+			<input type="number" data-type="range" name="slider" id="slider-0" value="0" min="0" max="10" data-highlight="true"  />		
 			</div>
 			<button type="submit">Save</button>
 			</form>
 		</div>	
 	</div>
-
 
 </body>
 
