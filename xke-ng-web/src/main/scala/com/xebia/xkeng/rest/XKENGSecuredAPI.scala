@@ -62,10 +62,10 @@ trait XKENGSecuredAPI extends RestHelper with Logger {
       getNextConferenceSlots(1)
     case Req("conference" :: "next" :: AsInt(ahead) :: "slots" :: Nil, _, GetRequest) =>
       getNextConferenceSlots(ahead)
-  // GET /conference/<id>
-    case Req("conference" :: id ::"slots" ::  Nil, _, GetRequest) =>
+    // GET /conference/<id>
+    case Req("conference" :: id :: "slots" :: Nil, _, GetRequest) =>
       getConferenceSlot(id)
-      
+
     // POST /conference
     case req @ Req("conference" :: Nil, _, PostRequest) =>
       doWithRequestBody(req.body) {
@@ -193,6 +193,17 @@ trait XKENGSecuredAPI extends RestHelper with Logger {
       doWithRequestBody(req.body) {
         handleRatingCreate(sessionId, _)
       }
+
+    /**
+     * *******************
+     * logout
+     * *******************
+     */
+    // GET /logout
+    case Req("logout" :: Nil, _, GetRequest) =>
+      UserHolder.logout
+      S.session.open_!.terminateHint
+      Full(OkResponse())
   }
 
 }
