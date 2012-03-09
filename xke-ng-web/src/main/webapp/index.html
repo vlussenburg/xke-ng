@@ -93,6 +93,8 @@
 	}	
 	 
 	function loginSuccessCallback(response) {
+		$("#username").val("");
+		$("#password").val("");
 		$.mobile.changePage("#conf", {
 			transition : "slidedown"
 		});
