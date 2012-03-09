@@ -115,7 +115,8 @@ var LocalStorageAPI = {};
 		});
 	};
 	ProxyAPI.rateSession = function(sessId, rating, callback) {
-		 var jsonRequest = {};
+		$.mobile.showPageLoadingMsg(); 
+		var jsonRequest = {};
 			jsonRequest.rate = rating;
 			$.ajax({
 				type : 'POST',

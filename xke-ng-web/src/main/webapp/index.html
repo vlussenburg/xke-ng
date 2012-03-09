@@ -42,12 +42,12 @@
 			$("#conf").live(
 					"pageshow",
 					function(event, ui) {
+						cleanSessionDetails()
 						ProxyAPI.loadConfById(GuiState.currentConferenceId, conferenceSuccessCallback)
 					}),
 			$("#detail").live(
 					"pageshow",
 					function(event, ui) {						
-						cleanSessionDetails()
 						ProxyAPI.loadSessionById(GuiState.currentSessionId, sessionSuccessCallback, GuiState.forceSessionReload)
 						GuiState.forceSessionReload = false
 				}),					
@@ -70,8 +70,7 @@
 		if(xhr.status == 403) {
 			$("#loginFailure").html("<p style='color:red'>You entered invalid credentials.<br>Please try again.</p>");
 		} else {
-			$("#loginFailure").html("<p style='color:red'>An unexpected error occured.\nStatus Code " + xhr.status + "\nMessage: "
-				+ thrownError + "\nTry again later."</p>");			
+			$("#loginFailure").html("<p style='color:red'>An unexpected error occured.\nStatus Code " + xhr.status + "\nMessage: " + thrownError + "\nTry again later.</p>");			
 		}
 	}
 	
@@ -80,6 +79,7 @@
 	}
 
 	 function rate() {
+		 cleanSessionDetails()
 		 GuiState.forceSessionReload = true
 		 var rating = parseInt($("#slider-0").val())
 		 ProxyAPI.rateSession(GuiState.currentSessionId, rating, showSessionDetailsPage)
@@ -114,6 +114,14 @@
 	function changeToSessionDetailsPage(id) {
 		GuiState.currentSessionId = id;
 		 showSessionDetailsPage()
+	}
+	
+	function selectConference() {
+		$("#conf-list").empty();
+		$.mobile.changePage("#chooseConference", {
+			transition : "fade"
+			
+		});
 	}
 	
 	function changeToConferencePage(id, next) {
@@ -211,7 +219,7 @@
 	function sessionSuccessCallback(session) {
 		$.mobile.hidePageLoadingMsg();
 		var authors = getAuthors(session)
-		$("#session-title").html("Session " + getFormattedDate(session.startTime, "ddd, dd mmm yyyy"))
+		$("#session-title").html(getFormattedDate(session.startTime, "ddd, dd mmm yyyy"))
 		$("#detail-list").append(
 				"<li data-role='list-divider'>" + session.startTimeShort
 						+ " - " + session.endTimeShort + "</li>")
@@ -256,8 +264,8 @@
 
 		<div data-role="header">
 			<h1><span id="conf-title">XKE</span></h1>	
-			<a href="javascript:logout();" data-rel="page" class="ui-btn-left" data-transition="fade">Logout</a>
-			<a href="#chooseConference" data-rel="dialog" class="ui-btn-right">XKEs</a>
+			<a href="javascript:logout();" data-rel="page" class="ui-btn-right" data-transition="fade">Logout</a>
+			<a href="javascript:selectConference();" data-rel="dialog" class="ui-btn-left">XKEs</a>
 		</div>
 		<div data-role="content">
 			<ul id="conf-list" data-role="listview" data-filter="true" />
@@ -286,7 +294,7 @@
  -->
 	</div>
 
-	<div data-role="page" id="chooseConference">
+	<div data-role="dialog" id="chooseConference">
 		<div data-role="header">
 			<h1 id="detailHeader">Choose a conference</h1>
 		</div>
