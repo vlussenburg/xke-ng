@@ -19,7 +19,8 @@ import com.xebia.xcoss.axcv.util.SecurityUtils;
 import com.xebia.xcoss.axcv.util.StringUtil;
 import com.xebia.xcoss.axcv.util.XCS;
 
-public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsyncTask<ParameterT, ProgressT, ReturnT> {
+public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends
+		BetterAsyncTask<ParameterT, ProgressT, ReturnT> {
 
 	private String action;
 	private ConferenceViewerApplication application;
@@ -32,17 +33,20 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 		this.action = ctx.getString(action);
 		this.callback = callback;
 		disableDialog();
-		Log.w(XCS.LOG.COMMUNICATE, "Task created: " + getClass().getSimpleName());
+		Log.w(XCS.LOG.COMMUNICATE, "Task created: "
+				+ getClass().getSimpleName());
 		// DebugUtil.showCallStack();
 	}
 
 	@Override
-	final protected ReturnT doCheckedInBackground(Context ctx, ParameterT... params) throws Exception {
+	final protected ReturnT doCheckedInBackground(Context ctx,
+			ParameterT... params) throws Exception {
 		validateLogin();
 		return background(ctx, params);
 	};
 
-	protected abstract ReturnT background(Context ctx, ParameterT... params) throws Exception;
+	protected abstract ReturnT background(Context ctx, ParameterT... params)
+			throws Exception;
 
 	@Override
 	final protected void after(Context ctx, ReturnT result) {
@@ -64,7 +68,8 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 	@Override
 	final protected void handleError(final Context ctx, Exception e) {
 		try {
-			// Do not throw exception here. It will block the async task waiting dialog.
+			// Do not throw exception here. It will block the async task waiting
+			// dialog.
 			if (callback != null) {
 				callback.onCalled(null);
 			}
@@ -72,48 +77,58 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 			if (e instanceof DataException) {
 				if (((DataException) e).missing()) {
 					msg = ctx.getString(R.string.server_missing_url, action);
-					// TODO Temporary, since login failure currently returns a 404 
-					RestClient.logout();
 				} else if (((DataException) e).networkError()) {
 					msg = ctx.getString(R.string.server_unreachable, action);
 				} else if (((DataException) e).timedOut()) {
 					msg = ctx.getString(R.string.server_timeout, action);
-				} else {
+				} else if (((DataException) e).denied()) {
+					RestClient.logout();
 					AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 					builder.setTitle(R.string.auth_failed_title)
-							.setMessage(ctx.getString(R.string.auth_failed, action))
+							.setMessage(
+									ctx.getString(R.string.auth_failed, action))
 							.setIcon(android.R.drawable.ic_dialog_alert)
-							.setPositiveButton(R.string.edit, new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {
-									dialog.dismiss();
-									ctx.startActivity(new Intent(ctx, CVSettings.class));
-								}
-							}).setNegativeButton(R.string.ignore, new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {
-									dialog.dismiss();
-									RestClient.logout();
-								}
-							});
+							.setPositiveButton(R.string.edit,
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog, int id) {
+											dialog.dismiss();
+											ctx.startActivity(new Intent(ctx,
+													CVSettings.class));
+										}
+									})
+							.setNegativeButton(R.string.ignore,
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog, int id) {
+											dialog.dismiss();
+											RestClient.logout();
+										}
+									});
 					AlertDialog alertDialog = builder.create();
 					alertDialog.show();
 				}
 				if (!silent && msg != null) {
 					Log.w(XCS.LOG.COMMUNICATE, msg);
-					BaseActivity.createDialog(ctx, ctx.getString(R.string.action_failed), msg).show();
+					BaseActivity.createDialog(ctx,
+							ctx.getString(R.string.action_failed), msg).show();
 				}
 				return;
 			}
 			if (!silent) {
-				msg = ctx.getString(R.string.communication_failure, action, StringUtil.getExceptionMessage(e));
+				msg = ctx.getString(R.string.communication_failure, action,
+						StringUtil.getExceptionMessage(e));
 				e.printStackTrace();
 				Log.w(XCS.LOG.COMMUNICATE, msg);
-				BaseActivity.createDialog(ctx, ctx.getString(R.string.action_failed), msg).show();
+				BaseActivity.createDialog(ctx,
+						ctx.getString(R.string.action_failed), msg).show();
 			}
-		}
-		catch (Exception ex) {
-			Log.w(XCS.LOG.COMMUNICATE, "Processing error callback failed: " + StringUtil.getExceptionMessage(ex));
+		} catch (Exception ex) {
+			Log.w(XCS.LOG.COMMUNICATE, "Processing error callback failed: "
+					+ StringUtil.getExceptionMessage(ex));
 			if (ctx instanceof BaseActivity) {
-				((BaseActivity) ctx).getExceptionReporter().reportException(Thread.currentThread(), ex,
+				((BaseActivity) ctx).getExceptionReporter().reportException(
+						Thread.currentThread(), ex,
 						"Failure during task '" + action + "'");
 			}
 		}
@@ -123,7 +138,8 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends BetterAsync
 		if (!RestClient.isAuthenticated()) {
 			String requestUrl = getRequestUrl("/login");
 			String decrypt = SecurityUtils.decrypt(application.getPassword());
-			Credential credential = new Credential(application.getUser(), decrypt);
+			Credential credential = new Credential(application.getUser(),
+					decrypt);
 			RestClient.postObject(requestUrl, credential, void.class);
 		}
 	}
