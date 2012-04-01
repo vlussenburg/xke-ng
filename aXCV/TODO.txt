@@ -5,6 +5,9 @@ IN PROGRESS
 TODO
 -------------------------------------------------------------------
 client
+
+-	Adé werkt niet goed (tonen)
+
 -	Validatie ingegeven datum/tijdformaat
 -	Swipe in zoekscherm werkt niet op leeg scherm
 
