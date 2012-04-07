@@ -195,6 +195,7 @@
 						"<li><a href='javascript:changeToSessionDetailsPage(\""
 								+ session.id + "\");'><span><i>" + splitText(session.title, 32, '<br>')
 								+ "</i></span><br><br><p>by: " + authors + "</p><span class='ui-li-aside'> "
+								+ "</i></span><br><p>labels: " + session.labels + "</p><span class='ui-li-aside'> "
 								+ session.location.description + "&nbsp;&nbsp;&nbsp;</span></a></li>")
  */				$("#conf-list").append(
 						"<li><a href='javascript:changeToSessionDetailsPage(\""
@@ -249,6 +250,8 @@
 		$("#detail-list").append(
 				"<li data-role='list-divider'>Description</li>")
 		$("#detail-list").append("<li>" + session.description + "</li>")
+		$("#detail-list").append("<li data-role='list-divider'>Labels</li>")
+		$("#detail-list").append("<li>" + session.labels + "</li>")		
 		$("#detail-list").append(
 				"<li data-role='list-divider'>" + session.ratings.length + " Rating(s)</li>")
 		renderRatings(session.ratings)
