@@ -233,48 +233,48 @@ public class Session implements Serializable {
 		// Title: Max 10
 		if (!StringUtil.isEmpty(title)) {
 			value += Math.min(10, title.length() / 1.6);
-			Log.v(XCS.LOG.ALL, "Title boosted value to " + value);
+//			Log.v(XCS.LOG.ALL, "Title boosted value to " + value);
 		}
 		// Description: Max 35
 		if (!StringUtil.isEmpty(description)) {
 			String dscrpt = description.replaceAll("\\s", "");
 			value += Math.min(35, dscrpt.length() * 1.4);
-			Log.v(XCS.LOG.ALL, "Description '" + dscrpt + "' boosted value to " + value);
+//			Log.v(XCS.LOG.ALL, "Description '" + dscrpt + "' boosted value to " + value);
 		}
 		// startTime: Max 5
 		if (startTime != null) {
 			value += 5;
-			Log.v(XCS.LOG.ALL, "Start time boosted value to " + value);
+//			Log.v(XCS.LOG.ALL, "Start time boosted value to " + value);
 		}
 		// Location: Max 5
 		if (location != null) {
 			value += 5;
-			Log.v(XCS.LOG.ALL, "Location boosted value to " + value);
+//			Log.v(XCS.LOG.ALL, "Location boosted value to " + value);
 		}
 		// Author: Max 5
 		if (authors != null && authors.size() > 0) {
 			value += 5;
-			Log.v(XCS.LOG.ALL, "Authors boosted value to " + value);
+//			Log.v(XCS.LOG.ALL, "Authors boosted value to " + value);
 		}
 		// Labels: Max 10
 		if (labels != null) {
 			value += Math.min(10, labels.size() * 3);
-			Log.v(XCS.LOG.ALL, "Labels boosted value to " + value);
+//			Log.v(XCS.LOG.ALL, "Labels boosted value to " + value);
 		}
 		// Languages: Max 5
 		if (languages != null && languages.size() > 0) {
 			value += 5;
-			Log.v(XCS.LOG.ALL, "Languages boosted value to " + value);
+//			Log.v(XCS.LOG.ALL, "Languages boosted value to " + value);
 		}
 		// Preparation: Max 5
 		if (!StringUtil.isEmpty(preparation)) {
 			value += Math.min(5, preparation.length() / 3);
-			Log.v(XCS.LOG.ALL, "Preparation boosted value to " + value);
+//			Log.v(XCS.LOG.ALL, "Preparation boosted value to " + value);
 		}
 		// intendedAudience: Max 20
 		if (!StringUtil.isEmpty(intendedAudience)) {
 			value += Math.min(20, intendedAudience.length() * 2);
-			Log.v(XCS.LOG.ALL, "Audience boosted value to " + value);
+//			Log.v(XCS.LOG.ALL, "Audience boosted value to " + value);
 		}
 		Log.i(XCS.LOG.ALL, "Completeness (100) = " + value);
 

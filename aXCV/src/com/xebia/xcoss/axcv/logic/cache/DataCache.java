@@ -7,6 +7,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.xebia.xcoss.axcv.Messages;
+import com.xebia.xcoss.axcv.logic.cache.DataCache.Type;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Moment;
 import com.xebia.xcoss.axcv.model.Session;
@@ -19,6 +20,8 @@ public abstract class DataCache {
 	public static final String CK_ALL_AUTHORS = "CK-Author";
 	public static final String CK_ALL_LABELS = "CK-Label";
 
+	private Type type;
+	
 	public enum Type {
 		Memory(MemoryCache.class), Database(DatabaseCache.class), None(NoCache.class);
 
@@ -33,7 +36,7 @@ public abstract class DataCache {
 		}
 	}
 
-	public DataCache(Context ctx) {}
+	public DataCache(Context ctx, Type t) { this.type = t; }
 
 	public <T> T getObject(String key, Class<T> type) {
 		return checkValid(doGetCachedObject(key, type));
@@ -200,5 +203,9 @@ public abstract class DataCache {
 			sb.append(object);
 		}
 		return sb.toString();
+	}
+
+	public Type getType() {
+		return type;
 	}
 }

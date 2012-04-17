@@ -5,12 +5,8 @@ IN PROGRESS
 TODO
 -------------------------------------------------------------------
 client
-
--	Adé werkt niet goed (tonen)
-
 -	Validatie ingegeven datum/tijdformaat
 -	Swipe in zoekscherm werkt niet op leeg scherm
-
 -	BUG Reschedule with duration 120 overwrites breaks
 -	Certificate check
 -	Afhandeling 400 meldingen
@@ -105,3 +101,4 @@ FIX Possible to add conferences in history
 FIX Keep add/edit session open on error
 FIX Remove location - any sessions there? - 
 FIX Change time - any sessions there? -
+FIX UTF8

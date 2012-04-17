@@ -8,7 +8,7 @@ import android.content.Context;
 public class NoCache extends DataCache {
 
 	public NoCache(Context ctx) {
-		super(ctx);
+		super(ctx, Type.None);
 	}
 
 	@Override

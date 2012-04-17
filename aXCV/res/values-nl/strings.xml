@@ -6,7 +6,7 @@
     <string name="app_version">0.7</string>
     <string name="app_help_url">http://xke.xebia.com/help</string>
     
-    <string name="splash_conferentie">Xebia Knowledge Exchange</string>
+    <string name="splash_conference">Xebia Knowledge Exchange</string>
     <string name="splash_company">Xebia</string>
     <string name="splash_version">Versie %s</string>
     <string name="splash_copyright">Copyright &#169; 2012 Xebia B.V.</string>
@@ -55,6 +55,7 @@
         <item>10 minuten</item>
         <item>15 minuten</item>
         <item>30 minuten</item>
+        <item>45 minuten</item>
         <item>60 minuten</item>
         <item>90 minuten</item>
         <item>120 minuten</item>
@@ -110,7 +111,7 @@
 		<item>Steengoed</item>
 		<item>Superieur!</item>
     </string-array>
-    <string-array name="conferentieFields">
+    <string-array name="conferenceFields">
 		<item>Starttijd</item>
 		<item>Eindtijd</item>
 		<item>Titel</item>
@@ -169,9 +170,9 @@
     <string name="confirm_delete_session">De sessie \'%1$s\' op %2$s verwijderen?</string>
     <string name="rescheduling_failed">Inplannen mislukt</string>
     <string name="reschedule_failed_message">De sessie kon niet opnieuw worden ingepland. Verkort of verplaats de sessie naar een andere locatie of datum.</string>
-    <string name="pick_conferentie">Kies een conferentie</string>
+    <string name="pick_conference">Kies een conferentie</string>
     <string name="pick_start">Kies een starttijd</string>
-    <string name="conferentie_fully_booked">Deze conferentie is volgeboekt!</string>
+    <string name="conference_fully_booked">De sessie past niet in deze conferentie!</string>
     <string name="pick_duration">Kies de duur</string>
     <string name="select_languages">Kies de talen</string>
     <string name="select_location">Kies een locatie</string>
@@ -180,17 +181,17 @@
     <string name="description">Beschrijving</string>
     <string name="number_of_people">Aantal personen</string>
     <string name="intended_audience">Doelgroep</string>
-    <string name="add_conferentie">Conferentie toevoegen</string>
-    <string name="edit_conferentie">Wijzig conferentie</string>
-    <string name="conferentie_with_sessions">Deze conferentie heeft %d sessies</string>
-    <string name="confirm_delete_conferentie">De conferentie \'%1$s\' op %2$s verwijderen?</string>
-    <string name="delete_conferentie">Verwijder conferentie</string>
+    <string name="add_conference">Conferentie toevoegen</string>
+    <string name="edit_conference">Wijzig conferentie</string>
+    <string name="conference_with_sessions">Deze conferentie heeft %d sessies</string>
+    <string name="confirm_delete_conference">De conferentie \'%1$s\' op %2$s verwijderen?</string>
+    <string name="delete_conference">Verwijder conferentie</string>
     <string name="move_delete">Verplaats &amp; verwijder</string>
     <string name="failure_move_session">Mislukt! Een sessie kan niet worden verplaatst</string>
     <string name="add_location">Nieuw&#8230;</string>
-    <string name="conferentie_detail">Details conferentie</string>
+    <string name="conference_detail">Details conferentie</string>
     <string name="no_location_date">Geen locatie en/of datum gespecificeerd</string>
-    <string name="conferentie_title">Conferentietitel</string>
+    <string name="conference_title">Conferentietitel</string>
     <string name="notification_on">Meldingen ingeschakeld</string>
     <string name="notification_off">Meldingen uitgechakeld</string>
     <string name="search_no_search">Geef een geldige zoektekst op</string>
@@ -201,15 +202,15 @@
     <string name="action_search_sessions">Zoek sessies</string>
     <string name="action_search_authors">Zoek presentator</string>
     <string name="action_delete_session">Verwijder sessie</string>
-    <string name="action_delete_conferentie">Delete conferentie</string>
-    <string name="action_register_conferentie">Registreer conferentie</string>
+    <string name="action_delete_conference">Delete conferentie</string>
+    <string name="action_register_conference">Registreer conferentie</string>
     <string name="action_register_location">Registreer locatie</string>
     <string name="action_register_rate">Geef waardering</string>
     <string name="action_register_remark">Plaats opmerking</string>
     <string name="action_register_session">Registreer sessie</string>
     <string name="action_retrieve_authors">Laad presentatoren</string>
-    <string name="action_retrieve_conferentie">Laad conferentie</string>
-    <string name="action_retrieve_conferenties">Laad conferenties</string>
+    <string name="action_retrieve_conference">Laad conferentie</string>
+    <string name="action_retrieve_conferences">Laad conferenties</string>
     <string name="action_retrieve_remarks">Laad commentaar</string>
     <string name="action_retrieve_labels">Laad labels</string>
     <string name="action_retrieve_locations">Laad locaties</string>

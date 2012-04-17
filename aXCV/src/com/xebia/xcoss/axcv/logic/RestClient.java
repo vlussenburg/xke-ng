@@ -1,7 +1,6 @@
 package com.xebia.xcoss.axcv.logic;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -35,6 +34,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 
 import android.util.Log;
 
@@ -59,16 +59,18 @@ public class RestClient {
 	private static Cookie sessionCookie = null;
 	private static boolean showDataStreams = false;
 
-//	static {
-//		// In the adb shell, setprop log.tag.org.apache.http.headers and log.tag.org.apache.http.wire to VERBOSE
-//		java.util.logging.Logger.getLogger("org.apache.http.wire").setLevel(java.util.logging.Level.FINEST);
-//		java.util.logging.Logger.getLogger("org.apache.http.headers").setLevel(java.util.logging.Level.FINEST);
-//	}
+	// static {
+	// // In the adb shell, setprop log.tag.org.apache.http.headers and
+	// log.tag.org.apache.http.wire to VERBOSE
+	// java.util.logging.Logger.getLogger("org.apache.http.wire").setLevel(java.util.logging.Level.FINEST);
+	// java.util.logging.Logger.getLogger("org.apache.http.headers").setLevel(java.util.logging.Level.FINEST);
+	// }
 
 	private static Gson getGson() {
 		if (gsonBuilder == null) {
 			gsonBuilder = new GsonBuilder();
-			gsonBuilder.registerTypeAdapter(Moment.class, new GsonMomentAdapter());
+			gsonBuilder.registerTypeAdapter(Moment.class,
+					new GsonMomentAdapter());
 		}
 		return gsonBuilder.create();
 	}
@@ -82,14 +84,14 @@ public class RestClient {
 	}
 
 	public static <T> T loadObject(String url, Class<T> rvClass) {
-		Log.d(LOG.COMMUNICATE, "Loading [" + rvClass.getSimpleName() + "] " + url);
+		Log.d(LOG.COMMUNICATE, "Loading [" + rvClass.getSimpleName() + "] "
+				+ url);
 		Reader reader = null;
 		try {
 			reader = getReader(new HttpGet(url));
 			T result = getGson().fromJson(reader, rvClass);
 			return result;
-		}
-		finally {
+		} finally {
 			StreamUtil.close(reader);
 		}
 	}
@@ -100,14 +102,14 @@ public class RestClient {
 		try {
 			reader = getReader(new HttpGet(url));
 			return getGson().fromJson(reader, rvClass);
-		}
-		finally {
+		} finally {
 			StreamUtil.close(reader);
 		}
 	}
 
 	public static <T> List<T> loadObjects(String url, Class<T> rvClass) {
-		Log.d(LOG.COMMUNICATE, "Loading [[" + rvClass.getSimpleName() + "]] " + url);
+		Log.d(LOG.COMMUNICATE, "Loading [[" + rvClass.getSimpleName() + "]] "
+				+ url);
 		Reader reader = null;
 		try {
 			reader = getReader(new HttpGet(url));
@@ -125,17 +127,18 @@ public class RestClient {
 					results.add(gson.fromJson(element, rvClass));
 				}
 			} else {
-				Log.d(LOG.COMMUNICATE, "Expecting JsonArray, was " + parse.getClass().getSimpleName());
+				Log.d(LOG.COMMUNICATE, "Expecting JsonArray, was "
+						+ parse.getClass().getSimpleName());
 			}
 			return results;
-		}
-		finally {
+		} finally {
 			StreamUtil.close(reader);
 		}
 	}
 
 	public static <T, U> U createObject(String url, T object, Class<U> rvClass) {
-		Log.d(LOG.COMMUNICATE, "Creating [" + object.getClass().getSimpleName() + "] " + url);
+		Log.d(LOG.COMMUNICATE, "Creating [" + object.getClass().getSimpleName()
+				+ "] " + url);
 		Reader reader = null;
 		try {
 			Gson gson = getGson();
@@ -144,14 +147,14 @@ public class RestClient {
 			logCommunicationData(postData);
 			reader = getReader(new HttpPost(url), postData);
 			return gson.fromJson(reader, rvClass);
-		}
-		finally {
+		} finally {
 			StreamUtil.close(reader);
 		}
 	}
 
 	public static <T> T updateObject(String url, T object) {
-		Log.d(LOG.COMMUNICATE, "Updating [" + object.getClass().getSimpleName() + "] " + url);
+		Log.d(LOG.COMMUNICATE, "Updating [" + object.getClass().getSimpleName()
+				+ "] " + url);
 		Reader reader = null;
 		try {
 			Gson gson = getGson();
@@ -161,8 +164,7 @@ public class RestClient {
 			reader = getReader(new HttpPut(url), postData);
 			T result = getGson().fromJson(reader, (Class<T>) object.getClass());
 			return result;
-		}
-		finally {
+		} finally {
 			StreamUtil.close(reader);
 		}
 	}
@@ -172,14 +174,16 @@ public class RestClient {
 		Reader reader = null;
 		try {
 			reader = getReader(new HttpDelete(url));
-		}
-		finally {
+		} finally {
 			StreamUtil.close(reader);
 		}
 	}
 
-	public static <T> List<T> searchObjects(String url, String key, Class<T> rvClass, Object searchParms) {
-		Log.d(LOG.COMMUNICATE, "Searching [" + key + "[" + rvClass.getSimpleName() + "]] " + url);
+	public static <T> List<T> searchObjects(String url, String key,
+			Class<T> rvClass, Object searchParms) {
+		Log.d(LOG.COMMUNICATE,
+				"Searching [" + key + "[" + rvClass.getSimpleName() + "]] "
+						+ url);
 		Reader reader = null;
 		try {
 			Gson gson = getGson();
@@ -191,7 +195,8 @@ public class RestClient {
 
 			ArrayList<T> results = new ArrayList<T>();
 			if (parse.isJsonObject()) {
-				JsonArray jsonArray = parse.getAsJsonObject().get(key).getAsJsonArray();
+				JsonArray jsonArray = parse.getAsJsonObject().get(key)
+						.getAsJsonArray();
 				Iterator<JsonElement> iterator = jsonArray.iterator();
 
 				while (iterator.hasNext()) {
@@ -200,8 +205,7 @@ public class RestClient {
 				}
 			}
 			return results;
-		}
-		finally {
+		} finally {
 			StreamUtil.close(reader);
 		}
 	}
@@ -216,7 +220,8 @@ public class RestClient {
 	}
 
 	public static <T, V> V postObject(String url, T object, Class<V> rvClass) {
-		Log.d(LOG.COMMUNICATE, "Posting [" + object.getClass().getSimpleName() + "] " + url);
+		Log.d(LOG.COMMUNICATE, "Posting [" + object.getClass().getSimpleName()
+				+ "] " + url);
 		Reader reader = null;
 		try {
 			Gson gson = getGson();
@@ -224,19 +229,19 @@ public class RestClient {
 			logCommunicationData(postData);
 			reader = getReader(new HttpPost(url), postData);
 			return getGson().fromJson(reader, rvClass);
-		}
-		finally {
+		} finally {
 			StreamUtil.close(reader);
 		}
 	}
 
-	private static Reader getReader(HttpEntityEnclosingRequestBase request, String content) {
+	private static Reader getReader(HttpEntityEnclosingRequestBase request,
+			String content) {
 		try {
 			if (!StringUtil.isEmpty(content)) {
-				request.setEntity(new StringEntity(content));
+				request.setEntity(new StringEntity(content, HTTP.UTF_8));
+
 			}
-		}
-		catch (UnsupportedEncodingException e) {
+		} catch (UnsupportedEncodingException e) {
 			throw new ServerException(request.getURI().toString(), e);
 		}
 		return getReader(request);
@@ -247,14 +252,16 @@ public class RestClient {
 		try {
 			httpClient = getHttpClient();
 			if (sessionCookie != null) {
-				// Log.e(XCS.LOG.COMMUNICATE, "Sending cookie " + sessionCookie);
+				// Log.e(XCS.LOG.COMMUNICATE, "Sending cookie " +
+				// sessionCookie);
 				httpClient.getCookieStore().addCookie(sessionCookie);
 			}
 			HttpResponse response = httpClient.execute(request);
 			List<Cookie> cookies = httpClient.getCookieStore().getCookies();
 			for (Cookie cookie : cookies) {
 				if (JSESSIONID.equals(cookie.getName())) {
-					// Log.e(XCS.LOG.COMMUNICATE, "Retrieving cookie " + sessionCookie);
+					// Log.e(XCS.LOG.COMMUNICATE, "Retrieving cookie " +
+					// sessionCookie);
 					sessionCookie = cookie;
 					break;
 				}
@@ -266,48 +273,47 @@ public class RestClient {
 				Log.i(XCS.LOG.COMMUNICATE, "Read: " + result);
 			}
 			return new StringReader(result);
-		}
-		catch (InterruptedIOException e) {
+		} catch (InterruptedIOException e) {
 			throw new DataException(Code.TIME_OUT, request.getURI());
-		}
-		catch (SocketException e) {
+		} catch (SocketException e) {
 			// Connection refused
 			throw new DataException(Code.NO_NETWORK, request.getURI());
-		}
-		catch (UnknownHostException e) {
+		} catch (UnknownHostException e) {
 			throw new DataException(Code.NO_NETWORK, request.getURI());
-		}
-		catch (IOException e) {
-			throw new ServerException(e.getClass().getSimpleName() + ": " + request.getURI().toString(), e);
-		}
-		finally {
+		} catch (IOException e) {
+			throw new ServerException(e.getClass().getSimpleName() + ": "
+					+ request.getURI().toString(), e);
+		} finally {
 			try {
 				httpClient.getConnectionManager().closeExpiredConnections();
-			}
-			catch (Exception e) {
-				Log.i(XCS.LOG.COMMUNICATE, "Close expired failed: " + StringUtil.getExceptionMessage(e));
+			} catch (Exception e) {
+				Log.i(XCS.LOG.COMMUNICATE, "Close expired failed: "
+						+ StringUtil.getExceptionMessage(e));
 			}
 		}
 	}
 
-	private static String readResponse(HttpResponse response) throws IOException {
-		InputStreamReader str = null;
-		StringBuilder result = new StringBuilder();
-		try {
-			HttpEntity entity = response.getEntity();
-			if (entity != null) {
-				str = new InputStreamReader(entity.getContent());
-				char[] buffer = new char[1024];
-				int read;
-				while ((read = str.read(buffer, 0, 1024)) >= 0) {
-					result.append(buffer, 0, read);
-				}
-			}
+	private static String readResponse(HttpResponse response)
+			throws IOException {
+		// InputStreamReader str = null;
+		// StringBuilder result = new StringBuilder();
+		// try {
+		HttpEntity entity = response.getEntity();
+		if (entity != null) {
+			return EntityUtils.toString(entity, HTTP.UTF_8);
+			// str = new InputStreamReader(entity.getContent());
+			// char[] buffer = new char[1024];
+			// int read;
+			// while ((read = str.read(buffer, 0, 1024)) >= 0) {
+			// result.append(buffer, 0, read);
+			// }
+			// }
 		}
-		finally {
-			StreamUtil.close(str);
-		}
-		return result.toString();
+		return "";
+		// finally {
+		// StreamUtil.close(str);
+		// }
+		// return result.toString();
 	}
 
 	private static DefaultHttpClient getHttpClient() {
@@ -318,61 +324,73 @@ public class RestClient {
 		HttpConnectionParams.setSoTimeout(params, HTTP_TIMEOUT);
 		params.setBooleanParameter("http.protocol.expect-continue", false);
 		SchemeRegistry registry = new SchemeRegistry();
-		registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 8080));
+		registry.register(new Scheme("http", PlainSocketFactory
+				.getSocketFactory(), 8080));
 		try {
-   			SSLSocketFactory sslSocketFactory = new EC2TrustedSocketFactory();
-   			// Comodo is not a trusted provider (yet?)
-   			// HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
-   			// sslSocketFactory.setHostnameVerifier((X509HostnameVerifier) hostnameVerifier);
-			// Define only one port for the scheme, otherwise it will be overwritten
+			SSLSocketFactory sslSocketFactory = new EC2TrustedSocketFactory();
+			// Comodo is not a trusted provider (yet?)
+			// HostnameVerifier hostnameVerifier =
+			// org.apache.http.conn.ssl.SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
+			// sslSocketFactory.setHostnameVerifier((X509HostnameVerifier)
+			// hostnameVerifier);
+			// Define only one port for the scheme, otherwise it will be
+			// overwritten
 			registry.register(new Scheme("https", sslSocketFactory, 443));
+		} catch (Exception e) {
+			Log.e(XCS.LOG.COMMUNICATE, "Could not use secure connection: "
+					+ StringUtil.getExceptionMessage(e));
 		}
-		catch (Exception e) {
-			Log.e(XCS.LOG.COMMUNICATE, "Could not use secure connection: " + StringUtil.getExceptionMessage(e));
-		}
-		ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager(params, registry);
+		ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager(
+				params, registry);
 		return new DefaultHttpClient(manager, params);
 	}
 
-	private static void handleResponse(HttpRequestBase request, HttpResponse response) {
+	private static void handleResponse(HttpRequestBase request,
+			HttpResponse response) {
 		int responseCode = response.getStatusLine().getStatusCode();
 		String message = "?";
 		switch (responseCode) {
-			case 200:
+		case 200:
 			// This is an ok status
 			break;
-			case 400:
+		case 400:
+			try {
+				message = readResponse(response);
+			} catch (IOException e) {
+			}
+			Log.w(XCS.LOG.COMMUNICATE, "Server said warning '"
+					+ request.getURI().toString() + "': " + message + ".");
+			throw new DataException(DataException.Code.NOT_HANDLED,
+					request.getURI());
+		case 403:
+			Log.w(XCS.LOG.COMMUNICATE, "Not authenticated for URL '"
+					+ request.getURI().toString() + "'.");
+			throw new DataException(DataException.Code.NOT_ALLOWED,
+					request.getURI());
+		case 404:
+			Log.w(XCS.LOG.COMMUNICATE, "The URL '"
+					+ request.getURI().toString() + "' (" + request.getMethod()
+					+ ") was not found!");
+			throw new DataException(DataException.Code.NOT_FOUND,
+					request.getURI());
+		case 500:
+			try {
+				message = readResponse(response);
+			} catch (IOException e) {
+			}
+			Log.e(XCS.LOG.COMMUNICATE, "Server error on '"
+					+ request.getURI().toString() + "': " + message);
+			throw new ServerException(request.getURI().getPath());
+		default:
+			if (responseCode >= 400) {
 				try {
 					message = readResponse(response);
+				} catch (IOException e) {
 				}
-				catch (IOException e) {}
-				Log.w(XCS.LOG.COMMUNICATE, "Server said warning '" + request.getURI().toString() + "': " + message
-						+ ".");
-				throw new DataException(DataException.Code.NOT_HANDLED, request.getURI());
-			case 403:
-				Log.w(XCS.LOG.COMMUNICATE, "Not authenticated for URL '" + request.getURI().toString() + "'.");
-				throw new DataException(DataException.Code.NOT_ALLOWED, request.getURI());
-			case 404:
-				Log.w(XCS.LOG.COMMUNICATE, "The URL '" + request.getURI().toString() + "' (" + request.getMethod()
-						+ ") was not found!");
-				throw new DataException(DataException.Code.NOT_FOUND, request.getURI());
-			case 500:
-				try {
-					message = readResponse(response);
-				}
-				catch (IOException e) {}
-				Log.e(XCS.LOG.COMMUNICATE, "Server error on '" + request.getURI().toString() + "': " + message);
-				throw new ServerException(request.getURI().getPath());
-			default:
-				if (responseCode >= 400) {
-					try {
-						message = readResponse(response);
-					}
-					catch (IOException e) {}
-					Log.e(XCS.LOG.COMMUNICATE, "Error " + responseCode + " on '" + request.getURI().toString() + "': "
-							+ message);
-					throw new CommException(request.getURI(), responseCode);
-				}
+				Log.e(XCS.LOG.COMMUNICATE, "Error " + responseCode + " on '"
+						+ request.getURI().toString() + "': " + message);
+				throw new CommException(request.getURI(), responseCode);
+			}
 			break;
 		}
 	}

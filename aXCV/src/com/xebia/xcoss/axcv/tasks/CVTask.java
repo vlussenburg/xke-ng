@@ -26,6 +26,8 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends
 	private ConferenceViewerApplication application;
 	private TaskCallBack<ReturnT> callback;
 	private boolean silent = false;
+	
+	@SuppressWarnings("rawtypes")
 
 	public CVTask(int action, BaseActivity ctx, TaskCallBack<ReturnT> callback) {
 		super(ctx);
@@ -34,8 +36,7 @@ public abstract class CVTask<ParameterT, ProgressT, ReturnT> extends
 		this.callback = callback;
 		disableDialog();
 		Log.w(XCS.LOG.COMMUNICATE, "Task created: "
-				+ getClass().getSimpleName());
-		// DebugUtil.showCallStack();
+				+ getClass().getSimpleName() + " on " + ctx.getClass().getSimpleName());
 	}
 
 	@Override
