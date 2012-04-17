@@ -25,6 +25,7 @@
 		{
 		case 403:
 			//alert("Please login")
+			$("#loginFailure").html("<p style='color:red'>Your session has expired.<br>Please login again.</p>");
 			showLoginPage()
 		  break;
 		case 404:
@@ -55,8 +56,14 @@
 					"pageshow",
 					function(event, ui) {
 						$.mobile.showPageLoadingMsg();
-						ProxyAPI.loadConfSummary(3,5)
+						ProxyAPI.loadConfSummary(3,5);
+					}),
+			$("#chooseConference").live(
+					"pagehide",
+					function(event, ui) {
+						abortSelectConference();
 					})
+					
 	});
 
 	function login() {
@@ -122,8 +129,11 @@
 		$("#conf-list").empty();
 		$.mobile.changePage("#chooseConference", {
 			transition : "fade"
-			
 		});
+	}
+	
+	function abortSelectConference() {
+		$("#summary-list").empty()		
 	}
 	
 	function changeToConferencePage(id, next) {
@@ -181,11 +191,17 @@
 			for (sessionsIndex in slot.sessions) {
 				var session = slot.sessions[sessionsIndex]
 				var authors = getAuthors(session)
-				$("#conf-list").append(
+/* 				$("#conf-list").append(
 						"<li><a href='javascript:changeToSessionDetailsPage(\""
 								+ session.id + "\");'><span><i>" + splitText(session.title, 32, '<br>')
 								+ "</i></span><br><br><p>by: " + authors + "</p><span class='ui-li-aside'> "
+								+ "</i></span><br><p>labels: " + session.labels + "</p><span class='ui-li-aside'> "
 								+ session.location.description + "&nbsp;&nbsp;&nbsp;</span></a></li>")
+ */				$("#conf-list").append(
+						"<li><a href='javascript:changeToSessionDetailsPage(\""
+								+ session.id + "\");'><span><h3><i>" + session.title
+								+ "</i></h3></span><p>by: " + authors + "<br/>"
+								+ session.location.description + "</p></a></li>")
 			}
 		}
 		$("#conf-list").listview("refresh");
@@ -234,6 +250,8 @@
 		$("#detail-list").append(
 				"<li data-role='list-divider'>Description</li>")
 		$("#detail-list").append("<li>" + session.description + "</li>")
+		$("#detail-list").append("<li data-role='list-divider'>Labels</li>")
+		$("#detail-list").append("<li>" + session.labels + "</li>")		
 		$("#detail-list").append(
 				"<li data-role='list-divider'>" + session.ratings.length + " Rating(s)</li>")
 		renderRatings(session.ratings)
