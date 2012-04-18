@@ -44,9 +44,9 @@ import com.xebia.xcoss.axcv.util.XCS;
 
 /**
  * IA_CONFERENCE_ID - ID of selected conference (required by parent).
- * IA_SESSION_ID - ID of selected conference (optional).
- * IA_LOCATION_ID - ID of selected location (optional by parent).
- * IA_SESSION_START - ID of selected session (optional).
+ * IA_SESSION_ID - ID of selected conference (optional). IA_LOCATION_ID - ID of
+ * selected location (optional by parent). IA_SESSION_START - ID of selected
+ * session (optional).
  * 
  * @author Michael
  */
@@ -87,27 +87,29 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	@Override
 	protected void onResume() {
-		new RetrieveConferenceTask(R.string.action_retrieve_conference, this, new TaskCallBack<Conference>() {
-			@Override
-			public void onCalled(Conference conference) {
-				if (conference != null) {
-					currentConference = conference;
-					updateLocations(conference);
+		new RetrieveConferenceTask(R.string.action_retrieve_conference, this,
+				new TaskCallBack<Conference>() {
+					@Override
+					public void onCalled(Conference conference) {
+						if (conference != null) {
+							currentConference = conference;
+							updateLocations(conference);
 
-					currentSession = determineSelectedSession(conference);
-					if (currentSession != null) {
-						updateCurrentLocation(currentSession);
-						fill();
-						scheduleRateAndReviewRefresh();
+							currentSession = determineSelectedSession(conference);
+							if (currentSession != null) {
+								updateCurrentLocation(currentSession);
+								fill();
+								scheduleRateAndReviewRefresh();
+							}
+							updateLocationNavigation();
+							updatePreviousAndNextSessionButtons();
+						} else {
+							// TODO The CVTask currently shows a dialog, which
+							// will leak when finishing...
+							finish();
+						}
 					}
-					updateLocationNavigation();
-					updatePreviousAndNextSessionButtons();
-				} else {
-					// TODO The CVTask currently shows a dialog, which will leak when finishing...
-					finish();
-				}
-			}
-		}).execute(getConferenceId());
+				}).execute(getConferenceId());
 		super.onResume();
 	}
 
@@ -150,20 +152,26 @@ public class CVSessionView extends SessionSwipeActivity {
 			sessionLocation.setText(getCurrentLocation().getDescription());
 			sessionTitle.setText(currentSession.getTitle());
 			sessionDescription.setText(currentSession.getDescription());
-			sessionAuthor.setText(FormatUtil.getList(currentSession.getAuthors()));
+			sessionAuthor.setText(FormatUtil.getList(currentSession
+					.getAuthors()));
 
 			// Optional fields (hide when not available)
-			updateTextField(R.id.scAudience, R.id.scAudienceLabel, currentSession.getIntendedAudience());
-			updateTextField(R.id.scLabels, R.id.scLabelsLabel, FormatUtil.getList(currentSession.getLabels(), false));
+			updateTextField(R.id.scAudience, R.id.scAudienceLabel,
+					currentSession.getIntendedAudience());
+			updateTextField(R.id.scLabels, R.id.scLabelsLabel,
+					FormatUtil.getList(currentSession.getLabels(), false));
 			updateTextField(R.id.scLanguage, R.id.scLanguageLabel,
 					FormatUtil.getList(currentSession.getLanguages(), false));
-			updateTextField(R.id.scLimit, R.id.scLimitLabel, currentSession.getLimit());
-			updateTextField(R.id.scPreparation, R.id.scPreparationLabel, currentSession.getPreparation());
+			updateTextField(R.id.scLimit, R.id.scLimitLabel,
+					currentSession.getLimit());
+			updateTextField(R.id.scPreparation, R.id.scPreparationLabel,
+					currentSession.getPreparation());
 
 			TextView labelView = (TextView) findViewById(R.id.scLabels);
 			Linkify.addLinks(labelView, XCS.TAG.PATTERN, XCS.TAG.LINK);
 			if (currentSession.getAuthors().size() > 0) {
-				Linkify.addLinks(sessionAuthor, XCS.AUTHOR.PATTERN, XCS.AUTHOR.LINK);
+				Linkify.addLinks(sessionAuthor, XCS.AUTHOR.PATTERN,
+						XCS.AUTHOR.LINK);
 			}
 			OnClickListener lRate = new OnClickListener() {
 				@Override
@@ -186,7 +194,8 @@ public class CVSessionView extends SessionSwipeActivity {
 			view.setOnClickListener(lReview);
 
 			ImageView button = (ImageView) findViewById(R.id.sessionMarkButton);
-			if (currentSession.isBreak() || StringUtil.isEmpty(getUser()) || currentSession.isExpired()) {
+			if (currentSession.isBreak() || StringUtil.isEmpty(getUser())
+					|| currentSession.isExpired()) {
 				button.setVisibility(View.GONE);
 			} else {
 				getMyApplication().markSession(currentSession, button, false);
@@ -194,7 +203,8 @@ public class CVSessionView extends SessionSwipeActivity {
 				button.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View view) {
-						getMyApplication().markSession(currentSession, view, true);
+						getMyApplication().markSession(currentSession, view,
+								true);
 					}
 				});
 			}
@@ -202,28 +212,32 @@ public class CVSessionView extends SessionSwipeActivity {
 	}
 
 	private void updateRateAndReview() {
-		if (currentSession == null || StringUtil.isEmpty(currentSession.getId())) {
+		if (currentSession == null
+				|| StringUtil.isEmpty(currentSession.getId())) {
 			return;
 		}
 		Log.i(XCS.LOG.COMMUNICATE, "Updating rate and reviews"); //$NON-NLS-1$
-		new RetrieveRateTask(R.string.action_retrieve_rate, this, new TaskCallBack<Rate>() {
-			@Override
-			public void onCalled(Rate result) {
-				if (result != null) {
-					TextView view = (TextView) findViewById(R.id.scRating);
-					view.setText(FormatUtil.getText(result));
-				}
-			}
-		}).silent().execute(currentSession.getId());
+		new RetrieveRateTask(R.string.action_retrieve_rate, this,
+				new TaskCallBack<Rate>() {
+					@Override
+					public void onCalled(Rate result) {
+						if (result != null) {
+							TextView view = (TextView) findViewById(R.id.scRating);
+							view.setText(FormatUtil.getText(result));
+						}
+					}
+				}).silent().execute(currentSession.getId());
 
-		new RetrieveRemarksTask(R.string.action_retrieve_remarks, this, new TaskCallBack<List<Remark>>() {
-			@Override
-			public void onCalled(List<Remark> result) {
-				TextView view = (TextView) findViewById(R.id.scComments);
-				Spanned spannedContent = Html.fromHtml(FormatUtil.getHtml(result));
-				view.setText(spannedContent, BufferType.SPANNABLE);
-			}
-		}).silent().execute(currentSession.getId());
+		new RetrieveRemarksTask(R.string.action_retrieve_remarks, this,
+				new TaskCallBack<List<Remark>>() {
+					@Override
+					public void onCalled(List<Remark> result) {
+						TextView view = (TextView) findViewById(R.id.scComments);
+						Spanned spannedContent = Html.fromHtml(FormatUtil
+								.getHtml(result));
+						view.setText(spannedContent, BufferType.SPANNABLE);
+					}
+				}).silent().execute(currentSession.getId());
 	}
 
 	private void updatePreviousAndNextSessionButtons() {
@@ -265,43 +279,50 @@ public class CVSessionView extends SessionSwipeActivity {
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		if (currentSession == null) {
-			return null;
-		}
-		Dialog dialog = null;
-		switch (id) {
+		if (currentSession != null) {
+			Dialog dialog = null;
+			switch (id) {
 			case XCS.DIALOG.ADD_RATING:
 				dialog = new Dialog(this);
 				dialog.setContentView(R.layout.dialog_rating);
 				dialog.setTitle(R.string.your_rating);
-				TextView text = (TextView) dialog.findViewById(R.id.drSessionTitle);
+				TextView text = (TextView) dialog
+						.findViewById(R.id.drSessionTitle);
 				text.setText(currentSession.getTitle());
 
 				Button submit = (Button) dialog.findViewById(R.id.drSubmit);
-				final RatingBar ratingBar = (RatingBar) dialog.findViewById(R.id.drSessionRate);
-				final TextView rateText = (TextView) dialog.findViewById(R.id.drRateText);
+				final RatingBar ratingBar = (RatingBar) dialog
+						.findViewById(R.id.drSessionRate);
+				final TextView rateText = (TextView) dialog
+						.findViewById(R.id.drRateText);
 				rateText.setText(new Rate(ratingBar, null).getMessage());
 
-				// Or use a DialogInterface.OnClickListener to directly access the dialog
+				// Or use a DialogInterface.OnClickListener to directly access
+				// the dialog
 				submit.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View paramView) {
 						Rate rate = new Rate(ratingBar, currentSession.getId());
 						if (rate.isRated()) {
-							new RegisterRateTask(R.string.action_register_rate, CVSessionView.this).execute(rate);
-							if (timer != null) scheduleRateAndReviewRefresh();
+							new RegisterRateTask(R.string.action_register_rate,
+									CVSessionView.this).execute(rate);
+							if (timer != null)
+								scheduleRateAndReviewRefresh();
 						}
 						dismissDialog(XCS.DIALOG.ADD_RATING);
 					}
 				});
 
-				ratingBar.setOnRatingBarChangeListener(new OnRatingBarChangeListener() {
+				ratingBar
+						.setOnRatingBarChangeListener(new OnRatingBarChangeListener() {
 
-					@Override
-					public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-						rateText.setText(new Rate(ratingBar, null).getMessage());
-					}
-				});
+							@Override
+							public void onRatingChanged(RatingBar ratingBar,
+									float rating, boolean fromUser) {
+								rateText.setText(new Rate(ratingBar, null)
+										.getMessage());
+							}
+						});
 				return dialog;
 			case XCS.DIALOG.CREATE_REVIEW:
 				dialog = new Dialog(this);
@@ -311,20 +332,26 @@ public class CVSessionView extends SessionSwipeActivity {
 				text.setText(currentSession.getTitle());
 
 				submit = (Button) dialog.findViewById(R.id.dvSubmit);
-				final TextView edit = (TextView) dialog.findViewById(R.id.dvEditText);
+				final TextView edit = (TextView) dialog
+						.findViewById(R.id.dvEditText);
 
-				// Or use a DialogInterface.OnClickListener to directly access the dialog
+				// Or use a DialogInterface.OnClickListener to directly access
+				// the dialog
 				submit.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View paramView) {
-						Remark remark = new Remark(getUser(), edit.getText().toString(), currentSession.getId());
+						Remark remark = new Remark(getUser(), edit.getText()
+								.toString(), currentSession.getId());
 						edit.setText("");
-						new RegisterRemarkTask(R.string.action_register_remark, CVSessionView.this).execute(remark);
+						new RegisterRemarkTask(R.string.action_register_remark,
+								CVSessionView.this).execute(remark);
 						dismissDialog(XCS.DIALOG.CREATE_REVIEW);
-						if (timer != null) scheduleRateAndReviewRefresh();
+						if (timer != null)
+							scheduleRateAndReviewRefresh();
 					}
 				});
 				return dialog;
+			}
 		}
 		return super.onCreateDialog(id);
 	}
@@ -360,21 +387,21 @@ public class CVSessionView extends SessionSwipeActivity {
 		intent.putExtra(BaseActivity.IA_CONFERENCE_ID, getConferenceId());
 
 		switch (item.getItemId()) {
-			case XCS.MENU.ADD:
+		case XCS.MENU.ADD:
+			startActivity(intent);
+			return true;
+		case XCS.MENU.EDIT:
+			if (currentSession != null) {
+				intent.putExtra(BaseActivity.IA_SESSION, currentSession.getId());
 				startActivity(intent);
-				return true;
-			case XCS.MENU.EDIT:
-				if (currentSession != null) {
-					intent.putExtra(BaseActivity.IA_SESSION, currentSession.getId());
-					startActivity(intent);
-				}
-				return true;
-			case XCS.MENU.LIST:
-				intent = new Intent(this, CVSessionList.class);
-				intent.putExtra(IA_LOCATION_ID, currentLocation);
-				intent.putExtra(IA_CONFERENCE_ID, getConferenceId());
-				startActivity(intent);
-				return true;
+			}
+			return true;
+		case XCS.MENU.LIST:
+			intent = new Intent(this, CVSessionList.class);
+			intent.putExtra(IA_LOCATION_ID, currentLocation);
+			intent.putExtra(IA_CONFERENCE_ID, getConferenceId());
+			startActivity(intent);
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -386,7 +413,8 @@ public class CVSessionView extends SessionSwipeActivity {
 			startActivityCurrentSession();
 			overridePendingTransition(R.anim.slide_bottom_to_top, 0);
 		} else {
-			Toast.makeText(this, R.string.no_later_session, Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.no_later_session, Toast.LENGTH_LONG)
+					.show();
 		}
 	}
 
@@ -397,14 +425,16 @@ public class CVSessionView extends SessionSwipeActivity {
 			startActivityCurrentSession();
 			overridePendingTransition(R.anim.slide_top_to_bottom, 0);
 		} else {
-			Toast.makeText(this, R.string.no_earlier_session, Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, R.string.no_earlier_session, Toast.LENGTH_LONG)
+					.show(); //$NON-NLS-1$
 		}
 	}
 
 	@Override
 	public void onSwipeLeftToRight() {
 		if (currentSession != null) {
-			getIntent().putExtra(IA_SESSION_START, currentSession.getStartTime().asMinutes());
+			getIntent().putExtra(IA_SESSION_START,
+					currentSession.getStartTime().asMinutes());
 		}
 		super.onSwipeLeftToRight();
 	}
@@ -412,7 +442,8 @@ public class CVSessionView extends SessionSwipeActivity {
 	@Override
 	public void onSwipeRightToLeft() {
 		if (currentSession != null) {
-			getIntent().putExtra(IA_SESSION_START, currentSession.getStartTime().asMinutes());
+			getIntent().putExtra(IA_SESSION_START,
+					currentSession.getStartTime().asMinutes());
 		}
 		super.onSwipeRightToLeft();
 	}
@@ -466,7 +497,8 @@ public class CVSessionView extends SessionSwipeActivity {
 		intent.putExtra(IA_SESSION, currentSession.getId());
 		intent.putExtra(IA_LOCATION_ID, currentLocation);
 		startActivity(intent);
-		// Finish this activity to let the back button go directly to the overview page
+		// Finish this activity to let the back button go directly to the
+		// overview page
 		finish();
 	}
 
@@ -477,7 +509,8 @@ public class CVSessionView extends SessionSwipeActivity {
 			// Find all sessions on this particular location
 			ArrayList<Session> options = new ArrayList<Session>();
 			for (Session s : conference.getSessions()) {
-				if (s.isMandatory() || s.getLocation().equals(getCurrentLocation())) {
+				if (s.isMandatory()
+						|| s.getLocation().equals(getCurrentLocation())) {
 					options.add(s);
 				}
 			}

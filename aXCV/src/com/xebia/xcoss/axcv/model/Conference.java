@@ -68,12 +68,12 @@ public class Conference implements Serializable {
 	}
 
 	public static void init(String[] input) {
-		if ( input == null || input.length != 4) {
+		if (input == null || input.length != 4) {
 			throw new RuntimeException(Messages.getString("Exception.5"));
 		}
 		mandatoryFields = input;
 	}
-	
+
 	// Getters and setters
 
 	public String getId() {
@@ -91,14 +91,13 @@ public class Conference implements Serializable {
 	public void setSessions(Set<Session> sessions) {
 		this.sessions = sessions;
 	}
-	
+
 	private Set<Session> sort(Set<Session> org) {
 		try {
 			if (((TreeSet<Session>) org).comparator() instanceof SessionComparator) {
 				return org;
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			// Ignore
 		}
 
@@ -115,7 +114,8 @@ public class Conference implements Serializable {
 
 		TreeSet<Session> set = new TreeSet<Session>(new SessionComparator());
 		for (Session session : data) {
-			// If the session has a location not assigned to the conference, it never shows ...
+			// If the session has a location not assigned to the conference, it
+			// never shows ...
 			if (session.isMandatory() || loc.equals(session.getLocation())) {
 				set.add(session);
 			}
@@ -181,7 +181,8 @@ public class Conference implements Serializable {
 	}
 
 	public void addLocation(Location location) {
-		if (location != null) locations.add(location);
+		if (location != null)
+			locations.add(location);
 	}
 
 	public void removeLocation(Location location) {
@@ -215,7 +216,7 @@ public class Conference implements Serializable {
 			messages.add(mandatoryFields[3]);
 		}
 		return (messages.size() == 0);
-		}
+	}
 
 	private void resetSessions() {
 		sessions = new TreeSet<Session>(new SessionComparator());
@@ -255,7 +256,8 @@ public class Conference implements Serializable {
 				return (space >= length);
 			}
 		}
-		// Either we have no more sessions, or there is space between the last and the end of the conference.
+		// Either we have no more sessions, or there is space between the last
+		// and the end of the conference.
 		long space = getEndTime().asMinutes() - start.asMinutes();
 		return (space >= length);
 	}
@@ -265,17 +267,24 @@ public class Conference implements Serializable {
 
 		int prefstart = Math.max(start == null ? 0 : start.asMinutes(), startTime.asMinutes());
 		int sessionDuration = duration < TimeSlot.MIN_LENGTH ? TimeSlot.LENGTH : duration;
-		
+
 		for (Session session : getSessions()) {
-			if (!location.equals(session.getLocation()) || session.equals(rescheduleSession)) {
+			if (session.equals(rescheduleSession)) {
 				continue;
+			}
+			if (!location.equals(session.getLocation())) {
+				if (!session.isMandatory() && !session.isBreak()) {
+					continue;
+				}
 			}
 			int sesstart = session.getStartTime().asMinutes();
 
 			// Preferred start time is later than session time.
 			if (prefstart >= sesstart) {
-				// Log.d(XCS.LOG.ALL, "On " + session.getTitle() + ": session starting earlier.");
-				// If the session ends after the preferred start time, move start time.
+				// Log.d(XCS.LOG.ALL, "On " + session.getTitle() +
+				// ": session starting earlier.");
+				// If the session ends after the preferred start time, move
+				// start time.
 				prefstart = Math.max(session.getEndTime().asMinutes(), prefstart);
 			} else {
 				// There is room before this session
@@ -298,7 +307,7 @@ public class Conference implements Serializable {
 
 	public SortedSet<TimeSlot> getAvailableTimeSlots(int duration, List<Location> locsIn) {
 		List<Location> locs = locsIn;
-		if ( locs == null ) {
+		if (locs == null) {
 			locs = new ArrayList<Location>();
 			locs.addAll(locations);
 		}
@@ -309,14 +318,15 @@ public class Conference implements Serializable {
 		int length = duration < TimeSlot.MIN_LENGTH ? TimeSlot.LENGTH : duration;
 		Moment start = startTime;
 		while ((t = getNextAvailableTimeSlot(null, start, length, firstLocation)) != null) {
-//			Log.i("debug", "Available: " + t);
+			// Log.i("debug", "Available: " + t);
 			// Check the remainder of the locations for this slot
 			boolean availableOnAllLocations = true;
 			for (int i = 1; i < allLocations.length; i++) {
 				Location location = allLocations[i];
-				if (location.equals(firstLocation)) continue;
+				if (location.equals(firstLocation))
+					continue;
 				boolean slotAvailable = isTimeSlotAvailable(start, length, location);
-//				Log.i("debug", "  On '" + location + "' : " + slotAvailable);
+				// Log.i("debug", "  On '" + location + "' : " + slotAvailable);
 				availableOnAllLocations = availableOnAllLocations && slotAvailable;
 			}
 			if (availableOnAllLocations) {
@@ -347,16 +357,23 @@ public class Conference implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
 		Conference other = (Conference) obj;
 		if (startTime == null) {
-			if (other.startTime != null) return false;
-		} else if (!startTime.equals(other.startTime)) return false;
+			if (other.startTime != null)
+				return false;
+		} else if (!startTime.equals(other.startTime))
+			return false;
 		if (title == null) {
-			if (other.title != null) return false;
-		} else if (!title.equals(other.title)) return false;
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
 		return true;
 	}
 

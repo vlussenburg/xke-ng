@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -40,6 +41,7 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 	private int shownYear;
 	private Conference[] conferences;
 	private boolean redirect = false;
+	private RetrieveConferencesPerYearTask task1;
 
 	/**
 	 * Called when the activity is first created.
@@ -73,10 +75,15 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 	}
 
 	private void refreshScreen() {
-		new RetrieveConferencesPerYearTask(R.string.action_retrieve_conferences, this,
+		if ( task1 != null ) {
+			return;
+		}
+		
+		task1 = new RetrieveConferencesPerYearTask(R.string.action_retrieve_conferences, this,
 				new TaskCallBack<List<Conference>>() {
 					@Override
 					public void onCalled(List<Conference> result) {
+						task1 = null;
 						if (result != null) {
 							updateConferences(result);
 							if (redirect) {
@@ -91,7 +98,8 @@ public class CVConferences extends BaseActivity implements SwipeActivity {
 							}
 						}
 					}
-				}).execute(shownYear);
+				});
+		task1.execute(shownYear);
 	}
 
 	public void updateConferences(List<Conference> list) {

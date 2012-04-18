@@ -23,7 +23,7 @@ public class DatabaseCache extends DataCache {
 	private BaseActivity context;
 
 	public DatabaseCache(Context ctx) {
-		super(ctx);
+		super(ctx, Type.Database);
 		if ( ctx instanceof BaseActivity) {
 			context = (BaseActivity) ctx;
 		}

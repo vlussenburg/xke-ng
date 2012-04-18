@@ -3,7 +3,7 @@
 
     <string name="app_name">Conference Viewer</string>
     <string name="app_full_name">Xebia Conference Viewer</string>
-    <string name="app_version">0.7</string>
+    <string name="app_version">0.7.2</string>
     <string name="app_help_url">http://xke.xebia.com/help</string>
     
     <string name="splash_conference">Xebia Knowledge Exchange</string>
@@ -55,6 +55,7 @@
         <item>10 minutes</item>
         <item>15 minutes</item>
         <item>30 minutes</item>
+        <item>45 minutes</item>
         <item>60 minutes</item>
         <item>90 minutes</item>
         <item>120 minutes</item>
@@ -171,7 +172,7 @@
     <string name="reschedule_failed_message">The session cannot be scheduled. Shorten session, use another location or choose another conference.</string>
     <string name="pick_conference">Pick a conference</string>
     <string name="pick_start">Pick a start time</string>
-    <string name="conference_fully_booked">This conference is fully booked!</string>
+    <string name="conference_fully_booked">This conference has no room for this session</string>
     <string name="pick_duration">Pick a duration</string>
     <string name="select_languages">Select languages</string>
     <string name="select_location">Select location</string>

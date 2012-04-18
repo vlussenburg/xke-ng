@@ -29,6 +29,7 @@ public class CVSessionList extends SessionSwipeActivity {
 
 	private Session[] sessions;
 	private Conference conference;
+	private RetrieveConferenceTask task1;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -45,9 +46,13 @@ public class CVSessionList extends SessionSwipeActivity {
 	}
 
 	private void refreshScreen() {
-		new RetrieveConferenceTask(R.string.action_retrieve_conference, this, new TaskCallBack<Conference>() {
+		if ( task1 != null) {
+			return;
+		}
+		task1 = new RetrieveConferenceTask(R.string.action_retrieve_conference, this, new TaskCallBack<Conference>() {
 			@Override
 			public void onCalled(Conference cc) {
+				task1 = null;
 				if (cc != null) {
 					conference = cc;
 					updateLocations(conference);
@@ -74,7 +79,8 @@ public class CVSessionList extends SessionSwipeActivity {
 					finish();
 				}
 			}
-		}).execute(getConferenceId());
+		});
+		task1.execute(getConferenceId());
 	}
 
 	public void switchTo(int paramInt) {

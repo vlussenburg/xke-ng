@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import com.github.droidfu.DroidFuApplication;
 import com.xebia.xcoss.axcv.logic.ProfileManager;
 import com.xebia.xcoss.axcv.logic.cache.DataCache;
+import com.xebia.xcoss.axcv.logic.cache.DataCache.Type;
 import com.xebia.xcoss.axcv.logic.cache.MemoryCache;
 import com.xebia.xcoss.axcv.model.Conference;
 import com.xebia.xcoss.axcv.model.Rate;
@@ -77,17 +78,21 @@ public class ConferenceViewerApplication extends DroidFuApplication {
 	}
 
 	public DataCache getCache() {
-		if (storage == null) {
-			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-			String type = null;
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+		String type = sp.getString(XCS.PREF.CACHETYPE, null);
+		Type typeOf = DataCache.Type.valueOf(type);
+		if (typeOf == null) {
+			typeOf = DataCache.Type.Memory;
+			sp.edit().putString(XCS.PREF.CACHETYPE, typeOf.name()).commit();
+		}
+
+		if (storage == null || typeOf != storage.getType()) {
+			if ( storage != null) {
+				storage.destroy();
+			}
 			try {
-				type = sp.getString(XCS.PREF.CACHETYPE, null);
-				if (type == null) {
-					type = DataCache.Type.Memory.name();
-					sp.edit().putString(XCS.PREF.CACHETYPE, type).commit();
-				}
 				Log.i(XCS.LOG.PROPERTIES, "Using storage type: " + type);
-				storage = DataCache.Type.valueOf(type).newInstance(this);
+				storage = typeOf.newInstance(this);
 			}
 			catch (Exception e) {
 				Log.w(XCS.LOG.PROPERTIES,

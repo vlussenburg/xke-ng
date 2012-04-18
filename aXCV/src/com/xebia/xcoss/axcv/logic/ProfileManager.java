@@ -21,7 +21,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 
 	private static final int DAYS_TO_KEEP_IN_CACHE = 1;
 
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 
 	private static final String DATABASE_NAME = "xkeng.db";
 	private static final String TRACK_TABLE = "Track";
@@ -34,7 +34,8 @@ public class ProfileManager extends SQLiteOpenHelper {
 	private static final String SES_COL_DATE = "timestamp";
 	private static final String SES_COL_CONF = "cid";
 	private static final String CACHE_COL_KEY = "key";
-	private static final String CACHE_COL_OBJ = "value";
+//	private static final String CACHE_COL_OBJ = "value";
+	private static final String CACHE_COL_BLOB = "bvalue";
 	private static final String CACHE_COL_DATE = "timestamp";
 
 	private static final String SES_QUERY_TRACKABLE = SES_COL_USER + " = ? AND " + SES_COL_SESSION + " = ?";
@@ -89,6 +90,7 @@ public class ProfileManager extends SQLiteOpenHelper {
 	}
 
 	private void checkConnection() {
+		openConnection();
 		if (database == null) {
 			String who = DebugUtil.whoCalledMe();
 			throw new SQLException(Messages.getString("SQLException.0", who));
@@ -128,8 +130,8 @@ public class ProfileManager extends SQLiteOpenHelper {
 		create.append(" (");
 		create.append(CACHE_COL_KEY);
 		create.append(" text primary key not null, ");
-		create.append(CACHE_COL_OBJ);
-		create.append(" text not null,");
+		create.append(CACHE_COL_BLOB);
+		create.append(" blob,");
 		create.append(CACHE_COL_DATE);
 		create.append(" datetime);");
 		db.execSQL(create.toString());
@@ -269,7 +271,6 @@ public class ProfileManager extends SQLiteOpenHelper {
 	}
 
 	private void updateSession(Trackable trackable, String table) {
-		int update = -1;
 		ContentValues values = new ContentValues();
 
 		try {
@@ -279,12 +280,10 @@ public class ProfileManager extends SQLiteOpenHelper {
 			values.put(SES_COL_DATE, trackable.date);
 			whereArgs[0] = trackable.userId;
 			whereArgs[1] = String.valueOf(trackable.sessionId);
-			update = database.update(table, values, SES_QUERY_TRACKABLE, whereArgs);
+			database.update(table, values, SES_QUERY_TRACKABLE, whereArgs);
 		}
 		catch (Exception e) {
 			Log.w(XCS.LOG.COMMUNICATE, "Update failed: " + StringUtil.getExceptionMessage(e));
-		}
-		if (update == 0) {
 			try {
 				values.put(SES_COL_USER, trackable.userId);
 				values.put(SES_COL_SESSION, trackable.sessionId);
@@ -293,8 +292,8 @@ public class ProfileManager extends SQLiteOpenHelper {
 				values.put(SES_COL_HASH, trackable.hash);
 				database.insert(table, null, values);
 			}
-			catch (Exception e) {
-				Log.w(XCS.LOG.COMMUNICATE, "Insert failed: " + StringUtil.getExceptionMessage(e));
+			catch (Exception ex) {
+				Log.w(XCS.LOG.COMMUNICATE, "Insert failed: " + StringUtil.getExceptionMessage(ex));
 			}
 		}
 	}
@@ -329,12 +328,12 @@ public class ProfileManager extends SQLiteOpenHelper {
 	private String[] doGetCachedObjects(String whereCause, String[] whereArgs) {
 		try {
 			checkConnection();
-			Cursor query = database.query(CACHE_TABLE, new String[] { CACHE_COL_OBJ }, whereCause, whereArgs, null,
+			Cursor query = database.query(CACHE_TABLE, new String[] { CACHE_COL_BLOB }, whereCause, whereArgs, null,
 					null, null);
 			String[] result = new String[query.getCount()];
 			int i = 0;
 			for (query.moveToFirst(); !query.isAfterLast(); query.moveToNext()) {
-				result[i++] = query.getString(query.getColumnIndex(CACHE_COL_OBJ));
+				result[i++] = query.getString(query.getColumnIndex(CACHE_COL_BLOB));
 			}
 			query.close();
 			return result;
@@ -346,29 +345,26 @@ public class ProfileManager extends SQLiteOpenHelper {
 	}
 
 	public void updateCachedObject(String key, String value) {
-		int update = -1;
 		ContentValues values = new ContentValues();
 		long now = System.currentTimeMillis();
 		try {
 			checkConnection();
 			String[] whereArgs = new String[] { key };
 			values.put(CACHE_COL_KEY, key);
-			values.put(CACHE_COL_OBJ, value);
+			values.put(CACHE_COL_BLOB, value);
 			values.put(CACHE_COL_DATE, now);
-			update = database.update(CACHE_TABLE, values, CACHE_QUERY, whereArgs);
+			database.update(CACHE_TABLE, values, CACHE_QUERY, whereArgs);
 		}
 		catch (Exception e) {
 			Log.w(XCS.LOG.COMMUNICATE, "Update failed: " + StringUtil.getExceptionMessage(e));
-		}
-		if (update == 0) {
 			try {
 				values.put(CACHE_COL_KEY, key);
-				values.put(CACHE_COL_OBJ, value);
+				values.put(CACHE_COL_BLOB, value);
 				values.put(CACHE_COL_DATE, now);
 				database.insert(CACHE_TABLE, null, values);
 			}
-			catch (Exception e) {
-				Log.w(XCS.LOG.COMMUNICATE, "Insert failed: " + StringUtil.getExceptionMessage(e));
+			catch (Exception ex) {
+				Log.w(XCS.LOG.COMMUNICATE, "Insert failed: " + StringUtil.getExceptionMessage(ex));
 			}
 		}
 	}
@@ -398,8 +394,19 @@ public class ProfileManager extends SQLiteOpenHelper {
 	}
 
 	@Override
-	public void onUpgrade(SQLiteDatabase paramSQLiteDatabase, int paramInt1, int paramInt2) {
-		// Not supported for the first release.
+	public void onUpgrade(SQLiteDatabase db, int oldId, int newId) {
+		db.beginTransaction();
+		try {
+			if (oldId == 1 && newId > 1) {
+				db.execSQL("alter table " + CACHE_TABLE + " ADD COLUMN  " + CACHE_COL_BLOB + " blob;");
+			}
+			if (oldId <= 2 && newId > 2) {
+			}
+			Log.d("upgrade", "Successful");
+			db.setTransactionSuccessful();
+		} finally {
+			db.endTransaction();
+		}
 	}
 
 	public void removeAllCache() {

@@ -12,7 +12,7 @@ public class MemoryCache extends DataCache {
 	private HashMap<String, CachedObject<?>> cachedObjects;
 
 	public MemoryCache(Context ctx) {
-		super(ctx);
+		super(ctx, Type.Memory);
 		this.cachedObjects = new HashMap<String, CachedObject<?>>();
 	}
 	

@@ -23,8 +23,8 @@ public class RetrieveConferenceTask extends CVTask<String, Void, Conference> {
 				if (result == null) {
 					String requestUrl = getRequestUrl("/conference/", id);
 					result = RestClient.loadObject(requestUrl, Conference.class);
+					getStorage().add(result);
 				}
-				getStorage().add(result);
 				return result;
 			}
 		}
