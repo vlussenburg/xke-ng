@@ -35,16 +35,9 @@ object Assembly extends Logger {
   }
 
   trait RestHandlerComponentImpl extends RestHandlerComponent with RepositoryComponentImpl
-
-  object XKENGSecuredAPIAssembly extends XKENGSecuredAPI with RestHandlerComponentImpl {
-
-  }
-
-  class XKENGPublicAPIAssembly extends XKENGPublicAPI with RestHandlerComponentImpl {
-
-  }
-
-  class ExceptionHandlerAssembly extends ExceptionHandler {}
+  object XKENGSecuredAPIAssembly extends XKENGSecuredAPI with RestHandlerComponentImpl 
+  class XKENGPublicAPIAssembly extends XKENGPublicAPI with RestHandlerComponentImpl 
+  object ExceptionHandlerAssembly extends ExceptionHandler
 
   def init() = {
     initMongoDB()
@@ -58,7 +51,7 @@ object Assembly extends Logger {
     info("MongoDB properties= " + mo)
     MongoDB.defineDb(DefaultMongoIdentifier, new Mongo(srvr, mo), Props.get("mongo.db.name").getOrElse("xkeng"))
     ensureIndexes()
-    
+
     //Unittests with maven fail when indexes are ensured in ConferenceMetaData class. Here it works...
     def ensureIndexes() {
       Conference.ensureIndex(("begin" -> 1))

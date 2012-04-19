@@ -25,7 +25,7 @@ trait ExceptionHandlerHelper extends PartialFunction[(Props.RunModes.Value, Req,
   /**
    * Is the exception  helper defined for a given request
    */
-  def isDefinedAt(t: (Props.RunModes.Value, Req, Throwable)) = dispatch.find(_.isDefinedAt(t)).isDefined
+  override def isDefinedAt(t: (Props.RunModes.Value, Req, Throwable)) = dispatch.find(_.isDefinedAt(t)).isDefined
 
 }
 /**

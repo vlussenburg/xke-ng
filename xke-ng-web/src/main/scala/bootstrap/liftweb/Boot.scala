@@ -26,7 +26,7 @@ class Boot {
     val enableSecurity = Props.get("enable.secruity").map(_.trim.toBoolean).getOrElse(true)
 
     purgeAndPushTestdata(purge)
-    LiftRules.exceptionHandler.prepend(new ExceptionHandlerAssembly)
+    LiftRules.exceptionHandler.prepend(ExceptionHandlerAssembly)
     if (enableSecurity) {
       LiftRules.dispatch.append(new XKENGPublicAPIAssembly)
     } else {
