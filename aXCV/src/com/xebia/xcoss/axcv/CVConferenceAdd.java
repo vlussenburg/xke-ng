@@ -574,20 +574,28 @@ public class CVConferenceAdd extends AdditionActivity {
 			}
 		});
 		builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				DeleteConferenceTask dcTask = new DeleteConferenceTask(R.string.action_delete_conference, ctx, null);
+			public void onClick(final DialogInterface dialog, int which) {
+				DeleteConferenceTask dcTask = new DeleteConferenceTask(R.string.action_delete_conference, ctx, new TaskCallBack<Boolean>() {
+					@Override
+					public void onCalled(Boolean result) {
+						dialog.dismiss();
+						scb.onCalled(true);
+					}
+				});
 				dcTask.setMoveSessions(false);
 				dcTask.execute(conference);
-				dialog.dismiss();
-				scb.onCalled(true);
 			}
 		});
 		if (size > 0) {
 			builder.setNeutralButton(R.string.move_delete, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					new DeleteConferenceTask(R.string.action_delete_conference, ctx, null).execute(conference);
-					dialog.dismiss();
-					scb.onCalled(true);
+				public void onClick(final DialogInterface dialog, int id) {
+					new DeleteConferenceTask(R.string.action_delete_conference, ctx, new TaskCallBack<Boolean>() {
+						@Override
+						public void onCalled(Boolean result) {
+							dialog.dismiss();
+							scb.onCalled(true);
+						}
+					}).execute(conference);
 				}
 			});
 		}

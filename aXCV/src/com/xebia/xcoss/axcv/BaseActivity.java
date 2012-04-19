@@ -83,15 +83,15 @@ public abstract class BaseActivity extends BetterDefaultActivity {
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		if (id == XCS.DIALOG.WAITING) {
-			Dialog dialog = new Dialog(this, android.R.style.Theme_Translucent_NoTitleBar);
+			final Dialog dialog = new Dialog(this, android.R.style.Theme_Translucent_NoTitleBar);
 			dialog.setContentView(R.layout.waiting);
 			dialog.setCancelable(true);
-			dialog.setOnCancelListener(new OnCancelListener() {
-				@Override
-				public void onCancel(DialogInterface arg0) {
-					BaseActivity.this.finish();
-				}
-			});
+//			dialog.setOnCancelListener(new OnCancelListener() {
+//				@Override
+//				public void onCancel(DialogInterface arg0) {
+//					BaseActivity.this.finish();
+//				}
+//			});
 			return dialog;
 		}
 		return super.onCreateDialog(id);

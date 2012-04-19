@@ -52,7 +52,7 @@
 			android:title="Cache"
 			android:summary="Welk cachebeleid (herstart vereist)?"
 			android:key="CacheType"
-			android:defaultValue="1"
+			android:defaultValue="Memory"
 			android:entries="@array/cacheNames"
 			android:entryValues="@array/cacheClassNames" />
 	</PreferenceCategory>

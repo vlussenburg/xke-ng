@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">conferentie Viewer</string>
-    <string name="app_full_name">Xebia conferentie Viewer</string>
-    <string name="app_version">0.7</string>
-    <string name="app_help_url">http://xke.xebia.com/help</string>
-    
-    <string name="splash_conference">Xebia Knowledge Exchange</string>
-    <string name="splash_company">Xebia</string>
     <string name="splash_version">Versie %s</string>
-    <string name="splash_copyright">Copyright &#169; 2012 Xebia B.V.</string>
     <string name="splash_copyright2">Copyright &#169; 2012 Xebia B.V. Alle rechten voorbehouden.</string>
     <string name="menu_settings">Voorkeuren</string>
     <string name="menu_search">Zoeken</string>
@@ -143,7 +135,7 @@
     </string-array>
     
     <string name="close">Sluiten</string>
-    <string name="cancel">Annuleren</string>
+    <string name="cancel">Annuleer</string>
     <string name="cancelled">Geannuleerd</string>
     <string name="delete">Verwijder</string>
     <string name="error">Fout</string>
@@ -186,7 +178,7 @@
     <string name="conference_with_sessions">Deze conferentie heeft %d sessies</string>
     <string name="confirm_delete_conference">De conferentie \'%1$s\' op %2$s verwijderen?</string>
     <string name="delete_conference">Verwijder conferentie</string>
-    <string name="move_delete">Verplaats &amp; verwijder</string>
+    <string name="move_delete">Verplaats ook</string>
     <string name="failure_move_session">Mislukt! Een sessie kan niet worden verplaatst</string>
     <string name="add_location">Nieuw&#8230;</string>
     <string name="conference_detail">Details conferentie</string>

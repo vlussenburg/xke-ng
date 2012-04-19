@@ -27,8 +27,8 @@ public class DeleteConferenceTask extends CVTask<Conference, Void, Boolean> {
 				}
 			}
 			String requestUrl = getRequestUrl("/conference/", conference.getId());
-			getStorage().remove(conference);
 			RestClient.deleteObject(requestUrl);
+			getStorage().remove(conference);
 		}
 		return true;
 	}

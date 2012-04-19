@@ -23,9 +23,9 @@ Veel later op de client
 
 server
 -	Zoeken
--	403 on session expiration or invalid login
 -	Nieuwe datum conferentie leidt niet tot nieuwe datum sessies (wordt wel gestuurd)
--	Unimplemented fields of conference (organiser, description) and session (...)
+-	Unimplemented fields of conference (organiser, description)
+-	Unimplemented fields of session (...)
 -	Session scheduling
 -	Error handling (/error URL geeft 400 zonder verdere melding)
 -	Support conferenceId within session object (at least for search)
