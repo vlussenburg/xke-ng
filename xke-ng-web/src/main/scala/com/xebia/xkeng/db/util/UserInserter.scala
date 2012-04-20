@@ -1,13 +1,12 @@
-package com.xebia.xkeng.db
-import com.xebia.xkeng.dao.RepositoryTestAssembly._
+package com.xebia.xkeng.db.util
+import com.xebia.xkeng.assembly.Assembly._
 import com.atlassian.crowd.exception._
 import net.liftweb.util.Helpers._
 import com.atlassian.crowd.model.user.User
 import net.liftweb.util.Props
 import com.xebia.xkeng.model._
-import com.xebia.xkeng.dao.MongoTestConnection
 
-object UserInserter extends MongoTestConnection {
+object UserInserter extends RepositoryComponentImpl with MongoConnection {
   private val crowdSysUser = Props.get("crowd.sysuser").get
   private val crowdSysUserPwd = Props.get("crowd.sysuser.pwd").get
   private val crowdBase = Props.get("crowd.base.url").get

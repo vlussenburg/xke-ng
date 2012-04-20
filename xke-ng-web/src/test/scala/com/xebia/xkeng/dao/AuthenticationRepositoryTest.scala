@@ -1,8 +1,8 @@
 package com.xebia.xkeng.dao
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers
+	import org.junit.runner.RunWith
+	import org.scalatest.junit.JUnitRunner
+	import org.scalatest.matchers.ShouldMatchers
 import org.bson.types.ObjectId
 import org.scalatest.{ BeforeAndAfterEach, FlatSpec }
 import org.joda.time.DateTime
