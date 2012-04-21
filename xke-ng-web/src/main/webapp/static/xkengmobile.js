@@ -49,7 +49,7 @@ var LocalStorageAPI = {};
 		if(confId) {
 			var selectedConf = LocalStorageAPI.getConf();
 			if(selectedConf != null && selectedConf.id == confId) {
-				console.log('load local conf: ' + conf.id);
+				console.log('load local conf: ' + selectedConf);
 				callback(selectedConf);
 			} else {
 				console.log('load remote conf');

@@ -1,4 +1,4 @@
-package com.xebia.xkeng.rest
+package com.xebia.xkeng.assembly
 
 import com.xebia.xkeng.dao._
 import net.liftweb.util.Props
@@ -12,6 +12,10 @@ import net.liftweb.json.JsonDSL._
 import com.xebia.xkeng.model.{ Session, Location, Conference, Author, Facility, AuthorDoc, Labels, SlotInfo }
 import net.liftweb.mongodb.{ MongoDocument, ObjectIdSerializer, MongoDocumentMeta }
 import com.mongodb.BasicDBObject
+import com.xebia.xkeng.rest.XKENGPublicAPI
+import com.xebia.xkeng.rest.XKENGSecuredAPI
+import com.xebia.xkeng.rest.RestHandlerComponent
+import com.xebia.xkeng.rest.ExceptionHandler
 
 object Assembly extends Logger {
 

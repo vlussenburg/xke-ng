@@ -4,7 +4,7 @@ import _root_.net.liftweb.common._
 import _root_.net.liftweb.http._
 import _root_.net.liftweb.http.provider._
 import _root_.net.liftweb.sitemap._
-import com.xebia.xkeng.rest.Assembly._
+import com.xebia.xkeng.assembly.Assembly._
 import com.xebia.xkeng.rest.XKENGSecurityInterceptor
 import net.liftweb.util.Props
 import net.liftweb.mongodb.{ DefaultMongoIdentifier, MongoDB }

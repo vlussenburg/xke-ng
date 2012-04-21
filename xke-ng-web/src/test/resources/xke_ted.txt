@@ -1,0 +1,20 @@
+|| Who || Time || Title || Notes ||
+| Laurens Bonnema \\ | 5m | How to Sweeten A Bitter Manager \\ | |
+| Jan Vermeir | 15m | {color:#222222}How Mr. Kokee beats Ikea{color}\\ | |
+| Geert Bossuyt | 5m | The Essence of People First | |
+| Age Mooy | 15m | Topic to be decided later... | Either type classes in Scala, 10 great Javascript libraries you've never heard of, or something about Javascript Modules. Any requests? |
+| BREAK | 15m | | |
+| Gero Vermaas | 5m | How cycling changed architecture | |
+| Iwein Fuld | 15m | Developing for a Lean Startup \\ | |
+| Gerbrand van Dieijen | 5m | Everybody should learn to program | |
+| Wian Vos \\ | 15m | Topic tbd \\ | |
+| DINER |60m | | |
+| Wilco Koorn \\ | 5m | The "3-2-1 BANG ! ! !" Use-case. \\ | |
+| Olav Maassen | 15m | How to write a graphic novel | |
+| Kris Geusebroek | 5m | Parsing: everybody should know it | About the use of Scala Parser Combinators |
+| Raymond Roestenburg | 15m | Herding Actors in the Zoo | A talk about how you can use Apache Zookeeper as a reliable key/value store and coordination service for configuring fault tolerant actor systems \\ |
+| BREAK | 15m | | |
+| Cees Hupkes \\ | 5m | Topic tbd \\ | |
+| Vincent Partington \\ | 15m | Lab adventures (working title) \\ | |
+| Mystery Guest | 5m | {color:#222222}What if Bic would create software?{color} | |
+| Erik van der Velde | 15m | Lean in an Agile world | |

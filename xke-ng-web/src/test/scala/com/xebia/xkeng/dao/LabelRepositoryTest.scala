@@ -22,7 +22,7 @@ class LabelRepositoryTest extends FlatSpec with ShouldMatchers with BeforeAndAft
   override def beforeEach() {
     init()
 
-    createTestData();
+	createTestData();
   }
 
   private def createTestData() = {
