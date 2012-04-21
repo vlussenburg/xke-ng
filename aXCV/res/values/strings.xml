@@ -3,7 +3,7 @@
 
     <string name="app_name">Conference Viewer</string>
     <string name="app_full_name">Xebia Conference Viewer</string>
-    <string name="app_version">0.7.2</string>
+    <string name="app_version">0.7.3</string>
     <string name="app_help_url">http://xke.xebia.com/help</string>
     
     <string name="splash_conference">Xebia Knowledge Exchange</string>

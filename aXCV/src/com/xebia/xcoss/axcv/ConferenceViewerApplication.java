@@ -80,7 +80,13 @@ public class ConferenceViewerApplication extends DroidFuApplication {
 	public DataCache getCache() {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 		String type = sp.getString(XCS.PREF.CACHETYPE, null);
-		Type typeOf = DataCache.Type.valueOf(type);
+		Type typeOf = null;
+		try {
+			typeOf = DataCache.Type.valueOf(type);
+		} catch (Exception e) {
+			// ignore
+		}
+		
 		if (typeOf == null) {
 			typeOf = DataCache.Type.Memory;
 			sp.edit().putString(XCS.PREF.CACHETYPE, typeOf.name()).commit();

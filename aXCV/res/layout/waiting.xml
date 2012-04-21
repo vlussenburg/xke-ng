@@ -3,9 +3,9 @@
     android:id="@+id/FrameLayout1"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
-
+
     <LinearLayout
-        android:id="@+id/LLayaout1"
+        android:id="@+id/progressLayout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:gravity="center" >

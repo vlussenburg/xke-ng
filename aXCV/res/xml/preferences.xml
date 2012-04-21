@@ -52,7 +52,7 @@
 			android:title="Caching"
 			android:summary="Which caching policy (requires restart)?"
 			android:key="CacheType"
-			android:defaultValue="1"
+			android:defaultValue="Memory"
 			android:entries="@array/cacheNames"
 			android:entryValues="@array/cacheClassNames" />
 	</PreferenceCategory>

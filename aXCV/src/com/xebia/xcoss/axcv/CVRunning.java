@@ -63,6 +63,9 @@ public class CVRunning extends SessionSwipeActivity {
 			public void onCalled(Conference cc) {
 				if (cc != null) {
 					conference = cc;
+					
+					updateMoment();
+					
 					setConferenceId(conference);
 					TextView title = (TextView) findViewById(R.id.conferenceTitle);
 					title.setText(cc.getTitle());
@@ -89,6 +92,18 @@ public class CVRunning extends SessionSwipeActivity {
 				}
 			}
 		}).execute(getConferenceId());
+	}
+
+	private void updateMoment() {
+		int from = conference.getStartTime().asMinutes();
+		if ( moment < from ) {
+			moment = from;
+			return;
+		}
+		int to = conference.getEndTime().asMinutes();
+		if ( moment > to ) {
+			moment = to - TIME_DELTA;
+		}
 	}
 
 	private void updateTimeNavigation() {
