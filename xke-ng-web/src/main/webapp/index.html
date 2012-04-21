@@ -185,23 +185,12 @@
 		$("#conf-title").html(confTitle)	
 		for (slotIndex in response.slots) {
 			var slot = response.slots[slotIndex]
-			$("#conf-list").append(
-					"<li data-role='list-divider'>" + slot.from + " - "
-							+ slot.to + "</li>")
+			$("#conf-list").append("<li data-role='list-divider'>" + slot.from + " - " + slot.to + "</li>")
 			for (sessionsIndex in slot.sessions) {
 				var session = slot.sessions[sessionsIndex]
 				var authors = getAuthors(session)
-				var authorsSnippet = ""
-				if(authors) {
-					authorsSnippet = "by: " + authors + "<br/>"
-				}
-/* 				$("#conf-list").append(
-						"<li><a href='javascript:changeToSessionDetailsPage(\""
-								+ session.id + "\");'><span><i>" + splitText(session.title, 32, '<br>')
-								+ "</i></span><br><br><p>by: " + authors + "</p><span class='ui-li-aside'> "
-								+ "</i></span><br><p>labels: " + session.labels + "</p><span class='ui-li-aside'> "
-								+ session.location.description + "&nbsp;&nbsp;&nbsp;</span></a></li>")
- */				$("#conf-list").append(
+				var authorsSnippet = authors ? "by: " + authors + "<br/>" : ""
+				$("#conf-list").append(
 						"<li><a href='javascript:changeToSessionDetailsPage(\""
 								+ session.id + "\");'><span><h3><i>" + session.title
 								+ "</i></h3></span><p>" + authorsSnippet
@@ -241,11 +230,7 @@
 	function sessionSuccessCallback(session) {
 		$.mobile.hidePageLoadingMsg();
 		var authors = getAuthors(session)
-		var authorsSnippet = ""
-		if(authors) {
-			authorsSnippet = "<p>by: " + authors + "</p>" 
-		}
-
+		var authorsSnippet = authors ? "<p>by: " + authors + "</p>" : ""
 		$("#session-title").html(getFormattedDate(session.startTime, "ddd, dd mmm yyyy"))
 		$("#detail-list").append(
 				"<li data-role='list-divider'>" + session.startTimeShort
