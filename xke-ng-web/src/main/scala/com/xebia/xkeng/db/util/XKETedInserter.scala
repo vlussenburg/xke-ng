@@ -32,12 +32,26 @@ object XKETedInserter extends RepositoryComponentImpl with MongoConnection {
     } else
       println("no existing conf found")
 
-    val schedule = List(SlotInfo(startDate, startDate.plusHours(5), "TED"))
+    val schedule = createSchedule(startDate)
     val c = Conference("XKE TED", startDate, startDate.plusHours(5), sess, List(l), schedule)
     c.save
     println("Saved " + c)
   }
 
+  def createSchedule(startDate: DateTime) = {
+    def createRecursively(lengths:List[(Int, String)], startDate:DateTime):List[SlotInfo] = {
+      lengths match {
+        case (length, sessionType) :: tail => {
+          val end = startDate.plusHours(length);
+          SlotInfo(startDate, end, sessionType) :: createRecursively(tail, end)
+        }
+        case _ => Nil
+      }
+    }
+    val lengths = List((2, "Session"),(1, "Diner"),(2, "Session"))
+    createRecursively(lengths, startDate)
+  }
+  
   def createOrGetLocation(name: String): Location = {
     facilityRepository.findLocationByName(name) match {
       case Some(l) => l
@@ -53,24 +67,32 @@ object XKETedInserter extends RepositoryComponentImpl with MongoConnection {
     parts match {
       case head :: tail => {
         val (s, end) = createSession(head, start, l)
-        s :: processParts(tail, end, l)
+        s match {
+          case Some(session) => session :: processParts(tail, end, l)
+          case None => processParts(tail, end, l)
+        }
       }
       case _ => Nil
     }
   }
 
-  private def createSession(s: Part, start: DateTime, l: Location): (XKESession, DateTime) = {
+  private def createSession(s: Part, start: DateTime, l: Location): (Option[XKESession], DateTime) = {
     s match {
       case s: Session => {
         val authorOpt = authorRepository.findAuthorByName(s.who)
         val end = start.plusMinutes(s.minutes)
         val s1 = XKESession(start, end, l, s.title, s.notes, "TED", "Unlimited", authorOpt.map(a => List(a)).getOrElse(Nil))
-        (s1, end)
+        (Some(s1), end)
       }
-      case s: Break => {
-        val end = start.plusMinutes(s.minutes)
-        val s1 = XKESession(start, end, l, s.breakType, s.breakType, "TED", "Unlimited")
-        (s1, end)
+      case Break("BREAK", minutes) => {
+        val end = start.plusMinutes(minutes)
+        (None, end)
+      }
+      case b @ Break("DINER", _) => {
+        val start = fmt.parseDateTime("2012-04-24T18:00:00.000Z")
+        val end = start.plusMinutes(b.minutes)
+        val s1 = XKESession(start, end, Location("Maup", 30), b.breakType, b.breakType, "TED", "Unlimited")
+        (Some(s1), end)
       }
     }
   }
