@@ -19,7 +19,9 @@ object XKETedInserter extends RepositoryComponentImpl with MongoConnection {
     val parts = parseParts()
     val l = createOrGetLocation("Laapersveld")
     val sess = processParts(parts, startDate, l)
-    replaceConferenceWithSessions(sess, startDate, l)
+    val overallTED = XKESession(sess.last.end, sess.last.end.plusMinutes(1), l, "[Overall Impression TED]", "Please provide a rating for your overall impression of this TED XKE", "TED", "Unlimited")
+    val overallApp = XKESession(sess.last.end, sess.last.end.plusMinutes(1), l, "[Feedback about this App]", "Please provide a rating about the usage of this application", "TED", "Unlimited")
+    replaceConferenceWithSessions(sess :+ overallTED :+ overallApp, startDate, l)
   }
 
   def replaceConferenceWithSessions(sess: List[XKESession], startDate: DateTime, l: Location) = {
