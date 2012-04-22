@@ -63,8 +63,8 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
   it should "serialize a slot correctly" in {
     val from = fmt.parseDateTime("2011-11-07T16:00:00.000Z")
     val to = fmt.parseDateTime("2011-11-07T17:00:00.000Z")
-    val expected: JValue = ("from" -> from.toString("HH:mm")) ~
-      ("to" -> to.toString("HH:mm")) ~
+    val expected: JValue = ("from" -> DATE_TIME_FORMAT.print(from)) ~
+      ("to" -> DATE_TIME_FORMAT.print(to)) ~
       ("sessions" -> List[Session]())
     val slot = Slot(from, to, Nil)
     slotsToJValue(slot) should be(expected)
@@ -76,7 +76,7 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
     val json = conferenceSlotsToJValue(c)
     val JArray(slots) = json \ "slots"
     val JString(from) = json \ "slots" \ "from"
-    from should be(xkeStartDate.toString("HH:mm"))
+    from should be(DATE_TIME_FORMAT.print(xkeStartDate))
   }
 
   it should "serialize a session with authors, comments and ratings" in {
