@@ -90,8 +90,6 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
       ("description" -> s1.description) ~
       ("startTime" -> fmt.print(s1.start)) ~
       ("endTime" -> fmt.print(s1.end)) ~
-      ("startTimeShort" -> s1.start.toString(TIME_FORMAT)) ~
-      ("endTimeShort" -> s1.end.toString(TIME_FORMAT)) ~
       ("limit" -> s1.limit) ~
       ("type" -> s1.sessionType) ~
       ("authors" -> List(a1)) ~
@@ -110,8 +108,6 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
       ("description" -> s1.description) ~
       ("startTime" -> fmt.print(s1.start)) ~
       ("endTime" -> fmt.print(s1.end)) ~
-      ("startTimeShort" -> s1.start.toString(TIME_FORMAT)) ~
-      ("endTimeShort" -> s1.end.toString(TIME_FORMAT)) ~
       ("authors" -> List[Author]()) ~
       ("limit" -> s1.limit) ~
       ("type" -> s1.sessionType) ~
