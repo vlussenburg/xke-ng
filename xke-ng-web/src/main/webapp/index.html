@@ -62,8 +62,12 @@
 					"pagehide",
 					function(event, ui) {
 						abortSelectConference();
+					}),
+			$("#rate").live(
+					"pagehide",
+					function(event, ui) {
+						cleanSessionDetails();
 					})
-					
 	});
 
 	function login() {
@@ -135,6 +139,11 @@
 	function abortSelectConference() {
 		$("#summary-list").empty()		
 	}
+
+	function abortSelectConference() {
+		$("#rate").empty()		
+	}
+
 	
 	function changeToConferencePage(id, next) {
 		$("#summary-list").empty()
