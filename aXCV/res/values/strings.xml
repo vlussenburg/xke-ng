@@ -3,7 +3,7 @@
 
     <string name="app_name">Conference Viewer</string>
     <string name="app_full_name">Xebia Conference Viewer</string>
-    <string name="app_version">0.7.4</string>
+    <string name="app_version">0.7.5</string>
     <string name="app_help_url">http://xke.xebia.com/help</string>
     
     <string name="splash_conference">Xebia Knowledge Exchange</string>
@@ -159,7 +159,7 @@
     <string name="auth_failed_title">Not authorized</string>
     <string name="auth_failed">Authentication failed for task \'%s\'. Please set credentials.</string>
     <string name="action_failed">Action failed</string>
-    <string name="communication_failure">Communication failure on \'%1$s\' due to %2$s.</string>
+    <string name="communication_failure">Failure on \'%1$s\': %2$s.</string>
     <string name="server_unreachable">Server unreachable</string>
     <string name="server_missing_url">No result for \'%s\'</string>
     <string name="server_timeout">Time out on \'%s\'</string>

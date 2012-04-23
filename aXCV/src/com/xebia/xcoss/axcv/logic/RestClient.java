@@ -339,6 +339,7 @@ public class RestClient {
 		} catch (Exception e) {
 			Log.e(XCS.LOG.COMMUNICATE, "Could not use secure connection: "
 					+ StringUtil.getExceptionMessage(e));
+			throw new RuntimeException(e);
 		}
 		ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager(
 				params, registry);

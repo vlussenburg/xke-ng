@@ -151,7 +151,7 @@
     <string name="auth_failed_title">Niet toegestaan</string>
     <string name="auth_failed">Actie \'%s\' is niet toegestaan. Geef de juiste toegangsgegevens op.</string>
     <string name="action_failed">Actie mislukt</string>
-    <string name="communication_failure">Communicatiefout bij \'%1$s\' veroorzaakt door %2$s.</string>
+    <string name="communication_failure">Fout bij \'%1$s\': %2$s.</string>
     <string name="server_unreachable">Server onbereikbaar</string>
     <string name="server_missing_url">Geen resultaat bij \'%s\'</string>
     <string name="server_timeout">Geen tijdige reactie op \'%s\'</string>
