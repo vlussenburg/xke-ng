@@ -194,7 +194,7 @@
 		$("#conf-title").html(confTitle)	
 		for (slotIndex in response.slots) {
 			var slot = response.slots[slotIndex]
-			$("#conf-list").append("<li data-role='list-divider'>" + slot.from + " - " + slot.to + "</li>")
+			$("#conf-list").append("<li data-role='list-divider'>" +  getFormattedDate(slot.from, "HH:MM") + " - " + getFormattedDate(slot.to, "HH:MM") + "</li>")
 			for (sessionsIndex in slot.sessions) {
 				var session = slot.sessions[sessionsIndex]
 				var authors = getAuthors(session)
@@ -242,8 +242,8 @@
 		var authorsSnippet = authors ? "<p>by: " + authors + "</p>" : ""
 		$("#session-title").html(getFormattedDate(session.startTime, "ddd, dd mmm yyyy"))
 		$("#detail-list").append(
-				"<li data-role='list-divider'>" + session.startTimeShort
-						+ " - " + session.endTimeShort + "</li>")
+				"<li data-role='list-divider'>" + getFormattedDate(session.startTime, "HH:MM")
+						+ " - " + getFormattedDate(session.endTime, "HH:MM") + "</li>")
 		$("#detail-list").append(
 				"<li><h3><i>" + session.title + "</i></h3>" + authorsSnippet + "</li>")
 		$("#detail-list").append("<li data-role='list-divider'>Location</li>")

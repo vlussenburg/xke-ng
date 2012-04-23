@@ -16,7 +16,7 @@ import com.xebia.xcoss.axcv.util.XCS;
 public class Session implements Serializable {
 
 	public enum Type {
-		 STANDARD, WORKSHOP, BRAINSTORM, BOOK, SUMMARY, STRATEGIC, INCUBATOR, MANDATORY, BREAK;
+		 STANDARD, WORKSHOP, BRAINSTORM, BOOK, SUMMARY, STRATEGIC, INCUBATOR, MANDATORY, BREAK, TED;
 	}
 
 	private static final long serialVersionUID = 1L;

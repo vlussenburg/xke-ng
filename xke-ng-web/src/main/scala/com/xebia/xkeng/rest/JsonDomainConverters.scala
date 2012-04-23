@@ -73,8 +73,6 @@ object JsonDomainConverters extends Logger {
       ("description" -> session.description) ~
       ("startTime" -> DATE_TIME_FORMAT.print(session.start)) ~
       ("endTime" -> DATE_TIME_FORMAT.print(session.end)) ~
-      ("startTimeShort" -> session.start.toString(TIME_FORMAT)) ~
-      ("endTimeShort" -> session.end.toString(TIME_FORMAT)) ~
       ("limit" -> session.limit) ~
       ("type" -> session.sessionType) ~
       ("authors" -> authorsToJArray(session.authors)) ~
@@ -158,8 +156,8 @@ object JsonDomainConverters extends Logger {
    * }
    */
   implicit def slotsToJValue(slot: Slot): JValue = {
-    ("from" -> slot.key.from.toString(TIME_FORMAT)) ~
-      ("to" -> slot.key.to.toString(TIME_FORMAT)) ~
+    ("from" -> DATE_TIME_FORMAT.print(slot.key.from)) ~
+      ("to" -> DATE_TIME_FORMAT.print(slot.key.to)) ~
       ("sessions" -> slot.sessions.map(sessionToJValue(_)))
   }
 
