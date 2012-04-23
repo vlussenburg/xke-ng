@@ -12,16 +12,16 @@ import com.xebia.xkeng.model.SlotInfo
 
 object XKETedInserter extends RepositoryComponentImpl with MongoConnection {
   val fmt = ISODateTimeFormat.dateTime()
+    val begin = fmt.parseDateTime("2012-04-24T14:00:00.000Z")
 
   def main(args: Array[String]) {
     init()
-    val startDate = fmt.parseDateTime("2012-04-24T16:00:00.000Z")
     val parts = parseParts()
     val l = createOrGetLocation("Laapersveld")
-    val sess = processParts(parts, startDate, l)
+    val sess = processParts(parts, begin, l)
     val overallTED = XKESession(sess.last.end, sess.last.end.plusMinutes(1), l, "[Overall Impression TED]", "Please provide a rating for your overall impression of this TED XKE", "TED", "Unlimited")
     val overallApp = XKESession(sess.last.end, sess.last.end.plusMinutes(1), l, "[Feedback about this App]", "Please provide a rating about the usage of this application", "TED", "Unlimited")
-    replaceConferenceWithSessions(sess :+ overallTED :+ overallApp, startDate, l)
+    replaceConferenceWithSessions(sess :+ overallTED :+ overallApp, begin, l)
   }
 
   def replaceConferenceWithSessions(sess: List[XKESession], startDate: DateTime, l: Location) = {
@@ -91,7 +91,7 @@ object XKETedInserter extends RepositoryComponentImpl with MongoConnection {
         (None, end)
       }
       case b @ Break("DINER", _) => {
-        val start = fmt.parseDateTime("2012-04-24T18:00:00.000Z")
+        val start = begin.plusHours(2)
         val end = start.plusMinutes(b.minutes)
         val s1 = XKESession(start, end, Location("Maup", 30), b.breakType, b.breakType, "TED", "Unlimited")
         (Some(s1), end)
