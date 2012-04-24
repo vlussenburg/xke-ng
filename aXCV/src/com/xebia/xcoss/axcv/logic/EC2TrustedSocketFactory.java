@@ -67,7 +67,7 @@ public class EC2TrustedSocketFactory extends SSLSocketFactory {
 			} else {
 				trustStore = KeyStore.getInstance("BKS");
 				trustStore.load(new BufferedInputStream(new FileInputStream(getTrustStorePath())),
-						getTrustStorePassword().toCharArray());
+						getTrustStorePassword());
 			}
 
 			return trustStore;
@@ -110,13 +110,13 @@ public class EC2TrustedSocketFactory extends SSLSocketFactory {
 		return path;
 	}
 
-	private static String getTrustStorePassword() {
+	private static char[] getTrustStorePassword() {
 		String password = System.getProperty("javax.net.ssl.trustStorePassword");
 
-		if (password == null)
-			password = "changeit";
-
-		return password;
+		if (password != null) {
+			return password.toCharArray();
+		}
+		return null;
 	}
 
 	@Override
