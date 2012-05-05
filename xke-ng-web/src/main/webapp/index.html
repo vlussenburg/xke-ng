@@ -312,7 +312,7 @@
 		$("#detail-list").append("<li><div id='comments'></div></li>")
 		renderComments(session.comments)
 		$("#detail-list").append("<li data-role='list-divider'><label id='comment-label' for='comment-block'>Your Comment</label></li>")
-		$("#comment-block").append("<div data-role='fieldcontain' ><textarea name='comment' id='comment' cols='50' rows='7'></textarea></div>")		
+		$("#comment-block").append("<div data-role='fieldcontain' ><textarea name='comment' id='comment' cols='35' rows='5'></textarea></div>")		
 		$("#comment-button").append("<button type='submit'>Send</button>")
        	$("#comment-button").trigger("create"); 
 		$("#detail-list").listview("refresh");
