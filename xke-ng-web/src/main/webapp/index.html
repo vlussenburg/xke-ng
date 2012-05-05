@@ -39,6 +39,8 @@
 			changeToConferencePage(null, false)
 		}
 	}
+
+	
 	$(document).bind("mobileinit", function(){
 			$("#conf").live(
 					"pageshow",
@@ -69,7 +71,7 @@
 						cleanSessionDetails();
 					})
 	});
-
+	
 	function login() {
 		$("#loginFailure").empty();
 		var username = $("#username").val();
@@ -89,14 +91,48 @@
 		ProxyAPI.logout(showLoginPage)
 	}
 
-	 function rate() {
-		 cleanSessionDetails()
-		 GuiState.forceSessionReload = true
-		 var rating = parseInt($("#slider-0").val())
-		 ProxyAPI.rateSession(GuiState.currentSessionId, rating, showSessionDetailsPage)
+	function rate() {
+		 var rating = parseInt($('#rating-select option:selected').val())
+		 resetRatingSelect(); 		
+		 ProxyAPI.rateSession(GuiState.currentSessionId, rating, updateRatings)
 	 }
 	 
+	 function resetRatingSelect() {
+		var select = $('#rating-select')
+		select.val($('option:first', select).val());
+		$('#rating-select').selectmenu('refresh', true);		
 
+	 }
+	 
+	 function updateRatings(ratings) {		 
+		$.mobile.hidePageLoadingMsg();
+		$("#rating-title").html(ratings.length + " Rating(s)")
+		var sum = 0;
+		for(index in ratings) {
+			sum += parseInt(ratings[index]);
+		}
+		var avgRating = Math.round((sum / ratings.length) / 2);
+		renderRatings(avgRating)	
+	 }
+
+	 function comment() {
+		 var comment = $('#comment').val()
+		 if(comment) {
+		 $('#comment').val("") 		
+		 ProxyAPI.commentSession(GuiState.currentSessionId, comment, updateComments)
+		 } else {
+			 alert("Please enter a comment.");
+		 }
+	 }
+	 
+	 function updateComments(comments) {		 
+		$.mobile.hidePageLoadingMsg();
+		$("#comments-title").html(comments.length + " Comment(s)")
+		$('#comments').empty();
+		renderComments(comments);
+		$("#detail-list").listview("refresh");
+	}
+	 
 	function showLoginPage() {
 		$.mobile.changePage("#login", {
 			transition : "fade"
@@ -114,11 +150,13 @@
 	function cleanSessionDetails() {
 		$("#detail-list").empty()
 		$("#rating-stars").empty()
-		$("#rate-button").empty()		
-		
+		$("#rate-button").empty()	
+		$("#comment-block").empty()	
+		$("#comment-button").empty()	
 	}
 
 	function showSessionDetailsPage() {
+		$.mobile.hidePageLoadingMsg();
 		$.mobile.changePage("#detail", {
 			transition : "slide"
 		});
@@ -201,9 +239,9 @@
 				var authorsSnippet = authors ? "by: " + authors + "<br/>" : ""
 				$("#conf-list").append(
 						"<li><a href='javascript:changeToSessionDetailsPage(\""
-								+ session.id + "\");'><span><h3><i>" + session.title
-								+ "</i></h3></span><p>" + authorsSnippet
-								+ session.location.description + "</p></a></li>")
+								+ session.id + "\");'><span><h3><div style='white-space:normal'><i>" + session.title
+								+ "</i></div></h3></span><div style='white-space:normal'><p>" + authorsSnippet
+								+ session.location.description + "</p></div></a></li>")
 			}
 		}
 		$("#conf-list").listview("refresh");
@@ -216,15 +254,15 @@
 			for(ratingIndex in ratings) {
 				total += ratings[ratingIndex].rate
 			}
-			return parseInt(total / ratings.length);		
+			var avg10Based = parseInt(total / ratings.length) 
+			return Math.round(avg10Based / 2);
 		}
 		return 0;
 	}
 
-	function renderRatings(ratings) {
+	function renderRatings(avgRating) {		
 		var maxRating = 5
-		var avgRating = Math.round(getRatingAverage(ratings) / 2)
-		var ratingStars = "<div style='margin: auto 1.5em; display: inline-block;'>"
+		var ratingStars = "";
 		for(var i = 0; i<maxRating; i++) {
 			if(avgRating != 0 && i == (avgRating -1)) {
 				ratingStars +="<input name='star1' type='radio' class='star' data-role='none' disabled='disabled' checked='checked' /> ";
@@ -232,20 +270,31 @@
 				ratingStars += "<input name='star1' type='radio' class='star' data-role='none' disabled='disabled' /> ";
 			}						
 		}
-		$("#rating-stars").html(ratingStars + " </div>")
-		$('input[type=radio].star').rating(); 
+		$("#rating-stars").html(ratingStars)
+		$('input[type=radio].star').rating(); 		
+	}
+	
+	function renderComments(comments) {		
+		var commentsSnippet = "";
+		if(comments) {
+			for(commentIndex in comments) {
+				var comment = comments[commentIndex];
+				commentsSnippet += "<p><b>" + comment.user + "</b></br>" + comment.comment + "</p><br/>";
+			}
+		}
+		$("#comments").append(commentsSnippet)
 	}
 	
 	function sessionSuccessCallback(session) {
 		$.mobile.hidePageLoadingMsg();
 		var authors = getAuthors(session)
-		var authorsSnippet = authors ? "<p>by: " + authors + "</p>" : ""
+		var authorsSnippet = authors ? "<div style='white-space:normal'><p>by: " + authors + "</p></div>" : ""
 		$("#session-title").html(getFormattedDate(session.startTime, "ddd, dd mmm yyyy"))
 		$("#detail-list").append(
 				"<li data-role='list-divider'>" + getFormattedDate(session.startTime, "HH:MM")
 						+ " - " + getFormattedDate(session.endTime, "HH:MM") + "</li>")
 		$("#detail-list").append(
-				"<li><h3><i>" + session.title + "</i></h3>" + authorsSnippet + "</li>")
+				"<li><h3><div style='white-space:normal'><i>" + session.title + "</i></div></h3>" + authorsSnippet + "</li>")
 		$("#detail-list").append("<li data-role='list-divider'>Location</li>")
 		$("#detail-list").append(
 				"<li>" + session.location.description + "<p class='ui-li-aside'>Max:"
@@ -256,10 +305,16 @@
 		$("#detail-list").append("<li data-role='list-divider'>Labels</li>")
 		$("#detail-list").append("<li>" + session.labels + "</li>")		
 		$("#detail-list").append(
-				"<li data-role='list-divider'>" + session.ratings.length + " Rating(s)</li>")
-		renderRatings(session.ratings)
-		$("#rate-button").append("<a href='#rate' data-role='button' data-rel='dialog' >Rate</a>")
-		$("#rate-button").trigger("create"); 
+				"<li data-role='list-divider'><div id='rating-title'>" + session.ratings.length + " Rating(s)</div></li>")
+		$("#detail-list").append("<li><div id='rating-stars'></div><br/><br/></li>")
+		renderRatings(getRatingAverage(session.ratings))
+		$("#detail-list").append("<li data-role='list-divider'><div id='comments-title'>" + session.comments.length + " Comment(s)</div></li>")
+		$("#detail-list").append("<li><div id='comments'></div></li>")
+		renderComments(session.comments)
+		$("#detail-list").append("<li data-role='list-divider'><label id='comment-label' for='comment-block'>Your Comment</label></li>")
+		$("#comment-block").append("<div data-role='fieldcontain' ><textarea name='comment' id='comment' cols='50' rows='7'></textarea></div>")		
+		$("#comment-button").append("<button type='submit'>Send</button>")
+       	$("#comment-button").trigger("create"); 
 		$("#detail-list").listview("refresh");
 	}
 	
@@ -283,8 +338,8 @@
 		</div>
 	</div>
 
-	<div data-role="page" id="conf">
 
+	<div data-role="page" id="conf">
 		<div data-role="header">
 			<h1><span id="conf-title">XKE</span></h1>	
 			<a href="javascript:logout();" data-rel="page" class="ui-btn-right" data-transition="fade">Logout</a>
@@ -295,6 +350,7 @@
 		</div>
 	</div>
 	
+	
 	<div data-role="page" id="detail" >
 		<div data-role="header">
 			<h1 id="detailHeader"><span id="session-title">Session</span></h1>
@@ -303,19 +359,29 @@
 		<div data-role="content">
 			<ul id="detail-list" data-role="listview" />	
 		</div>
-		<br/><div id="rating-stars"></div><br/>
-		<div id="rate-button"></div>
-
-<!--		<div data-role="footer" data-position="fixed">
+		<br/>				
+		<form action="javascript: comment();">
+		 	<div id='comment-block' align="center"></div>
+		 	<div id='comment-button'></div><br/><hr/><br/>
+		</form>
+		<div data-role="footer" data-position="fixed">
 			<div data-role="navbar">
 				<ul>
-					<li><a href="#current">Current</a></li>
-					<li><a href="#next" class="ui-btn-active">Next</a></li>
+					<li>				
+						<select id="rating-select" name="rating-select" data-native-menu="false">
+							<option value="0">Rating: </option>
+							<option value="2">1 Poor</option>
+							<option value="4">2 Fair</option>
+							<option value="6">3 Good</option>
+							<option value="8">4 Very Good</option>
+							<option value="10">5 Excellent</option>
+						</select>				
+					</li>
 				</ul>
 			</div>
 		</div>
- -->
 	</div>
+
 
 	<div data-role="dialog" id="chooseConference">
 		<div data-role="header">
@@ -326,19 +392,12 @@
 		</div>
 	</div>
 
-	<div data-role="page" id="rate">
-		<div data-role="header">
-			<h1 id="detailHeader">Rate Session</h1>
-		</div>
-		<div data-role="content">
-		<form action="javascript: rate();">
-			<div data-role="fieldcontain">
-			<input type="number" data-type="range" name="slider" id="slider-0" value="0" min="0" max="10" data-highlight="true"  />		
-			</div>
-			<button type="submit">Save</button>
-			</form>
-		</div>	
-	</div>
+<script type="text/javascript">
+$("#rating-select").change(function() {
+	rate()
+});
+ </script>
+
 
 </body>
 
