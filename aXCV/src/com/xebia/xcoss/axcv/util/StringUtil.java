@@ -4,7 +4,7 @@ package com.xebia.xcoss.axcv.util;
 
 public class StringUtil {
 
-	public static final int LEN = 50;
+	public static final int LEN = 80;
 	
 	public static boolean isEmpty(String value) {
 		return value == null || value.trim().length() == 0;
