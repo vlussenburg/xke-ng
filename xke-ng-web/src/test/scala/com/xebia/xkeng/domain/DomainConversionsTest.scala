@@ -217,7 +217,7 @@ class DomainConversionsTest extends FlatSpec with ShouldMatchers with BeforeAndA
   }
   it should "deserialize a comment correctly" in {
     val jsonString = """{"comment":"This is awesome"}"""
-    val Comment(comment, userId) = fromCommentJson(jsonString)
+    val Comment(comment, userId, date) = fromCommentJson(jsonString)
     comment should be("This is awesome")
     //TODO needs to be changed when login is implemented
     userId should be("guest")
