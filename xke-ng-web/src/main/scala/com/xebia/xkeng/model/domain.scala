@@ -299,7 +299,9 @@ object Slot {
 /**
  * Represents a comment for a session
  */
-case class Comment(comment: String, userId: String) extends ToJsonSerializer[Comment]
+case class Comment(comment: String, userId: String, date:DateTime = new DateTime()) extends ToJsonSerializer[Comment] with Ordered[Comment] {
+  override def compare(that:Comment) = this.date.compareTo(that.date)
+}
 
 /**
  * Represents a rating for a session
