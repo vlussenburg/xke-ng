@@ -279,7 +279,7 @@
 		if(comments) {		
 			for(commentIndex in comments) {
 				var comment = comments[commentIndex];
-				commentsSnippet +=  comment.user + ":<br/><span class='li-small-font'>" + comment.comment + "</span><br/>";
+				commentsSnippet +=  comment.user + ":<br/><span class='li-small-font'><i>" + comment.comment + "</i></span><br/>";
 			}
 			$("#detail-list").append("<li><div id='comments'></div></li>")
 			$("#comments").append(commentsSnippet)
