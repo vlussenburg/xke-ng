@@ -8,6 +8,7 @@
 
 <link rel="stylesheet" href="static/jquery.mobile-1.0.1.min.css" />
 <link rel="stylesheet" href="static/jquery.rating.css" />
+<link rel="stylesheet" href="static/xkengmobile.css" />
 <script type="text/javascript" src="static/jquery-1.6.4.min.js"></script>
 <script type="text/javascript" src="static/jquery.rating.js"></script>
 <script type="text/javascript" src="static/jquery.rating.pack.js"></script>
@@ -127,7 +128,6 @@
 	 
 	 function updateComments(comments) {		 
 		$.mobile.hidePageLoadingMsg();
-		$("#comments-title").html(comments.length + " Comment(s)")
 		$('#comments').empty();
 		renderComments(comments);
 		$("#detail-list").listview("refresh");
@@ -240,7 +240,7 @@
 				$("#conf-list").append(
 						"<li><a href='javascript:changeToSessionDetailsPage(\""
 								+ session.id + "\");'><span><h3><div style='white-space:normal'><i>" + session.title
-								+ "</i></div></h3></span><div style='white-space:normal'><p>" + authorsSnippet
+								+ "</i></div></h3></span><p class='li-small-font'>" + authorsSnippet
 								+ session.location.description + "</p></div></a></li>")
 			}
 		}
@@ -276,42 +276,39 @@
 	
 	function renderComments(comments) {		
 		var commentsSnippet = "";
-		if(comments) {
+		if(comments) {		
 			for(commentIndex in comments) {
 				var comment = comments[commentIndex];
-				commentsSnippet += "<p><b>" + comment.user + "</b></br>" + comment.comment + "</p><br/>";
+				commentsSnippet +=  comment.user + ":<br/><span class='li-small-font'>" + comment.comment + "</span><br/>";
 			}
+			$("#detail-list").append("<li><div id='comments'></div></li>")
+			$("#comments").append(commentsSnippet)
 		}
-		$("#comments").append(commentsSnippet)
+		
 	}
 	
 	function sessionSuccessCallback(session) {
 		$.mobile.hidePageLoadingMsg();
 		var authors = getAuthors(session)
-		var authorsSnippet = authors ? "<div style='white-space:normal'><p>by: " + authors + "</p></div>" : ""
+		var authorsSnippet = authors ? "<span class='li-small-font'>by: " + authors + "</span>" : ""
 		$("#session-title").html(getFormattedDate(session.startTime, "ddd, dd mmm yyyy"))
 		$("#detail-list").append(
 				"<li data-role='list-divider'>" + getFormattedDate(session.startTime, "HH:MM")
 						+ " - " + getFormattedDate(session.endTime, "HH:MM") + "</li>")
 		$("#detail-list").append(
 				"<li><h3><div style='white-space:normal'><i>" + session.title + "</i></div></h3>" + authorsSnippet + "</li>")
-		$("#detail-list").append("<li data-role='list-divider'>Location</li>")
 		$("#detail-list").append(
 				"<li>" + session.location.description + "<p class='ui-li-aside'>Max:"
 						+ session.limit + "</p></li>")
-		$("#detail-list").append(
-				"<li data-role='list-divider'>Description</li>")
-		$("#detail-list").append("<li>" + session.description + "</li>")
-		$("#detail-list").append("<li data-role='list-divider'>Labels</li>")
-		$("#detail-list").append("<li>" + session.labels + "</li>")		
+		$("#detail-list").append("<li data-role='list-divider'>Description</li>")
+		$("#detail-list").append("<li><span class='li-small-font'>" + session.description + "</span></li>")
 		$("#detail-list").append(
 				"<li data-role='list-divider'><div id='rating-title'>" + session.ratings.length + " Rating(s)</div></li>")
 		$("#detail-list").append("<li><div id='rating-stars'></div><br/><br/></li>")
 		renderRatings(getRatingAverage(session.ratings))
-		$("#detail-list").append("<li data-role='list-divider'><div id='comments-title'>" + session.comments.length + " Comment(s)</div></li>")
-		$("#detail-list").append("<li><div id='comments'></div></li>")
+		$("#detail-list").append("<li data-role='list-divider'><label id='comment-label' for='comment-block'>Comments</label></li>")				
 		renderComments(session.comments)
-		$("#detail-list").append("<li data-role='list-divider'><label id='comment-label' for='comment-block'>Your Comment</label></li>")
+		$("#detail-list").append("<li><form action='javascript: comment();'><div id='comment-block' align='center'></div><div id='comment-button'></div></form></li><br/><br/>");	
 		$("#comment-block").append("<div data-role='fieldcontain' ><textarea name='comment' id='comment' cols='35' rows='5'></textarea></div>")		
 		$("#comment-button").append("<button type='submit'>Send</button>")
        	$("#comment-button").trigger("create"); 
@@ -360,11 +357,6 @@
 		<div data-role="content">
 			<ul id="detail-list" data-role="listview" />	
 		</div>
-		<br/>				
-		<form action="javascript: comment();">
-		 	<div id='comment-block' align="center"></div>
-		 	<div id='comment-button'></div><br/><hr/><br/>
-		</form>
 		<div data-role="footer" data-position="fixed">
 			<div data-role="navbar">
 				<ul>
