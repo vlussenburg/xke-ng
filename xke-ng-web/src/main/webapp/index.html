@@ -281,7 +281,6 @@
 				var comment = comments[commentIndex];
 				commentsSnippet +=  comment.user + ":<br/><span class='li-small-font'><i>" + comment.comment + "</i></span><br/>";
 			}
-			$("#detail-list").append("<li><div id='comments'></div></li>")
 			$("#comments").append(commentsSnippet)
 		}
 		
@@ -307,6 +306,7 @@
 		$("#detail-list").append("<li><div id='rating-stars'></div><br/><br/></li>")
 		renderRatings(getRatingAverage(session.ratings))
 		$("#detail-list").append("<li data-role='list-divider'><label id='comment-label' for='comment-block'>Comments</label></li>")				
+		$("#detail-list").append("<li><div id='comments'></div></li>")
 		renderComments(session.comments)
 		$("#detail-list").append("<li><form action='javascript: comment();'><div id='comment-block' align='center'></div><div id='comment-button'></div></form></li><br/><br/>");	
 		$("#comment-block").append("<div data-role='fieldcontain' ><textarea name='comment' id='comment' cols='35' rows='5'></textarea></div>")		
