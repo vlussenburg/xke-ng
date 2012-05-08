@@ -136,15 +136,15 @@ trait RepositoryComponent {
       val offsetDate = new DateTime().hourOfDay.setCopy(16).minuteOfHour.setCopy(0).minusDays(1)
       val pastConferencesQry = ("begin" -> ("$lt" -> offsetDate.toString(MONG_DB_DATE_FORMAT)))
       val futureConferencesQry = ("begin" -> ("$gte" -> offsetDate.toString(MONG_DB_DATE_FORMAT)))
-      val pastSortQry = ("begin" -> 0)
+      val pastSortQry = ("begin" -> -1)
       val futureSortQry = ("begin" -> 1)
-      val past = if(amountPastConferences > 0) Conference.findAll(pastConferencesQry, pastSortQry, Limit(amountPastConferences)) else Nil
+      val past = if(amountPastConferences > 0) Conference.findAll(pastConferencesQry, pastSortQry, Limit(amountPastConferences)) reverse else Nil
       val future = if(amountFutureConferences > 0) Conference.findAll(futureConferencesQry, futureSortQry, Limit(amountFutureConferences)) else Nil
       val next = if(future.isEmpty) None else Some(future.head)
       (past ::: future, next)
     }
 
-  }
+  } 
 
   class SessionRepositoryImpl extends SessionRepository {
     def findSessionById(id: Long): Option[(Conference, Session)] = {
@@ -158,14 +158,12 @@ trait RepositoryComponent {
     def rateSessionById(id: Long, rating: Rating): List[Rating] = {
       val (conference, _) = getSessionById(id)
       val ratedSession = conference.rateSessionById(id, rating)
-      //conference.saveOrUpdate(ratedSession)
       ratedSession.ratings
     }
 
     def commentSessionById(id: Long, comment: Comment): List[Comment] = {
       val (conference, _) = getSessionById(id)
       val commentedSession = conference.commentSessionById(id, comment)
-      //conference.saveOrUpdate(commentedSession)
       commentedSession.comments
     }
 
