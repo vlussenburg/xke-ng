@@ -117,8 +117,8 @@ class ConferenceRepositoryTest extends FlatSpec with ShouldMatchers with BeforeA
     next.get.begin should be(xkeFuture1)
     conf should not be Nil
     conf.size should be(3)
-       val (conf2, next2) = conferenceRepository.findConferencesRange(3, 0)
-        next2 should be(None)
+    val (conf2, next2) = conferenceRepository.findConferencesRange(3, 0)
+    next2 should be(None)
     conf2 should not be Nil
   }
 

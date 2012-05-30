@@ -9,7 +9,7 @@ import org.bson.types.ObjectId
 import net.liftweb.json._
 import net.liftweb.common._
 import net.liftweb.json.JsonDSL._
-import com.xebia.xkeng.model.{ Session, Location, Conference, Author, Facility, AuthorDoc, Labels, SlotInfo }
+import com.xebia.xkeng.model.{ Session, Location, Conference, Author, Facility, AuthorDoc, Labels, SlotInfo, Comment }
 import net.liftweb.mongodb.{ MongoDocument, ObjectIdSerializer, MongoDocumentMeta }
 import com.mongodb.BasicDBObject
 import com.xebia.xkeng.rest.XKENGPublicAPI
@@ -106,7 +106,7 @@ object Assembly extends Logger {
     val slot2Start = slot1End
     val slot2End = slot2Start.plusMinutes(60)
     val schedule = SlotInfo(slot1Start, slot1End) :: SlotInfo(slot2Start, slot2End) :: Nil
-    val s1 = Session(slot1Start, slot1End, locations(0), "Mongo rocks", "Mongo is a paperless document database", "STRATEGIC", "10 people", List(a1), Nil, Nil, Set("Database", "Mongo", "Javascript"))
+    val s1 = Session(slot1Start, slot1End, locations(0), "Mongo rocks", "Mongo is a paperless document database", "STRATEGIC", "10 people", List(a1), Nil, List(Comment("Awesome session", "upeter"), Comment("Amazing technology", "amooy")), Set("Database", "Mongo", "Javascript"))
     val s2 = Session(slot1Start, slot1End, locations(1), "Scala rocks even more", "Scala is a codeless programming language", "STRATEGIC", "10 people", List(a2), Nil, Nil, Set("Scala", "Functions", "DSL"))
     val s3 = Session(slot1Start, slot2End, locations(2), "Zero Maintenance Middleware - A Continuous Delivery Concept", "Richard Pot and Erwin Embsen are developing / implementing Zero Maintenance Middleware at KVK. ZMM deals with the lifecycle of applications, operating systems and middleware, and is based on VMWare, Puppet and Deployit. ", "STRATEGIC", "15 people", List(a1, a2), Nil, Nil, Set("Scala", "Functional Programming", "Beauty"))
     val s4 = Session(slot2Start, slot2End, locations(0), "Deployment with puppet", "Even animals start to like deploying", "STRATEGIC", "20 people", List(a1, a2), Nil, Nil, Set("Middleware", "Deoployment", "Quick"))

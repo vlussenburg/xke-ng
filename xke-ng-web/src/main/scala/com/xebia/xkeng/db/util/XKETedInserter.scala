@@ -12,7 +12,7 @@ import com.xebia.xkeng.model.SlotInfo
 
 object XKETedInserter extends RepositoryComponentImpl with MongoConnection {
   val fmt = ISODateTimeFormat.dateTime()
-    val begin = fmt.parseDateTime("2012-04-24T14:00:00.000Z")
+  val begin = fmt.parseDateTime("2012-04-24T14:00:00.000Z")
 
   def main(args: Array[String]) {
     init()
@@ -41,7 +41,7 @@ object XKETedInserter extends RepositoryComponentImpl with MongoConnection {
   }
 
   def createSchedule(startDate: DateTime) = {
-    def createRecursively(lengths:List[(Int, String)], startDate:DateTime):List[SlotInfo] = {
+    def createRecursively(lengths: List[(Int, String)], startDate: DateTime): List[SlotInfo] = {
       lengths match {
         case (length, sessionType) :: tail => {
           val end = startDate.plusHours(length);
@@ -50,10 +50,10 @@ object XKETedInserter extends RepositoryComponentImpl with MongoConnection {
         case _ => Nil
       }
     }
-    val lengths = List((2, "Session"),(1, "Diner"),(2, "Session"))
+    val lengths = List((2, "Session"), (1, "Diner"), (2, "Session"))
     createRecursively(lengths, startDate)
   }
-  
+
   def createOrGetLocation(name: String): Location = {
     facilityRepository.findLocationByName(name) match {
       case Some(l) => l
