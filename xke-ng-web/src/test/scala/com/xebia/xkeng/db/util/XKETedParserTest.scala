@@ -23,7 +23,7 @@ class XKETedParserTest extends FlatSpec with ShouldMatchers with BeforeAndAfterE
   it should "parse a session correctly" in {
     val txt = """| [~kgeusebroek] | 5m | {color:#222222}Parsing: everybody should know it?{color} | About the use of Scala Parser Combinators \\ |"""
     val ts = XKETedParser.parseSource(txt, XKETedParser.session)
-    val expected = Session("[~kgeusebroek]", 5, "Parsing: everybody should know it?", "About the use of Scala Parser Combinators")
+    val expected = XKESession("[~kgeusebroek]", 5, "Parsing: everybody should know it?", "About the use of Scala Parser Combinators")
     ts should be(expected)
   }
   it should "parse sessions correctly" in {
