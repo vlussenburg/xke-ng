@@ -4,7 +4,7 @@ import net.liftweb.util.Helpers._
 import com.atlassian.crowd.model.user.User
 import net.liftweb.util.Props
 import com.xebia.xkeng.assembly.Assembly._
-import com.xebia.xkeng.model.{ Session => XKESession, Location, Conference, Author }
+import com.xebia.xkeng.model.{ Session, Location, Conference, Author }
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.DateTime
@@ -19,12 +19,12 @@ object XKETedInserter extends RepositoryComponentImpl with MongoConnection {
     val parts = parseParts()
     val l = createOrGetLocation("Laapersveld")
     val sess = processParts(parts, begin, l)
-    val overallTED = XKESession(sess.last.end, sess.last.end.plusMinutes(1), l, "[Overall Impression TED]", "Please provide a rating for your overall impression of this TED XKE", "TED", "Unlimited")
-    val overallApp = XKESession(sess.last.end, sess.last.end.plusMinutes(1), l, "[Feedback about this App]", "Please provide a rating about the usage of this application", "TED", "Unlimited")
+    val overallTED = Session(sess.last.end, sess.last.end.plusMinutes(1), l, "[Overall Impression TED]", "Please provide a rating for your overall impression of this TED XKE", "TED", "Unlimited")
+    val overallApp = Session(sess.last.end, sess.last.end.plusMinutes(1), l, "[Feedback about this App]", "Please provide a rating about the usage of this application", "TED", "Unlimited")
     replaceConferenceWithSessions(sess :+ overallTED :+ overallApp, begin, l)
   }
 
-  def replaceConferenceWithSessions(sess: List[XKESession], startDate: DateTime, l: Location) = {
+  def replaceConferenceWithSessions(sess: List[Session], startDate: DateTime, l: Location) = {
     val (year, month, day) = (startDate.getYear(), startDate.getMonthOfYear(), startDate.getDayOfMonth())
     println("%04d-%02d-%02d" format (year, month, day))
     val conf = conferenceRepository.findConferences(year, month, day)
@@ -65,7 +65,7 @@ object XKETedInserter extends RepositoryComponentImpl with MongoConnection {
     }
   }
 
-  def processParts(parts: Seq[Part], start: DateTime, l: Location): List[XKESession] = {
+  def processParts(parts: Seq[Part], start: DateTime, l: Location): List[Session] = {
     parts match {
       case head :: tail => {
         val (s, end) = createSession(head, start, l)
@@ -78,12 +78,12 @@ object XKETedInserter extends RepositoryComponentImpl with MongoConnection {
     }
   }
 
-  private def createSession(s: Part, start: DateTime, l: Location): (Option[XKESession], DateTime) = {
+  private def createSession(s: Part, start: DateTime, l: Location): (Option[Session], DateTime) = {
     s match {
-      case s: Session => {
+      case s: XKESession => {
         val authorOpt = authorRepository.findAuthorByName(s.who)
         val end = start.plusMinutes(s.minutes)
-        val s1 = XKESession(start, end, l, s.title, s.notes, "TED", "Unlimited", authorOpt.map(a => List(a)).getOrElse(Nil))
+        val s1 = Session(start, end, l, s.title, s.notes, "TED", "Unlimited", authorOpt.map(a => List(a)).getOrElse(Nil))
         (Some(s1), end)
       }
       case Break("BREAK", minutes) => {
@@ -93,7 +93,7 @@ object XKETedInserter extends RepositoryComponentImpl with MongoConnection {
       case b @ Break("DINER", _) => {
         val start = begin.plusHours(2)
         val end = start.plusMinutes(b.minutes)
-        val s1 = XKESession(start, end, Location("Maup", 30), b.breakType, b.breakType, "TED", "Unlimited")
+        val s1 = Session(start, end, Location("Maup", 30), b.breakType, b.breakType, "TED", "Unlimited")
         (Some(s1), end)
       }
     }

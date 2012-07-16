@@ -3,7 +3,7 @@ package com.xebia.xkeng.db.util
 import util.parsing.combinator.RegexParsers
 sealed trait Part
 case class Header(who: String, time: String, title: String, notes: String)
-case class Session(who: String, minutes: Int, title: String, notes: String) extends Part
+case class XKESession(who: String, minutes: Int, title: String, notes: String) extends Part
 case class Break(breakType: String, minutes: Int) extends Part
 
 object XKETedParser extends RegexParsers {
@@ -40,7 +40,7 @@ object XKETedParser extends RegexParsers {
   /** session **/
   def session = sep ~> (word <~ opt(wikiNewLine) <~ sep) ~ (timeToken <~ sep) ~ (opt(wikiStyle) ~> word <~ opt(wikiStyle) <~ opt(wikiNewLine) <~ sep) ~ opt(word) <~ opt(wikiNewLine) <~ sep <~ opt(newline) ^^ {
     case who ~ time ~ title ~ notes =>
-      val tr = Session(who.trim, time, title.trim, notes.getOrElse("").trim); tr
+      val tr = XKESession(who.trim, time, title.trim, notes.getOrElse("").trim); tr
   }
 
   /** Combine all**/
