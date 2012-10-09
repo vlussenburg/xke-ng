@@ -37,6 +37,3 @@ based on JSON, written in Scala and using ???.
 is a Play framework application. Download play at playframework.org
 and start with 'play run MockServer' in this directory.
 After the MockServer has started request a page: http://localhost:9000/conferences/2011
-
-## Info
-Michael van Leeuwen [mvanleeuwen@xebia.com]
