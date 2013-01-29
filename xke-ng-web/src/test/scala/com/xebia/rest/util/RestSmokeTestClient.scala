@@ -30,7 +30,7 @@ object RestSmokeTestClient {
     val secure: Boolean
   }
   case class LocalhostSecureCfg(host: String = "localhost", contextRoot: String = "xkeng", port: Int = 8443, secure: Boolean = true) extends Config
-  case class LocalhostCfg(host: String = "localhost", contextRoot: String = "xkeng", port: Int = 8080, secure: Boolean = false) extends Config
+  case class LocalhostCfg(host: String = "localhost", contextRoot: String = "xkeng", port: Int = 8020, secure: Boolean = false) extends Config
   case class AwsSecureCfg(host: String = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com", contextRoot: String = "xkeng", port: Int = 8443, secure: Boolean = true) extends Config
   case class AwsCfg(host: String = "ec2-46-137-184-99.eu-west-1.compute.amazonaws.com", contextRoot: String = "xkeng", port: Int = 8080, secure: Boolean = false) extends Config
   case class AwsApacheSecureCfg(host: String = "ssl-lb-xkeng-1607107363.eu-west-1.elb.amazonaws.com", contextRoot: String = "xkeng", port: Int = 443, secure: Boolean = true) extends Config
@@ -66,6 +66,13 @@ object RestSmokeTestClient {
     }
   }
 
+  def queryConferenceSlots(id: String): Option[Conference] = {
+    query("conference/" + id + "/slots") {
+      fromConferenceJson(_)
+    }
+  }
+
+  
   def deleteConference(id: String): Unit = {
     delete("conference/" + id)(printResp)
   }
@@ -142,13 +149,14 @@ object RestSmokeTestClient {
     println("Login...")
     val aPwd = new String(hexDecode("757065746572"))
     val aUser = "716AF9A87BD5A9735C20AC8FCED05F40"
-    val loggedIn = login(aPwd, aUser, false)
+    val loggedIn = login(aPwd, aUser, true)
 
     //    println("Create location")
     //    val l = addLocation(l3)
     //    assert(l.description == l3.description)
     //    println("new location %s" format l)
     //    
+
     println("Create new conference...")
     val newConf = addConference(c)
     assert(newConf._id == c._id)
@@ -194,6 +202,10 @@ object RestSmokeTestClient {
     println("commented session %s %s" format (newSession, comments))
     assert(comments.map(_.comment).contains(c1.comment))
 
+    println("Query conference slots...")
+    val slots = queryConferenceSlots(newConf._id.toString)
+    assert(slots != None)
+
     println("Delete session...")
     deleteSession(newSession.id)
     println("deleted session %s" format (newSession.id))
@@ -221,8 +233,30 @@ object RestSmokeTestClient {
     found = queryConference(newConf._id.toString)
     assert(found == None)
     println("found conference %s" format found)
+    
+    
 
   }
+  /*
+  
+        var found = queryConference(xke)
+    
+    
+    def calcRatings(session:Session) = {
+      val ratings = session.ratings
+            val sum = ratings.foldLeft(0)(_ + _.rate)
+      val total = ratings.size
+      (if (total == 0) 0 else sum / total, total)
+      "%s\t%s\t%s".format(session.title, if (total == 0) 0 else sum.toDouble / total.toDouble, total)
+
+    }
+    
+    val result = found.map{_.sessions map calcRatings}.getOrElse(List("Empty"))
+    result foreach println
+
+
+  
+  */
 
   trait RestClientHelper {
     val host: String
