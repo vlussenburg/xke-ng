@@ -32,6 +32,11 @@
 			<name>Scala-Tools Dependencies Repository for Releases</name>
 			<url>http://scala-tools.org/repo-snapshots</url>
 		</repository>
+    <repository>
+      <id>typesafe.snapshots</id>
+      <name>TypeSafe repo SnapShots</name>
+      <url>http://repo.typesafe.com/typesafe/snapshots</url>
+    </repository>
 		<repository>
 		  <id>atlassian</id>
 		  <name>Atlassian Dependencies Repository for Releases</name>
