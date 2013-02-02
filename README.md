@@ -9,19 +9,13 @@ Basically it consists of the following components:
 * Android front-end to browse through conference talks
 * REST services to manage talks
 
-There are five projects:
+There are three projects:
 
-  1. XCoSS (Xebia Conference Scheduling System - Java)
-  2. aXCV (Xebia Conference Viewer for Android)
-  3. iXCV (Xebia Conference Viewer for iPhone/iPad)
-  4. xke-ng-web (Xebia Conference Scheduling System - Scala)
-  5. MockServer (Mocks the xke-ng-web)
+  1. aXCV (Xebia Conference Viewer for Android)
+  2. xke-ng-web (Xebia Conference Scheduling System - Scala)
+  3. iXCV (not active yet)
 
 The projects are explained below:
-
-* XCoSS 
-is the server component with a web interface and REST services,
-based on XML and/or JSON, written in Java and using Hibernate.
 
 * aXCV
 is the Android 2+ client for viewing and editing conference sessions.
@@ -31,9 +25,9 @@ is currently not active, but will do the same as aXCV.
 
 * xke-ng-web 
 is the server component with a web interface and REST services,
-based on JSON, written in Scala and using ???.
+based on JSON, written in Scala with Lift and using JQuery and MongoDB as 
+backend database. For the administrator functionality will be AngularJS.
 
-* MockServer 
-is a Play framework application. Download play at playframework.org
-and start with 'play run MockServer' in this directory.
-After the MockServer has started request a page: http://localhost:9000/conferences/2011
+
+How to setup your environment is written down in the README.md files within the different 
+projects.
